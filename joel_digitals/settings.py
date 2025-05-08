@@ -128,9 +128,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# Für Entwicklungsserver:
+# Wenn du während der Entwicklung zusätzliche statische Dateien hast
 STATICFILES_DIRS = [
-    BASE_DIR / 'main' / 'static',  # passe ggf. an deinen Pfad an
+    BASE_DIR / "static",  # Dein static Ordner
 ]
 
 

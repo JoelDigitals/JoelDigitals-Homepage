@@ -22,7 +22,6 @@ def home(request):
 
 #register 
 def register_view(request):
-    user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -31,7 +30,7 @@ def register_view(request):
             return redirect('login')
     else:
         form = UserCreationForm()
-    return render(request, 'main/register.html', {'form': form}, {'user_groups': user_groups})
+    return render(request, 'main/register.html', {'form': form})
 
 def login_view(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
@@ -43,12 +42,14 @@ def login_view(request):
             return redirect('home')  # oder eine andere Zielseite
     else:
         form = AuthenticationForm()
-    return render(request, 'main/login.html', {'form': form}, {'user_groups': user_groups})
+    return render(request, 'main/login.html', {'form': form, 'user_groups': user_groups})
+
+from django.shortcuts import redirect
 
 def logout_view(request):
-    user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     logout(request)
-    return redirect('home', {'user_groups': user_groups})
+    return redirect('home')  # KEINE weiteren Argumente hier
+
 
 def about_view(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []

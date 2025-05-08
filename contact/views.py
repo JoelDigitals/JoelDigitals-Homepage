@@ -12,7 +12,7 @@ def is_Support_Ticket_Admin(user):
     return user.groups.filter(name='Admin Support').exists()
 
 def is_Sales_Editor(user):
-    return user.groups.filter(name='Sales').exists()
+    return user.groups.filter(name='Selling').exists()
 
 def is_Support_Editor(user):
     return user.groups.filter(name='Support').exists()
@@ -38,7 +38,7 @@ def contact_view(request):
         messages.success(request, "Deine Nachricht wurde erfolgreich gesendet.")
         return redirect('contact_form')
 
-    return render(request, 'contact/contact.html', {'form': form}, {'user_groups': user_groups})
+    return render(request, 'contact/contact.html', {'form': form, 'user_groups': user_groups})
 
 @login_required
 def sales(request):
@@ -74,7 +74,7 @@ def sales(request):
         .prefetch_related('wishes', 'chat_messages')\
         .order_by('-created_at')
 
-    return render(request, 'contact/sales.html', {'entries': entries}, {'user_groups': user_groups})
+    return render(request, 'contact/sales.html', {'entries': entries, 'user_groups': user_groups})
 
 @login_required
 def sales_chat(request, entry_id):
@@ -101,8 +101,9 @@ def sales_chat(request, entry_id):
 
     return render(request, 'contact/sales_chat.html', {
         'entry': entry,
-        'messages': messages
-    }, {'user_groups': user_groups})
+        'messages': messages,
+        'user_groups': user_groups
+    })
 
 @login_required
 def send_chat_message(request, entry_id):
@@ -113,7 +114,6 @@ def send_chat_message(request, entry_id):
             SalesChatMessage.objects.create(entry=entry, user=request.user, message=message)
     return redirect('sales')
 
-
 @login_required
 def export_wishes(request):
     wishes = SalesWish.objects.all()
@@ -121,7 +121,6 @@ def export_wishes(request):
     response = HttpResponse(content, content_type='text/plain')
     response['Content-Disposition'] = f'attachment; filename=wunschliste.txt'
     return response
-
 
 @login_required
 def support_tickets(request):
@@ -141,8 +140,7 @@ def support_tickets(request):
         return redirect('support_tickets')
 
     tickets = SupportTicket.objects.filter(user=request.user).order_by('-created_at')  # hier auch "user"
-    return render(request, 'contact/support.html', {'form': form, 'tickets': tickets}, {'user_groups': user_groups})
-
+    return render(request, 'contact/support.html', {'form': form, 'tickets': tickets, 'user_groups': user_groups})
 
 @login_required
 def ticket_detail(request, ticket_number):
@@ -171,7 +169,8 @@ def ticket_detail(request, ticket_number):
         'ticket': ticket,
         'messages': messages_list,
         'form': form,
-    }, {'user_groups': user_groups})
+        'user_groups': user_groups
+    })
 
 @user_passes_test(is_Support_Editor or is_Support_Ticket_Admin)
 def admin_ticket_view(request):
@@ -184,19 +183,19 @@ def admin_ticket_view(request):
         if action == "toggle":
             ticket.is_resolved = not ticket.is_resolved
             ticket.save()
-    return render(request, 'contact/admin_tickets.html', {'tickets': tickets}, {'user_groups': user_groups})
+    return render(request, 'contact/admin_tickets.html', {'tickets': tickets, 'user_groups': user_groups})
 
 @user_passes_test(is_Sales_Editor)
 def admin_sales_view(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     entries = SalesEntry.objects.all().order_by('-created_at')
-    return render(request, 'contact/admin_sales.html', {'entries': entries}, {'user_groups': user_groups})
+    return render(request, 'contact/admin_sales.html', {'entries': entries, 'user_groups': user_groups})
 
 def sales_entry_detail(request, entry_id):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     entry = get_object_or_404(SalesEntry, id=entry_id)
     wishes = entry.wishes.all()
-    return render(request, 'contact/sales_entry_detail.html', {'entry': entry, 'wishes': wishes}, {'user_groups': user_groups})
+    return render(request, 'contact/sales_entry_detail.html', {'entry': entry, 'wishes': wishes, 'user_groups': user_groups})
 
 def add_wish(request, entry_id):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
@@ -215,7 +214,7 @@ def add_wish(request, entry_id):
     else:
         form = SalesWishForm()
 
-    return render(request, 'contact/wish_form.html', {'form': form, 'title': 'Neuen Wunsch hinzufügen'}, {'user_groups': user_groups})
+    return render(request, 'contact/wish_form.html', {'form': form, 'title': 'Neuen Wunsch hinzufügen', 'user_groups': user_groups})
 
 def edit_wish(request, entry_id, wish_id):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
@@ -227,7 +226,7 @@ def edit_wish(request, entry_id, wish_id):
             return redirect('sales_entry_detail', entry_id=entry_id)
     else:
         form = SalesWishForm(instance=wish)
-    return render(request, 'contact/wish_form.html', {'form': form, 'title': 'Wunsch bearbeiten'}, {'user_groups': user_groups})
+    return render(request, 'contact/wish_form.html', {'form': form, 'title': 'Wunsch bearbeiten', 'user_groups': user_groups})
 
 def delete_wish(request, entry_id, wish_id):
     wish = get_object_or_404(SalesWish, pk=wish_id)
@@ -245,4 +244,3 @@ def export_single_wish(request, entry_id, wish_id):
     response.write(f'Wunsch: {wish.wishes}\n')
     response.write(f'Erstellt am: {wish.created_at}\n')
     return response
-

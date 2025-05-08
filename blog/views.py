@@ -6,8 +6,9 @@ from .models import BlogPost, BlogCategory
 from .forms import BlogPostForm, BlogCategoryForm
 
 def is_blog_editor(user):
-    user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
-    return user.groups.filter(name='Marketing').exists()
+    return user.is_authenticated and user.groups.filter(name='Marketing').exists()
+
+
 
 def blog_list(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
@@ -42,7 +43,10 @@ def blog_detail(request, pk):
 def admin_blog(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     posts = BlogPost.objects.all().order_by('-created_at')
-    return render(request, 'blog/admin_blog.html', {'posts': posts}, {'user_groups': user_groups})
+    return render(request, 'blog/admin_blog.html', {
+        'posts': posts,
+        'user_groups': user_groups
+    })
 
 @user_passes_test(is_blog_editor)
 def blog_create(request):
