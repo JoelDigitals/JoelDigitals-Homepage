@@ -26,6 +26,8 @@ SECRET_KEY = 'django-insecure-7!2q=m-knqi1a#+7()qky&!*(*5k3^9(bb)*koh_y$&&i7x$da
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    '*',  # Erlaube alle Hosts (nicht für Produktion empfohlen)
+    'joel-digitals-homepage.vercel.app',
     '127.0.0.1', 
     'localhost',
     ]
