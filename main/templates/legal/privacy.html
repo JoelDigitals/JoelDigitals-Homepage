@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Privacy Policy – Joel Digitals</title>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(191, 185, 185);
+            color: #000;
+            font-size: 18px;
+        }
+
+        header {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 250px;
+            height: 111px;
+            object-fit: contain;
+        }
+
+        nav a {
+            color: #fff;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 40px 20px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        footer {
+            background-color: #0044cc;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 50px;
+            border-top: 1px solid #ccc;
+        }
+
+        footer a {
+            color: #ccc;
+            margin: 0 5px;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="/">
+        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
+    </a>
+    <nav style="margin-left: auto;">
+        <a href="/services/">Services</a> |
+        <a href="/about/">About Us</a> |
+        <a href="/contact/">Contact</a> |
+        <a href="/blog/">Blog</a> |
+        {% if user.is_authenticated %}
+            <a href="/auth/logout/">Logout</a>
+            {% if user.is_staff %}
+                | <a href="/contact/admin-tickets/">Admin: Tickets</a>
+                | <a href="/contact/admin-sales/">Admin: Sales</a>
+            {% endif %}
+        {% else %}
+            <a href="/auth/login/">Login</a>
+        {% endif %}
+    </nav>
+</header>
+
+<main>
+    <div class="container">
+        <h2>Privacy Policy</h2>
+        <p>Your privacy is important to us. This privacy policy explains how we collect, use, and protect your personal data in accordance with the General Data Protection Regulation (GDPR).</p>
+
+        <h3>1. Data Controller</h3>
+        <p>The data controller is:<br>
+        Joel Digitals<br>
+        Email: <a class="mail-link" href="mailto:joel-digitals@gmx.de">joel-digitals@gmx.de</a></p>
+
+        <h3>2. What Personal Data We Collect</h3>
+        <ul>
+            <li>Contact details (name, email, phone number)</li>
+            <li>IP address and browser user agent for analytics and security</li>
+            <li>Any other data you voluntarily provide (e.g. via contact form)</li>
+        </ul>
+
+        <h3>3. Why We Process Your Data</h3>
+        <ul>
+            <li>To provide our services</li>
+            <li>To respond to inquiries</li>
+            <li>To improve our website</li>
+            <li>To comply with legal obligations</li>
+        </ul>
+
+        <h3>4. Legal Basis</h3>
+        <p>We process your data based on Article 6 GDPR – especially based on your consent, contractual necessity, and legal obligations.</p>
+
+        <h3>5. Data Sharing</h3>
+        <p>We do not sell or rent your personal data. Data may be shared with service providers under data processing agreements.</p>
+
+        <h3>6. Your Rights</h3>
+        <ul>
+            <li>Access, correction, and deletion of your data</li>
+            <li>Withdrawal of consent</li>
+            <li>Data portability</li>
+            <li>Right to lodge a complaint with a supervisory authority</li>
+        </ul>
+
+        <h3>7. Data Security</h3>
+        <p>We use technical and organizational measures to protect your data.</p>
+
+        <h3>8. Retention</h3>
+        <p>We store your data only as long as necessary for the purposes stated above or as required by law.</p>
+
+        <h3>9. Contact</h3>
+        <p>For any data protection concerns, contact us at <a class="mail-link" href="mailto:joel-digitals@gmx.de">joel-digitals@gmx.de</a>.</p>
+    </div>
+</main>
+
+<footer>
+    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
+    <p>
+        <a href="/imprint/">Imprint</a> |
+        <a href="/privacy/">Privacy Policy</a> |
+        <a href="/terms/">Terms of Service</a> |
+        <a href="/">Home</a>
+    </p>
+</footer>
+</body>
+</html>

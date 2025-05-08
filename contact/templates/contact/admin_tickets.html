@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Joel Digitals - Admin Support Tickets</title>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(191, 185, 185);
+            color: #000;
+            font-size: 18px;
+        }
+
+        header {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 250px;
+            height: 111px;
+            object-fit: contain;
+        }
+
+        main {
+            padding: 40px 20px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 15px;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+
+        a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #1d00d9;
+        }
+
+        .ticket {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .status-open {
+            color: red;
+        }
+
+        .status-resolved {
+            color: green;
+        }
+
+        footer {
+            background-color: #0044cc;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 50px;
+            border-top: 1px solid #ccc;
+        }
+
+        footer a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="/">
+        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
+    </a>
+    <nav style="margin-left: auto;">
+        <a href="/services/">Services</a> |
+        <a href="/about/">About Us</a> |
+        <a href="/contact/">Contact</a> |
+        <a href="/blog/">Blog</a> |
+        <a href="/auth/logout/">Logout</a>
+    </nav>
+</header>
+
+<main>
+    <h2>🛠️ Admin Area: Support Tickets</h2>
+
+    {% if tickets %}
+        {% for ticket in tickets %}
+            <div class="ticket">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
+                    <strong>{{ ticket.subject }}</strong> – 
+                    <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
+                        {% if ticket.is_resolved %}Resolved{% else %}Open{% endif %}
+                    </span>
+                    <p><strong>From:</strong> {{ ticket.email }}<br>
+                    <strong>Created:</strong> {{ ticket.created_at|date:"d.m.Y H:i" }}</p>
+                    <p>{{ ticket.description|linebreaks }}</p>
+
+                    <label>Status:</label>
+                    <button type="submit" name="action" value="toggle" class="btn">
+                        {% if ticket.is_resolved %}Mark as Open{% else %}Mark as Resolved{% endif %}
+                    </button>
+                    <br><br>
+
+                    <label>Assign to:</label>
+                    <select name="assigned_to">
+                        <option value="">-- None --</option>
+                        {% for user in staff_users %}
+                            <option value="{{ user.id }}" {% if ticket.assigned_to == user %}selected{% endif %}>{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+
+                    <label>Priority:</label>
+                    <select name="priority">
+                        <option value="low" {% if ticket.priority == 'low' %}selected{% endif %}>Low</option>
+                        <option value="medium" {% if ticket.priority == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="high" {% if ticket.priority == 'high' %}selected{% endif %}>High</option>
+                    </select>
+                    <br><br>
+
+                    <input type="submit" name="action" value="update" class="btn">
+                    <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">View Chat</a>
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No tickets found.</p>
+    {% endif %}
+</main>
+
+<footer>
+    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
+    <p>
+        <a href="/imprint/">Imprint</a> |
+        <a href="/privacy/">Privacy Policy</a> |
+        <a href="/terms/">Terms of Service</a> |
+        <a href="/">Home</a>
+    </p>
+</footer>
+</body>
+</html>

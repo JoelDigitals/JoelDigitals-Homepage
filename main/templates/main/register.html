@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrieren – Joel Digitals</title>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(191, 185, 185);
+            color: #000;
+            font-size: 18px;
+        }
+        header { background-color: #0044cc; color: white; padding: 10px 20px; display: flex; align-items: center; }
+        .logo-img { width: 250px; height: 111px; object-fit: contain; }
+        nav a { color: #fff; margin: 0 10px; text-decoration: none; }
+        nav a:hover { text-decoration: underline; }
+        main { padding: 40px 20px; max-width: 600px; margin: auto; }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        h2 { color: #0044cc; }
+        .btn {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .btn:hover { background-color: #0033a0; }
+        footer {
+            background-color: #0044cc;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 50px;
+            border-top: 1px solid #ccc;
+        }
+        footer a {
+            color: #ccc;
+            margin: 0 5px;
+            text-decoration: none;
+        }
+        footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<header>
+    <a href="/">
+        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
+    </a>
+    <nav style="margin-left: auto;">
+        <a href="/services/">Services</a> |
+        <a href="/about/">About Us</a> |
+        <a href="/contact/">Contact</a> |
+        <a href="/blog/">Blog</a> |
+        <a href="/auth/login/">Login</a>
+    </nav>
+</header>
+
+<main>
+    <div class="container">
+        <h2>Registrieren</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Registrieren</button>
+        </form>
+        <p>Schon registriert?
+            <a href="{% url 'login' %}">Zum Login</a>
+        </p>
+    </div>
+</main>
+
+<footer>
+    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
+    <p>
+        <a href="/imprint/">Imprint</a> |
+        <a href="/privacy/">Privacy Policy</a> |
+        <a href="/terms/">Terms of Service</a> |
+        <a href="/">Home</a>
+    </p>
+</footer>
+</body>
+</html>

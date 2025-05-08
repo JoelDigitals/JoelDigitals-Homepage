@@ -1,0 +1,165 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Joel Digitals – Admin Blog</title>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #bfb9b9;
+            color: #000;
+            font-size: 18px;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 250px;
+            height: 111px;
+            object-fit: contain;
+        }
+
+        nav {
+            margin-left: auto;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .draft {
+            color: red;
+        }
+
+        .post-box {
+            padding: 15px;
+            background: white;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #0044cc;
+            color: white;
+            padding: 6px 12px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px 5px 0 0;
+        }
+
+        .btn:hover {
+            background-color: #002a80;
+        }
+
+        .btn-danger {
+            background-color: darkred;
+        }
+
+        .btn-danger:hover {
+            background-color: #a00000;
+        }
+
+        .teaser {
+            margin: 10px 0;
+            font-size: 0.95em;
+        }
+
+        footer {
+            background-color: #0044cc;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            border-top: 1px solid #ccc;
+        }
+
+        footer a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="/"><img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img"></a>
+    <nav>
+        <a href="/services/">Services</a>
+        <a href="/admin/">Admin Panel</a>
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Blog</a>
+        <a href="/auth/logout/">Logout</a>
+    </nav>
+</header>
+
+<main>
+    <h2>📝 Blog Verwaltung</h2>
+    <a href="/admin/blog/blogpost/add/" class="btn">➕ Add new blog post</a>
+
+    {% for post in posts %}
+        <div class="post-box">
+            <strong>{{ post.title }}</strong> – {{ post.created_at|date:"d.m.Y H:i" }}
+            {% if not post.is_published %}
+                <span class="draft">(Draft)</span>
+            {% endif %}
+            <br>
+            <small>Kategorien:
+                {% for cat in post.categories.all %}
+                    {{ cat.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}Keine{% endfor %}
+            </small>
+            <div class="teaser">{{ post.teaser_text|safe }}</div>
+            <a href="/admin/blog/blogpost/{{ post.id }}/change/" class="btn">✏️ Bearbeiten</a>
+            <a href="/admin/blog/blogpost/{{ post.id }}/delete/" class="btn btn-danger">🗑 Löschen</a>
+        </div>
+    {% empty %}
+        <p>Keine Blogeinträge verfügbar.</p>
+    {% endfor %}
+
+    <p>Hinweis: Du kannst neue Beiträge oben hinzufügen oder vorhandene bearbeiten/löschen.</p>
+</main>
+
+<footer>
+    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
+    <p>
+        <a href="/imprint/">Impressum</a> |
+        <a href="/privacy/">Datenschutz</a> |
+        <a href="/">Startseite</a>
+    </p>
+</footer>
+</body>
+</html>

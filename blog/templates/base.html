@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Joel Digitals</title>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(250, 250, 250);
+            color: #000;
+        }
+
+        header {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        header img {
+            height: 50px;
+            margin-right: 15px;
+        }
+
+        main {
+            padding: 40px 20px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1, h2 {
+            margin-bottom: 15px;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        a {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        a1 {
+            color: #0044cc;
+        }
+
+        a2 {
+            color: #ffffff;
+            text-decoration: none;
+            margin-bottom: 25px;
+
+        }
+
+        a1:hover {
+            text-decoration: underline;
+            color: #1d00d9;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        a2:hover {
+            text-decoration: underline;
+            color: #ffffff;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #1d00d9;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        form {
+            max-width: 400px;
+            margin: auto;
+        }
+
+        form input, form button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo">
+        <h1>Joel Digitals</h1>
+        <nav style="margin-left: auto;">
+            <a2 href="/services/">Services</a2> |
+            <a2 href="/about/">About Us</a2> |
+            <a2 href="/contact/">Contact</a2> |
+            <a2 href="/blog/">Blog</a2> |
+            {% if user.is_authenticated %}
+                <a2 href="/auth/logout/">Logout</a2>
+            {% else %}
+                <a2 href="/auth/login/">Login</a2>
+            {% endif %}
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Joel Digitals - Auftrag #{{ entry.id }}</title>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(191, 185, 185);
+            color: #000;
+            font-size: 18px;
+        }
+
+        header {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 250px;
+            height: 111px;
+            object-fit: contain;
+        }
+
+        main {
+            padding: 40px 20px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1, h2 {
+            margin-bottom: 20px;
+        }
+
+        .wish {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px 5px 5px 0;
+        }
+
+        .btn:hover {
+            background-color: #1d00d9;
+        }
+
+        form {
+            display: inline;
+        }
+
+        footer {
+            background-color: #0044cc;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 50px;
+        }
+
+        footer a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="/">
+        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
+    </a>
+    <nav style="margin-left: auto;">
+        <a href="/services/">Services</a> |
+        <a href="/about/">About Us</a> |
+        <a href="/contact/">Contact</a> |
+        <a href="/blog/">Blog</a> |
+        <a href="/auth/logout/">Logout</a>
+    </nav>
+</header>
+
+<main>
+    <h2>Details für Auftrag #{{ entry.id }} – {{ entry.subject }}</h2>
+
+    {% for wish in wishes %}
+        <div class="wish">
+            <p><strong>Titel:</strong> {{ wish.title }}</p>
+            <p><strong>Beschreibung:</strong><br>{{ wish.description|linebreaks }}</p>
+            <p><strong>Erstellt:</strong> {{ wish.created_at|date:"d.m.Y H:i" }}</p>
+            <a href="{% url 'edit_wish' entry.id wish.id %}" class="btn">✏️ Bearbeiten</a>
+            <a href="{% url 'delete_wish' entry.id wish.id %}" class="btn">🗑️ Löschen</a>
+        </div>
+    {% empty %}
+        <p>Keine Wünsche vorhanden.</p>
+    {% endfor %}
+
+    <a href="{% url 'add_wish' entry.id %}" class="btn">➕ Neuen Wunsch hinzufügen</a>
+    <a href="{% url 'sales_chat' entry.id %}" class="btn">💬 Zum Chat</a>
+    <a href="{% url 'admin_sales' %}" class="btn">🔙 Zurück zur Übersicht</a>
+</main>
+
+<footer>
+    <a>&copy; 2025 Joel Digitals. Alle Rechte vorbehalten.</a>
+    <p>
+        <a href="/imprint/">Impressum</a> |
+        <a href="/privacy/">Datenschutz</a> |
+        <a href="/terms/">AGB</a> |
+        <a href="/">Home</a>
+    </p>
+</footer>
+</body>
+</html>

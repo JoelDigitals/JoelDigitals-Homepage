@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket {{ ticket.ticket_number }} – Support</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+        body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+        .chat-box { background: white; padding: 20px; border-radius: 8px; max-width: 800px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .message { margin-bottom: 15px; padding: 10px; border-radius: 6px; }
+        .from-user { background-color: #d0e6ff; text-align: left; }
+        .from-admin { background-color: #ffe0e0; text-align: left; }
+        .meta { font-size: 12px; color: #555; margin-bottom: 4px; }
+        form { margin-top: 20px; }
+        textarea { width: 100%; padding: 10px; }
+        .btn { padding: 10px 15px; background: #0044cc; color: white; border: none; border-radius: 4px; }
+        .btn:hover { background: #002c99; }
+        .back-link { margin-bottom: 20px; display: block; }
+    </style>
+</head>
+<body>
+    <div class="chat-box">
+        {% if user.is_staff %}
+            <h1>Admin-Ansicht</h1>
+        {% else %}
+            <h1>Mein Ticket</h1>
+        {% endif %}
+
+        {% if user.is_staff %}
+            <h2>Ticket-Details</h2>
+            <p>Ticketnummer: {{ ticket.ticket_number }}</p>
+            <p>Erstellt am: {{ ticket.created_at|date:"d.m.Y H:i" }}</p>
+            <p>Zuletzt aktualisiert: {{ ticket.updated_at|date:"d.m.Y H:i" }}</p>
+            <p>Erstellt von: {{ ticket.user.username }}</p>
+        {% endif %}
+
+        {% if user.is_staff %}
+            <a href="{% url 'admin_tickets' %}" class="back-link">← Zurück zum Adminpanel</a>
+        {% else %}
+            <a href="{% url 'support_tickets' %}" class="back-link">← Zurück zu meinen Tickets</a>
+        {% endif %}
+        <h2>Support-Ticket: {{ ticket.subject }}</h2>
+        <p>Status: {% if ticket.is_resolved %}<span style="color: green;">Gelöst{% else %}<span style="color: red;">Offen{% endif %}</span></p>
+
+        <div class="chat-history">
+            {% for msg in messages %}
+                <div class="message {% if msg.sender.is_staff %}from-admin{% else %}from-user{% endif %}">
+                    <div class="meta">{{ msg.sender.username }} – {{ msg.created_at|date:"d.m.Y H:i" }}</div>
+                    <div class="text">{{ msg.message|linebreaks }}</div>
+                </div>
+            {% empty %}
+                <p>Noch keine Nachrichten vorhanden.</p>
+            {% endfor %}
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Nachricht senden</button>
+        </form>
+    </div>
+</body>
+</html>

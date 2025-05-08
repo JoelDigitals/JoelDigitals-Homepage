@@ -1,0 +1,256 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Our Services – Joel Digitals</title>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(191, 185, 185);
+            color: #000;
+            font-size: 18px;
+        }
+
+        header {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 250px;
+            height: 111px;
+            object-fit: contain;
+        }
+
+        nav a {
+            color: #fff;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 40px 20px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #0044cc;
+        }
+
+        .service-section {
+            margin-bottom: 30px;
+        }
+
+        .toggle {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 6px;
+            flex-direction: column;
+        }
+
+        .toggle h3 {
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .expanded .arrow {
+            transform: rotate(90deg);
+        }
+
+        .content {
+            display: none;
+            padding: 15px;
+        }
+
+        .expanded .content {
+            display: block;
+        }
+
+        .feature {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        footer {
+            background-color: #0044cc;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 50px;
+            border-top: 1px solid #ccc;
+        }
+
+        footer a {
+            color: #ccc;
+            margin: 0 5px;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        function toggleSection(id) {
+            const section = document.getElementById(id);
+            section.classList.toggle("expanded");
+        }
+    </script>
+</head>
+<body>
+<header>
+    <a href="/">
+        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
+    </a>
+    <nav style="margin-left: auto;">
+        <a href="/services/">Services</a> |
+        <a href="/about/">About Us</a> |
+        <a href="/contact/">Contact</a> |
+        <a href="/blog/">Blog</a> |
+        {% if user.is_authenticated %}
+            <a href="/auth/logout/">Logout</a>
+            {% if user.is_staff %}
+                | <a href="/contact/admin-tickets/">Admin: Tickets</a>
+                | <a href="/contact/admin-sales/">Admin: Sales</a>
+                | <a href="/blog/admin-blog/">Admin: Blog</a>
+            {% endif %}
+        {% else %}
+            <a href="/auth/login/">Login</a>
+        {% endif %}
+    </nav>
+</header>
+
+<main>
+    <div class="container">
+        <h1>Our Services</h1>
+        <p>
+            At Joel Digitals, we believe technology should be a driving force for growth and efficiency. Our services are designed to tackle the challenges of a modern, interconnected world. From cutting-edge app development to expert IT consultancy, we ensure your business stays ahead of the competition.
+        </p>
+
+        <div id="service1" class="service-section">
+            <div class="toggle" onclick="toggleSection('service1')">
+                <h3>Custom Software Development <span class="arrow">▶</span></h3>
+                <br>
+                <p>
+                    At Joel Digitals, we focus on delivering custom software solutions that align perfectly with your business goals. 
+                    We bring ideas to life with scalable, efficient, and secure applications that ensure long-term success.
+                </p>
+                
+            </div>
+            <div class="content">
+        
+                <p>
+                    Custom software development is at the heart of our offerings. We understand that every business is unique, and so are its challenges. That’s why we work closely with you to craft a solution tailored to your specific needs. Our team is well-versed in modern frameworks and agile methodologies, ensuring a smooth development process and delivering high-quality results. 
+                    Whether you're building an internal tool, customer-facing platform, or enterprise-grade system, we have the experience to help you succeed. We take pride in our ability to seamlessly integrate various technologies to create a cohesive and scalable product.
+                </p>
+                <img src="{% static 'images/service-custom.jpg' %}" class="feature" alt="Custom Software Development">
+            </div>
+        </div>
+
+        <div id="service2" class="service-section">
+            <div class="toggle" onclick="toggleSection('service2')">
+                <h3>IT Consultancy<span class="arrow">▶</span></h3>
+                <p>
+                    In a fast-changing digital landscape, expert IT consultancy is key to staying ahead. We offer strategic guidance to optimize your technology stack.
+                </p>
+                
+            </div>
+            <div class="content">
+                <p>
+                    Our IT consultancy services are designed to guide businesses through the complexities of digital transformation. We assess your current technology infrastructure and recommend actionable steps to improve efficiency, reduce costs, and enhance overall performance. With our extensive knowledge of industry best practices, we help you implement innovative solutions that foster growth and drive success. 
+                    Whether it’s selecting the right technology for a new project or optimizing your existing systems, our consultants provide tailored advice that aligns with your business objectives. Our goal is to ensure your IT investments support your long-term vision, enabling you to scale and stay ahead in a competitive marketplace.
+                </p>
+                <img src="{% static 'images/service-consultancy.jpg' %}" class="feature" alt="IT Consultancy">
+            </div>
+        </div>
+
+        <div id="service3" class="service-section">
+            <div class="toggle" onclick="toggleSection('service3')">
+                <h3>Ongoing Support & Maintenance <span class="arrow">▶</span></h3>
+                <p>
+                    With our ongoing support and maintenance, your systems will always be secure, up-to-date, and running at peak performance. We offer continuous care.
+                </p>
+               
+            </div>
+            <div class="content">
+                <p>
+                    Technology is constantly evolving, and your systems must adapt to keep up. Our ongoing support and maintenance services ensure your software and infrastructure remain optimized and secure. From regular system updates and bug fixes to infrastructure scaling and performance monitoring, we provide comprehensive support for your digital assets.
+                    We understand the importance of minimizing downtime and maximizing productivity, which is why our team is always available to resolve issues promptly and implement improvements as needed. By partnering with us for long-term support, you can focus on your core business operations while we ensure your systems remain at their best.
+                </p>
+                <img src="{% static 'images/service-support.jpg' %}" class="feature" alt="Ongoing Support & Maintenance">
+            </div>
+        </div>
+        <div id="service4" class="service-section">
+            <div class="toggle" onclick="toggleSection('service6')">
+                <h3>Cloud Integration <span class="arrow">▶</span></h3>
+                <p>Secure, scalable, and always available – we move your systems to the cloud.</p>
+            </div>
+            <div class="content">
+                <p>
+                    We help businesses embrace the cloud by designing and implementing cloud-based architectures tailored to your needs.
+                    Whether you're migrating legacy systems or starting fresh, our team ensures seamless transitions, reduced costs, and improved flexibility.
+                </p>
+                <img src="{% static 'images/service-cloud.jpg' %}" class="feature" alt="Cloud Integration">
+            </div>
+        </div>
+
+        <div id="service5" class="service-section">
+            <div class="toggle" onclick="toggleSection('service7')">
+                <h3>Data Analytics & BI <span class="arrow">▶</span></h3>
+                <p>Turn raw data into actionable insights with our analytics solutions.</p>
+            </div>
+            <div class="content">
+                <p>
+                    Unlock the potential of your data. Our analytics and business intelligence services help you discover trends,
+                    measure performance, and make informed decisions. From dashboards to predictive analytics, we deliver the tools to compete smarter.
+                </p>
+                <img src="{% static 'images/service-analytics.jpg' %}" class="feature" alt="Data Analytics">
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer>
+    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
+    <p>
+        <a href="/imprint/">Imprint</a> |
+        <a href="/privacy/">Privacy Policy</a> |
+        <a href="/terms/">Terms of Service</a> |
+        <a href="/">Home</a>
+    </p>
+</footer>
+</body>
+</html>
