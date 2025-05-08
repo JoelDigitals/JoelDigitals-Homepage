@@ -1,0 +1,127 @@
+<!-- blog/templates/blog/category_form.html -->
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ action }} Kategorie</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #bfb9b9;
+            color: #000;
+            font-size: 18px;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 250px;
+            height: 111px;
+            object-fit: contain;
+        }
+
+        nav {
+            margin-left: auto;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        form {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        form p {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #0044cc;
+            color: white;
+            padding: 8px 14px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #002a80;
+        }
+
+        .btn-secondary {
+            background-color: #aaa;
+        }
+
+        .btn-secondary:hover {
+            background-color: #888;
+        }
+    </style>
+</head>
+<body>
+<h2>{{ action }} Kategorie</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">{{ action }}</button>
+    <a href="{% url 'list_categories' %}" class="btn">Zurück</a>
+</form>
+</body>
+</html>

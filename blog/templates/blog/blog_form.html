@@ -3,22 +3,23 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Kontaktformular - Joel Digitals</title>
+    <title>{{ action }} Blogeintrag</title>
     <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if form.media %}{{ form.media }}{% endif %}
     <style>
         html, body {
+            margin: 0;
+            padding: 0;
             height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-        }
-        body {
-            margin: 0;
             font-family: Arial, sans-serif;
-            background-color: rgb(191, 185, 185);
+            background-color: #bfb9b9;
             color: #000;
             font-size: 18px;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
         }
 
         header {
@@ -26,25 +27,23 @@
             color: white;
             padding: 10px 20px;
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
-            justify-content: space-between;
         }
 
         .logo-img {
-            width: 180px;
-            height: auto;
+            width: 250px;
+            height: 111px;
+            object-fit: contain;
         }
 
         nav {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
+            margin-left: auto;
         }
 
         nav a {
-            color: #fff;
+            color: white;
             text-decoration: none;
+            margin-left: 15px;
         }
 
         nav a:hover {
@@ -54,61 +53,73 @@
         main {
             flex: 1;
             padding: 40px 20px;
-            max-width: 1000px;
+            max-width: 800px;
             margin: auto;
         }
 
-        form label {
-            display: block;
-            margin-top: 10px;
+        h2 {
+            margin-top: 0;
+            text-align: center;
         }
 
-        input, textarea {
+        form {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        form p {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        select,
+        textarea {
             width: 100%;
             padding: 8px;
-            margin-top: 5px;
+            font-size: 16px;
+            border: 1px solid #ccc;
             border-radius: 4px;
-            border: 1px solid #888;
         }
 
         .btn {
+            display: inline-block;
             background-color: #0044cc;
             color: white;
-            padding: 10px 15px;
-            border: none;
+            padding: 8px 14px;
+            text-decoration: none;
             border-radius: 4px;
-            margin-top: 15px;
+            margin-right: 10px;
+            border: none;
             cursor: pointer;
         }
 
         .btn:hover {
-            background-color: #1d00d9;
+            background-color: #002a80;
         }
 
-        footer {
-            background-color: #0044cc;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 50px;
-            color: #ccc;
+        .btn-secondary {
+            background-color: #aaa;
         }
 
-        footer a {
-            color: #ccc;
-            text-decoration: none;
-            margin: 0 5px;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
+        .btn-secondary:hover {
+            background-color: #888;
         }
     </style>
 </head>
 <body>
-    <header>
-        <a href="/"><img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img"></a>
-        <nav style="margin-left: auto;">
+
+<header>
+    <a href="/"><img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img"></a>
+    <nav style="margin-left: auto;">
     <a href="/services/">Services</a>
     <a href="/about/">About Us</a>
     <a href="/contact/">Contact</a>
@@ -130,23 +141,17 @@
     {% endif %}
 </nav>
 
-    </header>
+</header>
 
-    <main>
-        <h2>Kontaktformular</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button class="btn" type="submit">Senden</button>
-        </form>
-    </main>
+<main>
+    <h2>{{ action }} Blogeintrag</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">{{ action }}</button>
+        <a href="{% url 'admin_blog' %}" class="btn btn-secondary">Zurück</a>
+    </form>
+</main>
 
-    <footer>
-        <div>&copy; 2025 Joel Digitals. All rights reserved.</div>
-        <div>
-            <a href="/imprint/">Impressum</a> |
-            <a href="/privacy/">Datenschutz</a>
-        </div>
-    </footer>
 </body>
 </html>

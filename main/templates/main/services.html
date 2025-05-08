@@ -135,21 +135,27 @@
         <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
     </a>
     <nav style="margin-left: auto;">
-        <a href="/services/">Services</a> |
-        <a href="/about/">About Us</a> |
-        <a href="/contact/">Contact</a> |
-        <a href="/blog/">Blog</a> |
-        {% if user.is_authenticated %}
-            <a href="/auth/logout/">Logout</a>
-            {% if user.is_staff %}
-                | <a href="/contact/admin-tickets/">Admin: Tickets</a>
-                | <a href="/contact/admin-sales/">Admin: Sales</a>
-                | <a href="/blog/admin-blog/">Admin: Blog</a>
-            {% endif %}
-        {% else %}
-            <a href="/auth/login/">Login</a>
+    <a href="/services/">Services</a>
+    <a href="/about/">About Us</a>
+    <a href="/contact/">Contact</a>
+    <a href="/blog/">Blog</a>
+    {% if user.is_authenticated %}
+        {% if "Marketing" in user_groups %}
+            <a href="/blog/admin-blog/">Admin: Blog</a>
         {% endif %}
-    </nav>
+        {% if "Selling" in user_groups %}
+            <a href="/contact/admin-sales/">Admin: Sales</a>
+        {% endif %}
+        {% if "Support" in user_groups %}
+            <a href="/contact/admin-tickets/">Admin: Tickets</a>
+            <a href="/blog/admin-blog/">Admin: Blog</a>
+        {% endif %}
+        <a href="/auth/logout/">Logout</a>
+    {% else %}
+        <a href="/auth/login/">Login</a>
+    {% endif %}
+</nav>
+
 </header>
 
 <main>
@@ -175,7 +181,6 @@
                     Custom software development is at the heart of our offerings. We understand that every business is unique, and so are its challenges. That’s why we work closely with you to craft a solution tailored to your specific needs. Our team is well-versed in modern frameworks and agile methodologies, ensuring a smooth development process and delivering high-quality results. 
                     Whether you're building an internal tool, customer-facing platform, or enterprise-grade system, we have the experience to help you succeed. We take pride in our ability to seamlessly integrate various technologies to create a cohesive and scalable product.
                 </p>
-                <img src="{% static 'images/service-custom.jpg' %}" class="feature" alt="Custom Software Development">
             </div>
         </div>
 
@@ -192,7 +197,6 @@
                     Our IT consultancy services are designed to guide businesses through the complexities of digital transformation. We assess your current technology infrastructure and recommend actionable steps to improve efficiency, reduce costs, and enhance overall performance. With our extensive knowledge of industry best practices, we help you implement innovative solutions that foster growth and drive success. 
                     Whether it’s selecting the right technology for a new project or optimizing your existing systems, our consultants provide tailored advice that aligns with your business objectives. Our goal is to ensure your IT investments support your long-term vision, enabling you to scale and stay ahead in a competitive marketplace.
                 </p>
-                <img src="{% static 'images/service-consultancy.jpg' %}" class="feature" alt="IT Consultancy">
             </div>
         </div>
 
@@ -209,11 +213,10 @@
                     Technology is constantly evolving, and your systems must adapt to keep up. Our ongoing support and maintenance services ensure your software and infrastructure remain optimized and secure. From regular system updates and bug fixes to infrastructure scaling and performance monitoring, we provide comprehensive support for your digital assets.
                     We understand the importance of minimizing downtime and maximizing productivity, which is why our team is always available to resolve issues promptly and implement improvements as needed. By partnering with us for long-term support, you can focus on your core business operations while we ensure your systems remain at their best.
                 </p>
-                <img src="{% static 'images/service-support.jpg' %}" class="feature" alt="Ongoing Support & Maintenance">
             </div>
         </div>
         <div id="service4" class="service-section">
-            <div class="toggle" onclick="toggleSection('service6')">
+            <div class="toggle" onclick="toggleSection('service4')">
                 <h3>Cloud Integration <span class="arrow">▶</span></h3>
                 <p>Secure, scalable, and always available – we move your systems to the cloud.</p>
             </div>
@@ -222,12 +225,11 @@
                     We help businesses embrace the cloud by designing and implementing cloud-based architectures tailored to your needs.
                     Whether you're migrating legacy systems or starting fresh, our team ensures seamless transitions, reduced costs, and improved flexibility.
                 </p>
-                <img src="{% static 'images/service-cloud.jpg' %}" class="feature" alt="Cloud Integration">
             </div>
         </div>
 
         <div id="service5" class="service-section">
-            <div class="toggle" onclick="toggleSection('service7')">
+            <div class="toggle" onclick="toggleSection('service5')">
                 <h3>Data Analytics & BI <span class="arrow">▶</span></h3>
                 <p>Turn raw data into actionable insights with our analytics solutions.</p>
             </div>
@@ -236,7 +238,6 @@
                     Unlock the potential of your data. Our analytics and business intelligence services help you discover trends,
                     measure performance, and make informed decisions. From dashboards to predictive analytics, we deliver the tools to compete smarter.
                 </p>
-                <img src="{% static 'images/service-analytics.jpg' %}" class="feature" alt="Data Analytics">
             </div>
         </div>
 

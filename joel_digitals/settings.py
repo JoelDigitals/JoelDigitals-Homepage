@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-7!2q=m-knqi1a#+7()qky&!*(*5k3^9(bb)*koh_y$&&i7x$da
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1', 
+    'localhost',
+    ]
+
 
 
 # Application definition
@@ -38,10 +42,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ckeditor',
+    'ckeditor_uploader',
     'main',
     'blog', 
     'contact',
 ]
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
