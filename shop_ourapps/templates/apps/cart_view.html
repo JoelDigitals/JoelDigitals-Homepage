@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Cart</title>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(191, 185, 185);
+            color: #000;
+            font-size: 18px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 250px;
+            height: 111px;
+            object-fit: contain;
+        }
+
+        nav a {
+            color: #fff;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 40px 20px;
+            max-width: 1000px;
+            margin: auto;
+            flex-grow: 1;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #0044cc;
+        }
+
+        .button {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 16px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .button:hover {
+            background-color: #0033a0;
+        }
+
+        footer {
+            background-color: #0044cc;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 50px;
+            border-top: 1px solid #ccc;
+        }
+
+        footer a {
+            color: #ccc;
+            margin: 0 5px;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .cart-item {
+            border: 1px solid #ccc;
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-item h2 {
+            margin: 0;
+            color: #0044cc;
+        }
+
+        .cart-item p {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .cart-item a {
+            display: inline-block;
+            margin-top: 10px;
+            background-color: #0044cc;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+        .cart-item a:hover {
+            background-color: #0033a0;
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <a href="/">
+        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
+    </a>
+    <nav style="margin-left: auto;">
+        <a href="/services/">Services</a>
+        <a href="/about/">About Us</a>
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Blog</a>
+        <a href="/cart/">Cart</a>
+    </nav>
+</header>
+<main>
+    <div class="container">
+        <h1>Your Cart</h1>
+        {% if items %}
+            <ul>
+                {% for item in items %}
+                    <div class="cart-item">
+                        <h2>{{ item.app.name }}</h2>
+                        <p>{{ item.quantity }} x {{ item.app.price }}€</p>
+                        <p>Total: {{ item.total_price }}€</p>
+                        <a href="{% url 'remove_from_cart' item.id %}">Remove</a>
+                    </div>
+                {% endfor %}
+            </ul>
+
+            <hr>
+            <p><strong>Subtotal (Net):</strong> {{ total_netto }}€</p>
+            <p><strong>VAT (19%):</strong> {{ total_vat }}€</p>
+            <p><strong>Total (Gross):</strong> {{ total_brutto }}€</p>
+            <hr>
+
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="button">Proceed to Checkout</button>
+            </form>
+        {% else %}
+            <p>Your cart is empty.</p>
+        {% endif %}
+    </div>
+</main>
+
+<footer>
+    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
+    <p>
+        <a href="/imprint/">Imprint</a> |
+        <a href="/privacy/">Privacy Policy</a> |
+        <a href="/terms/">Terms of Service</a> |
+        <a href="/">Home</a>
+    </p>
+</footer>
+</body>
+</html>

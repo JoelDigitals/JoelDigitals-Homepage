@@ -11,7 +11,13 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+import environ
+env = environ.Env()
+environ.Env.read_env()  # Liest die .env-Datei
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-7!2q=m-knqi1a#+7()qky&!*(*5k3^9(bb)*koh_y$&&i7x$da'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'joel-digitals.onrender.com',
@@ -47,6 +53,7 @@ INSTALLED_APPS = [
     'main',
     'blog', 
     'contact',
+    'shop_ourapps',  # Deine App für die Affiliate-Links
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
@@ -86,10 +93,7 @@ WSGI_APPLICATION = 'joel_digitals.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env.db(),  # Liest die DATABASE_URL-Umgebungsvariable
 }
 
 
@@ -133,7 +137,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",  # Dein static Ordner
 ]
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -152,3 +156,9 @@ EMAIL_HOST_USER = 'joel-digitals@gmx.de'
 EMAIL_HOST_PASSWORD = 'Jojo240207!'
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'joel-digitals@gmx.de'
+COMPANY_EMAIL = 'joel-digitals@gmx.de'
+
+
+
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

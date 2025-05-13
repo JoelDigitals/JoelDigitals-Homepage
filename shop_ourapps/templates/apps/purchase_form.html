@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Joel Digitals</title>
+    <title>Buy {{ app.name }} - Joel Digitals Shop</title>
     <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
     <style>
         body {
@@ -12,6 +12,9 @@
             background-color: rgb(191, 185, 185);
             color: #000;
             font-size: 18px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Stellt sicher, dass der Body mindestens die volle Bildschirmhöhe hat */
         }
 
         header {
@@ -42,6 +45,7 @@
             padding: 40px 20px;
             max-width: 1000px;
             margin: auto;
+            flex-grow: 1; /* Lässt das Hauptinhaltselement den verbleibenden Raum ausfüllen */
         }
 
         .container {
@@ -53,14 +57,6 @@
 
         h1, h2 {
             color: #0044cc;
-        }
-
-        .feature {
-            width: 100%;
-            max-width: 600px;
-            border-radius: 10px;
-            margin-top: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
 
         .button {
@@ -86,6 +82,7 @@
             font-size: 14px;
             margin-top: 50px;
             border-top: 1px solid #ccc;
+            position: relative;
         }
 
         footer a {
@@ -96,6 +93,41 @@
 
         footer a:hover {
             text-decoration: underline;
+        }
+
+        .form-container {
+            margin-top: 30px;
+        }
+
+        .form-container button {
+            background-color: #0044cc;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .form-container button:hover {
+            background-color: #0033a0;
+        }
+
+        .affiliate-link {
+            background-color: #007b00;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 16px;
+            display: inline-block;
+            margin-top: 30px;
+        }
+
+        .affiliate-link:hover {
+            background-color: #005f00;
         }
     </style>
 </head>
@@ -109,61 +141,32 @@
     <a href="/about/">About Us</a>
     <a href="/contact/">Contact</a>
     <a href="/blog/">Blog</a>
-    <a href ="/our-apps/">Our Apps</a>
     {% if user.is_authenticated %}
-        {% if "Marketing" in user_groups %}
-            <a href="/blog/admin-blog/">Admin: Blog</a>
-        {% endif %}
-        {% if "Selling" in user_groups %}
-            <a href="/contact/admin-sales/">Admin: Sales</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/contact/admin-tickets/">Admin: Tickets</a>
-            <a href="/blog/admin-blog/">Admin: Blog</a>
-        {% endif %}
-        <a href ="/shop/">Shop</a>
         <a href="/auth/logout/">Logout</a>
     {% else %}
         <a href="/auth/login/">Login</a>
     {% endif %}
-</nav>
-
+    {% if user.is_authenticated %}
+        {% if user|has_affiliate_account %}
+            <a href="/affiliate/dashboard/">Affiliate Dashboard</a>
+        {% else %}
+            <a href="/affiliate/eligibility/">Affiliate Program</a>
+        {% endif %}
+    {% endif %}
+    
+    </nav>
 </header>
 
 <main>
     <div class="container">
-        <section>
-            <h2>Welcome to Joel Digitals</h2>
-            <p>
-                At Joel Digitals, we provide future-proof IT solutions for modern businesses. From full-stack web development to customized enterprise tools,
-                we transform your digital vision into reality. Our dedicated team ensures a smooth, scalable, and efficient experience for every client.
-            </p>
-            <a href="/about/" class="button">More about us</a>
-        </section>
+        <h1>Buy {{ app.name }}</h1>
 
-        <section>
-            <h2>What We Offer</h2>
-            <p>
-                Our services are tailored to help businesses evolve digitally:
-            </p>
-            <ul>
-                <li><strong>Web Development:</strong> Custom websites, portals & platforms.</li>
-                <li><strong>E-Commerce:</strong> Sell smart with tailored online shop systems.</li>
-                <li><strong>Cloud Services:</strong> Scalable, secure cloud integration and migration.</li>
-                <li><strong>IT Strategy:</strong> Comprehensive consulting for digital transformation.</li>
-                <li><strong>Support & Maintenance:</strong> Long-term technical care for peace of mind.</li>
-            </ul>
-            <a href="/services/" class="button">Explore our services</a>
-        </section>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
 
-        <section>
-            <h2>Join the Digital Evolution</h2>
-            <p>
-                Ready to elevate your business? Let’s work together to build something exceptional.
-                Contact us today and let's shape your digital future.
-            </p>
-            <a href="/contact/" class="button">Get in touch</a>
-        </section>
+            <button type="submit">Purchase Now</button>
+        </form>
     </div>
 </main>
 

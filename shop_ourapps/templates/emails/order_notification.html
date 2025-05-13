@@ -1,0 +1,14 @@
+Neue Bestellung erhalten! 
+Bestell-ID: {{ order.id }} 
+Kunde: {{ order.first_name }} {{ order.last_name }} 
+Email: {{ order.email }} 
+Adresse: {{ order.address }} 
+Gesamtbetrag: €{{ order.total_amount }} 
+Zahlungsmethode: {{ order.get_payment_method_display }} 
+Status: {{ order.order_status }} 
+Bestellpositionen: 
+{% for item in order.items.all %}
+  <li>{{ item.quantity }}x {{ item.app.name }} – {{ item.price }} €</li>
+{% endfor %}
+
+Bitte senden Sie die Rechnung an den Kunden. 

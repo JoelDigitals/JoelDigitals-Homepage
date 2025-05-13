@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Affiliate Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dashboard-summary {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-summary p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        .sales-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sale-item {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sale-info h3 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #333;
+        }
+
+        .sale-info p {
+            margin: 5px 0;
+            font-size: 1.2em;
+        }
+
+        .affiliate-link {
+            margin-top: 10px;
+        }
+
+        .affiliate-link-btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 18px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+        }
+
+        .affiliate-link-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            font-size: 2em;
+        }
+
+        h2 {
+            margin-top: 30px;
+            font-size: 2em;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        Your Affiliate Dashboard
+    </div>
+
+    <div class="container">
+        <div class="dashboard-summary">
+            <p>Total Sales: €{{ total_sales }}</p>
+            <p>Total Commission: €{{ total_commission }}</p>
+            <p>Total Apps Sold: {{ total_apps_sold }}</p>
+            <p>Total Purchases: {{ total_purchases }}</p>
+            <h2>Affiliate Link</h2>
+            <p>Here is your unique affiliate link: <a href="{{ affiliate_link }}" target="_blank">{{ affiliate_link }}</a></p>
+            <p>Share this link to earn commission on every sale made through it!</p>
+        </div>
+
+        <h2>Sales Overview</h2>
+        <!-- dashboard.html -->
+        <ul class="sales-list">
+            {% for purchase in purchases %}
+                <li>{{ purchase.app.name }} - €{{ purchase.app.price }} (Commission: €{{ purchase.commission }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>
