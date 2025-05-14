@@ -1,12 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
-from .models import App, AffiliateLink, Purchase, Affiliate, Cart, CartItem, Order, OrderItem
+from .models import App, AffiliateLink, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner
+from shop_ourapps.models import AffiliatePartner
 from .forms import PurchaseForm
 from django.contrib import messages
 from django.conf import settings
 from django.template.loader import render_to_string
 from decimal import Decimal
+from django.http import Http404
 
 def our_apps(request):
     apps = App.objects.all()
@@ -172,26 +174,40 @@ def affiliate_eligibility(request):
 
 @login_required
 def affiliate_dashboard(request):
-    # Beispiel-Daten
-    purchases = Purchase.objects.all()  # Deine Purchase-Objekte
-    for purchase in purchases:
-        purchase.commission = purchase.app.price * purchase.affiliate.commission_percent / 100
-    
-    total_sales = sum([purchase.app.price for purchase in purchases])
-    total_commission = sum([purchase.commission for purchase in purchases])
-    total_apps_sold = len(purchases)
-    total_purchases = len(purchases)
+    try:
+        # Berechnung der Affiliate-Statistiken für den eingeloggten Benutzer
+        stats = calculate_affiliate_stats(request.user)
+        return render(request, "affiliate/dashboard.html", stats)
+    except AffiliatePartner.DoesNotExist:
+        # Wenn der Benutzer kein Affiliate-Partner ist
+        messages.error(request, "You are not yet registered as an Affiliate Partner.")
+        return redirect('affiliate_eligibility')  # Weiterleitung zur Registrierung oder Eligibility-Seite
 
-    context = {
-        'purchases': purchases,
-        'total_sales': total_sales,
-        'total_commission': total_commission,
-        'total_apps_sold': total_apps_sold,
-        'total_purchases': total_purchases,
-        'affiliate_link': f'https://joel-digitals.onrender.com/shop/?ref={{ code }}',  # Beispiel-Link
+
+def calculate_affiliate_stats(user):
+    try:
+        # Versuchen, den Affiliate-Partner für den aktuellen Benutzer zu finden
+        partner = AffiliatePartner.objects.get(user=user)
+    except AffiliatePartner.DoesNotExist:
+        # Kein AffiliatePartner gefunden, Fehler wird bereits oben behandelt
+        raise AffiliatePartner.DoesNotExist
+
+    # Beispiel für eine einfache Berechnung (Verkäufe, Einnahmen)
+    total_earnings = Decimal('0.00')  # Standardwert für Einnahmen
+    total_sales = 0  # Standardwert für Verkäufe
+
+    # Falls der Partner existiert, könnten wir hier weitere Berechnungen vornehmen
+    # Beispiel: Berechnung basierend auf Affiliate-Codes, Bestellungen, etc.
+    
+    # Hier sind Platzhalter, um zu verdeutlichen, dass zusätzliche Logik folgen kann
+    # total_sales = berechne_verkaufszahlen(partner)  # z.B. eine Methode, die Verkäufe ermittelt
+    # total_earnings = berechne_einnahmen(partner)  # z.B. eine Methode, die die Einnahmen ermittelt
+
+    return {
+        "sales": total_sales,
+        "earnings": total_earnings,
     }
 
-    return render(request, 'apps/dashboard.html', context)
 
 @login_required
 def cart_view(request):
@@ -250,32 +266,70 @@ def remove_from_cart(request, item_id):
     cart_item.delete()
     return redirect('cart_view')
 
+
 @login_required
 def checkout(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     items = cart.items.all()
-    total = sum(item.app.price * item.quantity for item in items)
+    subtotal = sum(item.app.price * item.quantity for item in items)
+
+    discount_amount = 0
+    final_total = subtotal
+    discount_code_obj = None
+    affiliate_code_obj = None
 
     if request.method == 'POST':
-        # Benutzerdaten sammeln
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
-        address = request.POST.get('address')
-        payment_method = request.POST.get('payment_method')
+        # Kundendaten aus Formular
+        data = request.POST
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
+        email = data.get('email')
+        address = data.get('address')
+        phone = data.get('phone')
+        company_name = data.get('company_name')
+        vat_number = data.get('vat_number')
+        payment_method = data.get('payment_method')
 
-        # Bestellung erstellen
+        affiliate_code_input = data.get('affiliate_code', '').strip()
+        discount_code_input = data.get('discount_code', '').strip()
+
+        # Rabattcode prüfen
+        if discount_code_input:
+            try:
+                discount_code_obj = DiscountCode.objects.get(code__iexact=discount_code_input, is_active=True)
+                discount_amount = subtotal * (discount_code_obj.percentage / 100)
+                final_total = max(0, subtotal - discount_amount)
+            except DiscountCode.DoesNotExist:
+                messages.error(request, 'Ungültiger Rabattcode.')
+                final_total = subtotal
+
+        # Affiliate-Code prüfen
+        if affiliate_code_input:
+            try:
+                affiliate_code_obj = AffiliateCode.objects.get(code__iexact=affiliate_code_input, is_active=True)
+            except AffiliateCode.DoesNotExist:
+                messages.warning(request, 'Affiliate-Code ist ungültig.')
+                affiliate_code_obj = None
+
+        # Bestellung speichern
         order = Order.objects.create(
             user=request.user,
             first_name=first_name,
             last_name=last_name,
             email=email,
             address=address,
+            phone=phone,
+            company_name=company_name,
+            vat_number=vat_number,
             payment_method=payment_method,
-            total_amount=total,
+            subtotal=subtotal,
+            discount_amount=discount_amount,
+            total_amount=final_total,
+            affiliate_code=affiliate_code_obj,
+            discount_code=discount_code_obj,
         )
 
-        # OrderItems erstellen
+        # Einzelne Artikel speichern
         for item in items:
             OrderItem.objects.create(
                 order=order,
@@ -284,29 +338,36 @@ def checkout(request):
                 price=item.app.price
             )
 
-        # E-Mail an den Käufer
+        # Rabattcode aktualisieren
+        if discount_code_obj:
+            discount_code_obj.times_used += 1
+            discount_code_obj.save()
+
+        # E-Mails
         if payment_method == 'bank_transfer':
-            buyer_email_subject = 'Ihre Bestellbestätigung - Banküberweisung'
-            buyer_email_message = render_to_string('emails/order_confirmation_bank_transfer.html', {'order': order})
-        else:  # Rechnung
-            buyer_email_subject = 'Ihre Bestellbestätigung - Rechnung'
-            buyer_email_message = render_to_string('emails/order_confirmation_invoice.html', {'order': order})
+            buyer_subject = 'Ihre Bestellbestätigung - Banküberweisung'
+            buyer_message = render_to_string('emails/order_confirmation_bank_transfer.html', {'order': order})
+        else:
+            buyer_subject = 'Ihre Bestellbestätigung - Rechnung'
+            buyer_message = render_to_string('emails/order_confirmation_invoice.html', {'order': order})
 
-        send_mail(buyer_email_subject, buyer_email_message, settings.DEFAULT_FROM_EMAIL, [email])
+        send_mail(buyer_subject, buyer_message, settings.DEFAULT_FROM_EMAIL, [email])
 
-        # E-Mail an das Unternehmen
-        company_email_subject = 'Neue Bestellung - Bitte Rechnung senden'
-        company_email_message = render_to_string('emails/order_notification.html', {'order': order})
-        send_mail(company_email_subject, company_email_message, settings.DEFAULT_FROM_EMAIL, [settings.COMPANY_EMAIL])
+        company_subject = 'Neue Bestellung - Bitte Rechnung senden'
+        company_message = render_to_string('emails/order_notification.html', {'order': order})
+        send_mail(company_subject, company_message, settings.DEFAULT_FROM_EMAIL, [settings.COMPANY_EMAIL])
 
         # Warenkorb leeren
         cart.items.all().delete()
 
-        # Erfolgsmeldung und Weiterleitung
-        messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben. Eine Bestätigung wurde an Ihre E-Mail-Adresse gesendet.')
+        messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben.')
         return redirect('order_confirmation', order_id=order.id)
-    
-    return render(request, 'apps/checkout.html', {'total': total, 'items': items})
+
+    return render(request, 'apps/checkout.html', {
+        'total': final_total,
+        'items': items,
+    })
+
 
 def order_confirmation(request, order_id):
     order = Order.objects.get(id=order_id)

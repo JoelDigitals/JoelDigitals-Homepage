@@ -58,7 +58,11 @@ def blog_create(request):
             return redirect('admin_blog')
     else:
         form = BlogPostForm()
-    return render(request, 'blog/blog_form.html', {'form': form, 'action': 'Erstellen'}, {'user_groups': user_groups})
+    return render(request, 'blog/blog_form.html', {
+        'form': form,
+        'action': 'Erstellen',
+        'user_groups': user_groups
+    })
 
 @user_passes_test(is_blog_editor)
 def blog_edit(request, pk):
@@ -115,4 +119,4 @@ def delete_category(request, pk):
 @user_passes_test(is_blog_editor)
 def list_categories(request):
     categories = BlogCategory.objects.all()
-    return render(request, 'blog/category_list.html', {'categories': categories}, {'user_groups': user_groups})
+    return render(request, 'blog/category_list.html', {'categories': categories})

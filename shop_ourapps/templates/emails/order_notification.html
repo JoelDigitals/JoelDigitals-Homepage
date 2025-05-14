@@ -1,14 +1,35 @@
-Neue Bestellung erhalten! 
-Bestell-ID: {{ order.id }} 
-Kunde: {{ order.first_name }} {{ order.last_name }} 
-Email: {{ order.email }} 
-Adresse: {{ order.address }} 
-Gesamtbetrag: €{{ order.total_amount }} 
-Zahlungsmethode: {{ order.get_payment_method_display }} 
-Status: {{ order.order_status }} 
-Bestellpositionen: 
-{% for item in order.items.all %}
-  <li>{{ item.quantity }}x {{ item.app.name }} – {{ item.price }} €</li>
-{% endfor %}
+Neue Bestellung erhalten!
 
-Bitte senden Sie die Rechnung an den Kunden. 
+Bestell-ID: {{ order.id }}
+Kunde: {{ order.first_name }} {{ order.last_name }}
+Email: {{ order.email }}
+Telefon: {{ order.phone }}
+Adresse: {{ order.address|linebreaksbr }}
+
+{% if order.company_name %}
+Firma: {{ order.company_name }}
+{% endif %}
+
+{% if order.vat_number %}
+USt-IdNr.: {{ order.vat_number }}
+{% endif %}
+
+{% if order.affiliate_code %}
+Affiliate-Code: {{ order.affiliate_code }}
+{% endif %}
+
+{% if order.discount_code %}
+Rabattcode: {{ order.discount_code }}
+Rabattbetrag: €{{ order.discount_amount|floatformat:2 }}
+{% endif %}
+
+Zwischensumme: €{{ order.subtotal|floatformat:2 }}
+Gesamtbetrag: €{{ order.total_amount|floatformat:2 }}
+Zahlungsmethode: {{ order.get_payment_method_display }}
+Status: {{ order.order_status }}
+
+Bestellpositionen:
+{% for item in order.items.all %}
+  {{ item.quantity }}x {{ item.app.name }} – €{{ item.price|floatformat:2 }}
+{% endfor %}
+den Sie die Rechnung an den Kunden.

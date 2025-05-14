@@ -1,7 +1,23 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+from django.conf import settings
 
 User = get_user_model()
+
+class AffiliatePartner(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    website = models.URLField(blank=True)
+    social_links = models.TextField(blank=True, help_text="One link per line")
+    application_text = models.TextField()
+    approved = models.BooleanField(default=False)
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
 
 class App(models.Model):
     name = models.CharField(max_length=255)
@@ -74,26 +90,28 @@ class CartItem(models.Model):
 # ... (alle bisherigen Klassen wie App, AffiliateLink, Purchase etc.)
 
 class Order(models.Model):
-    PAYMENT_CHOICES = [
-        ('paypal', 'PayPal'),
-        ('bank_transfer', 'Banküberweisung'),
-        ('invoice', 'Rechnung'),
-    ]
-    
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField()
     address = models.TextField()
-    payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    order_status = models.CharField(max_length=100, default='Pending')  # 'Pending', 'Paid'
+    phone = models.CharField(max_length=50)
+    company_name = models.CharField(max_length=200, blank=True, null=True)
+    vat_number = models.CharField(max_length=50, blank=True, null=True)
+    payment_method = models.CharField(max_length=50)
+
+    # ➕ Die fehlenden Felder:
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    affiliate_code = models.ForeignKey('AffiliateCode', on_delete=models.SET_NULL, null=True, blank=True)
+    discount_code = models.ForeignKey('DiscountCode', on_delete=models.SET_NULL, null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=[('pending', 'Offen'), ('paid', 'Bezahlt')], default='pending')
 
     def __str__(self):
-        return f"Order {self.id} by {self.first_name} {self.last_name}"
-
+        return f"Bestellung {self.id} von {self.user}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
@@ -103,3 +121,30 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.app.name} x {self.quantity} (Order {self.order.id})"
+
+class AffiliateCode(models.Model):
+    code = models.CharField(max_length=20, unique=True)
+    partner = models.ForeignKey("AffiliatePartner", on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.code
+
+
+class DiscountCode(models.Model):
+    code = models.CharField(max_length=50, unique=True)
+    percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+    times_used = models.PositiveIntegerField(default=0)
+
+    def is_valid_now(self):
+        now = timezone.now()
+        return (
+            self.is_active and
+            (self.valid_from is None or self.valid_from <= now) and
+            (self.valid_until is None or now <= self.valid_until)
+        )
+
+    def __str__(self):
+        return self.code
