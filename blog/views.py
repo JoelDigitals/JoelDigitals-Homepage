@@ -68,6 +68,7 @@ def blog_create(request):
 def blog_edit(request, pk):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     post = get_object_or_404(BlogPost, pk=pk)
+
     if request.method == 'POST':
         form = BlogPostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
@@ -75,16 +76,28 @@ def blog_edit(request, pk):
             return redirect('admin_blog')
     else:
         form = BlogPostForm(instance=post)
-    return render(request, 'blog/blog_form.html', {'form': form, 'action': 'Bearbeiten'}, {'user_groups': user_groups})
+
+    context = {
+        'form': form,
+        'action': 'Bearbeiten',
+        'user_groups': user_groups,
+    }
+    return render(request, 'blog/blog_form.html', context)
 
 @user_passes_test(is_blog_editor)
 def blog_delete(request, pk):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     post = get_object_or_404(BlogPost, pk=pk)
+
     if request.method == 'POST':
         post.delete()
         return redirect('admin_blog')
-    return render(request, 'blog/blog_confirm_delete.html', {'post': post}, {'user_groups': user_groups})
+
+    context = {
+        'post': post,
+        'user_groups': user_groups,
+    }
+    return render(request, 'blog/blog_confirm_delete.html', context)
 
 @user_passes_test(is_blog_editor)
 def create_category(request):

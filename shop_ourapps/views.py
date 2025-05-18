@@ -10,9 +10,15 @@ from django.template.loader import render_to_string
 from decimal import Decimal
 from django.http import Http404
 
+
 def our_apps(request):
-    apps = App.objects.all()
-    return render(request, 'apps/our_apps.html', {'apps': apps})
+    apps = App.objects.filter(is_active=True)  # Nur aktive Apps
+    user_groups = request.user.groups.values_list('name', flat=True) if request.user.is_authenticated else []
+
+    return render(request, 'apps/our_apps.html', {
+        'apps': apps,
+        'user_groups': user_groups,
+    })
 
 def shop(request):
     apps = App.objects.filter(is_available_for_purchase=True)

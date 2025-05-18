@@ -100,6 +100,54 @@
         footer a:hover {
             text-decoration: underline;
         }
+        footer p {
+            margin: 5px 0;
+        }
+        footer a {
+            color: #ccc;
+            margin: 0 5px;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        .wish-field {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 6px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        table, th, td {
+            border: 1px solid #000;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            nav {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+            nav a {
+                display: block;
+                margin: 5px 0;
+            }
+        }
+        @media (max-width: 1000px) {
+            main {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -112,6 +160,8 @@
     <a href="/about/">About Us</a>
     <a href="/contact/">Contact</a>
     <a href="/blog/">Blog</a>
+    <a href ="/our-apps/">Our Apps</a>
+    <a href ="/shop/">Shop</a>
     {% if user.is_authenticated %}
         {% if "Marketing" in user_groups %}
             <a href="/blog/admin-blog/">Admin: Blog</a>
@@ -121,7 +171,6 @@
         {% endif %}
         {% if "Support" in user_groups %}
             <a href="/contact/admin-tickets/">Admin: Tickets</a>
-            <a href="/blog/admin-blog/">Admin: Blog</a>
         {% endif %}
         <a href="/auth/logout/">Logout</a>
     {% else %}

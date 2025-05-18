@@ -135,6 +135,61 @@
         .shop-item a:hover {
             background-color: #0033a0;
         }
+        .shop-item h3 {
+            font-size: 16px;
+            color: #666;
+        }
+        .shop-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        .shop-item p {
+            margin: 5px 0;
+        }
+        .shop-item p:last-child {
+            font-weight: bold;
+            color: #0044cc;
+        }
+        .shop-item p:first-child {
+            font-size: 16px;
+            color: #666;
+        }
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            nav {
+                margin-top: 10px;
+            }
+            .logo-img {
+                width: 100%;
+                height: auto;
+            }
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            .shop-item {
+                padding: 15px;
+            }
+            h1, h2, h3 {
+                font-size: 24px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1, h2, h3 {
+                font-size: 20px;
+            }
+            .shop-item {
+                padding: 10px;
+            }
+            .shop-item p {
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -147,13 +202,23 @@
     <a href="/about/">About Us</a>
     <a href="/contact/">Contact</a>
     <a href="/blog/">Blog</a>
+    <a href ="/our-apps/">Our Apps</a>
+    <a href ="/shop/">Shop</a>
     {% if user.is_authenticated %}
-        <a href="/affiliate/eligibility/">Affiliate Program</a>
+        {% if "Marketing" in user_groups %}
+            <a href="/blog/admin-blog/">Admin: Blog</a>
+        {% endif %}
+        {% if "Selling" in user_groups %}
+            <a href="/contact/admin-sales/">Admin: Sales</a>
+        {% endif %}
+        {% if "Support" in user_groups %}
+            <a href="/contact/admin-tickets/">Admin: Tickets</a>
+        {% endif %}
         <a href="/auth/logout/">Logout</a>
     {% else %}
         <a href="/auth/login/">Login</a>
     {% endif %}
-    </nav>
+</nav>
 </header>
 
 <main>
@@ -165,10 +230,14 @@
                 <h3>{{ app.image }}</h3>
                 <p>{{ app.description }}</p>
                 <p>Version: {{ app.version }}</p>
-                <p>€{{ app.price }}</p>
-                <a href="{% url 'app_detail' slug=app.slug %}">View Details</a>
+                {% if app.link %}
+                    <a href="{{ app.link }}" class="button" target="_blank" rel="noopener noreferrer" style="margin-left: 10px;">Go to App</a>
+                {% endif %}
             </div>
         {% endfor %}
+        {% if not apps %}
+            <p>No apps available at the moment.</p>
+        {% endif %}
     </div>
 </main>
 

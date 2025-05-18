@@ -27,6 +27,10 @@ class App(models.Model):
     image = models.ImageField(upload_to='app_images/', null=True, blank=True)
     is_available_for_purchase = models.BooleanField(default=False)
     price = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    link = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.name

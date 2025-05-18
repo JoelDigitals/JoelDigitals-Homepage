@@ -97,6 +97,40 @@
         footer a:hover {
             text-decoration: underline;
         }
+
+        @media (max-width: 600px) {
+            header, footer {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav {
+                margin-top: 10px;
+            }
+
+            nav a {
+                margin: 5px 0;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+        @media (max-width: 400px) {
+            .logo-img {
+                width: 150px;
+                height: auto;
+            }
+
+            h1, h2 {
+                font-size: 24px;
+            }
+
+            .button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -110,6 +144,7 @@
     <a href="/contact/">Contact</a>
     <a href="/blog/">Blog</a>
     <a href ="/our-apps/">Our Apps</a>
+    <a href ="/shop/">Shop</a>
     {% if user.is_authenticated %}
         {% if "Marketing" in user_groups %}
             <a href="/blog/admin-blog/">Admin: Blog</a>
@@ -119,9 +154,7 @@
         {% endif %}
         {% if "Support" in user_groups %}
             <a href="/contact/admin-tickets/">Admin: Tickets</a>
-            <a href="/blog/admin-blog/">Admin: Blog</a>
         {% endif %}
-        <a href ="/shop/">Shop</a>
         <a href="/auth/logout/">Logout</a>
     {% else %}
         <a href="/auth/login/">Login</a>
