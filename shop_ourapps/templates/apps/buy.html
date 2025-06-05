@@ -3,20 +3,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Your Cart</title>
+    <title>Gutschein kaufen – Joel Digitals</title>
     <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #bfb9b9;
+            background-color: rgb(191, 185, 185);
             color: #000;
             font-size: 18px;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
-
         header {
             background-color: #0044cc;
             color: white;
@@ -24,119 +24,61 @@
             display: flex;
             align-items: center;
         }
-
         .logo-img {
             width: 250px;
             height: 111px;
             object-fit: contain;
         }
-
-        nav {
-            margin-left: auto;
-        }
-
         nav a {
             color: #fff;
             margin: 0 10px;
             text-decoration: none;
         }
-
         nav a:hover {
             text-decoration: underline;
         }
-
         main {
             padding: 40px 20px;
-            max-width: 1000px;
+            max-width: 800px;
             margin: auto;
             flex-grow: 1;
         }
-
         .container {
-            background-color: #fff;
+            background-color: white;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
-
         h1, h2 {
             color: #0044cc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-
-        .button {
+        form {
+            margin-top: 20px;
+        }
+        form p {
+            margin-bottom: 15px;
+        }
+        .button, button[type="submit"] {
             background-color: #0044cc;
             color: white;
             padding: 10px 20px;
             border: none;
             border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        .button:hover {
-            background-color: #0033a0;
-        }
-
-        footer {
-            background-color: #0044cc;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 50px;
-            border-top: 1px solid #ccc;
-            color: #ccc;
-        }
-
-        footer a {
-            color: #ccc;
-            margin: 0 5px;
             text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        .cart-item {
-            border: 1px solid #ccc;
-            margin: 15px 0;
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .cart-item h2 {
-            margin-top: 0;
-        }
-
-        .cart-item p {
-            margin: 5px 0;
-        }
-
-        .cart-item a {
+            font-size: 16px;
             display: inline-block;
             margin-top: 10px;
-            background-color: #0044cc;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 6px;
-            text-decoration: none;
+            cursor: pointer;
         }
-
-        .cart-item a:hover {
+        .button:hover, button[type="submit"]:hover {
             background-color: #0033a0;
         }
-
-        .totals {
-            margin-top: 30px;
-            font-size: 18px;
-        }
-
-        .empty-cart {
-            font-style: italic;
-            color: #444;
+        .message {
+            color: green;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -175,42 +117,27 @@
 
 <main>
     <div class="container">
-        <h1>Your Cart</h1>
-        {% if items %}
-            {% for item in items %}
-                <div class="cart-item">
-                    <h2>{{ item.app.name }}</h2>
-                    <p>{{ item.quantity }} x {{ item.app.price }}€</p>
-                    <p><strong>Total:</strong> {{ item.total_price }}€</p>
-                    <a href="{% url 'remove_from_cart' item.id %}">Remove</a>
-                </div>
+        <h2><i class="fas fa-gift"></i> Gutschein kaufen</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit"><i class="fas fa-download"></i> Gutschein erstellen & herunterladen</button>
+        </form>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p class="message">{{ message }}</p>
             {% endfor %}
-
-            <div class="totals">
-                <hr>
-                <p><strong>Subtotal (Net):</strong> {{ total_netto }}€</p>
-                <p><strong>VAT (19%):</strong> {{ total_vat }}€</p>
-                <p><strong>Total (Gross):</strong> {{ total_brutto }}€</p>
-                <hr>
-            </div>
-
-            <form method="POST">
-                {% csrf_token %}
-                <button type="submit" class="button">Proceed to Checkout</button>
-            </form>
-        {% else %}
-            <p class="empty-cart">Your cart is currently empty.</p>
         {% endif %}
     </div>
 </main>
 
 <footer>
-    <div>&copy; 2025 Joel Digitals. All rights reserved.</div>
-    <p>
+    <p style="text-align: center; color: #ccc; margin: 30px 0 10px;">
+        &copy; 2025 Joel Digitals. All rights reserved. |
         <a href="/imprint/">Imprint</a> |
         <a href="/privacy/">Privacy Policy</a> |
-        <a href="/terms/">Terms of Service</a> |
-        <a href="/">Home</a>
+        <a href="/terms/">Terms</a>
     </p>
 </footer>
 </body>

@@ -133,12 +133,136 @@
         }
     </style>
 </head>
+<div id="cookie-banner" style="display:none; position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #ccc; padding: 20px; z-index: 9999; font-size: 14px;">
+    <div style="max-width: 900px; margin: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <div style="flex: 1;">
+                <p id="cookie-message"></p>
+                <div id="cookie-options" style="margin-top: 10px;">
+                    <label><input type="checkbox" id="essential" disabled checked> <span id="label-essential"></span></label><br>
+                    <label><input type="checkbox" id="functional"> <span id="label-functional"></span></label><br>
+                    <label><input type="checkbox" id="analytics"> <span id="label-analytics"></span></label><br>
+                    <label><input type="checkbox" id="marketing"> <span id="label-marketing"></span></label>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; min-width: 200px;">
+                <select id="language-select" onchange="setLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="de">Deutsch</option>
+                    <option value="fr">Français</option>
+                </select>
+                <button onclick="acceptAll()" class="button">Alle akzeptieren</button>
+                <button onclick="savePreferences()" class="button">Einstellungen speichern</button>
+                <button onclick="rejectEssentials()" class="button" style="background-color: #888;">Nur Essenzielle</button>
+                <a href="/privacy/" style="text-align: center; font-size: 12px;">Datenschutzerklärung</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const translations = {
+        de: {
+            message: "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern. Sie können auswählen, welchen Kategorien Sie zustimmen.",
+            labels: {
+                essential: "Essenzielle Cookies (immer aktiv)",
+                functional: "Funktionale Cookies (z. B. Warenkorb speichern)",
+                analytics: "Analyse-Cookies (z. B. Besucherzahlen messen)",
+                marketing: "Marketing-Cookies (z. B. für Werbung & Tracking)"
+            },
+            buttons: {
+                acceptAll: "Alle akzeptieren",
+                save: "Einstellungen speichern",
+                essentialsOnly: "Nur Essenzielle"
+            }
+        },
+        en: {
+            message: "We use cookies to improve your experience. You can choose which categories to allow.",
+            labels: {
+                essential: "Essential cookies (always active)",
+                functional: "Functional cookies (e.g., save cart)",
+                analytics: "Analytics cookies (e.g., visitor stats)",
+                marketing: "Marketing cookies (e.g., ads & tracking)"
+            },
+            buttons: {
+                acceptAll: "Accept all",
+                save: "Save preferences",
+                essentialsOnly: "Essentials only"
+            }
+        },
+        fr: {
+            message: "Nous utilisons des cookies pour améliorer votre expérience. Choisissez les catégories que vous souhaitez autoriser.",
+            labels: {
+                essential: "Cookies essentiels (toujours actifs)",
+                functional: "Cookies fonctionnels (ex. panier)",
+                analytics: "Cookies d’analyse (ex. nombre de visiteurs)",
+                marketing: "Cookies marketing (ex. publicité)"
+            },
+            buttons: {
+                acceptAll: "Tout accepter",
+                save: "Enregistrer",
+                essentialsOnly: "Essentiels uniquement"
+            }
+        }
+    };
+
+    let currentLang = 'de';  // Standard-Sprache
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        const t = translations[lang];
+        document.getElementById('cookie-message').innerText = t.message;
+        document.getElementById('label-essential').innerText = t.labels.essential;
+        document.getElementById('label-functional').innerText = t.labels.functional;
+        document.getElementById('label-analytics').innerText = t.labels.analytics;
+        document.getElementById('label-marketing').innerText = t.labels.marketing;
+        document.querySelector("button[onclick='acceptAll()']").innerText = t.buttons.acceptAll;
+        document.querySelector("button[onclick='savePreferences()']").innerText = t.buttons.save;
+        document.querySelector("button[onclick='rejectEssentials()']").innerText = t.buttons.essentialsOnly;
+    }
+
+    function showBannerIfNeeded() {
+        if (!localStorage.getItem('cookieConsent')) {
+            document.getElementById('cookie-banner').style.display = 'block';
+            setLanguage(currentLang);
+        }
+    }
+
+    function savePreferences() {
+        const consent = {
+            essential: true,
+            functional: document.getElementById('functional').checked,
+            analytics: document.getElementById('analytics').checked,
+            marketing: document.getElementById('marketing').checked
+        };
+        localStorage.setItem('cookieConsent', JSON.stringify(consent));
+        document.getElementById('cookie-banner').style.display = 'none';
+    }
+
+    function acceptAll() {
+        document.getElementById('functional').checked = true;
+        document.getElementById('analytics').checked = true;
+        document.getElementById('marketing').checked = true;
+        savePreferences();
+    }
+
+    function rejectEssentials() {
+        document.getElementById('functional').checked = false;
+        document.getElementById('analytics').checked = false;
+        document.getElementById('marketing').checked = false;
+        savePreferences();
+    }
+
+    document.addEventListener('DOMContentLoaded', showBannerIfNeeded);
+</script>
+
 <body>
 <header>
     <a href="/">
         <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
     </a>
     <nav style="margin-left: auto;">
+    <a href="/wiki/">Wiki</a>
     <a href="/services/">Services</a>
     <a href="/about/">About Us</a>
     <a href="/contact/">Contact</a>

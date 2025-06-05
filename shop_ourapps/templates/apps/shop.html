@@ -6,6 +6,7 @@
     <title>Joel Digitals Shop</title>
     <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
     <style>
+        /* Dein CSS bleibt gleich */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -14,9 +15,8 @@
             font-size: 18px;
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Stellt sicher, dass der Body mindestens die volle Bildschirmhöhe hat */
+            min-height: 100vh;
         }
-
         header {
             background-color: #0044cc;
             color: white;
@@ -24,41 +24,34 @@
             display: flex;
             align-items: center;
         }
-
         .logo-img {
             width: 250px;
             height: 111px;
             object-fit: contain;
         }
-
         nav a {
             color: #fff;
             margin: 0 10px;
             text-decoration: none;
         }
-
         nav a:hover {
             text-decoration: underline;
         }
-
         main {
             padding: 40px 20px;
             max-width: 1000px;
             margin: auto;
-            flex-grow: 1; /* Lässt das Hauptinhaltselement den verbleibenden Raum ausfüllen */
+            flex-grow: 1;
         }
-
         .container {
             background-color: white;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
-
         h1, h2 {
             color: #0044cc;
         }
-
         .feature {
             width: 100%;
             max-width: 600px;
@@ -66,7 +59,6 @@
             margin-top: 10px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
-
         .button {
             background-color: #0044cc;
             color: white;
@@ -78,11 +70,9 @@
             display: inline-block;
             margin-top: 20px;
         }
-
         .button:hover {
             background-color: #0033a0;
         }
-
         footer {
             background-color: #0044cc;
             padding: 20px;
@@ -92,17 +82,14 @@
             border-top: 1px solid #ccc;
             position: relative;
         }
-
         footer a {
             color: #ccc;
             margin: 0 5px;
             text-decoration: none;
         }
-
         footer a:hover {
             text-decoration: underline;
         }
-
         .shop-item {
             border: 1px solid #ccc;
             margin: 15px 0;
@@ -111,17 +98,14 @@
             background-color: #f9f9f9;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
-
         .shop-item h2 {
             margin: 0;
             color: #0044cc;
         }
-
         .shop-item p {
             font-size: 18px;
             color: #333;
         }
-
         .shop-item a {
             display: inline-block;
             margin-top: 10px;
@@ -131,42 +115,73 @@
             border-radius: 6px;
             text-decoration: none;
         }
-
         .shop-item a:hover {
             background-color: #0033a0;
         }
     </style>
 </head>
 <body>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <header>
     <a href="/">
         <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
     </a>
-    <nav style="margin-left: auto;">
-    <a href="/services/">Services</a>
-    <a href="/about/">About Us</a>
-    <a href="/contact/">Contact</a>
-    <a href="/blog/">Blog</a>
-    {% if user.is_authenticated %}
-        <a href="/affiliate/eligibility/">Affiliate Program</a>
-        <a href="/auth/logout/">Logout</a>
-    {% else %}
-        <a href="/auth/login/">Login</a>
-    {% endif %}
-    
+    <nav style="margin-left: auto; display: flex; align-items: center; gap: 15px;">
+        <a href="/services/">Services</a>
+        <a href="/about/">About Us</a>
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Blog</a>
+        {% if user.is_authenticated %}
+            <a href="/affiliate/dashboard/">Affiliate Program</a>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            <!-- Einkaufswagen -->
+            <a href="/cart/" title="Cart"><i class="fas fa-shopping-cart"></i></a>
+
+            <!-- Wallet-Link -->
+            <a href="/wallet/" title="Wallet">
+                <i class="fas fa-wallet"></i> {{ wallet_balance|floatformat:2 }} €
+            </a>
+
+            <!-- Logout -->
+            <a href="/auth/logout/" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+        {% else %}
+            <!-- Login -->
+            <a href="/auth/login/" title="Login"><i class="fas fa-sign-in-alt"></i></a>
+        {% endif %}
+    </nav>
 </header>
+
+
 
 <main>
     <div class="container">
         <h1>Shop</h1>
-        {% for app in apps %}
-            <div class="shop-item">
-                <h2>{{ app.name }}</h2>
-                <h2>{{ app.image }}</h2>
-                <p>{{ app.description }}</p>
-                <p>Version: {{ app.version }}</p>
-                <p>€{{ app.price }}</p>
-                <a href="{% url 'app_detail' slug=app.slug %}">View Details</a>
+        <p>All prices are in Euros (€) and include VAT.</p>
+        <input type="text" id="searchInput" placeholder="Search apps..." style="width: 100%; padding: 10px; font-size: 16px; margin-bottom: 20px;">
+
+        {% for group_key, apps in grouped_apps.items %}
+            <div class="group">
+                <h2 onclick="toggleGroup('{{ group_key }}')" style="cursor: pointer;">
+                    Group: <span id="group-title-{{ group_key }}">{{ group_key|title }}</span>
+                    <span id="arrow-{{ group_key }}">▼</span>
+                </h2>
+
+                <div id="group-{{ group_key }}">
+                    {% for app in apps %}
+                        <div class="shop-item">
+                            <h2>{{ app.name }}</h2>
+                            {% if app.image %}
+                                <img src="{{ app.image.url }}" alt="{{ app.name }}" class="feature">
+                            {% endif %}
+                            <p>{{ app.description }}</p>
+                            <p>Version: {{ app.version }}</p>
+                            <p>€{{ app.price }}</p>
+                            <a href="{% url 'app_detail' slug=app.slug %}">View Details</a>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         {% endfor %}
     </div>
@@ -181,5 +196,37 @@
         <a href="/">Home</a>
     </p>
 </footer>
+
+<script>
+    document.getElementById("searchInput").addEventListener("input", function () {
+        const query = this.value.toLowerCase();
+        const items = document.querySelectorAll(".shop-item");
+        items.forEach(item => {
+            const name = item.querySelector("h2").textContent.toLowerCase();
+            item.style.display = name.includes(query) ? "block" : "none";
+        });
+    });
+
+    const groupTitles = {};
+
+    function toggleGroup(key) {
+        const groupDiv = document.getElementById("group-" + key);
+        const arrow = document.getElementById("arrow-" + key);
+        if (groupDiv.style.display === "none") {
+            groupDiv.style.display = "block";
+            arrow.textContent = "▼";
+        } else {
+            groupDiv.style.display = "none";
+            arrow.textContent = "►";
+        }
+    }
+
+    function renameGroup(key, newName) {
+        if (newName.trim() !== "") {
+            document.getElementById("group-title-" + key).textContent = newName;
+            groupTitles[key] = newName;
+        }
+    }
+</script>
 </body>
 </html>

@@ -16,7 +16,6 @@
             flex-direction: column;
             min-height: 100vh;
         }
-
         header {
             background-color: #0044cc;
             color: white;
@@ -24,46 +23,38 @@
             display: flex;
             align-items: center;
         }
-
         .logo-img {
             width: 250px;
             height: 111px;
             object-fit: contain;
         }
-
         nav a {
             color: #fff;
             margin: 0 10px;
             text-decoration: none;
         }
-
         nav a:hover {
             text-decoration: underline;
         }
-
         main {
             padding: 40px 20px;
             max-width: 1000px;
             margin: auto;
             flex-grow: 1;
         }
-
         .container {
             background-color: white;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
-
         h1, h2 {
             color: #0044cc;
         }
-
         .form-input {
             margin-bottom: 10px;
         }
-
-        .form-input input {
+        .form-input input, textarea, select {
             width: 100%;
             padding: 8px;
             margin-top: 5px;
@@ -71,7 +62,6 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-
         .button {
             background-color: #0044cc;
             color: white;
@@ -83,11 +73,9 @@
             display: inline-block;
             margin-top: 20px;
         }
-
         .button:hover {
             background-color: #0033a0;
         }
-
         footer {
             background-color: #0044cc;
             padding: 20px;
@@ -96,23 +84,27 @@
             margin-top: 50px;
             border-top: 1px solid #ccc;
         }
-
         footer a {
             color: #ccc;
             margin: 0 5px;
             text-decoration: none;
         }
-
         footer a:hover {
             text-decoration: underline;
         }
+        .message {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .message.error { background-color: #f8d7da; color: #721c24; }
+        .message.success { background-color: #d4edda; color: #155724; }
+        .message.warning { background-color: #fff3cd; color: #856404; }
     </style>
 </head>
 <body>
 <header>
-    <a href="/">
-        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
-    </a>
+    <a href="/"><img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img"></a>
     <nav style="margin-left: auto;">
         <a href="/services/">Services</a>
         <a href="/about/">About Us</a>
@@ -121,75 +113,101 @@
         <a href="/cart/">Cart</a>
     </nav>
 </header>
-
 <main>
     <div class="container">
         <h1>Checkout</h1>
-        <p>Total: €{{ total }}</p>
-        <p>Proceed with payment:</p>
+
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+
+        <h2>Your Items</h2>
+        <ul>
+            {% for item in items %}
+                <li>{{ item.quantity }} × {{ item.app.name }} – €{{ item.app.price|floatformat:2 }}</li>
+            {% empty %}
+                <li>Your cart is empty.</li>
+            {% endfor %}
+        </ul>
+
+        {% with discount_amount|default:0 as discount %}
+            <p><strong>Subtotal:</strong> €{{ total|add:discount|floatformat:2 }}</p>
+            <p id="discount-line" style="display: {% if discount > 0 %}block{% else %}none{% endif %};">
+                <strong>Discount:</strong> -€<span id="discount-amount">{{ discount|floatformat:2 }}</span>
+            </p>
+        {% endwith %}
+        <p><strong>Total:</strong> €<span id="total-amount">{{ total|floatformat:2 }}</span></p>
+
         <form method="post">
             {% csrf_token %}
+            <div class="form-input"><label>First Name</label><input type="text" name="first_name" required></div>
+            <div class="form-input"><label>Last Name</label><input type="text" name="last_name" required></div>
+            <div class="form-input"><label>Email</label><input type="email" name="email" required></div>
+            <div class="form-input"><label>Address, ZipCode, City</label><textarea name="address" required></textarea></div>
+            <div class="form-input"><label>Company Name (optional)</label><input type="text" name="company_name"></div>
+            <div class="form-input"><label>VAT Number (optional)</label><input type="text" name="vat_number"></div>
+            <div class="form-input"><label>Phone Number</label><input type="text" name="phone" required></div>
+            <div class="form-input"><label>Affiliate Code</label><input type="text" name="affiliate_code" placeholder="Affiliate-Code"></div>
+            <div class="form-input"><label>Discount Code</label><input type="text" name="discount_code" placeholder="Rabattcode" id="discount-code-input"></div>
             <div class="form-input">
-                <label for="first_name">First Name</label>
-                <input type="text" name="first_name" required>
-            </div>
-            <div class="form-input">
-                <label for="last_name">Last Name</label>
-                <input type="text" name="last_name" required>
-            </div>
-            <div class="form-input">
-                <label for="email">Email</label>
-                <input type="email" name="email" required>
-            </div>
-            <div class="form-input">
-                <label for="address">Address, ZipCode, City</label>
-                <textarea name="address" required></textarea>
-            </div>
-            <div class="form-input">
-                <label for="company_name">Company Name (optional)</label>
-                <input type="text" name="company_name">
-            </div>
-            <div class="form-input">
-                <label for="vat_number">VAT Number (optional)</label>
-                <input type="text" name="vat_number">
-            </div>
-            <div class="form-input">
-                <label for="phone">Phone Number</label>
-                <input type="text" name="phone">
-            </div>
-            <div class="form-input">
-                <input type="text" name="affiliate_code" placeholder="Affiliate-Code">
-                <input type="text" name="discount_code" placeholder="Rabattcode">
-            </div>
-            <div class="form-input">
-                <label for="payment_method">Payment Method</label>
+                <label>Payment Method</label>
                 <select name="payment_method" required>
-                    <option value="bank_transfer">Bank Transfer</option>
                     <option value="invoice">Invoice</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                    {% if wallet_balance %}
+                        <option value="wallet">Wallet (Balance: €{{ wallet_balance|floatformat:2 }})</option>
+                    {% endif %}
                 </select>
             </div>
-            <div>
-                <label for="terms">
-                    <input type="checkbox" name="terms" required>
-                    I agree to the <a href="/terms/">Terms of Service</a>
-                </label>
-            </div>
-            <div>
-                <button type="submit" class="button">Complete Order</button>
-            </div>
+            <button class="button" type="submit">Place Order</button>
         </form>
-        <p>For any questions, please contact us at <a href="mailto:joel-digitals@gmx.de">joel-digitals@gmx.de</a>.</p>
     </div>
 </main>
-
 <footer>
-    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
-    <p>
-        <a href="/imprint/">Imprint</a> |
-        <a href="/privacy/">Privacy Policy</a> |
-        <a href="/terms/">Terms of Service</a> |
-        <a href="/">Home</a>
-    </p>
+    <p>&copy; {{ now|date:"Y" }} Joel Digitals. All rights reserved.</p>
+    <p><a href="/privacy/">Privacy</a> | <a href="/terms/">Terms</a></p>
 </footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const discountInput = document.getElementById("discount-code-input");
+    const discountLine = document.getElementById("discount-line");
+    const discountAmount = document.getElementById("discount-amount");
+    const totalAmount = document.getElementById("total-amount");
+
+    let timeout = null;
+
+    discountInput.addEventListener("input", function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            fetch("{% url 'validate_codes' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({
+                    discount_code: discountInput.value.trim()
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    discountLine.style.display = "block";
+                    discountAmount.textContent = parseFloat(data.discount).toFixed(2);
+                    totalAmount.textContent = parseFloat(data.new_total).toFixed(2);
+                } else {
+                    discountLine.style.display = "none";
+                    discountAmount.textContent = "0.00";
+                    totalAmount.textContent = "{{ total|floatformat:2 }}";
+                    if (discountInput.value.trim()) {
+                        alert(data.message);
+                    }
+                }
+            });
+        }, 500); // debounce
+    });
+});
+</script>
 </body>
 </html>

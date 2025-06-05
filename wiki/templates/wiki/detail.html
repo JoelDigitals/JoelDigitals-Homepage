@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ wiki.title }} | Wiki{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row gap-8">
+
+  <!-- Inhaltsverzeichnis -->
+  <aside class="md:w-1/4 hidden md:block">
+    <div class="sticky top-24">
+      <h2 class="text-lg font-bold mb-4">Inhaltsverzeichnis</h2>
+      <ul class="space-y-2 text-sm">
+            {% for item in toc %}
+                {% if item.level == "h3" %}
+                  <li class="ml-4">
+                {% else %}
+                  <li>
+                {% endif %}
+                    <a href="#{{ item.anchor }}" class="text-blue-700 hover:underline">
+                        {{ item.text }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Inhalt -->
+  <article class="prose prose-lg max-w-none">
+    {{ content_html|safe }}
+  </article>
+</div>
+{% endblock %}

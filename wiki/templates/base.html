@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Wiki | Joel Digitals{% endblock %}</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="{% static 'images/favicon.png' %}" type="image/x-icon" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind Typography Plugin -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            inter: ['Inter', 'sans-serif']
+          }
+        }
+      },
+      plugins: [tailwindcss.typography]
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-image: linear-gradient(
+        rgba(255, 255, 255, 0.9),
+        rgba(255, 255, 255, 0.95)
+      ),
+      url("{% static 'images/wiki-bg.jpg' %}");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="flex flex-col min-h-screen text-gray-800 bg-fixed">
+
+  <!-- HEADER -->
+  <header class="bg-[#0044cc] text-white shadow-md z-10 relative">
+    <div class="container mx-auto flex justify-between items-center py-4 px-6">
+      <a href="/" class="flex items-center space-x-3">
+        <img src="{% static 'images/logo.png' %}" alt="Joel Digitals Logo" class="h-10 w-auto" />
+        <span class="text-xl font-bold tracking-wide">Joel Digitals</span>
+      </a>
+      <nav class="space-x-6 text-white font-medium">
+        <a href="/wiki/" class="hover:underline">Wiki</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 container mx-auto px-6 py-10">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-[#0044cc] text-white text-center py-4 mt-8">
+    &copy; {{ now|date:"Y" }} Joel Digitals – All rights reserved.
+  </footer>
+
+</body>
+</html>

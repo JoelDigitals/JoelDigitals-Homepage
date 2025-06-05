@@ -228,13 +228,14 @@
             <div class="shop-item">
                 <h2>{{ app.name }}</h2>
                 <h3>{{ app.image }}</h3>
-                <p>{{ app.description }}</p>
+                <p>{{ app.description|linebreaksbr }}</p>
                 <p>Version: {{ app.version }}</p>
                 {% if app.link %}
                     <a href="{{ app.link }}" class="button" target="_blank" rel="noopener noreferrer" style="margin-left: 10px;">Go to App</a>
                 {% endif %}
             </div>
         {% endfor %}
+
         {% if not apps %}
             <p>No apps available at the moment.</p>
         {% endif %}

@@ -1,15 +1,198 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
-from .models import App, AffiliateLink, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner
+from .models import App, AffiliateLink, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder
 from shop_ourapps.models import AffiliatePartner
-from .forms import PurchaseForm
+from .forms import PurchaseForm, VoucherPurchaseForm
 from django.contrib import messages
 from django.conf import settings
 from django.template.loader import render_to_string
 from decimal import Decimal
-from django.http import Http404
+from django.http import Http404, JsonResponse
+from django.utils.timezone import now
+from django.db.models.functions import TruncMonth
+from django.db.models import Sum
+import json
+from django.utils import timezone
+from collections import defaultdict
+from django.core.exceptions import ValidationError
+from io import BytesIO
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+from io import BytesIO
+from django.http import FileResponse, HttpResponse
+from django.shortcuts import render
+from django.utils.timezone import now
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.units import cm, mm
+from reportlab.lib.utils import ImageReader
+from .models import Voucher, VoucherOrder, Wallet
+from .forms import VoucherPurchaseForm
+import os
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from django.core.exceptions import ValidationError
 
+from reportlab.lib.utils import ImageReader
+
+@login_required
+def buy_voucher(request):
+    if request.method == 'POST':
+        form = VoucherPurchaseForm(request.POST)
+        if form.is_valid():
+            amount = form.cleaned_data['amount']
+            payment_method = form.cleaned_data['payment_method']
+            recipient_email = form.cleaned_data['recipient_email']
+            recipient_name = form.cleaned_data['recipient_name']
+            message = form.cleaned_data.get('message', '')
+            design = form.cleaned_data.get('design', 'default')
+
+            wallet, _ = Wallet.objects.get_or_create(user=request.user)
+            if payment_method == 'wallet':
+                if not wallet.deduct(amount):
+                    return HttpResponse("Nicht genügend Guthaben im Wallet.", status=400)
+
+            voucher = Voucher.objects.create(amount=amount, user=request.user)
+            VoucherOrder.objects.create(
+                user=request.user,
+                voucher=voucher,
+                recipient_email=recipient_email,
+                recipient_name=recipient_name,
+                message=message
+            )
+
+            # PDF-Gutschein erzeugen
+            buffer = BytesIO()
+            p = canvas.Canvas(buffer, pagesize=landscape(A4))
+            width, height = landscape(A4)
+
+            # Designauswahl
+            if design == 'happy_birthday':
+                bg_color = colors.HexColor("#FFF3F5")
+                title = "🎉 Happy Birthday!"
+                msg_color = colors.darkmagenta
+            elif design == 'danke':
+                bg_color = colors.HexColor("#E6F9E6")
+                title = "🙏 Danke schön!"
+                msg_color = colors.green
+            elif design == 'fuer_dich':
+                bg_color = colors.HexColor("#E3F2FD")
+                title = "🎁 Für Dich!"
+                msg_color = colors.darkblue
+            else:
+                bg_color = colors.white
+                title = "🎫 Joel Digitals Gutschein"
+                msg_color = colors.black
+
+            # Hintergrundfarbe
+            p.setFillColor(bg_color)
+            p.rect(0, 0, width, height, fill=True, stroke=0)
+
+            # Faltlinien
+            quarter_width = width / 2
+            quarter_height = height / 2
+            p.setStrokeColor(colors.lightgrey)
+            p.setDash(2, 2)
+            p.line(quarter_width, 0, quarter_width, height)
+            p.line(0, quarter_height, width, quarter_height)
+
+            # Logo
+            logo_path = os.path.join('static', 'logo.png')
+
+            # OBEN LINKS: Shopinfos
+            p.setFont("Helvetica", 9)
+            p.setFillColor(colors.black)
+            shop_lines = [
+                "Joel Digitals",
+                "www.joel-digitals.de",
+                "info@joel-digitals.de",
+                "",
+                "Wichtiger Hinweis:",
+                "Dieser Gutschein ist nur einmal gültig.",
+                "Er kann auf www.joel-digitals.de eingelöst werden.",
+                "Keine Barauszahlung möglich.",
+            ]
+            x = 1 * cm
+            y = height - 2 * cm
+            for line in shop_lines:
+                p.drawString(x, y, line)
+                y -= 0.5 * cm
+
+            # OBEN RECHTS: Titel & Logo
+            p.setFont("Helvetica-Bold", 24)
+            p.setFillColor(msg_color)
+            p.drawCentredString(width - quarter_width / 2, height - 2 * cm, title)
+
+            if os.path.exists(logo_path):
+                logo = ImageReader(logo_path)
+                logo_width = 50 * mm
+                logo_height = 20 * mm
+                logo_x = width - quarter_width + (quarter_width - logo_width) / 2
+                logo_y = height - logo_height - 3.5 * cm
+                p.drawImage(logo, logo_x, logo_y, width=logo_width, height=logo_height, mask='auto')
+
+            # UNTEN LINKS: Nachricht
+            p.saveState()
+            p.translate(0, quarter_height)
+            p.rotate(180)
+            p.setFont("Helvetica-Bold", 12)
+            p.setFillColor(colors.black)
+            p.drawString(-width + 1 * cm, -3 * cm, "Persönliche Nachricht:")
+            p.setFont("Helvetica", 11)
+            text = p.beginText(-width + 1 * cm, -4.2 * cm)
+            text.setFillColor(msg_color)
+            for line in message.splitlines():
+                text.textLine(line)
+            p.drawText(text)
+            p.restoreState()
+
+            # UNTEN RECHTS: Empfängerdaten & Code
+            p.saveState()
+            p.translate(width, quarter_height)
+            p.rotate(180)
+            p.setFont("Helvetica-Bold", 12)
+            p.setFillColor(colors.black)
+            p.drawString(-quarter_width + 1 * cm, -2 * cm, f"Wert: {amount:.2f} €")
+            p.setFont("Helvetica", 11)
+            p.drawString(-quarter_width + 1 * cm, -3.2 * cm, f"Gutscheincode: {voucher.code}")
+            p.drawString(-quarter_width + 1 * cm, -4.4 * cm, f"Empfänger: {recipient_name}")
+            p.drawString(-quarter_width + 1 * cm, -5.6 * cm, f"Datum: {now().strftime('%d.%m.%Y')}")
+            p.restoreState()
+
+            # PDF abschließen
+            p.showPage()
+            p.save()
+            buffer.seek(0)
+            return FileResponse(buffer, as_attachment=True, filename=f'gutschein_{voucher.code}.pdf')
+    else:
+        form = VoucherPurchaseForm()
+
+    return render(request, 'apps/buy.html', {'form': form})
+
+
+
+
+def redeem_voucher(code, user):
+    try:
+        voucher = Voucher.objects.get(code=code.upper())
+    except Voucher.DoesNotExist:
+        raise ValidationError("Dieser Gutscheincode existiert nicht.")
+
+    if voucher.redeemed:
+        raise ValidationError("Dieser Gutscheincode wurde bereits eingelöst.")
+
+    # Betrag dem Wallet hinzufügen (angenommen: user.wallet_balance vorhanden)
+    user.wallet_balance += voucher.amount
+    user.save()
+
+    voucher.redeemed = True
+    voucher.redeemed_at = timezone.now()
+    voucher.redeemed_by = user
+    voucher.save()
 
 def our_apps(request):
     apps = App.objects.filter(is_active=True)  # Nur aktive Apps
@@ -21,12 +204,92 @@ def our_apps(request):
     })
 
 def shop(request):
+    # Nur aktive und kaufbare Apps laden
     apps = App.objects.filter(is_available_for_purchase=True)
-    return render(request, 'apps/shop.html', {'apps': apps})
+    grouped_apps = defaultdict(list)
+    group_names = {}
+
+    for app in apps:
+        if app.group:
+            group_key = app.group.name.strip().lower()
+        else:
+            # Standardgruppe: erste vier Buchstaben des App-Namens
+            group_key = app.name[:4].strip().lower()
+        grouped_apps[group_key].append(app)
+
+    # Gruppen alphabetisch sortieren
+    grouped_apps = dict(sorted(grouped_apps.items()))
+
+    # Kontext vorbereiten
+    context = {
+        "grouped_apps": grouped_apps,
+        "group_names": group_names,
+    }
+
+    if request.user.is_authenticated:
+        wallet = Wallet.objects.filter(user=request.user).first()
+        context["wallet_balance"] = wallet.balance if wallet else 0.00
+
+    return render(request, "apps/shop.html", context)
 
 def app_detail(request, slug):
     app = get_object_or_404(App, slug=slug)
     return render(request, 'apps/app_detail.html', {'app': app})
+
+@login_required
+def wallet_view(request):
+    user = request.user
+    wallet, _ = Wallet.objects.get_or_create(user=user)
+
+    today = now()
+    start_of_month = today.replace(day=1)
+
+    try:
+        partner = user.affiliatepartner
+    except AffiliatePartner.DoesNotExist:
+        partner = None
+
+    total_monthly_earnings = Decimal('0.00')
+    if partner:
+        monthly_orders = Order.objects.filter(
+            affiliate_code__partner=partner,
+            created_at__gte=start_of_month,
+            created_at__lte=today
+        )
+        total_sales = monthly_orders.aggregate(total=Sum('total_amount'))['total'] or Decimal('0.00')
+        total_monthly_earnings = (total_sales * Decimal(partner.commission_percent)) / Decimal('100.00')
+
+    if request.method == "POST":
+        # Transfer Earnings
+        if 'transfer' in request.POST:
+            if wallet.pending_earnings > 0:
+                wallet.transfer_to_wallet()
+                messages.success(request, "Pending earnings have been transferred to your wallet.")
+            else:
+                messages.error(request, "No earnings to transfer.")
+            return redirect("wallet")
+
+        # Gutscheincode einlösen
+        elif 'redeem_code' in request.POST:
+            code = request.POST.get("code", "").strip().upper()
+            try:
+                voucher = Voucher.objects.get(code=code, redeemed=False)
+                wallet.balance += voucher.amount
+                wallet.save()
+                voucher.redeemed = True
+                voucher.redeemed_by = user
+                voucher.redeemed_at = now()
+                voucher.save()
+                messages.success(request, f"Gutscheincode '{code}' erfolgreich eingelöst: {voucher.amount} € wurden Ihrem Wallet gutgeschrieben.")
+            except Voucher.DoesNotExist:
+                messages.error(request, f"Gutscheincode '{code}' ist ungültig oder wurde bereits verwendet.")
+            return redirect("wallet")
+
+    return render(request, 'apps/wallet.html', {
+        'wallet': wallet,
+        'total_monthly_earnings': total_monthly_earnings,
+        'pending': wallet.pending_earnings,
+    })
 
 @login_required
 @login_required
@@ -181,57 +444,79 @@ def affiliate_eligibility(request):
 @login_required
 def affiliate_dashboard(request):
     try:
-        # Berechnung der Affiliate-Statistiken für den eingeloggten Benutzer
         stats = calculate_affiliate_stats(request.user)
-        return render(request, "affiliate/dashboard.html", stats)
+        if not stats:
+            raise AffiliatePartner.DoesNotExist
+        return render(request, "apps/dashboard.html", stats)
     except AffiliatePartner.DoesNotExist:
-        # Wenn der Benutzer kein Affiliate-Partner ist
         messages.error(request, "You are not yet registered as an Affiliate Partner.")
-        return redirect('affiliate_eligibility')  # Weiterleitung zur Registrierung oder Eligibility-Seite
+        return redirect('affiliate_eligibility')
 
 
 def calculate_affiliate_stats(user):
     try:
-        # Versuchen, den Affiliate-Partner für den aktuellen Benutzer zu finden
-        partner = AffiliatePartner.objects.get(user=user)
-    except AffiliatePartner.DoesNotExist:
-        # Kein AffiliatePartner gefunden, Fehler wird bereits oben behandelt
-        raise AffiliatePartner.DoesNotExist
+        affiliate_partner = AffiliatePartner.objects.get(user=user)
+        affiliate_code = AffiliateCode.objects.get(partner=affiliate_partner)
+    except (AffiliatePartner.DoesNotExist, AffiliateCode.DoesNotExist):
+        return {}
 
-    # Beispiel für eine einfache Berechnung (Verkäufe, Einnahmen)
-    total_earnings = Decimal('0.00')  # Standardwert für Einnahmen
-    total_sales = 0  # Standardwert für Verkäufe
+    commission_rate = Decimal(affiliate_partner.commission_percent) / Decimal('100')
 
-    # Falls der Partner existiert, könnten wir hier weitere Berechnungen vornehmen
-    # Beispiel: Berechnung basierend auf Affiliate-Codes, Bestellungen, etc.
-    
-    # Hier sind Platzhalter, um zu verdeutlichen, dass zusätzliche Logik folgen kann
-    # total_sales = berechne_verkaufszahlen(partner)  # z.B. eine Methode, die Verkäufe ermittelt
-    # total_earnings = berechne_einnahmen(partner)  # z.B. eine Methode, die die Einnahmen ermittelt
+    orders = Order.objects.filter(affiliate_code=affiliate_code)
+
+    total_sales = sum((order.total_amount for order in orders), Decimal('0.00'))
+    earnings = total_sales * commission_rate
+
+    today = now()
+    current_year, current_month = today.year, today.month
+    monthly_orders = orders.filter(created_at__year=current_year, created_at__month=current_month)
+    monthly_sales = sum((order.total_amount for order in monthly_orders), Decimal('0.00'))
+    monthly_earnings = monthly_sales * commission_rate
+
+    # Letzte 12 Monate: Umsatz und Verdienst pro Monat
+    monthly_data = (
+        orders.annotate(month=TruncMonth("created_at"))
+        .values("month")
+        .annotate(monthly_sales=Sum("total_amount"))
+        .order_by("month")
+    )
+
+    sales_chart_labels = []
+    sales_chart_data = []
+    earnings_chart_data = []
+
+    for entry in monthly_data:
+        month_label = entry["month"].strftime("%b %Y")
+        sales = entry["monthly_sales"] or Decimal('0.00')
+        sales_chart_labels.append(month_label)
+        sales_chart_data.append(float(sales))
+        earnings_chart_data.append(float(sales * commission_rate))
 
     return {
-        "sales": total_sales,
-        "earnings": total_earnings,
+        "sales": total_sales.quantize(Decimal("0.01")),
+        "earnings": earnings.quantize(Decimal("0.01")),
+        "monthly_sales": monthly_sales.quantize(Decimal("0.01")),
+        "monthly_earnings": monthly_earnings.quantize(Decimal("0.01")),
+        "commission_percent": affiliate_partner.commission_percent,
+        "affiliate_code": affiliate_code.code,
+        "order_count": orders.count(),
+        "monthly_order_count": monthly_orders.count(),
+        "chart_labels": sales_chart_labels,
+        "chart_sales": sales_chart_data,
+        "chart_earnings": earnings_chart_data,
     }
-
-
 @login_required
 def cart_view(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
-    items = CartItem.objects.filter(user=request.user)
-    total_amount = Decimal('0.0')
+    items = CartItem.objects.filter(cart=cart)
 
-    # Berechnung des Bruttobetrags für jedes Item und Sicherstellen, dass es als Decimal behandelt wird
-    for item in items:
-        item.total_price = Decimal(item.app.price) * Decimal(item.quantity)  # Brutto pro Position
-
-    # Gesamtbrutto (Summe aller Positionen) sicherstellen, dass total_brutto als Decimal behandelt wird
-    total_brutto = Decimal(sum(item.total_price for item in items))
+    # Gesamtbrutto
+    total_brutto = sum(item.total_price for item in items)
 
     # Netto = Brutto / 1.19 (bei 19 % MwSt)
     total_netto = total_brutto / Decimal('1.19')
 
-    # Steuerbetrag separat berechnen
+    # Steuerbetrag
     total_vat = total_brutto - total_netto
 
     if request.method == 'POST':
@@ -240,42 +525,64 @@ def cart_view(request):
     return render(request, 'apps/cart_view.html', {
         'cart': cart,
         'items': items,
-        'total_brutto': total_brutto.quantize(Decimal('0.01')),  # Runden auf 2 Dezimalstellen
-        'total_netto': total_netto.quantize(Decimal('0.01')),  # Runden auf 2 Dezimalstellen
-        'total_vat': total_vat.quantize(Decimal('0.01')),  # Runden auf 2 Dezimalstellen
+        'total_brutto': total_brutto.quantize(Decimal('0.01')),
+        'total_netto': total_netto.quantize(Decimal('0.01')),
+        'total_vat': total_vat.quantize(Decimal('0.01')),
     })
+
+
+def get_user_cart(user):
+    cart, created = Cart.objects.get_or_create(user=user)
+    return cart
+
 
 @login_required
 def add_to_cart(request, app_id):
     app = get_object_or_404(App, id=app_id)
+    cart = get_user_cart(request.user)
 
-    # Wenn der Benutzer noch keinen Warenkorb hat, erstellen wir einen neuen
-    cart, created = Cart.objects.get_or_create(user=request.user)
-
-    # Wenn der Artikel bereits im Warenkorb ist, erhöhen wir nur die Menge
     cart_item, created = CartItem.objects.get_or_create(
+        user=request.user,   # ✅ Benutzer setzen
         cart=cart,
         app=app,
-        user=request.user,  # Sicherstellen, dass der Benutzer zugewiesen wird
-        defaults={'price': app.price}  # Der Preis wird nur gesetzt, wenn der Artikel neu erstellt wird
+        defaults={'price': app.price, 'quantity': 1}
     )
-
     if not created:
-        cart_item.quantity += 1  # Erhöhen der Menge, falls der Artikel bereits im Warenkorb ist
+        cart_item.quantity += 1
         cart_item.save()
 
     return redirect('cart_view')
 
+
+@login_required
+@require_POST
+def update_cart(request):
+    cart = get_object_or_404(Cart, user=request.user)
+    for item in cart.items.all():
+        quantity_key = f'quantity_{item.id}'
+        if quantity_key in request.POST:
+            try:
+                quantity = int(request.POST[quantity_key])
+                if quantity > 0:
+                    item.quantity = quantity
+                    item.save()
+                else:
+                    item.delete()
+            except ValueError:
+                continue
+    return redirect('cart_view')
+
+
 @login_required
 def remove_from_cart(request, item_id):
-    cart_item = CartItem.objects.get(id=item_id)
+    cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
     cart_item.delete()
     return redirect('cart_view')
 
 
 @login_required
 def checkout(request):
-    cart, created = Cart.objects.get_or_create(user=request.user)
+    cart, _ = Cart.objects.get_or_create(user=request.user)
     items = cart.items.all()
     subtotal = sum(item.app.price * item.quantity for item in items)
 
@@ -283,9 +590,9 @@ def checkout(request):
     final_total = subtotal
     discount_code_obj = None
     affiliate_code_obj = None
+    wallet = getattr(request.user, 'wallet', None)
 
     if request.method == 'POST':
-        # Kundendaten aus Formular
         data = request.POST
         first_name = data.get('first_name')
         last_name = data.get('last_name')
@@ -299,25 +606,30 @@ def checkout(request):
         affiliate_code_input = data.get('affiliate_code', '').strip()
         discount_code_input = data.get('discount_code', '').strip()
 
-        # Rabattcode prüfen
         if discount_code_input:
             try:
-                discount_code_obj = DiscountCode.objects.get(code__iexact=discount_code_input, is_active=True)
-                discount_amount = subtotal * (discount_code_obj.percentage / 100)
-                final_total = max(0, subtotal - discount_amount)
+                discount_code_obj = DiscountCode.objects.get(code__iexact=discount_code_input)
+                discount_code_obj.update_status()
+                if discount_code_obj.is_valid_now():
+                    discount_amount = subtotal * (discount_code_obj.percentage / 100)
+                    final_total = max(0, subtotal - discount_amount)
+                else:
+                    messages.error(request, 'Rabattcode ist abgelaufen oder noch nicht gültig.')
+                    discount_code_obj = None
             except DiscountCode.DoesNotExist:
                 messages.error(request, 'Ungültiger Rabattcode.')
-                final_total = subtotal
 
-        # Affiliate-Code prüfen
         if affiliate_code_input:
             try:
                 affiliate_code_obj = AffiliateCode.objects.get(code__iexact=affiliate_code_input, is_active=True)
             except AffiliateCode.DoesNotExist:
                 messages.warning(request, 'Affiliate-Code ist ungültig.')
-                affiliate_code_obj = None
 
-        # Bestellung speichern
+        if payment_method == 'wallet':
+            if not wallet or not wallet.has_funds(final_total):
+                messages.error(request, 'Nicht genügend Guthaben im Wallet.')
+                return redirect('checkout')
+
         order = Order.objects.create(
             user=request.user,
             first_name=first_name,
@@ -335,50 +647,72 @@ def checkout(request):
             discount_code=discount_code_obj,
         )
 
-        # Einzelne Artikel speichern
         for item in items:
-            OrderItem.objects.create(
-                order=order,
-                app=item.app,
-                quantity=item.quantity,
-                price=item.app.price
-            )
+            OrderItem.objects.create(order=order, app=item.app, quantity=item.quantity, price=item.app.price)
 
-        # Rabattcode aktualisieren
         if discount_code_obj:
             discount_code_obj.times_used += 1
             discount_code_obj.save()
 
-        # E-Mails
+        if payment_method == 'wallet':
+            wallet.deduct(final_total)
+
         if payment_method == 'bank_transfer':
             buyer_subject = 'Ihre Bestellbestätigung - Banküberweisung'
             buyer_message = render_to_string('emails/order_confirmation_bank_transfer.html', {'order': order})
+        elif payment_method == 'wallet':
+            buyer_subject = 'Ihre Bestellbestätigung - Wallet'
+            buyer_message = render_to_string('emails/order_confirmation_wallet.html', {'order': order})
         else:
             buyer_subject = 'Ihre Bestellbestätigung - Rechnung'
             buyer_message = render_to_string('emails/order_confirmation_invoice.html', {'order': order})
 
         send_mail(buyer_subject, buyer_message, settings.DEFAULT_FROM_EMAIL, [email])
-
         company_subject = 'Neue Bestellung - Bitte Rechnung senden'
         company_message = render_to_string('emails/order_notification.html', {'order': order})
         send_mail(company_subject, company_message, settings.DEFAULT_FROM_EMAIL, [settings.COMPANY_EMAIL])
 
-        # Warenkorb leeren
         cart.items.all().delete()
-
         messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben.')
-        return redirect('order_confirmation', order_id=order.id)
+        return redirect('order_confirmation')  # oder eine Bestätigungsseite
 
-    return render(request, 'apps/checkout.html', {
-        'total': final_total,
+    context = {
         'items': items,
-    })
+        'total': final_total,
+        'discount_amount': discount_amount,
+        'wallet_balance': wallet.balance if wallet else 0,
+        'now': timezone.now(),
+    }
+    return render(request, 'apps/checkout.html', context)
 
-
+@login_required
 def order_confirmation(request, order_id):
     order = Order.objects.get(id=order_id)
     return render(request, 'apps/order_confirmation.html', {'order': order})
 
+@require_POST
+@login_required
+def validate_codes(request):
+    data = json.loads(request.body)
+    subtotal = sum(item.app.price * item.quantity for item in request.user.cart.items.all())
+    discount = 0
 
+    try:
+        discount_code = DiscountCode.objects.get(code__iexact=data.get("discount_code", ""))
+        discount_code.update_status()
+        if discount_code.is_valid_now():
+            discount = subtotal * (discount_code.percentage / 100)
+        else:
+            return JsonResponse({"valid": False, "message": "Rabattcode ist ungültig oder abgelaufen."})
+    except DiscountCode.DoesNotExist:
+        if data.get("discount_code"):
+            return JsonResponse({"valid": False, "message": "Rabattcode nicht gefunden."})
+
+    total = max(0, subtotal - discount)
+    return JsonResponse({
+        "valid": True,
+        "new_total": f"{total:.2f}",
+        "discount": f"{discount:.2f}"
+    })
 
 

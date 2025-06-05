@@ -2,8 +2,41 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.conf import settings
+from decimal import Decimal
+import uuid
 
 User = get_user_model()
+
+def generate_voucher_code():
+    return '-'.join([
+        uuid.uuid4().hex.upper()[i:i+4]
+        for i in range(0, 16, 4)
+    ])
+
+class Voucher(models.Model):
+    code = models.CharField(max_length=19, unique=True, default=generate_voucher_code)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    redeemed = models.BooleanField(default=False)
+    redeemed_at = models.DateTimeField(null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class VoucherOrder(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    voucher = models.OneToOneField('Voucher', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # Neue Felder für Rechnungsversand
+    recipient_email = models.EmailField()
+    recipient_name = models.CharField(max_length=255)
+    message = models.TextField(blank=True, help_text="Optional personal message")
+
+class AppGroup(models.Model):
+    key = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 class AffiliatePartner(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -12,12 +45,57 @@ class AffiliatePartner(models.Model):
     website = models.URLField(blank=True)
     social_links = models.TextField(blank=True, help_text="One link per line")
     application_text = models.TextField()
+    commission_percent = models.PositiveIntegerField(default=3, help_text="Provision in Prozent")  # z. B.3%
     approved = models.BooleanField(default=False)
     joined_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
 
+class Wallet(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    pending_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Noch nicht ausgezahlt
+
+    def add_earnings(self, amount):
+        self.pending_earnings += Decimal(amount)
+        self.save()
+
+    def has_funds(self, amount):
+        return self.balance >= amount
+
+    def deduct(self, amount):
+        if self.has_funds(amount):
+            self.balance -= Decimal(amount)
+            self.save()
+            return True
+        return False
+
+    def transfer_to_wallet(self):
+        self.balance += self.pending_earnings
+        self.pending_earnings = Decimal('0.00')
+        self.save()
+
+    def __str__(self):
+        return f"{self.user.email} – Balance: {self.balance} €, Pending: {self.pending_earnings} €"
+    
+class WalletCode(models.Model):
+    code = models.CharField(max_length=50, unique=True)
+    value = models.DecimalField(max_digits=8, decimal_places=2)
+    is_used = models.BooleanField(default=False)
+    used_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    def redeem(self, user):
+        if not self.is_used:
+            wallet, created = Wallet.objects.get_or_create(user=user)
+            wallet.add_credit(self.value)
+            self.is_used = True
+            self.used_by = user
+            self.used_at = timezone.now()
+            self.save()
+            return True
+        return False
 
 class App(models.Model):
     name = models.CharField(max_length=255)
@@ -31,6 +109,7 @@ class App(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     link = models.URLField(blank=True, null=True)
+    group = models.ForeignKey(AppGroup, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.name
@@ -90,6 +169,10 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
+    @property
+    def total_price(self):
+        return self.price * self.quantity
+
 
 # ... (alle bisherigen Klassen wie App, AffiliateLink, Purchase etc.)
 
@@ -104,7 +187,6 @@ class Order(models.Model):
     vat_number = models.CharField(max_length=50, blank=True, null=True)
     payment_method = models.CharField(max_length=50)
 
-    # ➕ Die fehlenden Felder:
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -116,6 +198,35 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Bestellung {self.id} von {self.user}"
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None  # nur beim ersten Speichern aktiv
+
+        super().save(*args, **kwargs)
+
+        if is_new and self.affiliate_code and self.total_amount > 0:
+            partner = self.affiliate_code.partner
+            provision_prozent = partner.commission_percent
+
+            # Berechne die Provision
+            provision_betrag = (Decimal(provision_prozent) / Decimal(100)) * self.total_amount
+
+            # Wallet anlegen (falls noch nicht vorhanden)
+            wallet, _ = Wallet.objects.get_or_create(user=partner.user)
+            wallet.add_earnings(provision_betrag)
+
+            # Transaktion speichern
+            AffiliateTransaction.objects.create(
+                partner=partner,
+                order=self,
+                amount=provision_betrag
+            )
+
+class AffiliateTransaction(models.Model):
+    partner = models.ForeignKey(AffiliatePartner, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
@@ -141,8 +252,25 @@ class DiscountCode(models.Model):
     percentage = models.DecimalField(max_digits=5, decimal_places=2)
     is_active = models.BooleanField(default=True)
     times_used = models.PositiveIntegerField(default=0)
+    valid_from = models.DateTimeField(null=True, blank=True)
+    valid_until = models.DateTimeField(null=True, blank=True)
+
+    def update_status(self):
+        """Aktiviert oder deaktiviert den Code basierend auf Zeit."""
+        now = timezone.now()
+
+        # Aktivieren, wenn Startzeit erreicht
+        if self.valid_from and now >= self.valid_from:
+            self.is_active = True
+
+        # Deaktivieren, wenn Endzeit überschritten
+        if self.valid_until and now > self.valid_until:
+            self.is_active = False
+
+        self.save()
 
     def is_valid_now(self):
+        """Prüft, ob der Code aktuell verwendet werden darf."""
         now = timezone.now()
         return (
             self.is_active and
