@@ -9,7 +9,7 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: url('{% static "images/wiki-bg.jpg" %}') no-repeat center center fixed;
+            background: url('{% static "images/wiki-bg.png" %}') no-repeat center center fixed;
             background-size: cover;
             color: #000;
             font-size: 18px;
@@ -164,8 +164,6 @@
         <a href="/blog/">Blog</a>
         {% if user.is_authenticated %}
             <a href="/affiliate/dashboard/">Affiliate</a>
-            <a href="/cart/" title="Warenkorb"><i class="fas fa-shopping-cart"></i></a>
-            <a href="/wallet/" title="Wallet"><i class="fas fa-wallet"></i> {{ wallet.balance|floatformat:2 }} €</a>
             <a href="/auth/logout/" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
         {% else %}
             <a href="/auth/login/" title="Login"><i class="fas fa-sign-in-alt"></i></a>

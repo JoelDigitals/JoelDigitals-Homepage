@@ -179,6 +179,9 @@
                             <p>Version: {{ app.version }}</p>
                             <p>€{{ app.price }}</p>
                             <a href="{% url 'app_detail' slug=app.slug %}">View Details</a>
+                            {% if app.link %}
+                                <a href="{{ app.link }}" target="_blank" class="button">Wiki</a>
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>

@@ -6,6 +6,7 @@ from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
 from bs4 import BeautifulSoup  # NEU
+from collections import defaultdict
 
 def is_developer(user):
     return user.groups.filter(name='Entwickler').exists()
@@ -48,16 +49,20 @@ def wiki_detail(request, slug):
     if wiki.is_developer_only and not is_developer(request.user):
         return HttpResponseForbidden("Nur für Entwickler zugänglich.")
 
-    # Markdown → HTML mit IDs für h2/h3
+    # Markdown → HTML
     md = markdown.Markdown(extensions=['toc', 'fenced_code', 'attr_list'])
     content_html = md.convert(wiki.content)
     soup = BeautifulSoup(content_html, "html.parser")
 
-    # Inhaltsverzeichnis generieren aus h2 und h3
+    # Eindeutige Anker erzeugen
+    ids = defaultdict(int)
     toc = []
+
     for tag in soup.find_all(['h2', 'h3']):
         text = tag.get_text()
-        anchor = slugify(text)
+        base_id = slugify(text)
+        ids[base_id] += 1
+        anchor = base_id if ids[base_id] == 1 else f"{base_id}-{ids[base_id]}"
         tag['id'] = anchor
         toc.append({'text': text, 'anchor': anchor, 'level': tag.name})
 

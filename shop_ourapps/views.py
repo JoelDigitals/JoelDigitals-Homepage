@@ -8,7 +8,7 @@ from .forms import PurchaseForm, VoucherPurchaseForm
 from django.contrib import messages
 from django.conf import settings
 from django.template.loader import render_to_string
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from django.http import Http404, JsonResponse
 from django.utils.timezone import now
 from django.db.models.functions import TruncMonth
@@ -510,11 +510,11 @@ def cart_view(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     items = CartItem.objects.filter(cart=cart)
 
-    # Gesamtbrutto
-    total_brutto = sum(item.total_price for item in items)
+    # Gesamtbrutto mit Decimal-Sicherheit
+    total_brutto = sum((item.total_price for item in items), start=Decimal('0.00'))
 
     # Netto = Brutto / 1.19 (bei 19 % MwSt)
-    total_netto = total_brutto / Decimal('1.19')
+    total_netto = total_brutto / Decimal('1.19') if total_brutto else Decimal('0.00')
 
     # Steuerbetrag
     total_vat = total_brutto - total_netto
@@ -525,9 +525,9 @@ def cart_view(request):
     return render(request, 'apps/cart_view.html', {
         'cart': cart,
         'items': items,
-        'total_brutto': total_brutto.quantize(Decimal('0.01')),
-        'total_netto': total_netto.quantize(Decimal('0.01')),
-        'total_vat': total_vat.quantize(Decimal('0.01')),
+        'total_brutto': total_brutto.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP),
+        'total_netto': total_netto.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP),
+        'total_vat': total_vat.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP),
     })
 
 
@@ -536,19 +536,28 @@ def get_user_cart(user):
     return cart
 
 
+@require_POST
 @login_required
 def add_to_cart(request, app_id):
     app = get_object_or_404(App, id=app_id)
     cart = get_user_cart(request.user)
 
+    try:
+        quantity = int(request.POST.get('quantity', 1))
+        if quantity < 1:
+            quantity = 1
+    except ValueError:
+        quantity = 1
+
     cart_item, created = CartItem.objects.get_or_create(
-        user=request.user,   # ✅ Benutzer setzen
+        user=request.user,
         cart=cart,
         app=app,
-        defaults={'price': app.price, 'quantity': 1}
+        defaults={'price': app.price, 'quantity': quantity}
     )
+
     if not created:
-        cart_item.quantity += 1
+        cart_item.quantity += quantity
         cart_item.save()
 
     return redirect('cart_view')

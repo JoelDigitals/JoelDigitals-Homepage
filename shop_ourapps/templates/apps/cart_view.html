@@ -181,7 +181,7 @@
                 <div class="cart-item">
                     <h2>{{ item.app.name }}</h2>
                     <p>{{ item.quantity }} x {{ item.app.price }}€</p>
-                    <p><strong>Total:</strong> {{ item.total_price }}€</p>
+                    <p><strong>Total inclusive VAT:</strong> {{ item.total_price }}€</p>
                     <a href="{% url 'remove_from_cart' item.id %}">Remove</a>
                 </div>
             {% endfor %}
@@ -197,9 +197,11 @@
             <form method="POST">
                 {% csrf_token %}
                 <button type="submit" class="button">Proceed to Checkout</button>
+                <a href="{% url 'shop' %}" class="button">Go back to the shop</a>
             </form>
         {% else %}
             <p class="empty-cart">Your cart is currently empty.</p>
+            <a href="{% url 'shop' %}" class="button">Go back to the shop</a>
         {% endif %}
     </div>
 </main>
