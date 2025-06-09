@@ -37,7 +37,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from django.core.exceptions import ValidationError
 
-from reportlab.lib.utils import ImageReader
+from reportlab.lib.utils import ImageReader, simpleSplit
 
 @login_required
 def buy_voucher(request):
@@ -52,9 +52,8 @@ def buy_voucher(request):
             design = form.cleaned_data.get('design', 'default')
 
             wallet, _ = Wallet.objects.get_or_create(user=request.user)
-            if payment_method == 'wallet':
-                if not wallet.deduct(amount):
-                    return HttpResponse("Nicht genügend Guthaben im Wallet.", status=400)
+            if payment_method == 'wallet' and not wallet.deduct(amount):
+                return HttpResponse("Nicht genügend Guthaben im Wallet.", status=400)
 
             voucher = Voucher.objects.create(amount=amount, user=request.user)
             VoucherOrder.objects.create(
@@ -65,107 +64,126 @@ def buy_voucher(request):
                 message=message
             )
 
-            # PDF-Gutschein erzeugen
             buffer = BytesIO()
             p = canvas.Canvas(buffer, pagesize=landscape(A4))
             width, height = landscape(A4)
-
-            # Designauswahl
-            if design == 'happy_birthday':
-                bg_color = colors.HexColor("#FFF3F5")
-                title = "🎉 Happy Birthday!"
-                msg_color = colors.darkmagenta
-            elif design == 'danke':
-                bg_color = colors.HexColor("#E6F9E6")
-                title = "🙏 Danke schön!"
-                msg_color = colors.green
-            elif design == 'fuer_dich':
-                bg_color = colors.HexColor("#E3F2FD")
-                title = "🎁 Für Dich!"
-                msg_color = colors.darkblue
-            else:
-                bg_color = colors.white
-                title = "🎫 Joel Digitals Gutschein"
-                msg_color = colors.black
-
-            # Hintergrundfarbe
-            p.setFillColor(bg_color)
-            p.rect(0, 0, width, height, fill=True, stroke=0)
-
-            # Faltlinien
-            quarter_width = width / 2
-            quarter_height = height / 2
+            
+            # === Faltlinien ===
+            p.setDash(1, 2)
             p.setStrokeColor(colors.lightgrey)
-            p.setDash(2, 2)
-            p.line(quarter_width, 0, quarter_width, height)
-            p.line(0, quarter_height, width, quarter_height)
+            # Vertikal halbieren
+            p.line(width / 2, 0, width / 2, height)
+            # Horizontal halbieren
+            p.line(0, height / 2, width, height / 2)
+            p.setDash()  # Reset
 
-            # Logo
-            logo_path = os.path.join('static', 'logo.png')
+            # === Bild oben rechts (1/4 Seite) ===
+            img_path = os.path.join('static', 'gutscheine', f'{design}.jpg')
+            if os.path.exists(img_path):
+                bg = ImageReader(img_path)
+                p.drawImage(bg, width / 2, height / 2, width=width / 2, height=height / 2, preserveAspectRatio=True)
+            else:
+                p.setFillColor(colors.white)
+                p.rect(0, 0, width, height, fill=True, stroke=0)
 
-            # OBEN LINKS: Shopinfos
+            # === Shopinfos oben links ===
             p.setFont("Helvetica", 9)
             p.setFillColor(colors.black)
             shop_lines = [
                 "Joel Digitals",
                 "www.joel-digitals.de",
-                "info@joel-digitals.de",
+                "joel-digitals@gmx.de",
                 "",
                 "Wichtiger Hinweis:",
                 "Dieser Gutschein ist nur einmal gültig.",
-                "Er kann auf www.joel-digitals.de eingelöst werden.",
+                "Er kann auf www.joel-digitals.onrender.com eingelöst werden.",
                 "Keine Barauszahlung möglich.",
             ]
-            x = 1 * cm
-            y = height - 2 * cm
+            x, y = cm, height - 2 * cm
             for line in shop_lines:
                 p.drawString(x, y, line)
                 y -= 0.5 * cm
 
-            # OBEN RECHTS: Titel & Logo
-            p.setFont("Helvetica-Bold", 24)
-            p.setFillColor(msg_color)
-            p.drawCentredString(width - quarter_width / 2, height - 2 * cm, title)
-
+            # === Logo UNTER Shopinfos ===
+            logo_path = os.path.join('static', 'logo.png')
             if os.path.exists(logo_path):
                 logo = ImageReader(logo_path)
-                logo_width = 50 * mm
-                logo_height = 20 * mm
-                logo_x = width - quarter_width + (quarter_width - logo_width) / 2
-                logo_y = height - logo_height - 3.5 * cm
-                p.drawImage(logo, logo_x, logo_y, width=logo_width, height=logo_height, mask='auto')
+                p.drawImage(logo, cm, y - 3.5 * cm, width=4 * cm, preserveAspectRatio=True, mask='auto')
 
-            # UNTEN LINKS: Nachricht
             p.saveState()
-            p.translate(0, quarter_height)
+
+            # Ursprung auf linken unteren Rand des Bildbereichs (oben rechts auf der Seite)
+            p.translate(width / 2, height / 2)
             p.rotate(180)
+            
+            # Textbereich: Breite und maximale Höhe (halbe Bildhöhe)
+            box_width = width / 2 - 2 * cm
+            box_height = (height / 2) / 2 - 1 * cm  # halbe Bildhöhe minus etwas Rand
+            
+            x_text = cm
+            y_start = cm  # beginnt unten
+            
+            # Textstil
+            style = getSampleStyleSheet()["Normal"]
+            style.fontName = "Helvetica"
+            style.fontSize = 11
+            style.leading = 13
+            style.textColor = colors.darkblue
+            
+            # Text vorbereiten (manueller Umbruch für ReportLab Canvas)
+            wrapped_lines = simpleSplit(message, style.fontName, style.fontSize, box_width)
+            
+            # Nur so viele Zeilen wie in box_height passen
+            max_lines = int(box_height // style.leading)
+            visible_lines = wrapped_lines[:max_lines]
+            
+            # Überschrift
             p.setFont("Helvetica-Bold", 12)
             p.setFillColor(colors.black)
-            p.drawString(-width + 1 * cm, -3 * cm, "Persönliche Nachricht:")
+            p.drawString(x_text, y_start + style.leading * (len(visible_lines) + 1), "Persönliche Nachricht:")
+            
+            # Nachricht selbst
             p.setFont("Helvetica", 11)
-            text = p.beginText(-width + 1 * cm, -4.2 * cm)
-            text.setFillColor(msg_color)
-            for line in message.splitlines():
-                text.textLine(line)
-            p.drawText(text)
+            p.setFillColor(colors.darkblue)
+            textobject = p.beginText(x_text, y_start)
+            for line in visible_lines:
+                textobject.textLine(line)
+            p.drawText(textobject)
+            
             p.restoreState()
 
-            # UNTEN RECHTS: Empfängerdaten & Code
+            # === Gutscheindaten – UNTEN RECHTS, unterhalb des Bildes, auf dem Kopf ===
             p.saveState()
-            p.translate(width, quarter_height)
-            p.rotate(180)
+
+            # Position berechnen: rechte Hälfte (x), unterhalb des Bildes (y)
+            block_margin_x = 2 * cm  # Abstand vom rechten Rand nach innen
+            block_margin_y = 2 * cm  # Abstand vom unteren Rand nach oben
+
+            # Wir platzieren den Ursprung am unteren rechten Viertel der Seite
+            p.translate(width / 2 + block_margin_x + 10 * cm, block_margin_y)
+            p.rotate(180)  # Auf den Kopf drehen
+
             p.setFont("Helvetica-Bold", 12)
             p.setFillColor(colors.black)
-            p.drawString(-quarter_width + 1 * cm, -2 * cm, f"Wert: {amount:.2f} €")
+
+            # Koordinaten beginnen gedreht von hier
+            x_info = 0
+            y_info = 0
+
+            p.drawString(x_info, y_info, f"Amount: {amount:.2f} €")
             p.setFont("Helvetica", 11)
-            p.drawString(-quarter_width + 1 * cm, -3.2 * cm, f"Gutscheincode: {voucher.code}")
-            p.drawString(-quarter_width + 1 * cm, -4.4 * cm, f"Empfänger: {recipient_name}")
-            p.drawString(-quarter_width + 1 * cm, -5.6 * cm, f"Datum: {now().strftime('%d.%m.%Y')}")
+            p.drawString(x_info, y_info - 1.0 * cm, f"COde: {voucher.code}")
+            p.drawString(x_info, y_info - 2.0 * cm, f"For: {recipient_name}")
+            p.drawString(x_info, y_info - 3.0 * cm, f"Date: {now().strftime('%d.%m.%Y')}")
+
             p.restoreState()
 
-            # PDF abschließen
+            
+
+
             p.showPage()
             p.save()
+
             buffer.seek(0)
             return FileResponse(buffer, as_attachment=True, filename=f'gutschein_{voucher.code}.pdf')
     else:

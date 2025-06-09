@@ -8,18 +8,17 @@ class PurchaseForm(forms.Form):
     city = forms.CharField(label="City")
     country = forms.CharField(label="Country")
 
+DESIGN_CHOICES = [
+    ('happy_birthday', 'Happy Birthday'),
+    ('thanks', 'Thank You'),
+    ('love_you', 'I love You'),
+    ('default', 'Standard'),
+]
+
 class VoucherPurchaseForm(forms.Form):
-    amount = forms.DecimalField(min_value=1, label="Betrag (€)")
-    payment_method = forms.ChoiceField(choices=[('wallet', 'Wallet')], label="Zahlungsmethode")
+    amount = forms.DecimalField(label="Betrag (€)", min_value=1, decimal_places=2)
+    payment_method = forms.ChoiceField(label="Zahlungsmethode", choices=[('wallet', 'Wallet'), ('invoice', 'Invoice')])
     recipient_email = forms.EmailField(label="E-Mail des Empfängers")
-    recipient_name = forms.CharField(max_length=100, label="Name des Empfängers")
-    message = forms.CharField(widget=forms.Textarea, required=False, label="Nachricht")
-    design = forms.ChoiceField(
-        choices=[
-            ('default', 'Standard'),
-            ('happy_birthday', '🎉 Happy Birthday'),
-            ('danke', '🙏 Danke'),
-            ('fuer_dich', '🎁 Für Dich'),
-        ],
-        label="Designauswahl"
-    )
+    recipient_name = forms.CharField(label="Name des Empfängers", max_length=100)
+    message = forms.CharField(label="Persönliche Nachricht", widget=forms.Textarea, required=False)
+    design = forms.ChoiceField(label="Design", choices=DESIGN_CHOICES, widget=forms.RadioSelect, initial='default')
