@@ -185,7 +185,41 @@ def buy_voucher(request):
             p.save()
 
             buffer.seek(0)
+            # E-Mail an den Nutzer
+            email_subject = f"Ihr Gutschein für {recipient_name}"
+            email_message = render_to_string('emails/voucher_purchase_confirmation.html', {
+                'recipient_name': recipient_name,
+                'amount': amount,
+                'voucher_code': voucher.code,
+                'message': message,
+            })
+            send_mail(
+                subject=email_subject,
+                message=email_message,
+                recipient_list=[recipient_email],
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                fail_silently=False,
+            )
+
+            # E-Mail an das Team
+            team_email_subject = f"Neuer Gutscheinverkauf: {voucher.code}"
+            team_email_message = render_to_string('emails/voucher_purchase_notification.html', {
+                'user': request.user,
+                'recipient_name': recipient_name,
+                'amount': amount,
+                'voucher_code': voucher.code,
+                'message': message,
+            })
+            send_mail(
+                subject=team_email_subject,
+                message=team_email_message,
+                recipient_list=["buy.joel-digitals@gmx.de"],
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                fail_silently=False,
+            )
+            
             return FileResponse(buffer, as_attachment=True, filename=f'gutschein_{voucher.code}.pdf')
+        
     else:
         form = VoucherPurchaseForm()
 

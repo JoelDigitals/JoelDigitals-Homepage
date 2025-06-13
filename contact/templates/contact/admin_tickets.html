@@ -75,10 +75,24 @@
 
         .status-open {
             color: red;
+            font-weight: bold;
         }
 
         .status-resolved {
             color: green;
+            font-weight: bold;
+        }
+
+        .priority-low {
+            border-left: 8px solid #7EC8E3;
+        }
+
+        .priority-medium {
+            border-left: 8px solid #f0ad4e;
+        }
+
+        .priority-high {
+            border-left: 8px solid #d9534f;
         }
 
         footer {
@@ -98,6 +112,7 @@
         footer a:hover {
             text-decoration: underline;
         }
+
         @media (max-width: 600px) {
             header {
                 flex-direction: column;
@@ -112,96 +127,45 @@
                 margin: 5px 0;
             }
         }
+
         @media (max-width: 1000px) {
             main {
                 padding: 20px;
             }
         }
+
         .ticket form {
             display: flex;
             flex-direction: column;
         }
+
         .ticket form label {
             margin-top: 10px;
         }
-        .ticket form select {
+
+        .ticket form select,
+        .ticket form input[type="submit"],
+        .ticket form textarea {
             margin-top: 5px;
-            padding: 5px;
+            padding: 10px;
             border-radius: 4px;
             border: 1px solid #ccc;
+            font-size: 16px;
         }
+
         .ticket form input[type="submit"] {
-            margin-top: 10px;
             background-color: #0044cc;
             color: white;
-            padding: 10px 15px;
             border: none;
-            border-radius: 4px;
             cursor: pointer;
         }
+
         .ticket form input[type="submit"]:hover {
             background-color: #1d00d9;
         }
-        .ticket form a {
-            margin-top: 10px;
-            display: inline-block;
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        .ticket form a:hover {
-            background-color: #1d00d9;
-        }
-        .ticket form input[type="hidden"] {
-            display: none;
-        }
-        .ticket form strong {
-            margin-bottom: 5px;
-        }
-        .ticket form p {
-            margin: 5px 0;
-        }
-        .ticket form .status-open {
-            color: red;
-        }
-        .ticket form .status-resolved {
-            color: green;
-        }
-        .ticket form .btn {
-            margin-top: 10px;
-        }
-        .ticket form .btn:hover {
-            background-color: #1d00d9;
-        }
-        .ticket form .btn:active {
-            background-color: #0033a0;
-        }
-        .ticket form .btn:focus {
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-        }
-        .ticket form .btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        .ticket form .btn:disabled:hover {
-            background-color: #ccc;
-        }
-        .ticket form .btn:disabled:active {
-            background-color: #ccc;
-        }
-        .ticket form .btn:disabled:focus {
-            outline: none;
-            box-shadow: none;
-        }
-        .ticket form .btn:disabled:focus-visible {
-            outline: none;
-            box-shadow: none;
-        }
-        .ticket form .btn:disabled:focus-visible:active {
-            background-color: #ccc;
+
+        .ticket form a.btn {
+            text-align: center;
         }
     </style>
 </head>
@@ -211,76 +175,131 @@
         <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
     </a>
     <nav style="margin-left: auto;">
-    <a href="/services/">Services</a>
-    <a href="/about/">About Us</a>
-    <a href="/contact/">Contact</a>
-    <a href="/blog/">Blog</a>
-    <a href ="/our-apps/">Our Apps</a>
-    <a href ="/shop/">Shop</a>
-    {% if user.is_authenticated %}
-        {% if "Marketing" in user_groups %}
-            <a href="/blog/admin-blog/">Admin: Blog</a>
+        <a href="/services/">Services</a>
+        <a href="/about/">About Us</a>
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Blog</a>
+        <a href="/our-apps/">Our Apps</a>
+        <a href="/shop/">Shop</a>
+        {% if user.is_authenticated %}
+            {% if "Marketing" in user_groups %}
+                <a href="/blog/admin-blog/">Admin: Blog</a>
+            {% endif %}
+            {% if "Selling" in user_groups %}
+                <a href="/contact/admin-sales/">Admin: Sales</a>
+            {% endif %}
+            {% if "Support" in user_groups %}
+                <a href="/contact/admin-tickets/">Admin: Tickets</a>
+            {% endif %}
+            <a href="/auth/logout/">Logout</a>
+        {% else %}
+            <a href="/auth/login/">Login</a>
         {% endif %}
-        {% if "Selling" in user_groups %}
-            <a href="/contact/admin-sales/">Admin: Sales</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/contact/admin-tickets/">Admin: Tickets</a>
-        {% endif %}
-        <a href="/auth/logout/">Logout</a>
-    {% else %}
-        <a href="/auth/login/">Login</a>
-    {% endif %}
-</nav>
+    </nav>
 </header>
 
 <main>
     <h2>🛠️ Admin Area: Support Tickets</h2>
 
     {% if tickets %}
+        <a href="{% url 'archive_ticket' %}" class="btn">View Archived Tickets</a>
+        <br>
         {% for ticket in tickets %}
-            <div class="ticket">
-                <form method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
-                    <strong>{{ ticket.subject }}</strong> – 
-                    <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
-                        {% if ticket.is_resolved %}Resolved{% else %}Open{% endif %}
-                    </span>
-                    <p><strong>From:</strong> {{ ticket.email }}<br>
-                    <strong>Created:</strong> {{ ticket.created_at|date:"d.m.Y H:i" }}</p>
-                    <p>{{ ticket.description|linebreaks }}</p>
+            {% if user.is_superuser or "SupportAdmin" in user_groups or ticket.assigned_to == user %}
+                <div class="ticket priority-{{ ticket.priority }}">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
 
-                    <label>Status:</label>
-                    <button type="submit" name="action" value="toggle" class="btn">
-                        {% if ticket.is_resolved %}Mark as Open{% else %}Mark as Resolved{% endif %}
-                    </button>
-                    <br><br>
+                        <strong>{{ ticket.subject }}</strong> – 
 
-                    <label>Assign to:</label>
-                    <select name="assigned_to">
-                        <option value="">-- None --</option>
-                        {% for user in staff_users %}
-                            <option value="{{ user.id }}" {% if ticket.assigned_to == user %}selected{% endif %}>{{ user.username }}</option>
+                        <!-- Status als Text -->
+                        <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
+                            {% if ticket.is_resolved %}Resolved{% else %}Open{% endif %}
+                        </span>
+
+                        <!-- assigned_to und priority als Text oben -->
+                        <p>
+                            <strong>Assigned to:</strong> {{ ticket.assigned_to }}<br>
+                            <strong>Priority:</strong> 
+                            {% if ticket.priority == 'low' %}
+                                Low
+                            {% elif ticket.priority == 'medium' %}
+                                Medium
+                            {% elif ticket.priority == 'high' %}
+                                High
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                            <br>
+                            <strong>Ticket Number:</strong> {{ ticket.ticket_number }}<br>
+                            <strong>App:</strong> {{ ticket.app_name }}<br>
+                            <strong>Platform:</strong> {{ ticket.platform }}<br>
+                        </p>
+
+                        <p><strong>From:</strong> {{ ticket.email }}<br>
+                           <strong>Created:</strong> {{ ticket.created_at|date:"d.m.Y H:i" }}</p>
+
+                        <p>{{ ticket.description|linebreaks }}</p>
+
+                        {% if user.is_superuser or "SupportAdmin" in user_groups %}
+                            <label>Status:</label>
+                            <button type="submit" name="action" value="toggle" class="btn">
+                                {% if ticket.is_resolved %}Mark as Open{% else %}Mark as Resolved{% endif %}
+                            </button>
+                        {% else %}
+                            <!-- Für Supporter nur Status als Text anzeigen -->
+                            <p><strong>Status:</strong> 
+                                <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
+                                    {% if ticket.is_resolved %}Resolved{% else %}Open{% endif %}
+                                </span>
+                            </p>
+                        {% endif %}
+
+                        <hr>
+                        <h4>Internal Notes</h4>
+                        {% for note in ticket.notes.all %}
+                            <p><strong>{{ note.author.get_full_name|default:note.author.username }}:</strong>
+                                {{ note.created_at|date:"d.m.Y H:i" }}<br>
+                                {{ note.note|linebreaks }}</p>
+                        {% empty %}
+                            <p><em>No notes yet.</em></p>
                         {% endfor %}
-                    </select>
-                    <br>
 
-                    <label>Priority:</label>
-                    <select name="priority">
-                        <option value="low" {% if ticket.priority == 'low' %}selected{% endif %}>Low</option>
-                        <option value="medium" {% if ticket.priority == 'medium' %}selected{% endif %}>Medium</option>
-                        <option value="high" {% if ticket.priority == 'high' %}selected{% endif %}>High</option>
-                    </select>
-                    <br><br>
+                        <label for="note">Add Note:</label>
+                        <textarea name="note" rows="3" placeholder="Internal note (visible only to Support)" style="width:100%;"></textarea>
 
-                    <input type="submit" name="action" value="update" class="btn">
-                    <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">View Chat</a>
-                </form>
-            </div>
+                        {% if user.is_superuser or "SupportAdmin" in user_groups %}
+                            <label>Assigned to:</label>
+                            <select name="assigned_to">
+                              {% for u in support_users %}
+                                <option value="{{ u.id }}" {% if ticket.assigned_to == u %}selected{% endif %}>
+                                  {{ u.get_full_name }} ({{ u.username }})
+                                </option>
+                              {% endfor %}
+                            </select>
+
+                            <label>Priority:</label>
+                            <select name="priority">
+                                <option value="low" {% if ticket.priority == 'low' %}selected{% endif %}>Low</option>
+                                <option value="medium" {% if ticket.priority == 'medium' %}selected{% endif %}>Medium</option>
+                                <option value="high" {% if ticket.priority == 'high' %}selected{% endif %}>High</option>
+                            </select>
+                        {% else %}
+                            <!-- Für Supporter assigned_to nur als Text anzeigen -->
+                            <!-- Da oben assigned_to schon angezeigt wird, hier nichts -->
+                            <!-- Priority für Supporter ausblenden -->
+                        {% endif %}
+
+                        <input type="submit" name="action" value="update" class="btn">
+                        <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">View Chat</a>
+                    </form>
+                </div>
+            {% endif %}
         {% endfor %}
     {% else %}
         <p>No tickets found.</p>
+        <a href="{% url 'archive_ticket' %}" class="btn">View Archived Tickets</a>
     {% endif %}
 </main>
 

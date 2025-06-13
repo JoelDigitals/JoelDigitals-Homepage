@@ -3,10 +3,17 @@ from django.core.mail import send_mail
 from .forms import ContactForm, SalesWishForm, SupportTicketForm, TicketMessageForm
 from django.contrib import messages
 from django.http import HttpResponse
-from .models import SalesWish, SupportTicket, TicketMessage, SalesChatMessage, SalesEntry
+from .models import SalesWish, SupportTicket, TicketMessage, SalesChatMessage, SalesEntry, TicketNote
 from django.contrib.admin.views.decorators import staff_member_required, user_passes_test
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.models import User
+from django.utils.timezone import now
+from datetime import timedelta
+from django.db.models import Q
+from django.core.paginator import Paginator
+from django.utils import timezone
+
 
 def is_Support_Ticket_Admin(user):
     return user.groups.filter(name='Admin Support').exists()
@@ -159,6 +166,9 @@ def ticket_detail(request, ticket_number):
             message.ticket = ticket
             message.sender = request.user
             message.save()
+
+            # Ticket ggf. reaktivieren
+            ticket.reactivate_if_new_message(request.user)
             return redirect('ticket_detail', ticket_number=ticket.ticket_number)
     else:
         form = TicketMessageForm()
@@ -172,18 +182,84 @@ def ticket_detail(request, ticket_number):
         'user_groups': user_groups
     })
 
-@user_passes_test(is_Support_Editor or is_Support_Ticket_Admin)
+@login_required
 def admin_ticket_view(request):
-    user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
-    tickets = SupportTicket.objects.all().order_by('-created_at')
+    user = request.user
+    is_editor = is_Support_Editor(user)
+    is_admin = is_Support_Ticket_Admin(user)
+
+    if not (is_editor or is_admin):
+        return redirect("support_tickets")
+
+    if is_admin:
+        tickets = SupportTicket.objects.filter(is_archived=False).order_by('-priority')
+        support_users_raw = User.objects.filter(groups__name__in=["Support", "Admin Support"]).distinct()
+        support_users = [u for u in support_users_raw if is_Support_Editor(u) or is_Support_Ticket_Admin(u)]
+    else:
+        tickets = SupportTicket.objects.filter(is_archived=False, assigned_to=user).order_by('-priority')
+        support_users = []
+
+    for ticket in tickets:
+        ticket.check_auto_archive()
+
     if request.method == "POST":
         ticket_id = request.POST.get("ticket_id")
         action = request.POST.get("action")
-        ticket = SupportTicket.objects.get(id=ticket_id)
-        if action == "toggle":
-            ticket.is_resolved = not ticket.is_resolved
-            ticket.save()
-    return render(request, 'contact/admin_tickets.html', {'tickets': tickets, 'user_groups': user_groups})
+
+        if request.method == "POST":
+            ticket_id = request.POST.get("ticket_id")
+            action = request.POST.get("action")
+
+            if ticket_id:
+                ticket = get_object_or_404(SupportTicket, id=ticket_id)
+
+                # Jeder Supporter darf Status toggeln
+                if action == "toggle" and (is_admin or is_editor):
+                    ticket.is_resolved = not ticket.is_resolved
+                    if ticket.is_resolved:
+                        ticket.resolved_at = timezone.now()
+                    else:
+                        ticket.resolved_at = None
+                    ticket.save()
+
+                # Admin-Only: assigned_to und priority ändern
+                if is_admin:
+                    changed = False
+                    assigned_id = request.POST.get("assigned_to")
+                    if assigned_id:
+                        try:
+                            assigned_user = User.objects.get(id=assigned_id)
+                            if is_Support_Editor(assigned_user) or is_Support_Ticket_Admin(assigned_user):
+                                if ticket.assigned_to != assigned_user:
+                                    ticket.assigned_to = assigned_user
+                                    changed = True
+                        except User.DoesNotExist:
+                            pass
+                        
+                    priority = request.POST.get("priority")
+                    if priority in dict(SupportTicket.PRIORITY_CHOICES):
+                        if ticket.priority != priority:
+                            ticket.priority = priority
+                            changed = True
+
+                    if changed:
+                        ticket.save()
+
+                # Notiz speichern für alle Supporter (Editoren & Admins)
+                if is_editor or is_admin:
+                    note_text = request.POST.get("note")
+                    if note_text:
+                        TicketNote.objects.create(ticket=ticket, author=user, note=note_text)
+
+            return redirect("admin_tickets")
+
+
+    return render(request, "contact/admin_tickets.html", {
+        "tickets": tickets,
+        "is_admin": is_admin,
+        "user_groups": [g.name for g in user.groups.all()],
+        "support_users": support_users,
+    })
 
 @user_passes_test(is_Sales_Editor)
 def admin_sales_view(request):
@@ -244,3 +320,47 @@ def export_single_wish(request, entry_id, wish_id):
     response.write(f'Wunsch: {wish.wishes}\n')
     response.write(f'Erstellt am: {wish.created_at}\n')
     return response
+
+@login_required
+def ticket_archive_view(request):
+    if not (is_Support_Ticket_Admin(request.user) or is_Support_Editor(request.user)):
+        raise PermissionDenied()
+
+    query = request.GET.get('q', '')
+    tickets = SupportTicket.objects.filter(is_archived=True)
+
+    if query:
+        tickets = tickets.filter(
+            Q(user__email__icontains=query) |
+            Q(ticket_number__icontains=query) |
+            Q(subject__icontains=query) |
+            Q(resolved_at__isnull=False) |  # Nur Tickets, die gelöst wurden
+            Q(resolved_at__icontains=query)
+        )
+
+
+    paginator = Paginator(tickets.order_by('-created_at'), 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'contact/ticket_archive.html', {
+        'page_obj': page_obj,
+        'query': query,
+        'user_groups': [g.name for g in request.user.groups.all()],
+    })
+
+def auto_archive_tickets():
+    for ticket in SupportTicket.objects.filter(is_resolved=True, is_archived=False):
+        ticket.check_and_archive()
+
+@login_required
+def ticket_detail_view(request, ticket_number):
+    if not (is_Support_Ticket_Admin(request.user) or is_Support_Editor(request.user)):
+        raise PermissionDenied()
+
+    ticket = get_object_or_404(SupportTicket, ticket_number=ticket_number, is_archived=True)
+
+    return render(request, 'contact/archive_ticket_detail.html', {
+        'ticket': ticket,
+        'user_groups': [g.name for g in request.user.groups.all()],
+    })

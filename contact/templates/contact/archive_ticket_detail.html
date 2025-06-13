@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket {{ ticket.ticket_number }} – Archiv</title>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: rgb(191, 185, 185);
+            color: #000;
+            font-size: 18px;
+        }
+        header {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .logo-img {
+            width: 250px;
+            height: 111px;
+            object-fit: contain;
+        }
+        main {
+            flex: 1 0 auto;
+            padding: 40px 20px;
+            max-width: 1000px;
+            margin: auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-bottom: 25px;
+        }
+        p {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        a.button {
+            display: inline-block;
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        a.button:hover {
+            background-color: #1d00d9;
+        }
+        footer {
+            flex-shrink: 0;
+            background-color: #0044cc;
+            padding: 20px;
+            text-align: center;
+            color: #ccc;
+            border-top: 1px solid #ccc;
+            margin-top: 50px;
+        }
+        .note {
+            background: #f0f0f0;
+            border-left: 4px solid #0044cc;
+            margin: 15px 0;
+            padding: 10px 15px;
+            border-radius: 4px;
+        }
+        .note-meta {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="/">
+        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
+    </a>
+</header>
+
+<main>
+    <h2>🎫 Ticket-Details – {{ ticket.ticket_number }}</h2>
+    <p><strong>Benutzer:</strong> {{ ticket.email }}</p>
+    <p><strong>Betreff:</strong> {{ ticket.subject }}</p>
+    <p><strong>Status:</strong> 
+        {% if ticket.is_resolved %}
+            ✅ Erledigt
+        {% else %}
+            ⏳ Offen
+        {% endif %}
+    </p>
+    <p><strong>Erstellt am:</strong> {{ ticket.created_at|date:"d.m.Y H:i" }}</p>
+    <p><strong>Bearbeitet von:</strong> {{ ticket.assigned_to }}</p>
+    <p><strong>Erledigt am:</strong> {{ ticket.resolved_at|default:"–" }}</p>
+    <p><strong>Nachricht:</strong><br>{{ ticket.description|linebreaks }}</p>
+
+    <h3>Notizen</h3>
+    {% if ticket.notes.all %}
+        {% for note in ticket.notes.all %}
+            <div class="note">
+                <div class="note-meta">
+                    Von <strong>{{ note.author.get_full_name|default:note.author.username }}</strong> am {{ note.created_at|date:"d.m.Y H:i" }}
+                </div>
+                <div class="note-text">
+                    {{ note.note|linebreaks }}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Keine Notizen vorhanden.</p>
+    {% endif %}
+
+    <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="button">🗨️ Zum Chat</a>
+</main>
+
+<footer>
+    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
+    <p>
+        <a href="/imprint/" style="color:#ccc; text-decoration:none;">Imprint</a> |
+        <a href="/privacy/" style="color:#ccc; text-decoration:none;">Privacy Policy</a> |
+        <a href="/terms/" style="color:#ccc; text-decoration:none;">Terms of Service</a> |
+        <a href="/" style="color:#ccc; text-decoration:none;">Home</a>
+    </p>
+</footer>
+</body>
+</html>

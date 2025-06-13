@@ -212,8 +212,16 @@
                         </span>
                         <p>{{ ticket.description|linebreaks }}</p>
                         <small>Ticket-ID: {{ ticket.ticket_number }} | Erstellt am {{ ticket.created_at|date:"d.m.Y H:i" }}</small>
+                        <small>| App: {{ ticket.app_name }} | Platform: {{ ticket.platform }}</small>
                         <br>
-                        <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">Zum Ticket-Chat</a>
+                        {% if ticket.is_resolved %}
+                            <small>Gelöst am {{ ticket.resolved_at|date:"d.m.Y H:i" }}</small>
+                        {% endif %}
+                        <br>
+                        {% if not ticket.is_archived %}
+                            <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">Zum Ticket-Chat</a>
+                        {% endif %}
+                        
                     </div>
                 {% endfor %}
             {% else %}

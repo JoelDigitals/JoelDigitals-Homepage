@@ -16,9 +16,9 @@ DESIGN_CHOICES = [
 ]
 
 class VoucherPurchaseForm(forms.Form):
-    amount = forms.DecimalField(label="Betrag (€)", min_value=1, decimal_places=2)
-    payment_method = forms.ChoiceField(label="Zahlungsmethode", choices=[('wallet', 'Wallet'), ('invoice', 'Invoice')])
-    recipient_email = forms.EmailField(label="E-Mail des Empfängers")
-    recipient_name = forms.CharField(label="Name des Empfängers", max_length=100)
-    message = forms.CharField(label="Persönliche Nachricht", widget=forms.Textarea, required=False)
+    amount = forms.DecimalField(label="Amount (€)", min_value=1, decimal_places=2)
+    payment_method = forms.ChoiceField(label="Payment Method", choices=[('wallet', 'Wallet'), ('invoice', 'Invoice')])
+    recipient_email = forms.EmailField(label="Your Email")
+    recipient_name = forms.CharField(label="Recipient Name", max_length=100)
+    message = forms.CharField(label="Personal Massage max. 100", widget=forms.Textarea, required=False, max_length=100)
     design = forms.ChoiceField(label="Design", choices=DESIGN_CHOICES, widget=forms.RadioSelect, initial='default')

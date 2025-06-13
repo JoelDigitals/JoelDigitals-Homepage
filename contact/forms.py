@@ -1,5 +1,6 @@
 from django import forms
-from .models import SalesEntry, SupportTicket, TicketMessage, SalesWish
+from .models import SalesEntry, SupportTicket, TicketMessage, SalesWish, TicketNote
+from shop_ourapps.models import App
 from django.contrib.auth.models import User
 
 
@@ -22,11 +23,12 @@ class SalesWishForm(forms.ModelForm):
 class SupportTicketForm(forms.ModelForm):
     class Meta:
         model = SupportTicket
-        fields = ['name', 'email', 'subject', 'description']  # keine priority, kein user
+        fields = ['name', 'email', 'subject', 'description', 'app_name', 'platform']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # user und priority nicht im Formular enthalten – werden automatisch gesetzt
+        self.fields['app_name'].queryset = App.objects.filter(is_active=True)
+
 
 class TicketMessageForm(forms.ModelForm):
     class Meta:
@@ -34,4 +36,12 @@ class TicketMessageForm(forms.ModelForm):
         fields = ['message']
         widgets = {
             'message': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Nachricht schreiben...'}),
+        }
+
+class TicketNoteForm(forms.ModelForm):
+    class Meta:
+        model = TicketNote
+        fields = ['note']
+        widgets = {
+            'note': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Interne Notiz hinzufügen...'}),
         }
