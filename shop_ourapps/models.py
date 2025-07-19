@@ -108,6 +108,14 @@ class App(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Neue App-Store Links
+    android_link = models.URLField(blank=True, null=True)
+    ios_link = models.URLField(blank=True, null=True)
+    windows_link = models.URLField(blank=True, null=True)
+    macos_link = models.URLField(blank=True, null=True)
+    linux_link = models.URLField(blank=True, null=True)
+
     link = models.URLField(blank=True, null=True)
     group = models.ForeignKey(AppGroup, null=True, blank=True, on_delete=models.SET_NULL)
 

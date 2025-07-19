@@ -117,6 +117,20 @@
             color: #0044cc;
         }
 
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        /* Bildgröße begrenzen */
+        .shop-item .app-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
         .shop-item p {
             font-size: 18px;
             color: #333;
@@ -220,22 +234,27 @@
     {% endif %}
 </nav>
 </header>
-
 <main>
     <div class="container">
         <h1>Our Apps</h1>
-        {% for app in apps %}
-            <div class="shop-item">
-                <h2>{{ app.name }}</h2>
-                <h3>{{ app.image }}</h3>
-                <p>{{ app.description|linebreaksbr }}</p>
-                <p>Version: {{ app.version }}</p>
-                {% if app.link %}
-                    <a href="{{ app.link }}" class="button" target="_blank" rel="noopener noreferrer" style="margin-left: 10px;">Go to App</a>
-                {% endif %}
-            </div>
-        {% endfor %}
-
+        <div class="apps-grid">  <!-- RICHTIGER Klassenname -->
+            {% for app in apps %}
+                <div class="shop-item">
+                    <h2>{{ app.name }}</h2>
+                    {% if app.image %}
+                        <img src="{{ app.image.url }}" alt="{{ app.name }} Image" class="app-image">
+                    {% endif %}
+                    <p>{{ app.description|truncatewords:50 }}</p>
+                    <p>Version: {{ app.version }}</p>
+                    <div style="margin-top: 10px;">
+                        {% if app.link %}
+                            <a href="{{ app.link }}" class="button" target="_blank" rel="noopener noreferrer">Go to App</a>
+                        {% endif %}
+                        <a href="{% url 'more_information' app.slug %}" class="button" style="background-color: #666;">More</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
         {% if not apps %}
             <p>No apps available at the moment.</p>
         {% endif %}

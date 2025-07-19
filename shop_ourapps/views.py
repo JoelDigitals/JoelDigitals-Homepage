@@ -776,4 +776,6 @@ def validate_codes(request):
         "discount": f"{discount:.2f}"
     })
 
-
+def more_informations(request, slug):
+    app = get_object_or_404(App, slug=slug)
+    return render(request, 'apps/app_infos.html', {'app': app})

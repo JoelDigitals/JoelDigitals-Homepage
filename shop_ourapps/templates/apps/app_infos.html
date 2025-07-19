@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ app.name }} – Details</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eee;
+            padding: 20px;
+        }
+
+        .app-container {
+            background-color: white;
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .buttons a {
+            display: inline-block;
+            margin: 10px 10px 0 0;
+            padding: 10px 16px;
+            background-color: #0044cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .buttons a:hover {
+            background-color: #0033a0;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #0044cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h1>{{ app.name }}</h1>
+        {% if app.image %}
+            <img src="{{ app.image.url }}" alt="{{ app.name }}">
+        {% endif %}
+
+        <p><strong>Version:</strong> {{ app.version }}</p>
+        <p>{{ app.description|linebreaks }}</p>
+
+        <div class="buttons">
+            {% if app.link %}<a href="{{ app.link }}" target="_blank">Zur App</a>{% endif %}
+            {% if app.android_link %}<a href="{{ app.android_link }}" target="_blank">Android</a>{% endif %}
+            {% if app.ios_link %}<a href="{{ app.ios_link }}" target="_blank">iOS</a>{% endif %}
+            {% if app.windows_link %}<a href="{{ app.windows_link }}" target="_blank">Windows</a>{% endif %}
+            {% if app.macos_link %}<a href="{{ app.macos_link }}" target="_blank">macOS</a>{% endif %}
+            {% if app.linux_link %}<a href="{{ app.linux_link }}" target="_blank">Linux</a>{% endif %}
+        </div>
+    </div>
+</body>
+</html>
