@@ -1,0 +1,296 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <title>Joel Digitals – Startseite</title>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        header strong {
+            font-size: 1.3rem;
+        }
+        nav.desktop-nav {
+            display: flex;
+            gap: 20px;
+        }
+        nav.desktop-nav a,
+        nav.desktop-nav form button {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            padding: 0;
+            line-height: 1;
+        }
+        nav.desktop-nav a:hover,
+        nav.desktop-nav form button:hover {
+            text-decoration: underline;
+        }
+        /* Hamburger Styles */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+        }
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+        /* Mobile Navigation */
+        nav.mobile-nav {
+            display: none;
+            flex-direction: column;
+            background: #0033aa;
+            padding: 10px 0;
+            flex-shrink: 0;
+        }
+        nav.mobile-nav a,
+        nav.mobile-nav form button {
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-weight: bold;
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1em;
+        }
+        nav.mobile-nav a:hover,
+        nav.mobile-nav form button:hover {
+            background: #002288;
+            text-decoration: underline;
+        }
+        main {
+            flex: 1 0 auto;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        h1 {
+            margin-bottom: 25px;
+        }
+        .info-box {
+            background: #e0f7fa;
+            border-left: 5px solid #00796b;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+        }
+        .admin {
+            background: #fff3e0;
+            border-left-color: #ef6c00;
+        }
+        .groups {
+            background: #ede7f6;
+            border-left-color: #673ab7;
+        }
+        ul {
+            margin-left: 1rem;
+        }
+        a {
+            color: #0044cc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        footer {
+            flex-shrink: 0;
+            background-color: #0044cc;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #ccc;
+            border-top: 1px solid #ccc;
+            margin-top: 50px;
+        }
+        footer a {
+            color: #ccc;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            nav.desktop-nav {
+                display: none;
+            }
+            .hamburger {
+                display: flex;
+            }
+            nav.mobile-nav.show {
+                display: flex;
+            }
+            header {
+                justify-content: space-between;
+                flex-wrap: nowrap;
+            }
+        }
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            nav.mobile-nav a,
+            nav.mobile-nav form button {
+                padding-left: 15px;
+            }
+            main {
+                margin: 20px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <strong>Joel Digitals – Admin</strong>
+    <nav class="desktop-nav">
+        {% if user.is_authenticated %}
+            {% if "Selling" in user_groups %}
+                <a href="/mobile/admin-sales/">Admin: Sales</a>
+            {% endif %}
+            {% if "Support" in user_groups %}
+                <a href="/mobile/admin-tickets/">Admin: Tickets</a>
+            {% endif %}
+            <form method="post" action="{% url 'logout_app' %}">
+                {% csrf_token %}
+                <button type="submit" title="Logout">🚪 Logout ({{ user.username }})</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login_app' %}">🔐 Login</a>
+        {% endif %}
+    </nav>
+    <div class="hamburger" onclick="toggleMenu()" aria-label="Navigation öffnen" role="button" tabindex="0">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</header>
+
+<nav class="mobile-nav" id="mobileMenu">
+    {% if user.is_authenticated %}
+        {% if "Selling" in user_groups %}
+            <a href="/mobile/admin-sales/">Admin: Sales</a>
+        {% endif %}
+        {% if "Support" in user_groups %}
+            <a href="/mobile/admin-tickets/">Admin: Tickets</a>
+        {% endif %}
+        <form method="post" action="{% url 'logout_app' %}">
+            {% csrf_token %}
+            <button type="submit" title="Logout">🚪 Logout ({{ user.username }})</button>
+        </form>
+    {% else %}
+        <a href="{% url 'login_app' %}">🔐 Login</a>
+    {% endif %}
+</nav>
+
+<main>
+    <h1>Willkommen auf der Startseite!</h1>
+
+    {% if user.is_authenticated %}
+        <div class="info-box admin">
+            <p><strong>Status:</strong><br>
+                {% if is_superuser %}
+                    🔑 Du bist ein <strong>Superuser</strong>.
+                {% else %}
+                    👤 Du bist ein normaler Benutzer.
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="info-box groups">
+            <p><strong>Gruppenrechte:</strong></p>
+            <ul>
+                {% if user_groups %}
+                    {% for group in user_groups %}
+                        <li>✅ Mitglied in: <strong>{{ group }}</strong></li>
+                    {% endfor %}
+                {% else %}
+                    <li>❌ Keine Gruppenrechte</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <p><strong>Verfügbare Bereiche:</strong></p>
+            <ul>
+                <li><a href="{% url 'sales_app' %}">🛒 Verkaufs-Kontakt</a></li>
+                <li><a href="{% url 'support_tickets_app' %}">🎫 Tickets</a></li>
+                {% if in_support_sales %}
+                    <li><a href="{% url 'admin_sales_app' %}">🛒 Verkaufs Admin</a></li>
+                {% endif %}
+                {% if in_support_tickets %}
+                    <li><a href="{% url 'admin_tickets_app' %}">🎫 Tickets Admin</a></li>
+                {% endif %}
+                {% if is_superuser %}
+                    <li><a href="/admin/">🔧 Adminseite</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    {% else %}
+        <div class="info-box">
+            <p>Du bist nicht eingeloggt. <a href="{% url 'login_app' %}">Hier einloggen</a>.</p>
+        </div>
+    {% endif %}
+</main>
+
+<footer>
+    <a>&copy; 2025 Joel Digitals. Alle Rechte vorbehalten.</a>
+    <p>
+        <a href="/imprint/">Impressum</a> |
+        <a href="/privacy/">Datenschutz</a> |
+        <a href="/terms/">AGB</a>
+    </p>
+</footer>
+
+<script>
+    function toggleMenu() {
+        const menu = document.getElementById('mobileMenu');
+        menu.classList.toggle('show');
+    }
+    document.querySelectorAll('nav.mobile-nav a, nav.mobile-nav button').forEach(el => {
+        el.addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.remove('show');
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+{% extends "base_home.html" %}
+{% load static %}
+
+{% block title %}Available Apps – Download{% endblock %}
+
+{% block content %}
+<style>
+    main {
+        padding: 40px 20px;
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    .container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        color: #000;
+    }
+
+    h1, h2 {
+        color: #0044cc;
+    }
+
+    .app-item {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .app-item img {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        border-radius: 8px;
+        background-color: #fff;
+        padding: 5px;
+    }
+
+    .app-item a {
+        font-size: 20px;
+        color: #0044cc;
+        text-decoration: none;
+    }
+
+    .app-item a:hover {
+        text-decoration: underline;
+    }
+
+    .button {
+        background-color: #0044cc;
+        color: white !important;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 16px;
+        display: inline-block;
+        margin-top: 10px;
+    }
+
+    .button:hover {
+        background-color: #0033a0;
+        color: white !important;
+    }
+
+    @media (max-width: 600px) {
+        .app-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .button {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+<main>
+    <div class="container">
+        <h1>Available Apps for Download</h1>
+
+        {% if apps %}
+            {% for app in apps %}
+                <div class="app-item">
+                    {% if app.logo %}
+                        <img src="{{ app.logo.url }}" alt="{{ app.name }}">
+                    {% endif %}
+                    <div>
+                        <a href="{% url 'download_app_detail' app.id %}">{{ app.name }}</a>
+                        <p>{{ app.short_description|default:"No description available." }}</p>
+                        <a href="{% url 'download_app_detail' app.id %}" class="button">Details & Download</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No apps available at the moment.</p>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

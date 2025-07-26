@@ -27,6 +27,8 @@ urlpatterns = [
     path('contact/', include('contact.urls')),
     path('', include('shop_ourapps.urls')),  # URL-Pattern für die App
     path('wiki/', include('wiki.urls')),
+    path('status/', include('status.urls')),
+    path('downloads/', include('download.urls')),
+    path('mobile/', include('MobileApp.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

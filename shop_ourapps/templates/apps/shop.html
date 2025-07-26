@@ -1,235 +1,153 @@
+{% extends 'base_shop.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Joel Digitals Shop</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
-    <style>
-        /* Dein CSS bleibt gleich */
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: rgb(191, 185, 185);
-            color: #000;
-            font-size: 18px;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-        }
-        .logo-img {
-            width: 250px;
-            height: 111px;
-            object-fit: contain;
-        }
-        nav a {
-            color: #fff;
-            margin: 0 10px;
-            text-decoration: none;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        main {
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: auto;
-            flex-grow: 1;
-        }
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-        h1, h2 {
-            color: #0044cc;
-        }
-        .feature {
-            width: 100%;
-            max-width: 600px;
-            border-radius: 10px;
-            margin-top: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-        .button {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 16px;
-            display: inline-block;
-            margin-top: 20px;
-        }
-        .button:hover {
-            background-color: #0033a0;
-        }
-        footer {
-            background-color: #0044cc;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 50px;
-            border-top: 1px solid #ccc;
-            position: relative;
-        }
-        footer a {
-            color: #ccc;
-            margin: 0 5px;
-            text-decoration: none;
-        }
-        footer a:hover {
-            text-decoration: underline;
-        }
-        .shop-item {
-            border: 1px solid #ccc;
-            margin: 15px 0;
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-        .shop-item h2 {
-            margin: 0;
-            color: #0044cc;
-        }
-        .shop-item p {
-            font-size: 18px;
-            color: #333;
-        }
-        .shop-item a {
-            display: inline-block;
-            margin-top: 10px;
-            background-color: #0044cc;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 6px;
-            text-decoration: none;
-        }
-        .shop-item a:hover {
-            background-color: #0033a0;
-        }
-    </style>
-</head>
-<body>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<header>
-    <a href="/">
-        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
-    </a>
-    <nav style="margin-left: auto; display: flex; align-items: center; gap: 15px;">
-        <a href="/services/">Services</a>
-        <a href="/about/">About Us</a>
-        <a href="/contact/">Contact</a>
-        <a href="/blog/">Blog</a>
-        {% if user.is_authenticated %}
-            <a href="/affiliate/dashboard/">Affiliate Program</a>
-        {% endif %}
 
-        {% if user.is_authenticated %}
-            <!-- Einkaufswagen -->
-            <a href="/cart/" title="Cart"><i class="fas fa-shopping-cart"></i></a>
+{% block title %}Joel Digitals Shop{% endblock %}
 
-            <!-- Wallet-Link -->
-            <a href="/wallet/" title="Wallet">
-                <i class="fas fa-wallet"></i> {{ wallet_balance|floatformat:2 }} €
-            </a>
+{% block extra_head %}
+<style>
+  .search-box {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #000000;
+  }
 
-            <!-- Logout -->
-            <a href="/auth/logout/" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
-        {% else %}
-            <!-- Login -->
-            <a href="/auth/login/" title="Login"><i class="fas fa-sign-in-alt"></i></a>
-        {% endif %}
-    </nav>
-</header>
+  .group-title {
+    cursor: pointer;
+    color: #007bff; /* Blue for links/buttons */
+    font-size: 1.4rem;
+    margin-top: 2rem;
+    user-select: none;
+  }
 
+  .group-content {
+    display: block;
+  }
 
+  .shop-item {
+    position: relative; /* For absolute positioning of image */
+    background: #ffffff; /* White background */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* subtle shadow */
+    color: #000000; /* Black text */
+  }
 
-<main>
-    <div class="container">
-        <h1>Shop</h1>
-        <p>All prices are in Euros (€) and include VAT.</p>
-        <input type="text" id="searchInput" placeholder="Search apps..." style="width: 100%; padding: 10px; font-size: 16px; margin-bottom: 20px;">
+  .shop-item h2 {
+    margin: 0 0 0.5rem;
+    color: #007bff; /* Primary blue */
+  }
 
-        {% for group_key, apps in grouped_apps.items %}
-            <div class="group">
-                <h2 onclick="toggleGroup('{{ group_key }}')" style="cursor: pointer;">
-                    Group: <span id="group-title-{{ group_key }}">{{ group_key|title }}</span>
-                    <span id="arrow-{{ group_key }}">▼</span>
-                </h2>
+  /* Image as small rounded badge at bottom-left, slightly above the edge */
+  .shop-item img {
+    position: absolute;
+    bottom: 80px;
+    left: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #007bff;
+    background: #fff;
+  }
 
-                <div id="group-{{ group_key }}">
-                    {% for app in apps %}
-                        <div class="shop-item">
-                            <h2>{{ app.name }}</h2>
-                            {% if app.image %}
-                                <img src="{{ app.image.url }}" alt="{{ app.name }}" class="feature">
-                            {% endif %}
-                            <p>{{ app.description }}</p>
-                            <p>Version: {{ app.version }}</p>
-                            <p>€{{ app.price }}</p>
-                            <a href="{% url 'app_detail' slug=app.slug %}">View Details</a>
-                            {% if app.link %}
-                                <a href="{{ app.link }}" target="_blank" class="button">Wiki</a>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endfor %}
+  /* Indent paragraphs so they don't overlap image */
+  .shop-item p {
+    margin: 0.3rem 0 0.3rem 80px; /* left margin to clear image */
+    font-size: 1rem;
+    color: #000000;
+  }
+
+  .btn-shop {
+    display: inline-block;
+    margin-top: 0.5rem;
+    background: #007bff;
+    color: #fff;
+    padding: 0.6rem 1rem;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-right: 0.5rem;
+  }
+
+  .btn-shop:hover {
+    background: #0056b3;
+  }
+
+  /* Responsive adjustments for small screens */
+  @media (max-width: 600px) {
+    .shop-item {
+      padding: 1rem;
+    }
+    .shop-item img {
+      position: static;
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      border: none;
+      background: none;
+    }
+    .shop-item p {
+      margin-left: 0;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+  <h1>Shop</h1>
+  <p>All prices include VAT.</p>
+
+  <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search apps...">
+
+  {% for group_key, apps in grouped_apps.items %}
+    <div class="group-title" onclick="toggleGroup('{{ group_key }}')">
+      {{ group_key|title }} <span id="arrow-{{ group_key }}">▼</span>
     </div>
-</main>
+    <div class="group-content" id="group-{{ group_key }}">
+      {% for app in apps %}
+        <div class="shop-item">
+          <h2>{{ app.name }}</h2>
+          {% if app.image %}
+            <img src="{{ app.image.url }}" alt="{{ app.name }}">
+          {% endif %}
+          <p><strong>{{ app.description|truncatechars:100 }}</strong></p>
+          <p>Version: {{ app.version }}</p>
+          <p>Price: €{{ app.price }}</p>
+          <a class="btn-shop" href="{% url 'app_detail' slug=app.slug %}">Details</a>
+          {% if app.link %}
+            <a class="btn-shop" href="{{ app.link }}" target="_blank">Wiki</a>
+          {% endif %}
+        </div>
+      {% empty %}
+        <p>No apps available in this group.</p>
+      {% endfor %}
+    </div>
+  {% endfor %}
+{% endblock %}
 
-<footer>
-    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
-    <p>
-        <a href="/imprint/">Imprint</a> |
-        <a href="/privacy/">Privacy Policy</a> |
-        <a href="/terms/">Terms of Service</a> |
-        <a href="/">Home</a>
-    </p>
-</footer>
-
+{% block extra_js %}
 <script>
-    document.getElementById("searchInput").addEventListener("input", function () {
-        const query = this.value.toLowerCase();
-        const items = document.querySelectorAll(".shop-item");
-        items.forEach(item => {
-            const name = item.querySelector("h2").textContent.toLowerCase();
-            item.style.display = name.includes(query) ? "block" : "none";
-        });
+  document.getElementById("searchInput").addEventListener("input", function () {
+    const query = this.value.toLowerCase();
+    document.querySelectorAll(".shop-item").forEach(item => {
+      const name = item.querySelector("h2").textContent.toLowerCase();
+      item.style.display = name.includes(query) ? "block" : "none";
     });
+  });
 
-    const groupTitles = {};
-
-    function toggleGroup(key) {
-        const groupDiv = document.getElementById("group-" + key);
-        const arrow = document.getElementById("arrow-" + key);
-        if (groupDiv.style.display === "none") {
-            groupDiv.style.display = "block";
-            arrow.textContent = "▼";
-        } else {
-            groupDiv.style.display = "none";
-            arrow.textContent = "►";
-        }
-    }
-
-    function renameGroup(key, newName) {
-        if (newName.trim() !== "") {
-            document.getElementById("group-title-" + key).textContent = newName;
-            groupTitles[key] = newName;
-        }
-    }
+  function toggleGroup(key) {
+    const content = document.getElementById("group-" + key);
+    const arrow = document.getElementById("arrow-" + key);
+    const isHidden = content.style.display === "none";
+    content.style.display = isHidden ? "block" : "none";
+    arrow.textContent = isHidden ? "▼" : "►";
+  }
 </script>
-</body>
-</html>
+{% endblock %}

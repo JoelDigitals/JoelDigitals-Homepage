@@ -1,0 +1,356 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Joel Digitals{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0044cc;
+      --bg: #121212;
+      --surface: #1e1e1e;
+      --text: #eee;
+      --border: #333;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      display: flex;
+      flex-direction: column;
+      font-family: "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      background: #181818;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0,0,0,.6);
+    }
+    .logo-img {
+      width: 200px;
+      height: auto;
+      object-fit: contain;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color .3s;
+    }
+    nav a:hover { color: var(--primary); }
+
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+    footer {
+      background: #181818;
+      padding: 1rem 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+      color: #ccc;
+    }
+    footer a {
+      color: #ccc;
+      margin: 0 0.5rem;
+      text-decoration: none;
+    }
+    footer a:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    /* Cookie Banner */
+    #cookie-banner {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 1rem 2rem;
+      z-index: 9999;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    #cookie-banner a {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+    #cookie-banner label {
+      display: block;
+      margin: 0.3rem 0;
+      cursor: pointer;
+    }
+    #cookie-banner input[type=checkbox] {
+      margin-right: 0.5rem;
+    }
+    #cookie-banner button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      margin: 0.3rem 0.3rem 0 0;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+    #cookie-banner button:hover {
+      background-color: #0033a0;
+    }
+    #cookie-banner select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      header, footer {
+        flex-direction: column;
+        align-items: center;
+      }
+      nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+      main {
+        padding: 1rem;
+      }
+      #cookie-banner {
+        padding: 1rem;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+    <a href="/">
+        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
+    </a>
+    <nav>
+        <a href="/wiki/">Wiki</a>
+        <a href="/status/">Status</a>
+        <a href="/services/">Services</a>
+        <a href="/about/">About Us</a>
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Blog</a>
+        <a href="/our-apps/">Our Apps</a>
+        <a href="/shop/">Shop</a>
+        {% if user.is_authenticated %}
+            {% if "Marketing" in user_groups %}
+                <a href="/blog/admin-blog/">Admin: Blog</a>
+            {% endif %}
+            {% if "Selling" in user_groups %}
+                <a href="/contact/admin-sales/">Admin: Sales</a>
+            {% endif %}
+            {% if "Support" in user_groups %}
+                <a href="/contact/admin-tickets/">Admin: Tickets</a>
+            {% endif %}
+            <a href="/auth/logout/">Logout</a>
+        {% else %}
+            <a href="/auth/login/">Login</a>
+        {% endif %}
+    </nav>
+</header>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer>
+    <div>&copy; 2025 Joel Digitals. All rights reserved.</div>
+    <div>
+        <a href="/imprint/">Imprint</a> |
+        <a href="/privacy/">Privacy Policy</a> |
+        <a href="/terms/">Terms of Service</a> |
+        <a href="/">Home</a>
+    </div>
+</footer>
+
+<!-- Cookie Banner -->
+<div id="cookie-banner" role="region" aria-label="Cookie Consent Banner">
+  <div style="display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center;">
+    <div style="flex: 1; min-width: 250px; margin-right: 1rem;">
+      <p id="cookie-message"></p>
+      <div id="cookie-options">
+        <label><input type="checkbox" id="essential" disabled checked> <span id="label-essential"></span></label>
+        <label><input type="checkbox" id="functional"> <span id="label-functional"></span></label>
+        <label><input type="checkbox" id="analytics"> <span id="label-analytics"></span></label>
+        <label><input type="checkbox" id="marketing"> <span id="label-marketing"></span></label>
+      </div>
+    </div>
+    <div style="min-width: 220px; display: flex; flex-direction: column; gap: 0.5rem;">
+      <select id="language-select" onchange="setLanguage(this.value)">
+        <option value="de">Deutsch</option>
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+      </select>
+      <button onclick="acceptAll()">Alle akzeptieren</button>
+      <button onclick="savePreferences()">Einstellungen speichern</button>
+      <button onclick="rejectEssentials()" style="background-color: #555;">Nur Essenzielle</button>
+      <a href="/privacy/" style="font-size: 0.8rem; margin-top: 0.5rem; text-align: center;">Datenschutzerklärung</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const translations = {
+    de: {
+      message: "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern. Sie können auswählen, welchen Kategorien Sie zustimmen.",
+      labels: {
+        essential: "Essenzielle Cookies (immer aktiv)",
+        functional: "Funktionale Cookies (z. B. Warenkorb speichern)",
+        analytics: "Analyse-Cookies (z. B. Besucherzahlen messen)",
+        marketing: "Marketing-Cookies (z. B. für Werbung & Tracking)"
+      },
+      buttons: {
+        acceptAll: "Alle akzeptieren",
+        save: "Einstellungen speichern",
+        essentialsOnly: "Nur Essenzielle"
+      }
+    },
+    en: {
+      message: "We use cookies to improve your experience. You can choose which categories to allow.",
+      labels: {
+        essential: "Essential cookies (always active)",
+        functional: "Functional cookies (e.g., save cart)",
+        analytics: "Analytics cookies (e.g., visitor stats)",
+        marketing: "Marketing cookies (e.g., ads & tracking)"
+      },
+      buttons: {
+        acceptAll: "Accept all",
+        save: "Save preferences",
+        essentialsOnly: "Essentials only"
+      }
+    },
+    fr: {
+      message: "Nous utilisons des cookies pour améliorer votre expérience. Choisissez les catégories que vous souhaitez autoriser.",
+      labels: {
+        essential: "Cookies essentiels (toujours actifs)",
+        functional: "Cookies fonctionnels (ex. sauvegarder panier)",
+        analytics: "Cookies analytiques (ex. statistiques visiteurs)",
+        marketing: "Cookies marketing (ex. pub & suivi)"
+      },
+      buttons: {
+        acceptAll: "Tout accepter",
+        save: "Enregistrer",
+        essentialsOnly: "Essentiels uniquement"
+      }
+    }
+  };
+
+  function setLanguage(lang) {
+    const t = translations[lang] || translations.de;
+    document.getElementById('cookie-message').textContent = t.message;
+    document.getElementById('label-essential').textContent = t.labels.essential;
+    document.getElementById('label-functional').textContent = t.labels.functional;
+    document.getElementById('label-analytics').textContent = t.labels.analytics;
+    document.getElementById('label-marketing').textContent = t.labels.marketing;
+    document.querySelector('#cookie-banner button:nth-child(2)').textContent = t.buttons.acceptAll;
+    document.querySelector('#cookie-banner button:nth-child(3)').textContent = t.buttons.save;
+    document.querySelector('#cookie-banner button:nth-child(4)').textContent = t.buttons.essentialsOnly;
+  }
+
+  function showBanner() {
+    document.getElementById('cookie-banner').style.display = 'block';
+  }
+
+  function getCookie(name) {
+    const value = "; " + document.cookie;
+    const parts = value.split("; " + name + "=");
+    if(parts.length === 2) return parts.pop().split(";").shift();
+  }
+
+  function setCookie(name, value, days) {
+    let expires = "";
+    if(days) {
+      const date = new Date();
+      date.setTime(date.getTime() + (days*24*60*60*1000));
+      expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Lax";
+  }
+
+  function loadPreferences() {
+    const prefs = getCookie('cookiePreferences');
+    if(!prefs) {
+      showBanner();
+      setLanguage('de');
+      return null;
+    }
+    try {
+      const obj = JSON.parse(prefs);
+      return obj;
+    } catch {
+      showBanner();
+      setLanguage('de');
+      return null;
+    }
+  }
+
+  function savePreferences() {
+    const prefs = {
+      essential: true,
+      functional: document.getElementById('functional').checked,
+      analytics: document.getElementById('analytics').checked,
+      marketing: document.getElementById('marketing').checked,
+      language: document.getElementById('language-select').value || 'de'
+    };
+    setCookie('cookiePreferences', JSON.stringify(prefs), 365);
+    document.getElementById('cookie-banner').style.display = 'none';
+  }
+
+  function acceptAll() {
+    document.getElementById('functional').checked = true;
+    document.getElementById('analytics').checked = true;
+    document.getElementById('marketing').checked = true;
+    savePreferences();
+  }
+
+  function rejectEssentials() {
+    document.getElementById('functional').checked = false;
+    document.getElementById('analytics').checked = false;
+    document.getElementById('marketing').checked = false;
+    savePreferences();
+  }
+
+  function applyPreferences(prefs) {
+    if(!prefs) return;
+    document.getElementById('functional').checked = !!prefs.functional;
+    document.getElementById('analytics').checked = !!prefs.analytics;
+    document.getElementById('marketing').checked = !!prefs.marketing;
+    document.getElementById('language-select').value = prefs.language || 'de';
+    setLanguage(prefs.language || 'de');
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const prefs = loadPreferences();
+    applyPreferences(prefs);
+    if(!prefs) showBanner();
+  });
+</script>
+
+</body>
+</html>

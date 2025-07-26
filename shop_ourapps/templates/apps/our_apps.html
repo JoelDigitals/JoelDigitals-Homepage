@@ -1,243 +1,146 @@
+{% extends "base_home.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Joel Digitals Shop</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: rgb(191, 185, 185);
-            color: #000;
-            font-size: 18px;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh; /* Stellt sicher, dass der Body mindestens die volle Bildschirmhöhe hat */
-        }
 
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-        }
+{% block title %}Joel Digitals Shop{% endblock %}
 
-        .logo-img {
-            width: 250px;
-            height: 111px;
-            object-fit: contain;
-        }
+{% block content %}
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        color: #000;
+        font-size: 18px;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* Stellt sicher, dass der Body mindestens die volle Bildschirmhöhe hat */
+    }
 
-        nav a {
-            color: #fff;
-            margin: 0 10px;
-            text-decoration: none;
-        }
+    main {
+        padding: 40px 20px;
+        max-width: 1000px;
+        margin: auto;
+        flex-grow: 1; /* Lässt das Hauptinhaltselement den verbleibenden Raum ausfüllen */
+    }
 
-        nav a:hover {
-            text-decoration: underline;
-        }
+    .container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
 
+    h1, h2 {
+        color: #0044cc;
+    }
+
+    .feature {
+        width: 100%;
+        max-width: 600px;
+        border-radius: 10px;
+        margin-top: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .button {
+        background-color: #0044cc;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 16px;
+        display: inline-block;
+        margin-top: 20px;
+    }
+
+    .button:hover {
+        background-color: #0033a0;
+    }
+
+    .shop-item {
+        border: 1px solid #ccc;
+        margin: 15px 0;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .shop-item h2 {
+        margin: 0;
+        color: #0044cc;
+    }
+
+    .apps-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+    }
+
+    /* Bildgröße begrenzen */
+    .shop-item .app-image {
+        width: 100%;
+        max-height: 200px;
+        object-fit: contain;
+        margin-bottom: 10px;
+    }
+
+    .shop-item p {
+        font-size: 18px;
+        color: #333;
+        margin: 5px 0;
+    }
+
+    .shop-item p:first-child {
+        font-size: 16px;
+        color: #666;
+    }
+
+    .shop-item p:last-child {
+        font-weight: bold;
+        color: #0044cc;
+    }
+
+    .shop-item a {
+        display: inline-block;
+        margin-top: 10px;
+        background-color: #0044cc;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 6px;
+        text-decoration: none;
+    }
+
+    .shop-item a:hover {
+        background-color: #0033a0;
+    }
+
+    @media (max-width: 600px) {
         main {
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: auto;
-            flex-grow: 1; /* Lässt das Hauptinhaltselement den verbleibenden Raum ausfüllen */
-        }
-
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        h1, h2 {
-            color: #0044cc;
-        }
-
-        .feature {
-            width: 100%;
-            max-width: 600px;
-            border-radius: 10px;
-            margin-top: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-
-        .button {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 16px;
-            display: inline-block;
-            margin-top: 20px;
-        }
-
-        .button:hover {
-            background-color: #0033a0;
-        }
-
-        footer {
-            background-color: #0044cc;
             padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 50px;
-            border-top: 1px solid #ccc;
-            position: relative;
         }
-
-        footer a {
-            color: #ccc;
-            margin: 0 5px;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
         .shop-item {
-            border: 1px solid #ccc;
-            margin: 15px 0;
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 15px;
         }
+    }
 
-        .shop-item h2 {
-            margin: 0;
-            color: #0044cc;
+    @media (max-width: 480px) {
+        h1, h2 {
+            font-size: 20px;
         }
-
-        .apps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        /* Bildgröße begrenzen */
-        .shop-item .app-image {
-            width: 100%;
-            max-height: 200px;
-            object-fit: contain;
-            margin-bottom: 10px;
-        }
-
-        .shop-item p {
-            font-size: 18px;
-            color: #333;
-        }
-
-        .shop-item a {
-            display: inline-block;
-            margin-top: 10px;
-            background-color: #0044cc;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 6px;
-            text-decoration: none;
-        }
-
-        .shop-item a:hover {
-            background-color: #0033a0;
-        }
-        .shop-item h3 {
-            font-size: 16px;
-            color: #666;
-        }
-        .shop-item img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
+        .shop-item {
+            padding: 10px;
         }
         .shop-item p {
-            margin: 5px 0;
-        }
-        .shop-item p:last-child {
-            font-weight: bold;
-            color: #0044cc;
-        }
-        .shop-item p:first-child {
             font-size: 16px;
-            color: #666;
         }
-        @media (max-width: 600px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            nav {
-                margin-top: 10px;
-            }
-            .logo-img {
-                width: 100%;
-                height: auto;
-            }
-        }
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            .shop-item {
-                padding: 15px;
-            }
-            h1, h2, h3 {
-                font-size: 24px;
-            }
-        }
-        @media (max-width: 480px) {
-            h1, h2, h3 {
-                font-size: 20px;
-            }
-            .shop-item {
-                padding: 10px;
-            }
-            .shop-item p {
-                font-size: 16px;
-            }
-        }
-    </style>
-</head>
-<body>
-<header>
-    <a href="/">
-        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
-    </a>
-    <nav style="margin-left: auto;">
-    <a href="/services/">Services</a>
-    <a href="/about/">About Us</a>
-    <a href="/contact/">Contact</a>
-    <a href="/blog/">Blog</a>
-    <a href ="/our-apps/">Our Apps</a>
-    <a href ="/shop/">Shop</a>
-    {% if user.is_authenticated %}
-        {% if "Marketing" in user_groups %}
-            <a href="/blog/admin-blog/">Admin: Blog</a>
-        {% endif %}
-        {% if "Selling" in user_groups %}
-            <a href="/contact/admin-sales/">Admin: Sales</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/contact/admin-tickets/">Admin: Tickets</a>
-        {% endif %}
-        <a href="/auth/logout/">Logout</a>
-    {% else %}
-        <a href="/auth/login/">Login</a>
-    {% endif %}
-</nav>
-</header>
+    }
+</style>
+
 <main>
     <div class="container">
         <h1>Our Apps</h1>
-        <div class="apps-grid">  <!-- RICHTIGER Klassenname -->
+        <div class="apps-grid">
             {% for app in apps %}
                 <div class="shop-item">
                     <h2>{{ app.name }}</h2>
@@ -246,29 +149,17 @@
                     {% endif %}
                     <p>{{ app.description|truncatewords:50 }}</p>
                     <p>Version: {{ app.version }}</p>
-                    <div style="margin-top: 10px;">
+                    <div>
                         {% if app.link %}
                             <a href="{{ app.link }}" class="button" target="_blank" rel="noopener noreferrer">Go to App</a>
                         {% endif %}
                         <a href="{% url 'more_information' app.slug %}" class="button" style="background-color: #666;">More</a>
                     </div>
                 </div>
+            {% empty %}
+                <p>No apps available at the moment.</p>
             {% endfor %}
         </div>
-        {% if not apps %}
-            <p>No apps available at the moment.</p>
-        {% endif %}
     </div>
 </main>
-
-<footer>
-    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
-    <p>
-        <a href="/imprint/">Imprint</a> |
-        <a href="/privacy/">Privacy Policy</a> |
-        <a href="/terms/">Terms of Service</a> |
-        <a href="/">Home</a>
-    </p>
-</footer>
-</body>
-</html>
+{% endblock %}

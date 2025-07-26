@@ -1,272 +1,226 @@
+{% extends "base_home.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Joel Digitals - Sales & Wishlist</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: rgb(191, 185, 185);
-            color: #000;
-            font-size: 18px;
+
+{% block title %}Sales / Wishlist – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+    .sales-container {
+        background-color: #fff;
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    h2 {
+        margin-top: 0;
+        color: #0044cc;
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    form label {
+        display: block;
+        margin-top: 15px;
+        font-weight: 600;
+        color: #0044cc;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea {
+        width: 100%;
+        padding: 8px 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-family: inherit;
+        box-sizing: border-box;
+        resize: vertical;
+    }
+
+    textarea {
+        min-height: 80px;
+    }
+
+    button.btn {
+        margin-top: 20px;
+        background-color: #0044cc;
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button.btn:hover,
+    button.btn:focus {
+        background-color: #003399;
+        outline: none;
+    }
+
+    #wish-form-container {
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        padding: 15px 20px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    .wish-field {
+        margin-bottom: 15px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+    }
+
+    .wish-field:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    #wish-fields label {
+        margin-top: 10px;
+    }
+
+    h3 {
+        color: #0044cc;
+        margin-top: 0;
+    }
+
+    .entry {
+        margin-bottom: 30px;
+        padding: 15px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    }
+
+    .entry strong {
+        color: #0044cc;
+    }
+
+    .entry ul {
+        margin-top: 8px;
+        padding-left: 20px;
+    }
+
+    .entry a.btn {
+        display: inline-block;
+        margin-top: 10px;
+        background-color: #0066ff;
+        padding: 8px 14px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        text-decoration: none;
+        color: white;
+        transition: background-color 0.3s ease;
+    }
+
+    .entry a.btn:hover,
+    .entry a.btn:focus {
+        background-color: #0044cc;
+        outline: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+        .sales-container {
+            padding: 30px 20px;
         }
 
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
+        h2 {
+            font-size: 1.8rem;
         }
+    }
+</style>
 
-        .logo-img {
-            width: 180px;
-            height: auto;
-        }
+<div class="sales-container">
+    <h2>Sales / Wishlist</h2>
 
-        nav {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+    <form action="{% url 'sales' %}" method="POST" id="wish-form">           
+        {% csrf_token %}
+        <label for="name">Your Name:</label>
+        <input type="text" name="name" id="name" required>
 
-        nav a {
-            color: #fff;
-            text-decoration: none;
-        }
+        <label for="email">Your Email:</label>
+        <input type="email" name="email" id="email" required>
 
-        nav a:hover {
-            text-decoration: underline;
-        }
+        <label for="subject">Subject:</label>
+        <input type="text" name="subject" id="subject" required>
 
-        main {
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: auto;
-        }
+        <label for="message">Message:</label>
+        <textarea name="message" id="message" rows="4"></textarea>
 
-        form label {
-            display: block;
-            margin-top: 10px;
-        }
+        <button type="button" class="btn" id="open-wish-form">Add Wish</button>
 
-        input, textarea {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 4px;
-            border: 1px solid #888;
-        }
+        <div id="wish-form-container" style="display: none;">
+            <h3>Add Wishes</h3>
+            <div id="wish-fields">
+                <div class="wish-field">
+                    <label for="wish-title-0">Wish Title:</label>
+                    <input type="text" name="wishes[0][title]" id="wish-title-0" required>
 
-        .btn {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            margin-top: 15px;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background-color: #1d00d9;
-        }
-
-        .wish-field {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border-radius: 6px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
-        }
-
-        table, th, td {
-            border: 1px solid #000;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-
-        footer {
-            background-color: #0044cc;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 50px;
-            color: #ccc;
-        }
-
-        footer a {
-            color: #ccc;
-            text-decoration: none;
-            margin: 0 5px;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-        footer p {
-            margin: 5px 0;
-        }
-        footer a {
-            color: #ccc;
-            margin: 0 5px;
-            text-decoration: none;
-        }
-        footer a:hover {
-            text-decoration: underline;
-        }
-        @media (max-width: 600px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            nav {
-                margin-left: 0;
-                margin-top: 10px;
-            }
-            nav a {
-                display: block;
-                margin: 5px 0;
-            }
-        }
-        @media (max-width: 1000px) {
-            main {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <header>
-    <a href="/">
-        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
-    </a>
-    <nav style="margin-left: auto;">
-    <a href="/services/">Services</a>
-    <a href="/about/">About Us</a>
-    <a href="/contact/">Contact</a>
-    <a href="/blog/">Blog</a>
-    <a href ="/our-apps/">Our Apps</a>
-    <a href ="/shop/">Shop</a>
-    {% if user.is_authenticated %}
-        {% if "Marketing" in user_groups %}
-            <a href="/blog/admin-blog/">Admin: Blog</a>
-        {% endif %}
-        {% if "Selling" in user_groups %}
-            <a href="/contact/admin-sales/">Admin: Sales</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/contact/admin-tickets/">Admin: Tickets</a>
-        {% endif %}
-        <a href="/auth/logout/">Logout</a>
-    {% else %}
-        <a href="/auth/login/">Login</a>
-    {% endif %}
-</nav>
-
-    </header>
-
-    <main>
-        <h2>Sales / Wishlist</h2>
-
-        <form action="{% url 'sales' %}" method="POST" id="wish-form">           
-            {% csrf_token %}
-            <label for="name">Your Name:</label>
-            <input type="text" name="name" id="name" required>
-
-            <label for="email">Your Email:</label>
-            <input type="email" name="email" id="email" required>
-
-            <label for="subject">Subject:</label>
-            <input type="text" name="subject" id="subject" required>
-
-            <label for="message">Message:</label>
-            <textarea name="message" id="message" rows="4"></textarea>
-
-            <button type="button" class="btn" id="open-wish-form">Add Wish</button>
-
-            <div id="wish-form-container" style="display: none;">
-                <h3>Add Wishes</h3>
-                <div id="wish-fields">
-                    <div class="wish-field">
-                        <label for="wish-title-0">Wish Title:</label>
-                        <input type="text" name="wishes[0][title]" id="wish-title-0" required>
-
-                        <label for="wish-description-0">Description:</label>
-                        <textarea name="wishes[0][description]" id="wish-description-0" required></textarea>
-                    </div>
+                    <label for="wish-description-0">Description:</label>
+                    <textarea name="wishes[0][description]" id="wish-description-0" required></textarea>
                 </div>
-                <button type="button" class="btn" id="add-wish">Add Another Wish</button>
             </div>
-
-            <button type="submit" class="btn">Submit Form</button>
-        </form>
-
-        <h3>All submitted entries</h3>
-        {% for entry in entries %}
-            <div style="margin-bottom: 30px; padding: 15px; background: #fff; border-radius: 8px;">
-                <strong>Name:</strong> {{ entry.name }}<br>
-                <strong>Email:</strong> {{ entry.email }}<br>
-                <strong>Subject:</strong> {{ entry.subject }}<br>
-                <strong>Message:</strong> {{ entry.message }}<br>
-                <strong>Submitted at:</strong> {{ entry.created_at }}<br>
-                <strong>Wishes:</strong>
-                <ul>
-                    {% for wish in entry.wishes.all %}
-                        <li><strong>{{ wish.title }}:</strong> {{ wish.description }}</li>
-                    {% endfor %}
-                </ul>
-                <a href="{% url 'sales_chat' entry.id %}" class="btn" style="margin-top: 10px;"> Chat</a>
-            </div>
-        {% empty %}
-            <p>You haven't submitted any wishes yet.</p>
-        {% endfor %}
-        
-    </main>
-
-    <footer>
-        <div>&copy; 2025 Joel Digitals. All rights reserved.</div>
-        <div>
-            <a href="/imprint/">Imprint</a> |
-            <a href="/privacy/">Privacy</a>
+            <button type="button" class="btn" id="add-wish">Add Another Wish</button>
         </div>
-    </footer>
 
-    <script>
-        document.getElementById('open-wish-form').onclick = function() {
-            const formContainer = document.getElementById('wish-form-container');
-            formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
-        };
+        <button type="submit" class="btn">Submit Form</button>
+    </form>
 
-        document.getElementById('add-wish').onclick = function() {
-            const wishFields = document.getElementById('wish-fields');
-            const wishCount = wishFields.getElementsByClassName('wish-field').length;
-            const newWishField = document.createElement('div');
-            newWishField.className = 'wish-field';
+    <h3 style="margin-top: 40px; text-align: center;">All submitted entries</h3>
+    {% for entry in entries %}
+        <div class="entry">
+            <strong>Name:</strong> {{ entry.name }}<br>
+            <strong>Email:</strong> {{ entry.email }}<br>
+            <strong>Subject:</strong> {{ entry.subject }}<br>
+            <strong>Message:</strong> {{ entry.message }}<br>
+            <strong>Submitted at:</strong> {{ entry.created_at }}<br>
+            <strong>Wishes:</strong>
+            <ul>
+                {% for wish in entry.wishes.all %}
+                    <li><strong>{{ wish.title }}:</strong> {{ wish.description }}</li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'sales_chat' entry.id %}" class="btn">Chat</a>
+        </div>
+    {% empty %}
+        <p style="text-align: center;">You haven't submitted any wishes yet.</p>
+    {% endfor %}
+</div>
 
-            newWishField.innerHTML = `
-                <label for="wish-title-${wishCount}">Wish Title:</label>
-                <input type="text" name="wishes[${wishCount}][title]" id="wish-title-${wishCount}" required>
+<script>
+    document.getElementById('open-wish-form').onclick = function() {
+        const formContainer = document.getElementById('wish-form-container');
+        formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+    };
 
-                <label for="wish-description-${wishCount}">Description:</label>
-                <textarea name="wishes[${wishCount}][description]" id="wish-description-${wishCount}" required></textarea>
-            `;
-            wishFields.appendChild(newWishField);
-        };
-    </script>
-</body>
-</html>
+    document.getElementById('add-wish').onclick = function() {
+        const wishFields = document.getElementById('wish-fields');
+        const wishCount = wishFields.getElementsByClassName('wish-field').length;
+        const newWishField = document.createElement('div');
+        newWishField.className = 'wish-field';
+
+        newWishField.innerHTML = `
+            <label for="wish-title-${wishCount}">Wish Title:</label>
+            <input type="text" name="wishes[${wishCount}][title]" id="wish-title-${wishCount}" required>
+
+            <label for="wish-description-${wishCount}">Description:</label>
+            <textarea name="wishes[${wishCount}][description]" id="wish-description-${wishCount}" required></textarea>
+        `;
+        wishFields.appendChild(newWishField);
+    };
+</script>
+{% endblock %}

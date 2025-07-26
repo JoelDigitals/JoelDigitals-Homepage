@@ -1,41 +1,12 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Our Services – Joel Digitals</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+{% extends "base_home.html" %}
+
+{% block content %}
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: rgb(191, 185, 185);
             color: #000;
             font-size: 18px;
-        }
-
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-        }
-
-        .logo-img {
-            width: 250px;
-            height: 111px;
-            object-fit: contain;
-        }
-
-        nav a {
-            color: #fff;
-            margin: 0 10px;
-            text-decoration: none;
-        }
-
-        nav a:hover {
-            text-decoration: underline;
         }
 
         main {
@@ -102,25 +73,6 @@
             margin-top: 10px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
-
-        footer {
-            background-color: #0044cc;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 50px;
-            border-top: 1px solid #ccc;
-        }
-
-        footer a {
-            color: #ccc;
-            margin: 0 5px;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
         @media (max-width: 600px) {
             header {
                 flex-direction: column;
@@ -155,35 +107,6 @@
             section.classList.toggle("expanded");
         }
     </script>
-</head>
-<body>
-<header>
-    <a href="/">
-        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
-    </a>
-    <nav style="margin-left: auto;">
-    <a href="/services/">Services</a>
-    <a href="/about/">About Us</a>
-    <a href="/contact/">Contact</a>
-    <a href="/blog/">Blog</a>
-    <a href ="/our-apps/">Our Apps</a>
-    <a href ="/shop/">Shop</a>
-    {% if user.is_authenticated %}
-        {% if "Marketing" in user_groups %}
-            <a href="/blog/admin-blog/">Admin: Blog</a>
-        {% endif %}
-        {% if "Selling" in user_groups %}
-            <a href="/contact/admin-sales/">Admin: Sales</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/contact/admin-tickets/">Admin: Tickets</a>
-        {% endif %}
-        <a href="/auth/logout/">Logout</a>
-    {% else %}
-        <a href="/auth/login/">Login</a>
-    {% endif %}
-</nav>
-</header>
 
 <main>
     <div class="container">
@@ -270,15 +193,4 @@
 
     </div>
 </main>
-
-<footer>
-    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
-    <p>
-        <a href="/imprint/">Imprint</a> |
-        <a href="/privacy/">Privacy Policy</a> |
-        <a href="/terms/">Terms of Service</a> |
-        <a href="/">Home</a>
-    </p>
-</footer>
-</body>
-</html>
+{% endblock %}

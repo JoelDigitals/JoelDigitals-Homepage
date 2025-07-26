@@ -55,6 +55,9 @@ INSTALLED_APPS = [
     'contact',
     'shop_ourapps',  # Deine App für die Affiliate-Links
     'wiki',  # Deine Wiki-App
+    'status',
+    'download',
+    'MobileApp'
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"

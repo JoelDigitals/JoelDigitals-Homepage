@@ -185,6 +185,12 @@ class CartItem(models.Model):
 # ... (alle bisherigen Klassen wie App, AffiliateLink, Purchase etc.)
 
 class Order(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -194,6 +200,8 @@ class Order(models.Model):
     company_name = models.CharField(max_length=200, blank=True, null=True)
     vat_number = models.CharField(max_length=50, blank=True, null=True)
     payment_method = models.CharField(max_length=50)
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')  # <--- hinzugefügt
 
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -208,22 +216,17 @@ class Order(models.Model):
         return f"Bestellung {self.id} von {self.user}"
 
     def save(self, *args, **kwargs):
-        is_new = self.pk is None  # nur beim ersten Speichern aktiv
-
+        is_new = self.pk is None
         super().save(*args, **kwargs)
 
         if is_new and self.affiliate_code and self.total_amount > 0:
             partner = self.affiliate_code.partner
             provision_prozent = partner.commission_percent
-
-            # Berechne die Provision
             provision_betrag = (Decimal(provision_prozent) / Decimal(100)) * self.total_amount
 
-            # Wallet anlegen (falls noch nicht vorhanden)
             wallet, _ = Wallet.objects.get_or_create(user=partner.user)
             wallet.add_earnings(provision_betrag)
 
-            # Transaktion speichern
             AffiliateTransaction.objects.create(
                 partner=partner,
                 order=self,

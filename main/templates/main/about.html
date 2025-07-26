@@ -1,172 +1,72 @@
+{% extends "base_home.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>About Us – Joel Digitals</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: rgb(191, 185, 185);
-            color: #000;
-            font-size: 18px;
-        }
 
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-        }
+{% block title %}About Us – Joel Digitals{% endblock %}
 
-        .logo-img {
-            width: 250px;
-            height: 111px;
-            object-fit: contain;
-        }
+{% block content %}
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        color: #000;
+        font-size: 18px;
+    }
 
-        nav a {
-            color: #fff;
-            margin: 0 10px;
-            text-decoration: none;
-        }
+    main {
+        padding: 40px 20px;
+        max-width: 1000px;
+        margin: auto;
+    }
 
-        nav a:hover {
-            text-decoration: underline;
-        }
+    .container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
 
+    h1, h2 {
+        color: #0044cc;
+    }
+
+    @media (max-width: 1000px) {
         main {
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: auto;
-        }
-
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        h2, h3 {
-            margin-top: 0;
-            color: #0044cc;
-        }
-
-        footer {
-            background-color: #0044cc;
             padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 50px;
-            border-top: 1px solid #ccc;
         }
+    }
 
-        footer a {
-            color: #ccc;
-            margin: 0 5px;
-            text-decoration: none;
+    @media (max-width: 600px) {
+        .logo-img {
+            width: 200px;
+            height: auto;
         }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-        @media (max-width: 600px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            nav {
-                margin-left: 0;
-                margin-top: 10px;
-            }
-            nav a {
-                display: block;
-                margin: 5px 0;
-            }
-        }
-        @media (max-width: 1000px) {
-            main {
-                padding: 20px;
-            }
-            .container {
-                padding: 20px;
-            }
-        }
-        @media (max-width: 400px) {
-            .logo-img {
-                width: 200px;
-                height: auto;
-            }
-            nav a {
-                font-size: 14px;
-            }
-        }
-    </style>
-</head>
-<body>
-<header>
-    <a href="/">
-        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
-    </a>
-    <nav style="margin-left: auto;">
-    <a href="/services/">Services</a>
-    <a href="/about/">About Us</a>
-    <a href="/contact/">Contact</a>
-    <a href="/blog/">Blog</a>
-    <a href ="/our-apps/">Our Apps</a>
-    <a href ="/shop/">Shop</a>
-    {% if user.is_authenticated %}
-        {% if "Marketing" in user_groups %}
-            <a href="/blog/admin-blog/">Admin: Blog</a>
-        {% endif %}
-        {% if "Selling" in user_groups %}
-            <a href="/contact/admin-sales/">Admin: Sales</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/contact/admin-tickets/">Admin: Tickets</a>
-        {% endif %}
-        <a href="/auth/logout/">Logout</a>
-    {% else %}
-        <a href="/auth/login/">Login</a>
-    {% endif %}
-</nav>
-
-</header>
+    }
+</style>
 
 <main>
     <div class="container">
         <h2>About Joel Digitals</h2>
         <p>
-        Joel Digitals is a Germany-based digital technology company specializing in custom IT solutions for businesses of all sizes. Since our inception, we've been dedicated to delivering quality, reliability, and cutting-edge expertise.
+            Joel Digitals is a Germany-based digital technology company specializing in custom IT solutions for businesses of all sizes.
+            Since our inception, we've been dedicated to delivering quality, reliability, and cutting-edge expertise.
         </p>
         <p>
-        Our multidisciplinary team includes skilled developers, creative designers, and experienced project managers who work together to turn your ideas into real-world digital products. We support you throughout every stage — from concept and development to ongoing support and growth.
+            Our multidisciplinary team includes skilled developers, creative designers, and experienced project managers who work together
+            to turn your ideas into real-world digital products. We support you throughout every stage — from concept and development to
+            ongoing support and growth.
         </p>
         <p>
-        What sets us apart is our ability to transform complex technical challenges into practical, user-friendly solutions. We take pride in understanding your goals and translating them into robust systems that are built to last.
+            What sets us apart is our ability to transform complex technical challenges into practical, user-friendly solutions.
+            We take pride in understanding your goals and translating them into robust systems that are built to last.
         </p>
         <p>
-        At Joel Digitals, we don’t just provide services — we build partnerships. Our mission is to be a trusted companion in your digital journey, offering clear communication, transparency, and consistently high standards.
+            At Joel Digitals, we don’t just provide services — we build partnerships.
+            Our mission is to be a trusted companion in your digital journey, offering clear communication, transparency, and
+            consistently high standards.
         </p>
         <p>
-        Let us help you unlock your digital potential and drive long-term success through innovation and strategy.
+            Let us help you unlock your digital potential and drive long-term success through innovation and strategy.
         </p>
-
     </div>
 </main>
-
-<footer>
-    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
-    <p>
-        <a href="/imprint/">Imprint</a> |
-        <a href="/privacy/">Privacy Policy</a> |
-        <a href="/terms/">Terms of Service</a> |
-        <a href="/">Home</a>
-    </p>
-</footer>
-</body>
-</html>
+{% endblock %}

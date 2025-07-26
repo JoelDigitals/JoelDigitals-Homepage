@@ -1,221 +1,88 @@
+{% extends "base_home.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Contact – Joel Digitals</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-        }
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: rgb(191, 185, 185);
-            color: #000;
-            font-size: 18px;
-        }
 
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-        }
+{% block title %}Contact – Joel Digitals{% endblock %}
 
-        .logo-img {
-            width: 250px;
-            height: 111px;
-            object-fit: contain;
-        }
+{% block content %}
+<style>
+    .contact-container {
+        background-color: #fff;
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
 
-        nav a {
-            color: #fff;
-            margin: 0 10px;
-            text-decoration: none;
-        }
+    h2 {
+        margin-top: 0;
+        color: #0044cc;
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+        text-align: center;
+    }
 
-        nav a:hover {
-            text-decoration: underline;
-        }
+    section {
+        margin-bottom: 30px;
+    }
 
-        main {
-            flex: 1;
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: auto;
-        }
+    section h3 a {
+        color: #0044cc;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.3rem;
+    }
 
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    section h3 a:hover,
+    section h3 a:focus {
+        text-decoration: underline;
+    }
+
+    p {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-top: 8px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+        .contact-container {
+            padding: 30px 20px;
         }
 
         h2 {
-            margin-top: 0;
+            font-size: 1.8rem;
         }
+    }
+</style>
 
-        a.mail-link {
-            color: #0044cc;
-            text-decoration: none;
-        }
+<div class="contact-container">
+    <h2>Welcome to the Joel Digitals Contact Center</h2>
+    <p>Please choose an option:</p>
 
-        a.mail-link:hover {
-            text-decoration: underline;
-        }
+    <section>
+        <h3><a href="{% url 'contact_form' %}">📬 Contact Form</a></h3>
+        <p>Have a general inquiry or question? Send us a message via the contact form.</p>
+    </section>
 
-        footer {
-            background-color: #0044cc;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 50px;
-            border-top: 1px solid #ccc;
-        }
-
-        footer a {
-            color: #ccc;
-            margin: 0 5px;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        .contact-button {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 18px;
-            margin-top: 20px;
-        }
-
-        .contact-button:hover {
-            background-color: #0033a0;
-        }
-        form label {
-            display: block;
-            margin-top: 10px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 4px;
-            border: 1px solid #888;
-        }
-        .btn {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            margin-top: 15px;
-            cursor: pointer;
-        }
-        .btn:hover {
-            background-color: #1d00d9;
-        }
-        @media (max-width: 600px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            nav {
-                margin-left: 0;
-                margin-top: 10px;
-            }
-            nav a {
-                display: block;
-                margin: 5px 0;
-            }
-        }
-        @media (max-width: 1000px) {
-            main {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-<header>
-    <a href="/">
-        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
-    </a>
-    <nav style="margin-left: auto;">
-    <a href="/services/">Services</a>
-    <a href="/about/">About Us</a>
-    <a href="/contact/">Contact</a>
-    <a href="/blog/">Blog</a>
-    <a href ="/our-apps/">Our Apps</a>
-    <a href ="/shop/">Shop</a>
     {% if user.is_authenticated %}
-        {% if "Marketing" in user_groups %}
-            <a href="/blog/admin-blog/">Admin: Blog</a>
-        {% endif %}
-        {% if "Selling" in user_groups %}
-            <a href="/contact/admin-sales/">Admin: Sales</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/contact/admin-tickets/">Admin: Tickets</a>
-        {% endif %}
-        <a href="/auth/logout/">Logout</a>
-    {% else %}
-        <a href="/auth/login/">Login</a>
-    {% endif %}
-</nav>
-</header>
-
-<main>
-    <div class="container">
-        <h2>Welcome to the Joel Digitals Contact Center</h2>
-        <p>Please choose an option:</p>
-
         <section>
-            <h3><a href="{% url 'contact_form' %}">📬 Contact Form</a></h3>
-            <p>Have a general inquiry or question? Send us a message via the contact form.</p>
+            <h3><a href="{% url 'sales' %}">🛒 Sales / Wishlist</a></h3>
+            <p>Let us know what you would like to buy or have created. Wishlist items are collected and stored for export.</p>
         </section>
 
-        {% if user.is_authenticated %}
-            <section>
-                <h3><a href="{% url 'sales' %}">🛒 Sales / Wishlist</a></h3>
-                <p>Let us know what you would like to buy or have created. Wishlist items are collected and stored for export.</p>
-            </section>
-
-            <section>
-                <h3><a href="{% url 'support_tickets' %}">🛠️ Support Ticket</a></h3>
-                <p>Having issues or technical questions? Create a support ticket, and we'll get back to you as soon as possible.</p>
-            </section>
-        {% else %}
-            <section>
-                <h3><a href="{% url 'login' %}">🔑 Login</a></h3>
-                <p>To access your tickets and wishlist, please log in.</p>
-            </section>
-        {% endif %}
-    </div>
-</main>
-
-<footer>
-    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
-    <p>
-        <a href="/imprint/">Imprint</a> |
-        <a href="/privacy/">Privacy Policy</a> |
-        <a href="/terms/">Terms of Service</a> |
-        <a href="/">Home</a>
-    </p>
-</footer>
-</body>
-</html>
+        <section>
+            <h3><a href="{% url 'support_tickets' %}">🛠️ Support Ticket</a></h3>
+            <p>Having issues or technical questions? Create a support ticket, and we'll get back to you as soon as possible.</p>
+        </section>
+    {% else %}
+        <section>
+            <h3><a href="{% url 'login' %}">🔑 Login</a></h3>
+            <p>To access your tickets and wishlist, please log in.</p>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

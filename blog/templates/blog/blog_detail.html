@@ -1,199 +1,71 @@
+{% extends "base_home.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ post.title }} – Joel Digitals</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
-            background-color: rgb(191, 185, 185);
-            color: #000;
-            font-size: 18px;
-        }
 
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+{% block title %}{{ post.title }} – Joel Digitals{% endblock %}
 
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            flex-shrink: 0;
-        }
+{% block content %}
+<style>
+    .post-container {
+        background-color: white;
+        color: #000; /* Schwarzer Text im Container */
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        max-width: 1000px;
+        margin: auto;
+        word-wrap: break-word;
+    }
 
-        .logo-img {
-            width: 250px;
-            height: 111px;
-            object-fit: contain;
-        }
+    .post-container h2,
+    .post-container p,
+    .post-container em,
+    .post-container div {
+        color: #000; /* explizit alles schwarz im Container */
+    }
 
-        nav {
-            margin-left: auto;
-            white-space: nowrap;
-        }
+    h2 {
+        margin-bottom: 10px;
+    }
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-left: 10px;
-        }
+    img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 6px;
+        margin: 20px 0;
+    }
 
-        nav a:hover {
-            text-decoration: underline;
-        }
+    .btn {
+        background-color: #0044cc;
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 4px;
+        display: inline-block;
+        margin-top: 20px;
+    }
 
-        main {
-            flex: 1;
-            padding: 40px 20px;
-            max-width: 1000px;
-            width: 100%;
-            box-sizing: border-box;
-            margin: auto;
-            word-wrap: break-word;
-        }
+    .btn:hover {
+        background-color: #1d00d9;
+    }
 
+    @media (max-width: 1000px) {
         .post-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            margin-bottom: 10px;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 6px;
-            margin: 20px 0;
-        }
-
-        .btn {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 4px;
-            display: inline-block;
-            margin-top: 20px;
-        }
-
-        .btn:hover {
-            background-color: #1d00d9;
-        }
-
-        footer {
-            background-color: #0044cc;
             padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            color: #ccc;
-            border-top: 1px solid #ccc;
-            flex-shrink: 0;
-            width: 100%;
-            box-sizing: border-box;
         }
-
-        footer a {
-            color: #ccc;
-            text-decoration: none;
-            margin: 0 5px;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-        @media (max-width: 600px) {
-            header, footer {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            nav {
-                margin-top: 10px;
-            }
-
-            nav a {
-                margin-left: 0;
-                margin-right: 10px;
-            }
-        }
-        @media (max-width: 400px) {
-            .logo-img {
-                width: 200px;
-                height: auto;
-            }
-        }
-        @media (max-width: 1000px) {
-            main {
-                padding: 20px;
-            }
-            .post-container {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-<header>
-    <a href="/">
-        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
-    </a>
-    <nav style="margin-left: auto;">
-    <a href="/services/">Services</a>
-    <a href="/about/">About Us</a>
-    <a href="/contact/">Contact</a>
-    <a href="/blog/">Blog</a>
-    <a href ="/our-apps/">Our Apps</a>
-    <a href ="/shop/">Shop</a>
-    {% if user.is_authenticated %}
-        {% if "Marketing" in user_groups %}
-            <a href="/blog/admin-blog/">Admin: Blog</a>
-        {% endif %}
-        {% if "Selling" in user_groups %}
-            <a href="/contact/admin-sales/">Admin: Sales</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/contact/admin-tickets/">Admin: Tickets</a>
-        {% endif %}
-        <a href="/auth/logout/">Logout</a>
-    {% else %}
-        <a href="/auth/login/">Login</a>
-    {% endif %}
-</nav>
-</header>
+    }
+</style>
 
 <main>
     <div class="post-container">
         <h2>{{ post.title }}</h2>
         <p><em>Published on {{ post.created_at|date:"d.m.Y H:i" }}</em></p>
-        <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}">
+        {% if post.teaser_image %}
+            <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}">
+        {% endif %}
         <div>
             {{ post.content|safe }}
         </div>
-        <a href="{% url 'blog_list' %}" class="btn">← Back to Blog Overview</a>
+        <a href="{% url 'blog_list' %}" class="btn">← Zurück zur Blog-Übersicht</a>
     </div>
 </main>
-
-<footer>
-    <div>&copy; 2025 Joel Digitals. All rights reserved.</div>
-    <p>
-        <a href="/imprint/">Imprint</a> |
-        <a href="/privacy/">Privacy Policy</a> |
-        <a href="/">Home</a>
-    </p>
-</footer>
-</body>
-</html>
+{% endblock %}

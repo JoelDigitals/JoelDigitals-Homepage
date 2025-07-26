@@ -1,0 +1,101 @@
+{% extends "base_home.html" %}
+{% load static %}
+
+{% block title %}Download {{ app.name }} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+    main {
+        padding: 40px 20px;
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    .container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        color: #000;
+    }
+
+    h1, h2 {
+        color: #0044cc;
+    }
+
+    .button {
+        background-color: #0044cc;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 16px;
+        display: inline-block;
+        margin-top: 20px;
+    }
+
+    .button:hover {
+        background-color: #0033a0;
+    }
+
+    select, option {
+        font-size: 16px;
+        padding: 6px;
+        margin-top: 10px;
+    }
+
+    ul {
+        margin-top: 20px;
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 15px;
+    }
+
+    @media (max-width: 600px) {
+        .button {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+<main>
+    <div class="container">
+        <a href="{% url 'download_app_list' %}" class="button">← Zurück zur App-Übersicht</a>
+
+        <h1>{{ app.name }}</h1>
+        <p>{{ app.description }}</p>
+
+        <h2>Download nach Betriebssystem</h2>
+
+        <form method="get" action=".">
+            <label for="os-select">Betriebssystem wählen:</label>
+            <select name="os" id="os-select" onchange="this.form.submit()">
+                <option value="">Alle</option>
+                {% for os in operating_systems %}
+                    <option value="{{ os.name }}" {% if selected_os == os.name %}selected{% endif %}>{{ os.name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+
+        {% if downloads %}
+            <ul>
+                {% for download in downloads %}
+                    <li>
+                        <strong>{{ download.operating_system.name }}</strong> – Version: {{ download.version|default:"N/A" }} –
+                        <a href="{{ download.file_url.url }}" target="_blank" rel="noopener noreferrer" class="button">Download</a>
+                        {% if download.release_date %}
+                            <span style="margin-left: 10px;">(Veröffentlicht am {{ download.release_date }})</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Keine Downloads für diese Auswahl verfügbar.</p>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

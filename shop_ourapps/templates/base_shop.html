@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Joel Digitals Shop{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0044cc;
+      --bg: #121212;
+      --surface: #1e1e1e;
+      --text: #eee;
+      --border: #333;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      display: flex;
+      flex-direction: column;
+      font-family: "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      background: #181818;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0,0,0,.6);
+    }
+    .logo-img {
+      width: 200px;
+      height: auto;
+      object-fit: contain;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color .3s;
+    }
+    nav a:hover { color: var(--primary); }
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+    footer {
+      background: #181818;
+      padding: 1rem;
+      text-align: center;
+      font-size: 14px;
+      border-top: 1px solid var(--border);
+    }
+    footer a {
+      color: var(--text);
+      margin: 0 .5rem;
+      text-decoration: none;
+    }
+    footer a:hover { color: var(--primary); }
+    @media (max-width: 600px) {
+      header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <header>
+    <a href="/">
+      <img src="{% static 'logo.png' %}" alt="Joel Digitals" class="logo-img">
+    </a>
+    <nav>
+      <a href="/shop/">Shop</a>
+      <a href="/contact/">Contact</a>
+      <a href="/downloads/">Downloads</a>
+      {% if user.is_authenticated %}
+        <a href="/my-orders/">My Orders</a>
+        <a href="/affiliate/dashboard/">Affiliate Program</a>
+        <a href="/cart/" title="Cart"><i class="fas fa-shopping-cart"></i></a>
+        <a href="/wallet/" title="Wallet">
+          <i class="fas fa-wallet"></i> {{ wallet_balance|floatformat:2 }} €
+        </a>
+        <a href="/auth/logout/" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+      {% else %}
+        <a href="/auth/login/" title="Login"><i class="fas fa-sign-in-alt"></i></a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Joel Digitals – Alle Rechte vorbehalten</p>
+    <p>
+      <a href="/imprint/">Impressum</a> |
+      <a href="/privacy/">Datenschutz</a> |
+      <a href="/terms/">AGB</a> |
+      <a href="/">Home</a>
+    </p>
+  </footer>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

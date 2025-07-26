@@ -1,0 +1,254 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Login – Joel Digitals</title>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: rgb(191, 185, 185);
+            color: #000;
+            font-size: 18px;
+        }
+
+        header {
+            background-color: #0044cc;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            width: 250px;
+            height: 111px;
+            object-fit: contain;
+        }
+
+        nav a {
+            color: #fff;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #0044cc;
+            margin-top: 0;
+        }
+
+        /* Eingabefelder größer & gut klickbar */
+        input, select, textarea {
+            font-size: 18px;
+            padding: 12px 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        /* Button größer, volle Breite */
+        .btn {
+            background-color: #0044cc;
+            color: white;
+            padding: 14px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0033a0;
+        }
+
+        footer {
+            background-color: #0044cc;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 50px;
+            border-top: 1px solid #ccc;
+            color: #ccc;
+        }
+
+        footer a {
+            color: #ccc;
+            margin: 0 5px;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        #cookie-banner {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        #cookie-banner button {
+            background-color: #0044cc;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin-left: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #cookie-banner button:hover {
+            background-color: #002a80;
+        }
+
+        #language-switch {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 1001;
+        }
+
+        #language-switch select {
+            font-size: 14px;
+            padding: 2px 6px;
+        }
+
+        /* Responsive für kleine Bildschirme */
+        @media (max-width: 600px) {
+            main {
+                padding: 20px 10px;
+            }
+
+            .container {
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="{% static 'logo.png' %}" alt="Logo" class="logo-img">
+    <nav>
+        <!-- Deine Navigation, falls benötigt -->
+    </nav>
+</header>
+
+<div id="language-switch">
+    <label for="language-select">🌐</label>
+    <select id="language-select">
+        <option value="de">Deutsch</option>
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+    </select>
+</div>
+
+<main>
+    <div class="container">
+        <h2>Login</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Einloggen</button>
+        </form>
+        <p>Noch keinen Account?
+            <a href="https://joel-digitals.onrender.com/auth/register/">Jetzt registrieren</a>
+        </p>
+    </div>
+</main>
+
+<div id="cookie-banner">
+    <span id="cookie-text">Wir verwenden Cookies, um Ihre Erfahrung zu verbessern.</span>
+    <button onclick="acceptCookies()">Akzeptieren</button>
+</div>
+
+<footer>
+    <a>&copy; 2025 Joel Digitals. Alle Rechte vorbehalten.</a>
+    <p>
+        <a href="/imprint/">Impressum</a> |
+        <a href="/privacy/">Datenschutz</a> |
+        <a href="/terms/">AGB</a>
+    </p>
+</footer>
+
+<script>
+    const cookieBanner = document.getElementById("cookie-banner");
+    const cookieText = document.getElementById("cookie-text");
+    const languageSelect = document.getElementById("language-select");
+
+    function acceptCookies() {
+        localStorage.setItem("cookiesAccepted", "true");
+        cookieBanner.style.display = "none";
+    }
+
+    function checkCookieConsent() {
+        if (localStorage.getItem("cookiesAccepted") === "true") {
+            cookieBanner.style.display = "none";
+        }
+    }
+
+    function updateLanguageText(lang) {
+        const texts = {
+            de: "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern.",
+            en: "We use cookies to improve your experience.",
+            fr: "Nous utilisons des cookies pour améliorer votre expérience."
+        };
+        cookieText.textContent = texts[lang] || texts["de"];
+    }
+
+    languageSelect.addEventListener("change", (e) => {
+        const lang = e.target.value;
+        updateLanguageText(lang);
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        checkCookieConsent();
+        updateLanguageText("de");
+    });
+</script>
+
+</body>
+</html>

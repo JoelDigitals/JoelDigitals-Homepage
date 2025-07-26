@@ -1,0 +1,202 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Auftrag #{{ entry.id }} – Chat</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+        body {
+            font-family: Arial;
+            background: #f0f0f0;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .chat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 800px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .from-user {
+            background-color: #d0e6ff;
+            text-align: left;
+        }
+
+        .from-admin {
+            background-color: #ffe0e0;
+            text-align: left;
+        }
+
+        .meta {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            background: #0044cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .btn:hover {
+            background: #002c99;
+        }
+
+        .back-link {
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        #cookie-banner {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        #cookie-banner button {
+            background-color: #0044cc;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin-left: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #cookie-banner button:hover {
+            background-color: #002a80;
+        }
+
+        #language-switch {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 1001;
+        }
+
+        #language-switch select {
+            font-size: 14px;
+            padding: 2px 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sprachumschaltung -->
+<div id="language-switch">
+    <label for="language-select">🌐</label>
+    <select id="language-select">
+        <option value="de">Deutsch</option>
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+    </select>
+</div>
+
+<!-- Chat-Fenster -->
+<div class="chat-box">
+    <h1>🧾 Auftrag #{{ entry.id }} – {{ entry.title }}</h1>
+    <p><strong>Status:</strong> {{ entry.status }}</p>
+    <p><strong>Erstellt von:</strong> {{ entry.user.username }}</p>
+
+    {% if user.is_staff %}
+        <a href="{% url 'admin_sales_app' %}" class="back-link">← Zurück zur Auftragsübersicht</a>
+    {% else %}
+        <a href="{% url 'sales_app' %}" class="back-link">← Zurück zu meinen Aufträgen</a>
+    {% endif %}
+
+    <h2>💬 Chatverlauf</h2>
+    <div class="chat-history">
+        {% for msg in messages %}
+            <div class="message {% if msg.user.is_staff %}from-admin{% else %}from-user{% endif %}">
+                <div class="meta">{{ msg.user.username }} – {{ msg.created_at|date:"d.m.Y H:i" }}</div>
+                <div class="text">{{ msg.message|linebreaks }}</div>
+            </div>
+        {% empty %}
+            <p>Noch keine Nachrichten vorhanden.</p>
+        {% endfor %}
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="message" required placeholder="Nachricht eingeben..."></textarea>
+        <button type="submit" class="btn">Nachricht senden</button>
+    </form>
+</div>
+
+<!-- Cookie-Banner -->
+<div id="cookie-banner">
+    <span id="cookie-text">Wir verwenden Cookies, um Ihre Erfahrung zu verbessern.</span>
+    <button onclick="acceptCookies()">Akzeptieren</button>
+</div>
+
+<!-- Skript -->
+<script>
+    const cookieBanner = document.getElementById("cookie-banner");
+    const cookieText = document.getElementById("cookie-text");
+    const languageSelect = document.getElementById("language-select");
+
+    function acceptCookies() {
+        localStorage.setItem("cookiesAccepted", "true");
+        cookieBanner.style.display = "none";
+    }
+
+    function checkCookieConsent() {
+        if (localStorage.getItem("cookiesAccepted") === "true") {
+            cookieBanner.style.display = "none";
+        }
+    }
+
+    function updateLanguageText(lang) {
+        const texts = {
+            de: "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern.",
+            en: "We use cookies to improve your experience.",
+            fr: "Nous utilisons des cookies pour améliorer votre expérience."
+        };
+        cookieText.textContent = texts[lang] || texts["de"];
+    }
+
+    languageSelect.addEventListener("change", (e) => {
+        const lang = e.target.value;
+        updateLanguageText(lang);
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        checkCookieConsent();
+        updateLanguageText("de");
+    });
+</script>
+
+</body>
+</html>

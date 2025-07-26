@@ -1,243 +1,147 @@
+{% extends "base_home.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>Joel Digitals - Support</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: rgb(191, 185, 185);
-            color: #000;
-            font-size: 18px;
-        }
 
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-        }
+{% block title %}Support & Tickets – Joel Digitals{% endblock %}
 
-        .logo-img {
-            width: 250px;
-            height: 111px;
-            object-fit: contain;
-        }
+{% block content %}
+<style>
+    body, .support-container {
+        font-family: Arial, sans-serif;
+        color: #000;
+    }
 
-        main {
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: auto;
-        }
+    .support-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        background-color: #fff;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+    }
 
-        h1, h2, h3 {
-            margin-bottom: 15px;
-        }
+    h2 {
+        color: #0044cc;
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+    }
 
-        section {
-            margin-bottom: 40px;
-        }
+    form {
+        margin-bottom: 40px;
+    }
 
-        a {
-            color: #ffffff;
-            text-decoration: none;
-        }
+    form label {
+        display: block;
+        margin-top: 10px;
+        font-weight: 600;
+    }
 
-        a:hover {
-            text-decoration: underline;
-        }
+    input[type="text"], input[type="email"], textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
 
-        .btn {
-            display: inline-block;
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-top: 10px;
-        }
+    button.btn, input[type="submit"] {
+        background-color: #0044cc;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+    }
 
-        .btn:hover {
-            background-color: #1d00d9;
-        }
+    button.btn:hover, input[type="submit"]:hover {
+        background-color: #0033a0;
+    }
 
-        .ticket {
-            background-color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+    section {
+        margin-bottom: 40px;
+    }
 
-        .status-open {
-            color: red;
-        }
+    .ticket {
+        background-color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
 
-        .status-resolved {
-            color: green;
-        }
+    .status-open {
+        color: red;
+        font-weight: 700;
+    }
 
-        footer {
-            background-color: #0044cc;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 50px;
-            border-top: 1px solid #ccc;
-        }
+    .status-resolved {
+        color: green;
+        font-weight: 700;
+    }
 
-        footer a {
-            color: #ccc;
-            text-decoration: none;
-        }
+    small {
+        display: block;
+        margin-top: 5px;
+        color: #555;
+    }
 
-        footer a:hover {
-            text-decoration: underline;
+    a.btn {
+        display: inline-block;
+        margin-top: 10px;
+        text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+        .support-container {
+            padding: 30px 20px;
         }
-        footer p {
-            margin: 5px 0;
+        h2 {
+            font-size: 1.8rem;
         }
-        footer a {
-            color: #ccc;
-            margin: 0 5px;
-            text-decoration: none;
-        }
-        footer a:hover {
-            text-decoration: underline;
-        }
-        form label {
-            display: block;
-            margin-top: 10px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-        input[type="text"], input[type="email"] {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-        input[type="submit"] {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 18px;
-            margin-top: 20px;
-        }
-        input[type="submit"]:hover {
-            background-color: #0033a0;
-        }
-        @media (max-width: 600px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            nav {
-                margin-left: 0;
-                margin-top: 10px;
-            }
-            nav a {
-                display: block;
-                margin: 5px 0;
-            }
-        }
-        @media (max-width: 1000px) {
-            main {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <header>
-    <a href="/">
-        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
-    </a>
-    <nav style="margin-left: auto;">
-    <a href="/services/">Services</a>
-    <a href="/about/">About Us</a>
-    <a href="/contact/">Contact</a>
-    <a href="/blog/">Blog</a>
-    <a href ="/our-apps/">Our Apps</a>
-    <a href ="/shop/">Shop</a>
-    {% if user.is_authenticated %}
-        {% if "Marketing" in user_groups %}
-            <a href="/blog/admin-blog/">Admin: Blog</a>
+    }
+</style>
+
+<div class="support-container">
+    <h2>🛠️ Support & Ticketsystem</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Ticket absenden">
+    </form>
+
+    <section>
+        <h3>📋 Deine Tickets</h3>
+        {% if tickets %}
+            {% for ticket in tickets %}
+                <div class="ticket"> 
+                    <strong>{{ ticket.subject }}</strong> – 
+                    <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
+                        {% if ticket.is_resolved %}Gelöst{% else %}Offen{% endif %}
+                    </span>
+                    <p>{{ ticket.description|linebreaks }}</p>
+                    <small>Ticket-ID: {{ ticket.ticket_number }} | Erstellt am {{ ticket.created_at|date:"d.m.Y H:i" }}</small>
+                    <small>App: {{ ticket.app_name }} | Plattform: {{ ticket.platform }}</small>
+                    {% if ticket.is_resolved %}
+                        <small>Gelöst am {{ ticket.resolved_at|date:"d.m.Y H:i" }}</small>
+                    {% endif %}
+                    {% if not ticket.is_archived %}
+                        <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">Zum Ticket-Chat</a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Du hast noch keine Support-Tickets eingereicht.</p>
         {% endif %}
-        {% if "Selling" in user_groups %}
-            <a href="/contact/admin-sales/">Admin: Sales</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/contact/admin-tickets/">Admin: Tickets</a>
-        {% endif %}
-        <a href="/auth/logout/">Logout</a>
-    {% else %}
-        <a href="/auth/login/">Login</a>
-    {% endif %}
-</nav>
-    </header>
-
-    <main>
-        <h2>🛠️ Support & Ticketsystem</h2>
-
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button class="btn" type="submit">Ticket absenden</button>
-        </form>
-
-        <section>
-            <h3>📋 Deine Tickets</h3>
-            {% if tickets %}
-                {% for ticket in tickets %}
-                    <div class="ticket">
-                        <strong>{{ ticket.subject }}</strong> – 
-                        <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
-                            {% if ticket.is_resolved %}Gelöst{% else %}Offen{% endif %}
-                        </span>
-                        <p>{{ ticket.description|linebreaks }}</p>
-                        <small>Ticket-ID: {{ ticket.ticket_number }} | Erstellt am {{ ticket.created_at|date:"d.m.Y H:i" }}</small>
-                        <small>| App: {{ ticket.app_name }} | Platform: {{ ticket.platform }}</small>
-                        <br>
-                        {% if ticket.is_resolved %}
-                            <small>Gelöst am {{ ticket.resolved_at|date:"d.m.Y H:i" }}</small>
-                        {% endif %}
-                        <br>
-                        {% if not ticket.is_archived %}
-                            <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">Zum Ticket-Chat</a>
-                        {% endif %}
-                        
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>Du hast noch keine Support-Tickets eingereicht.</p>
-            {% endif %}
-        </section>
-    </main>
-
-    <footer>
-        <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
-        <p>
-            <a href="/imprint/">Imprint</a> |
-            <a href="/privacy/">Privacy Policy</a> |
-            <a href="/terms/">Terms of Service</a> |
-            <a href="/">Home</a>
-        </p>
-    </footer>
-</body>
-</html>
+    </section>
+</div>
+{% endblock %}

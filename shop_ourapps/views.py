@@ -36,8 +36,9 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from django.core.exceptions import ValidationError
-
+from django.urls import reverse
 from reportlab.lib.utils import ImageReader, simpleSplit
+from django.views.decorators.csrf import csrf_exempt
 
 @login_required
 def buy_voucher(request):
@@ -52,181 +53,119 @@ def buy_voucher(request):
             design = form.cleaned_data.get('design', 'default')
 
             wallet, _ = Wallet.objects.get_or_create(user=request.user)
-            if payment_method == 'wallet' and not wallet.deduct(amount):
-                return HttpResponse("Nicht genügend Guthaben im Wallet.", status=400)
 
-            voucher = Voucher.objects.create(amount=amount, user=request.user)
-            VoucherOrder.objects.create(
-                user=request.user,
-                voucher=voucher,
-                recipient_email=recipient_email,
-                recipient_name=recipient_name,
-                message=message
-            )
+            if payment_method == 'wallet':
+                if not wallet.deduct(amount):
+                    return HttpResponse("Nicht genügend Guthaben im Wallet.", status=400)
 
-            buffer = BytesIO()
-            p = canvas.Canvas(buffer, pagesize=landscape(A4))
-            width, height = landscape(A4)
-            
-            # === Faltlinien ===
-            p.setDash(1, 2)
-            p.setStrokeColor(colors.lightgrey)
-            # Vertikal halbieren
-            p.line(width / 2, 0, width / 2, height)
-            # Horizontal halbieren
-            p.line(0, height / 2, width, height / 2)
-            p.setDash()  # Reset
+                # Direkt Gutschein erstellen
+                voucher = Voucher.objects.create(amount=amount, user=request.user)
+                VoucherOrder.objects.create(
+                    user=request.user,
+                    voucher=voucher,
+                    recipient_email=recipient_email,
+                    recipient_name=recipient_name,
+                    message=message
+                )
 
-            # === Bild oben rechts (1/4 Seite) ===
-            img_path = os.path.join('static', 'gutscheine', f'{design}.jpg')
-            if os.path.exists(img_path):
-                bg = ImageReader(img_path)
-                p.drawImage(bg, width / 2, height / 2, width=width / 2, height=height / 2, preserveAspectRatio=True)
-            else:
-                p.setFillColor(colors.white)
-                p.rect(0, 0, width, height, fill=True, stroke=0)
+                # PDF erstellen und senden
+                return generate_voucher_pdf(voucher, recipient_name, recipient_email, message, amount, design)
 
-            # === Shopinfos oben links ===
-            p.setFont("Helvetica", 9)
-            p.setFillColor(colors.black)
-            shop_lines = [
-                "Joel Digitals",
-                "www.joel-digitals.de",
-                "joel-digitals@gmx.de",
-                "",
-                "Wichtiger Hinweis:",
-                "Dieser Gutschein ist nur einmal gültig.",
-                "Er kann auf www.joel-digitals.onrender.com eingelöst werden.",
-                "Keine Barauszahlung möglich.",
-            ]
-            x, y = cm, height - 2 * cm
-            for line in shop_lines:
-                p.drawString(x, y, line)
-                y -= 0.5 * cm
+            elif payment_method == 'paypal':
+                # Erstelle eine "Pending"-Order für PayPal
+                voucher = Voucher.objects.create(amount=amount, user=request.user, redeemed=True)  # Markiert als "bezahlt" erstmal
+                order = VoucherOrder.objects.create(
+                    user=request.user,
+                    voucher=voucher,
+                    recipient_email=recipient_email,
+                    recipient_name=recipient_name,
+                    message=message
+                )
 
-            # === Logo UNTER Shopinfos ===
-            logo_path = os.path.join('static', 'logo.png')
-            if os.path.exists(logo_path):
-                logo = ImageReader(logo_path)
-                p.drawImage(logo, cm, y - 3.5 * cm, width=4 * cm, preserveAspectRatio=True, mask='auto')
+                # Weiterleitung zu PayPal
+                paypal_url = (
+                    f"https://www.paypal.com/cgi-bin/webscr?"
+                    f"cmd=_xclick&"
+                    f"business=buy.joel-digitals@gmx.de&"
+                    f"amount={amount}&"
+                    f"currency_code=EUR&"
+                    f"item_name=Gutschein #{voucher.code}&"
+                    f"invoice={voucher.id}&"
+                    f"return={request.build_absolute_uri(reverse('voucher_success', args=[voucher.id]))}&"
+                    f"cancel_return={request.build_absolute_uri(reverse('buy_voucher'))}"
+                )
+                return redirect(paypal_url)
 
-            p.saveState()
-
-            # Ursprung auf linken unteren Rand des Bildbereichs (oben rechts auf der Seite)
-            p.translate(width / 2, height / 2)
-            p.rotate(180)
-            
-            # Textbereich: Breite und maximale Höhe (halbe Bildhöhe)
-            box_width = width / 2 - 2 * cm
-            box_height = (height / 2) / 2 - 1 * cm  # halbe Bildhöhe minus etwas Rand
-            
-            x_text = cm
-            y_start = cm  # beginnt unten
-            
-            # Textstil
-            style = getSampleStyleSheet()["Normal"]
-            style.fontName = "Helvetica"
-            style.fontSize = 11
-            style.leading = 13
-            style.textColor = colors.darkblue
-            
-            # Text vorbereiten (manueller Umbruch für ReportLab Canvas)
-            wrapped_lines = simpleSplit(message, style.fontName, style.fontSize, box_width)
-            
-            # Nur so viele Zeilen wie in box_height passen
-            max_lines = int(box_height // style.leading)
-            visible_lines = wrapped_lines[:max_lines]
-            
-            # Überschrift
-            p.setFont("Helvetica-Bold", 12)
-            p.setFillColor(colors.black)
-            p.drawString(x_text, y_start + style.leading * (len(visible_lines) + 1), "Persönliche Nachricht:")
-            
-            # Nachricht selbst
-            p.setFont("Helvetica", 11)
-            p.setFillColor(colors.darkblue)
-            textobject = p.beginText(x_text, y_start)
-            for line in visible_lines:
-                textobject.textLine(line)
-            p.drawText(textobject)
-            
-            p.restoreState()
-
-            # === Gutscheindaten – UNTEN RECHTS, unterhalb des Bildes, auf dem Kopf ===
-            p.saveState()
-
-            # Position berechnen: rechte Hälfte (x), unterhalb des Bildes (y)
-            block_margin_x = 2 * cm  # Abstand vom rechten Rand nach innen
-            block_margin_y = 2 * cm  # Abstand vom unteren Rand nach oben
-
-            # Wir platzieren den Ursprung am unteren rechten Viertel der Seite
-            p.translate(width / 2 + block_margin_x + 10 * cm, block_margin_y)
-            p.rotate(180)  # Auf den Kopf drehen
-
-            p.setFont("Helvetica-Bold", 12)
-            p.setFillColor(colors.black)
-
-            # Koordinaten beginnen gedreht von hier
-            x_info = 0
-            y_info = 0
-
-            p.drawString(x_info, y_info, f"Amount: {amount:.2f} €")
-            p.setFont("Helvetica", 11)
-            p.drawString(x_info, y_info - 1.0 * cm, f"COde: {voucher.code}")
-            p.drawString(x_info, y_info - 2.0 * cm, f"For: {recipient_name}")
-            p.drawString(x_info, y_info - 3.0 * cm, f"Date: {now().strftime('%d.%m.%Y')}")
-
-            p.restoreState()
-
-            
-
-
-            p.showPage()
-            p.save()
-
-            buffer.seek(0)
-            # E-Mail an den Nutzer
-            email_subject = f"Ihr Gutschein für {recipient_name}"
-            email_message = render_to_string('emails/voucher_purchase_confirmation.html', {
-                'recipient_name': recipient_name,
-                'amount': amount,
-                'voucher_code': voucher.code,
-                'message': message,
-            })
-            send_mail(
-                subject=email_subject,
-                message=email_message,
-                recipient_list=[recipient_email],
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                fail_silently=False,
-            )
-
-            # E-Mail an das Team
-            team_email_subject = f"Neuer Gutscheinverkauf: {voucher.code}"
-            team_email_message = render_to_string('emails/voucher_purchase_notification.html', {
-                'user': request.user,
-                'recipient_name': recipient_name,
-                'amount': amount,
-                'voucher_code': voucher.code,
-                'message': message,
-            })
-            send_mail(
-                subject=team_email_subject,
-                message=team_email_message,
-                recipient_list=["buy.joel-digitals@gmx.de"],
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                fail_silently=False,
-            )
-            
-            return FileResponse(buffer, as_attachment=True, filename=f'gutschein_{voucher.code}.pdf')
-        
     else:
         form = VoucherPurchaseForm()
 
     return render(request, 'apps/buy.html', {'form': form})
 
+@login_required
+def voucher_success(request, voucher_id):
+    voucher = get_object_or_404(Voucher, id=voucher_id, user=request.user)
+    order = get_object_or_404(VoucherOrder, voucher=voucher)
 
+    # PDF generieren und senden
+    return generate_voucher_pdf(voucher, order.recipient_name, order.recipient_email, order.message, voucher.amount, 'default')
 
+def generate_voucher_pdf(voucher, recipient_name, recipient_email, message, amount, design):
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=landscape(A4))
+    width, height = landscape(A4)
+
+    # === Faltlinien ===
+    p.setDash(1, 2)
+    p.setStrokeColor(colors.lightgrey)
+    p.line(width / 2, 0, width / 2, height)
+    p.line(0, height / 2, width, height / 2)
+    p.setDash()
+
+    # === Bild ===
+    img_path = os.path.join('static', 'gutscheine', f'{design}.jpg')
+    if os.path.exists(img_path):
+        bg = ImageReader(img_path)
+        p.drawImage(bg, width / 2, height / 2, width=width / 2, height=height / 2, preserveAspectRatio=True)
+
+    # === Shopinfos ===
+    p.setFont("Helvetica", 9)
+    p.setFillColor(colors.black)
+    shop_lines = [
+        "Joel Digitals",
+        "www.joel-digitals.de",
+        "joel-digitals@gmx.de",
+        "",
+        "Wichtiger Hinweis:",
+        "Dieser Gutschein ist nur einmal gültig.",
+        "Er kann auf www.joel-digitals.onrender.com eingelöst werden.",
+        "Keine Barauszahlung möglich.",
+    ]
+    x, y = 2 * cm, height - 2 * cm
+    for line in shop_lines:
+        p.drawString(x, y, line)
+        y -= 0.5 * cm
+
+    # === Gutscheindaten ===
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(2 * cm, 2 * cm, f"Betrag: {amount:.2f} €")
+    p.setFont("Helvetica", 11)
+    p.drawString(2 * cm, 1.2 * cm, f"Code: {voucher.code}")
+    p.drawString(2 * cm, 0.4 * cm, f"Für: {recipient_name}")
+
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+
+    # E-Mail senden
+    send_mail(
+        f"Ihr Gutschein für {recipient_name}",
+        f"Hallo {recipient_name},\n\nSie haben einen Gutschein über {amount} € erhalten.\nCode: {voucher.code}",
+        settings.DEFAULT_FROM_EMAIL,
+        [recipient_email],
+        fail_silently=False,
+    )
+
+    return FileResponse(buffer, as_attachment=True, filename=f'gutschein_{voucher.code}.pdf')
 
 def redeem_voucher(code, user):
     try:
@@ -286,12 +225,17 @@ def shop(request):
 
 def app_detail(request, slug):
     app = get_object_or_404(App, slug=slug)
-    return render(request, 'apps/app_detail.html', {'app': app})
+    if request.user.is_authenticated:
+        wallet = Wallet.objects.filter(user=request.user).first()
+    return render(request, 'apps/app_detail.html', {'app': app, 'wallet_balance': wallet.balance if wallet else 0.00})
 
 @login_required
 def wallet_view(request):
     user = request.user
     wallet, _ = Wallet.objects.get_or_create(user=user)
+
+    if request.user.is_authenticated:
+        wallet = Wallet.objects.filter(user=request.user).first()
 
     today = now()
     start_of_month = today.replace(day=1)
@@ -341,6 +285,7 @@ def wallet_view(request):
         'wallet': wallet,
         'total_monthly_earnings': total_monthly_earnings,
         'pending': wallet.pending_earnings,
+        'wallet_balance': wallet.balance if wallet else 0.00
     })
 
 @login_required
@@ -557,6 +502,7 @@ def calculate_affiliate_stats(user):
         "chart_sales": sales_chart_data,
         "chart_earnings": earnings_chart_data,
     }
+
 @login_required
 def cart_view(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
@@ -571,6 +517,9 @@ def cart_view(request):
     # Steuerbetrag
     total_vat = total_brutto - total_netto
 
+    if request.user.is_authenticated:
+        wallet = Wallet.objects.filter(user=request.user).first()
+
     if request.method == 'POST':
         return redirect('checkout')
 
@@ -580,6 +529,7 @@ def cart_view(request):
         'total_brutto': total_brutto.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP),
         'total_netto': total_netto.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP),
         'total_vat': total_vat.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP),
+        'wallet_balance': wallet.balance if wallet else 0.00
     })
 
 
@@ -667,6 +617,7 @@ def checkout(request):
         affiliate_code_input = data.get('affiliate_code', '').strip()
         discount_code_input = data.get('discount_code', '').strip()
 
+        # Rabattcode prüfen
         if discount_code_input:
             try:
                 discount_code_obj = DiscountCode.objects.get(code__iexact=discount_code_input)
@@ -680,17 +631,20 @@ def checkout(request):
             except DiscountCode.DoesNotExist:
                 messages.error(request, 'Ungültiger Rabattcode.')
 
+        # Affiliate-Code prüfen
         if affiliate_code_input:
             try:
                 affiliate_code_obj = AffiliateCode.objects.get(code__iexact=affiliate_code_input, is_active=True)
             except AffiliateCode.DoesNotExist:
                 messages.warning(request, 'Affiliate-Code ist ungültig.')
 
+        # Wallet prüfen
         if payment_method == 'wallet':
             if not wallet or not wallet.has_funds(final_total):
                 messages.error(request, 'Nicht genügend Guthaben im Wallet.')
                 return redirect('checkout')
 
+        # Order erstellen
         order = Order.objects.create(
             user=request.user,
             first_name=first_name,
@@ -717,25 +671,13 @@ def checkout(request):
 
         if payment_method == 'wallet':
             wallet.deduct(final_total)
+            messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben.')
+            cart.items.all().delete()
+            return redirect('order_confirmation', order_id=order.id)
 
-        if payment_method == 'bank_transfer':
-            buyer_subject = 'Ihre Bestellbestätigung - Banküberweisung'
-            buyer_message = render_to_string('emails/order_confirmation_bank_transfer.html', {'order': order})
-        elif payment_method == 'wallet':
-            buyer_subject = 'Ihre Bestellbestätigung - Wallet'
-            buyer_message = render_to_string('emails/order_confirmation_wallet.html', {'order': order})
-        else:
-            buyer_subject = 'Ihre Bestellbestätigung - Rechnung'
-            buyer_message = render_to_string('emails/order_confirmation_invoice.html', {'order': order})
-
-        send_mail(buyer_subject, buyer_message, settings.DEFAULT_FROM_EMAIL, [email])
-        company_subject = 'Neue Bestellung - Bitte Rechnung senden'
-        company_message = render_to_string('emails/order_notification.html', {'order': order})
-        send_mail(company_subject, company_message, settings.DEFAULT_FROM_EMAIL, [settings.COMPANY_EMAIL])
-
-        cart.items.all().delete()
-        messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben.')
-        return redirect('order_confirmation')  # oder eine Bestätigungsseite
+        if payment_method == 'paypal':
+            # Weiterleitung zu PayPal mit Betrag und Rechnungsnummer
+            return redirect(reverse('paypal_checkout', args=[order.id]))
 
     context = {
         'items': items,
@@ -745,6 +687,40 @@ def checkout(request):
         'now': timezone.now(),
     }
     return render(request, 'apps/checkout.html', context)
+
+@login_required
+def paypal_checkout(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user, payment_method='paypal')
+    paypal_url = (
+        f"https://www.paypal.com/cgi-bin/webscr?"
+        f"cmd=_xclick&"
+        f"business=buy.joel-digitals@gmx.de&"
+        f"amount={order.total_amount}&"
+        f"currency_code=EUR&"
+        f"item_name=Bestellung #{order.id}&"
+        f"invoice={order.id}&"
+        f"return={request.build_absolute_uri(reverse('order_confirmation', args=[order.id]))}&"
+        f"cancel_return={request.build_absolute_uri(reverse('checkout'))}"
+    )
+    return redirect(paypal_url)
+
+@csrf_exempt
+@login_required
+def paypal_confirm(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        order_id = data.get('order_id')
+        total = Decimal(data.get('total'))
+
+        # Hier kannst du die Bestellung finalisieren
+        order = Order.objects.create(
+            user=request.user,
+            payment_method='paypal',
+            total_amount=total,
+            # ... weitere Felder
+        )
+
+        return JsonResponse({'status': 'success', 'order_id': order.id})
 
 @login_required
 def order_confirmation(request, order_id):
@@ -779,3 +755,8 @@ def validate_codes(request):
 def more_informations(request, slug):
     app = get_object_or_404(App, slug=slug)
     return render(request, 'apps/app_infos.html', {'app': app})
+
+@login_required
+def my_orders(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'apps/my_orders.html', {'orders': orders})

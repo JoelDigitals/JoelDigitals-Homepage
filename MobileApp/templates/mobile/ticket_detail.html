@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket {{ ticket.ticket_number }} – Support</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .chat-box {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.05);
+        }
+
+        h1, h2 {
+            color: #0044cc;
+            margin-top: 0;
+        }
+
+        .ticket-meta {
+            margin-bottom: 20px;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin: 10px 0 20px;
+            text-decoration: none;
+            color: #0044cc;
+            font-weight: bold;
+        }
+
+        .chat-history {
+            margin-bottom: 30px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            max-width: 90%;
+            word-wrap: break-word;
+        }
+
+        .from-user {
+            background-color: #e6f2ff;
+            align-self: flex-start;
+        }
+
+        .from-admin {
+            background-color: #ffeaea;
+            align-self: flex-end;
+        }
+
+        .meta {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .text {
+            font-size: 16px;
+            white-space: pre-wrap;
+        }
+
+        form {
+            margin-top: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            resize: vertical;
+        }
+
+        .btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #0044cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background: #0033aa;
+        }
+
+        @media (max-width: 768px) {
+            .chat-box, .container {
+                padding: 15px;
+            }
+
+            .message {
+                max-width: 100%;
+                font-size: 15px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chat-box">
+
+            {% if user.is_staff %}
+                <h1>Admin-Ansicht</h1>
+                <div class="ticket-meta">
+                    <p><strong>Ticketnummer:</strong> {{ ticket.ticket_number }}</p>
+                    <p><strong>Erstellt am:</strong> {{ ticket.created_at|date:"d.m.Y H:i" }}</p>
+                    <p><strong>Zuletzt aktualisiert:</strong> {{ ticket.updated_at|date:"d.m.Y H:i" }}</p>
+                    <p><strong>Erstellt von:</strong> {{ ticket.user.username }}</p>
+                </div>
+                <a href="{% url 'admin_tickets_app' %}" class="back-link">← Zurück zum Adminpanel</a>
+            {% else %}
+                <h1>Mein Ticket</h1>
+                <a href="{% url 'support_tickets_app' %}" class="back-link">← Zurück zu meinen Tickets</a>
+            {% endif %}
+
+            <h2>Support-Ticket: {{ ticket.subject }}</h2>
+            <p>Status: {% if ticket.is_resolved %}
+                <span style="color: green;">✔️ Gelöst</span>
+            {% else %}
+                <span style="color: red;">❌ Offen</span>
+            {% endif %}</p>
+
+            <div class="chat-history">
+                {% for msg in messages %}
+                    <div class="message {% if msg.sender.is_staff %}from-admin{% else %}from-user{% endif %}">
+                        <div class="meta">{{ msg.sender.username }} – {{ msg.created_at|date:"d.m.Y H:i" }}</div>
+                        <div class="text">{{ msg.message|linebreaks }}</div>
+                    </div>
+                {% empty %}
+                    <p>Noch keine Nachrichten vorhanden.</p>
+                {% endfor %}
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn">Nachricht senden</button>
+            </form>
+
+        </div>
+    </div>
+</body>
+</html>
