@@ -1,15 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST
-from django.core.mail import send_mail
-from .models import App, AffiliateLink, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder
+from django.core.mail import send_mail, EmailMultiAlternatives
+from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder
 from shop_ourapps.models import AffiliatePartner
 from .forms import PurchaseForm, VoucherPurchaseForm
 from django.contrib import messages
 from django.conf import settings
 from django.template.loader import render_to_string
 from decimal import Decimal, ROUND_HALF_UP
-from django.http import Http404, JsonResponse
+from django.http import JsonResponse
 from django.utils.timezone import now
 from django.db.models.functions import TruncMonth
 from django.db.models import Sum
@@ -27,18 +27,19 @@ from django.shortcuts import render
 from django.utils.timezone import now
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.units import cm, mm
+from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
 from .models import Voucher, VoucherOrder, Wallet
 from .forms import VoucherPurchaseForm
 import os
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from reportlab.lib.utils import ImageReader, simpleSplit
 from django.views.decorators.csrf import csrf_exempt
+from django import forms
+from contact.views import is_Sales_Editor
+from django.db.models import Q
 
 @login_required
 def buy_voucher(request):
@@ -609,6 +610,8 @@ def checkout(request):
         last_name = data.get('last_name')
         email = data.get('email')
         address = data.get('address')
+        zip_code = data.get('zip_code')
+        city = data.get('city')
         phone = data.get('phone')
         company_name = data.get('company_name')
         vat_number = data.get('vat_number')
@@ -651,6 +654,8 @@ def checkout(request):
             last_name=last_name,
             email=email,
             address=address,
+            zip_code=zip_code,
+            city=city,
             phone=phone,
             company_name=company_name,
             vat_number=vat_number,
@@ -669,14 +674,18 @@ def checkout(request):
             discount_code_obj.times_used += 1
             discount_code_obj.save()
 
+        # Wallet-Abzug und Abschluss
         if payment_method == 'wallet':
             wallet.deduct(final_total)
             messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben.')
             cart.items.all().delete()
+            
+            send_order_emails(order, request)  # E-Mails verschicken
+            
             return redirect('order_confirmation', order_id=order.id)
 
         if payment_method == 'paypal':
-            # Weiterleitung zu PayPal mit Betrag und Rechnungsnummer
+            send_order_emails(order, request)  # E-Mails verschicken vor Weiterleitung
             return redirect(reverse('paypal_checkout', args=[order.id]))
 
     context = {
@@ -687,6 +696,43 @@ def checkout(request):
         'now': timezone.now(),
     }
     return render(request, 'apps/checkout.html', context)
+
+
+def send_order_emails(order, request):
+    """
+    Versand der Mails an Kunde und Admin mit Vorlagen.
+    """
+
+    # Mail an Kunde
+    subject_customer = 'Bestellbestätigung – Joel Digitals'
+    from_email = settings.DEFAULT_FROM_EMAIL
+    to_email = [order.email]
+
+    context = {
+        'order': order,
+        'now': timezone.now(),
+    }
+
+    html_content = render_to_string('emails/order_customer_info.html', context)
+    text_content = render_to_string('emails/order_customer_info.txt', context)
+
+    msg = EmailMultiAlternatives(subject_customer, text_content, from_email, to_email)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
+    # Mail an Admin
+    subject_admin = f'Neue Bestellung #{order.id} von {order.first_name} {order.last_name}'
+    to_admin = ['buy.joel-digitals@gmx.de']
+    admin_context = {
+        'order': order,
+        'order_url': request.build_absolute_uri(reverse('order_admin')),
+    }
+    admin_html = render_to_string('emails/order_admin_notification.html', admin_context)
+    admin_text = render_to_string('emails/order_admin_notification.txt', admin_context)
+
+    admin_msg = EmailMultiAlternatives(subject_admin, admin_text, from_email, to_admin)
+    admin_msg.attach_alternative(admin_html, "text/html")
+    admin_msg.send()
 
 @login_required
 def paypal_checkout(request, order_id):
@@ -760,3 +806,172 @@ def more_informations(request, slug):
 def my_orders(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'apps/my_orders.html', {'orders': orders})
+
+
+class SendAccessMailForm(forms.Form):
+    MESSAGE_CHOICES = [
+        ('welcome', 'Welcome Message'),
+        ('registration', 'Registration Code'),
+        ('apps_info', 'Apps & Codes Info'),
+    ]
+
+    message_type = forms.ChoiceField(
+        choices=MESSAGE_CHOICES,
+        label="Select Message Type",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
+    registration_codes = forms.CharField(
+        required=False,
+        label="Registration Codes (AppName:Code, comma-separated)",
+        widget=forms.Textarea(attrs={
+            "placeholder": "AppName1:Code1, AppName2:Code2",
+            "rows": 4,
+            "class": "form-control"
+        })
+    )
+
+    suggested_apps = forms.MultipleChoiceField(
+        required=False,
+        label="Empfohlene Apps",
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Dynamische Vorschläge (kann auch aus DB stammen)
+        self.fields['suggested_apps'].choices = [
+            ('JDS Management', 'JDS Management – Easy, smart and fast.'),
+        ]
+
+    def extract_app_names(self):
+        apps = []
+        raw = self.cleaned_data.get("registration_codes", "")
+        for part in raw.split(','):
+            if ':' in part:
+                app, _ = part.split(':', 1)
+                apps.append(app.strip())
+        return apps
+
+@user_passes_test(is_Sales_Editor)
+def order_admin(request):
+    tab = request.GET.get('tab', 'pending')
+    query = request.GET.get('q', '').strip()
+
+    if tab == 'pending':
+        orders = Order.objects.filter(status='pending')
+    elif tab == 'completed':
+        orders = Order.objects.filter(status='completed')
+    elif tab == 'returns':
+        orders = Order.objects.filter(status__in=['cancelled', 'return', 'shipped'])
+    elif tab == 'shipping':
+        orders = Order.objects.filter(status__in=['in_delivery', 'delivered'])
+    elif tab == 'finished':
+        orders = Order.objects.filter(status__in=['finished'])
+    else:
+        orders = Order.objects.all() 
+
+    if query:
+        filters &= (
+            Q(id__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query)
+        )
+
+
+    if request.method == 'POST':
+        form = SendAccessMailForm(request.POST)
+        order_id = request.POST.get('order_id')
+        new_status = request.POST.get('new_status')
+
+        try:
+            order = Order.objects.get(id=order_id)
+
+            # Statusaktualisierung (unabhängig vom E-Mail-Versand)
+            if new_status in dict(Order.STATUS_CHOICES):
+                old_status = order.status
+                order.status = new_status
+                order.save()
+                messages.success(request, f"Bestellung #{order.id}: Status geändert von '{old_status}' auf '{new_status}'.")
+                return redirect(f"{request.path}?tab={new_status}")
+
+            if form.is_valid():
+                message_type = form.cleaned_data["message_type"]
+                registration_codes_raw = form.cleaned_data["registration_codes"]
+                suggested_ids = form.cleaned_data.get("suggested_apps", [])
+
+                # Registrierungscodes parsen
+                codes = {}
+                for part in registration_codes_raw.split(','):
+                    if ':' in part:
+                        app, code = part.split(':', 1)
+                        codes[app.strip()] = code.strip()
+
+                # Vorschläge aus IDs aufbauen
+                suggestion_map = {
+                    'JDS Management': {
+                        'title': 'JDS Management',
+                        'description': 'Manage fast, easy und ',
+                        'url': 'https://www.joel-digitals.de/our-apps/ManagementApp/',
+                        'btn_text': 'Jetzt entdecken',
+                    },
+                    'editorx': {
+                        'title': 'Editor X',
+                        'description': 'Ein leistungsstarker Editor für Code & Markdown.',
+                        'url': 'https://joel-digitals.de/store/editorx',
+                        'btn_text': 'Jetzt ansehen',
+                    },
+                    'weatherai': {
+                        'title': 'Weather AI',
+                        'description': 'Intelligente Wettervorhersage mit KI.',
+                        'url': 'https://joel-digitals.de/store/weatherai',
+                        'btn_text': 'Mehr erfahren',
+                    },
+                }
+
+                suggestions = [suggestion_map[sid] for sid in suggested_ids if sid in suggestion_map]
+
+                context = {
+                    'order': order,
+                    'codes': codes,
+                    'apps': codes.keys(),
+                    'message_type': message_type,
+                    'suggestions': suggestions,
+                    'now': timezone.now(),
+                }
+
+                # E-Mail-Inhalt generieren
+                html_content = render_to_string(f'emails/{message_type}.html', context)
+                subject_map = {
+                    'welcome': 'Willkommensnachricht zu Ihrer Bestellung',
+                    'registration': 'Ihre Registrierungscodes',
+                    'apps_info': 'Informationen zu Ihren Apps und Codes',
+                }
+                subject = subject_map.get(message_type, 'Ihre Zugangsdaten')
+
+                msg = EmailMultiAlternatives(
+                    subject=subject,
+                    body="Bitte verwenden Sie ein HTML-fähiges E-Mail-Programm.",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[order.email],
+                )
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+
+                messages.success(request, f"E-Mail '{subject}' an {order.email} gesendet.")
+
+        except Order.DoesNotExist:
+            messages.error(request, "Bestellung nicht gefunden.")
+        except Exception as e:
+            messages.error(request, f"Fehler beim Verarbeiten: {e}")
+
+        return redirect(f"{request.path}?tab={tab}")
+
+    mail_form = SendAccessMailForm()
+
+    return render(request, 'apps/order_admin.html', {
+        'orders': orders,
+        'tab': tab,
+        'mail_form': mail_form,
+    })

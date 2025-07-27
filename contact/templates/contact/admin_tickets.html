@@ -1,316 +1,172 @@
+{% extends "base_home.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Joel Digitals - Admin Support Tickets</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: rgb(191, 185, 185);
-            color: #000;
-            font-size: 18px;
+
+{% block title %}Admin Support Tickets – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+    .tickets-container {
+        background-color: #fff;
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    h2 {
+        margin-top: 0;
+        color: #0044cc;
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .btn {
+        display: inline-block;
+        background-color: #0044cc;
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 10px 5px 20px 0;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn:hover {
+        background-color: #1d00d9;
+    }
+
+    .ticket {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .status-open { color: red; font-weight: bold; }
+    .status-resolved { color: green; font-weight: bold; }
+
+    .priority-low { border-left: 8px solid #7EC8E3; }
+    .priority-medium { border-left: 8px solid #f0ad4e; }
+    .priority-high { border-left: 8px solid #d9534f; }
+
+    .ticket form textarea,
+    .ticket form select,
+    .ticket form input[type="submit"] {
+        width: 100%;
+        margin-top: 10px;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    hr {
+        margin: 20px 0;
+        border: none;
+        border-top: 1px solid #ccc;
+    }
+
+    h4 {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        color: #0044cc;
+    }
+
+    @media (max-width: 600px) {
+        .tickets-container {
+            padding: 30px 20px;
         }
 
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
+        h2 {
+            font-size: 1.8rem;
         }
+    }
+</style>
 
-        .logo-img {
-            width: 250px;
-            height: 111px;
-            object-fit: contain;
-        }
-
-        main {
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: auto;
-        }
-
-        h1, h2, h3 {
-            margin-bottom: 15px;
-        }
-
-        section {
-            margin-bottom: 40px;
-        }
-
-        a {
-            color: #ffffff;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-top: 10px;
-        }
-
-        .btn:hover {
-            background-color: #1d00d9;
-        }
-
-        .ticket {
-            background-color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .status-open {
-            color: red;
-            font-weight: bold;
-        }
-
-        .status-resolved {
-            color: green;
-            font-weight: bold;
-        }
-
-        .priority-low {
-            border-left: 8px solid #7EC8E3;
-        }
-
-        .priority-medium {
-            border-left: 8px solid #f0ad4e;
-        }
-
-        .priority-high {
-            border-left: 8px solid #d9534f;
-        }
-
-        footer {
-            background-color: #0044cc;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 50px;
-            border-top: 1px solid #ccc;
-        }
-
-        footer a {
-            color: #ccc;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 600px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            nav {
-                margin-left: 0;
-                margin-top: 10px;
-            }
-            nav a {
-                display: block;
-                margin: 5px 0;
-            }
-        }
-
-        @media (max-width: 1000px) {
-            main {
-                padding: 20px;
-            }
-        }
-
-        .ticket form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .ticket form label {
-            margin-top: 10px;
-        }
-
-        .ticket form select,
-        .ticket form input[type="submit"],
-        .ticket form textarea {
-            margin-top: 5px;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
-
-        .ticket form input[type="submit"] {
-            background-color: #0044cc;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        .ticket form input[type="submit"]:hover {
-            background-color: #1d00d9;
-        }
-
-        .ticket form a.btn {
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-<header>
-    <a href="/">
-        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
-    </a>
-    <nav style="margin-left: auto;">
-        <a href="/services/">Services</a>
-        <a href="/about/">About Us</a>
-        <a href="/contact/">Contact</a>
-        <a href="/blog/">Blog</a>
-        <a href="/our-apps/">Our Apps</a>
-        <a href="/shop/">Shop</a>
-        {% if user.is_authenticated %}
-            {% if "Marketing" in user_groups %}
-                <a href="/blog/admin-blog/">Admin: Blog</a>
-            {% endif %}
-            {% if "Selling" in user_groups %}
-                <a href="/contact/admin-sales/">Admin: Sales</a>
-            {% endif %}
-            {% if "Support" in user_groups %}
-                <a href="/contact/admin-tickets/">Admin: Tickets</a>
-            {% endif %}
-            <a href="/auth/logout/">Logout</a>
-        {% else %}
-            <a href="/auth/login/">Login</a>
-        {% endif %}
-    </nav>
-</header>
-
-<main>
+<div class="tickets-container">
     <h2>🛠️ Admin Area: Support Tickets</h2>
 
     {% if tickets %}
         <a href="{% url 'archive_ticket' %}" class="btn">View Archived Tickets</a>
-        <br>
+
         {% for ticket in tickets %}
             {% if user.is_superuser or "SupportAdmin" in user_groups or ticket.assigned_to == user %}
-                <div class="ticket priority-{{ ticket.priority }}">
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
+            <div class="ticket priority-{{ ticket.priority }}">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
 
-                        <strong>{{ ticket.subject }}</strong> – 
+                    <strong>{{ ticket.subject }}</strong> –
+                    <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
+                        {% if ticket.is_resolved %}Resolved{% else %}Open{% endif %}
+                    </span>
 
-                        <!-- Status als Text -->
-                        <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
-                            {% if ticket.is_resolved %}Resolved{% else %}Open{% endif %}
-                        </span>
+                    <p>
+                        <strong>Assigned to:</strong> {{ ticket.assigned_to }}<br>
+                        <strong>Priority:</strong> {{ ticket.get_priority_display }}<br>
+                        <strong>Ticket Number:</strong> {{ ticket.ticket_number }}<br>
+                        <strong>App:</strong> {{ ticket.app_name }}<br>
+                        <strong>Platform:</strong> {{ ticket.platform }}
+                    </p>
 
-                        <!-- assigned_to und priority als Text oben -->
-                        <p>
-                            <strong>Assigned to:</strong> {{ ticket.assigned_to }}<br>
-                            <strong>Priority:</strong> 
-                            {% if ticket.priority == 'low' %}
-                                Low
-                            {% elif ticket.priority == 'medium' %}
-                                Medium
-                            {% elif ticket.priority == 'high' %}
-                                High
-                            {% else %}
-                                Unknown
-                            {% endif %}
-                            <br>
-                            <strong>Ticket Number:</strong> {{ ticket.ticket_number }}<br>
-                            <strong>App:</strong> {{ ticket.app_name }}<br>
-                            <strong>Platform:</strong> {{ ticket.platform }}<br>
-                        </p>
+                    <p><strong>From:</strong> {{ ticket.email }}<br>
+                    <strong>Created:</strong> {{ ticket.created_at|date:"d.m.Y H:i" }}</p>
 
-                        <p><strong>From:</strong> {{ ticket.email }}<br>
-                           <strong>Created:</strong> {{ ticket.created_at|date:"d.m.Y H:i" }}</p>
+                    <p>{{ ticket.description|linebreaks }}</p>
 
-                        <p>{{ ticket.description|linebreaks }}</p>
+                    {% if user.is_superuser or "SupportAdmin" in user_groups %}
+                        <button type="submit" name="action" value="toggle" class="btn">
+                            {% if ticket.is_resolved %}Mark as Open{% else %}Mark as Resolved{% endif %}
+                        </button>
+                    {% endif %}
 
-                        {% if user.is_superuser or "SupportAdmin" in user_groups %}
-                            <label>Status:</label>
-                            <button type="submit" name="action" value="toggle" class="btn">
-                                {% if ticket.is_resolved %}Mark as Open{% else %}Mark as Resolved{% endif %}
-                            </button>
-                        {% else %}
-                            <!-- Für Supporter nur Status als Text anzeigen -->
-                            <p><strong>Status:</strong> 
-                                <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
-                                    {% if ticket.is_resolved %}Resolved{% else %}Open{% endif %}
-                                </span>
-                            </p>
-                        {% endif %}
+                    <hr>
+                    <h4>Internal Notes</h4>
+                    {% for note in ticket.notes.all %}
+                        <p><strong>{{ note.author.get_full_name|default:note.author.username }}:</strong>
+                            {{ note.created_at|date:"d.m.Y H:i" }}<br>
+                            {{ note.note|linebreaks }}</p>
+                    {% empty %}
+                        <p><em>No notes yet.</em></p>
+                    {% endfor %}
 
-                        <hr>
-                        <h4>Internal Notes</h4>
-                        {% for note in ticket.notes.all %}
-                            <p><strong>{{ note.author.get_full_name|default:note.author.username }}:</strong>
-                                {{ note.created_at|date:"d.m.Y H:i" }}<br>
-                                {{ note.note|linebreaks }}</p>
-                        {% empty %}
-                            <p><em>No notes yet.</em></p>
-                        {% endfor %}
+                    <label for="note">Add Note:</label>
+                    <textarea name="note" rows="3" placeholder="Internal note (visible only to Support)"></textarea>
 
-                        <label for="note">Add Note:</label>
-                        <textarea name="note" rows="3" placeholder="Internal note (visible only to Support)" style="width:100%;"></textarea>
-
-                        {% if user.is_superuser or "SupportAdmin" in user_groups %}
-                            <label>Assigned to:</label>
-                            <select name="assigned_to">
-                              {% for u in support_users %}
+                    {% if user.is_superuser or "SupportAdmin" in user_groups %}
+                        <label>Assigned to:</label>
+                        <select name="assigned_to">
+                            {% for u in support_users %}
                                 <option value="{{ u.id }}" {% if ticket.assigned_to == u %}selected{% endif %}>
-                                  {{ u.get_full_name }} ({{ u.username }})
+                                    {{ u.get_full_name }} ({{ u.username }})
                                 </option>
-                              {% endfor %}
-                            </select>
+                            {% endfor %}
+                        </select>
 
-                            <label>Priority:</label>
-                            <select name="priority">
-                                <option value="low" {% if ticket.priority == 'low' %}selected{% endif %}>Low</option>
-                                <option value="medium" {% if ticket.priority == 'medium' %}selected{% endif %}>Medium</option>
-                                <option value="high" {% if ticket.priority == 'high' %}selected{% endif %}>High</option>
-                            </select>
-                        {% else %}
-                            <!-- Für Supporter assigned_to nur als Text anzeigen -->
-                            <!-- Da oben assigned_to schon angezeigt wird, hier nichts -->
-                            <!-- Priority für Supporter ausblenden -->
-                        {% endif %}
+                        <label>Priority:</label>
+                        <select name="priority">
+                            <option value="low" {% if ticket.priority == 'low' %}selected{% endif %}>Low</option>
+                            <option value="medium" {% if ticket.priority == 'medium' %}selected{% endif %}>Medium</option>
+                            <option value="high" {% if ticket.priority == 'high' %}selected{% endif %}>High</option>
+                        </select>
+                    {% endif %}
 
-                        <input type="submit" name="action" value="update" class="btn">
-                        <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">View Chat</a>
-                    </form>
-                </div>
+                    <input type="submit" name="action" value="update" class="btn">
+                    <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">View Chat</a>
+                </form>
+            </div>
             {% endif %}
         {% endfor %}
     {% else %}
         <p>No tickets found.</p>
         <a href="{% url 'archive_ticket' %}" class="btn">View Archived Tickets</a>
     {% endif %}
-</main>
-
-<footer>
-    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
-    <p>
-        <a href="/imprint/">Imprint</a> |
-        <a href="/privacy/">Privacy Policy</a> |
-        <a href="/terms/">Terms of Service</a> |
-        <a href="/">Home</a>
-    </p>
-</footer>
-</body>
-</html>
+</div>
+{% endblock %}

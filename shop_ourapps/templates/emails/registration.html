@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Your Registration Codes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: #1e1e1e;
+      padding: 30px;
+      border-radius: 8px;
+    }
+    h1 {
+      color: #00bfff;
+    }
+    p {
+      line-height: 1.6;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #444;
+      text-align: left;
+      background-color: #2a2a2a;
+    }
+    th {
+      background-color: #333;
+      color: #00bfff;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #aaa;
+      text-align: center;
+    }
+    .suggestions {
+      margin-top: 40px;
+    }
+    .suggestion-box {
+      background-color: #2c2c2c;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #00bfff;
+      color: #000;
+      padding: 10px 18px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hello {{ order.first_name }},</h1>
+    <p>
+      Thank you for your purchase at <strong>Joel Digitals</strong>! Below are your registration codes
+      for the apps you’ve ordered. Please store them safely.
+    </p>
+
+    {% if codes %}
+    <table>
+      <thead>
+        <tr>
+          <th>App</th>
+          <th>Registration Code</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app, code in codes.items %}
+        <tr>
+          <td>{{ app }}</td>
+          <td><strong>{{ code }}</strong></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p><strong>Note:</strong> No registration codes were submitted.</p>
+    {% endif %}
+
+    <p>
+      For help or questions, visit our <a href="https://www.joel-digitals.de/contact" style="color:#00bfff;">support portal</a>
+      or reply directly to this email.
+    </p>
+
+    {% if suggestions %}
+    <div class="suggestions">
+      <h2 style="color: #00bfff;">💡 Recommended for you:</h2>
+      {% for item in suggestions %}
+      <div class="suggestion-box">
+        <strong>{{ item.title }}</strong><br>
+        {{ item.description }}<br>
+        <a class="btn" href="{{ item.url }}">{{ item.btn_text }}</a>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+
+    <div class="footer">
+      <p>&copy; {{ now.year }} Joel Digitals · All rights reserved</p>
+      <p>Joel Digitals  · https://www.joel-digitals.de</p>
+    </div>
+  </div>
+</body>
+</html>

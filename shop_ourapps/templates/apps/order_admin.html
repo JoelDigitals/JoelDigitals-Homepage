@@ -1,0 +1,107 @@
+{% extends "base_home.html" %}
+{% load static %}
+
+{% block title %}Bestellverwaltung – Joel Digitals{% endblock %}
+
+{% block content %}
+<h1>Bestellverwaltung</h1>
+
+<nav>
+    <a href="?tab=pending" class="{% if tab == 'pending' %}active{% endif %}">📝 Ausstehend</a> |
+    <a href="?tab=completed" class="{% if tab == 'completed' %}active{% endif %}">💰 Bezahlt</a> |
+    <a href="?tab=returns" class="{% if tab == 'returns' %}active{% endif %}">↩️ Retouren</a> |
+    <a href="?tab=shipping" class="{% if tab == 'shipping' %}active{% endif %}">📦 Versand</a> |
+    <a href="?tab=finished" class="{% if tab == 'finished' %}active{% endif %}">Beendet</a>
+</nav>
+
+
+<style>
+
+.order {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    background-color: #1e1e1e;
+}
+.mail-form {
+    margin-top: 15px;
+}
+form select {
+    padding: 6px;
+    border-radius: 6px;
+}
+form button.btn {
+    margin-left: 10px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background-color: #0044cc;
+    color: white;
+    border: none;
+}
+
+</style>
+
+<form method="get" style="margin: 20px 0;">
+    <input type="text" name="q" placeholder="Suche nach Name, E-Mail oder ID" value="{{ request.GET.q }}" style="padding: 6px; width: 300px; border-radius: 6px;">
+    <input type="hidden" name="tab" value="{{ tab }}">
+    <button type="submit" class="btn">Suchen</button>
+</form>
+
+
+{% for order in orders %}
+<div class="order">
+    <h3>Bestellung #{{ order.id }} von {{ order.first_name }} {{ order.last_name }}</h3>
+    <p><strong>Status:</strong> {{ order.get_status_display }}</p>
+    <p><strong>E-Mail:</strong> {{ order.email }}</p>
+    <p><strong>Adresse:</strong> {{ order.address|linebreaksbr }}</p>
+    <p><strong>Postleitzahl:</strong> {{ order.zip_code|linebreaksbr }}</p>
+    <p><strong>Stadt:</strong> {{ order.city|linebreaksbr }}</p>
+    <p><strong>Telefon:</strong> {{ order.phone }}</p>
+    <p><strong>Zahlungsmethode:</strong> {{ order.payment_method }}</p>
+    <p><strong>Gesamtbetrag:</strong> {{ order.total_amount }} €</p>
+
+    <h4>Bestellte Apps:</h4>
+    <ul>
+        {% for item in order.items.all %}
+            <li>
+                <strong>{{ item.app }}</strong>
+                ({{ item.quantity }}×, {{ item.price }} €)
+            </li>
+        {% empty %}
+            <li><em>Keine Artikel vorhanden.</em></li>
+        {% endfor %}
+    </ul>
+
+    <summary>Zugangsdaten per E-Mail senden</summary>
+    <form method="post" class="mail-form">
+        {% csrf_token %}
+        <input type="hidden" name="order_id" value="{{ order.id }}">
+        
+        {{ mail_form.message_type.label_tag }}
+        {{ mail_form.message_type }}
+        
+        {{ mail_form.registration_codes.label_tag }}
+        {{ mail_form.registration_codes }}
+        
+        {{ mail_form.suggested_apps.label_tag }}
+        {{ mail_form.suggested_apps }}
+        
+        <button type="submit" class="btn">E-Mail senden</button>
+    </form>
+
+    <form method="post" style="margin-top: 10px;">
+        {% csrf_token %}
+        <input type="hidden" name="order_id" value="{{ order.id }}">
+        <select name="new_status">
+            {% for value, label in order.STATUS_CHOICES %}
+                <option value="{{ value }}" {% if value == order.status %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" name="update_status" class="btn">Status ändern</button>
+    </form>
+</div>
+{% endfor %}
+
+
+{% endblock %}

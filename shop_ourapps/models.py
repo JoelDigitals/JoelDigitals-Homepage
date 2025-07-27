@@ -186,16 +186,23 @@ class CartItem(models.Model):
 
 class Order(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('completed', 'Completed'),
-        ('cancelled', 'Cancelled'),
+        ('Received', 'Received'),
+        ('Paid', 'Paid'),
+        ('Return', 'Return'),
+        ('Canceled', 'Canceled'),
+        ('Back', 'Back at Joel Digitals'),
+        ('In Delivery', 'In Delivery'),
+        ('Delivered', 'Delivered'),
+        ('Finished', 'Finished'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField()
-    address = models.TextField()
+    address = models.CharField(max_length=255)
+    zip_code = models.CharField(max_length=20)
+    city = models.CharField(max_length=100)
     phone = models.CharField(max_length=50)
     company_name = models.CharField(max_length=200, blank=True, null=True)
     vat_number = models.CharField(max_length=50, blank=True, null=True)

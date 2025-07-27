@@ -1,127 +1,84 @@
-<!-- blog/templates/blog/category_form.html -->
-
+{% extends "base_home.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ action }} Kategorie</title>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
-            background-color: #bfb9b9;
-            color: #000;
-            font-size: 18px;
-        }
 
-        body {
-            display: flex;
-            flex-direction: column;
-        }
+{% block title %}{{ action }} Kategorie{% endblock %}
 
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-        }
+{% block content %}
+<style>
+    .container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        max-width: 600px;
+        margin: 40px auto;
+        font-size: 18px;
+        color: #000;
+    }
 
-        .logo-img {
-            width: 250px;
-            height: 111px;
-            object-fit: contain;
-        }
+    h2 {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 30px;
+    }
 
-        nav {
-            margin-left: auto;
-        }
+    form p {
+        margin-bottom: 20px;
+    }
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-left: 15px;
-        }
+    label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 6px;
+    }
 
-        nav a:hover {
-            text-decoration: underline;
-        }
+    input[type="text"],
+    input[type="file"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 8px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
 
-        main {
-            flex: 1;
-            padding: 40px 20px;
-            max-width: 800px;
-            margin: auto;
-        }
+    .btn {
+        display: inline-block;
+        background-color: #0044cc;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-right: 10px;
+        text-decoration: none;
+        font-size: 16px;
+    }
 
-        h2 {
-            margin-top: 0;
-            text-align: center;
-        }
+    .btn:hover {
+        background-color: #002a80;
+    }
 
-        form {
-            background-color: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
+    .btn-secondary {
+        background-color: #aaa;
+        color: white;
+    }
 
-        form p {
-            margin-bottom: 20px;
-        }
+    .btn-secondary:hover {
+        background-color: #888;
+    }
+</style>
 
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        input[type="text"],
-        input[type="file"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 8px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #0044cc;
-            color: white;
-            padding: 8px 14px;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-right: 10px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background-color: #002a80;
-        }
-
-        .btn-secondary {
-            background-color: #aaa;
-        }
-
-        .btn-secondary:hover {
-            background-color: #888;
-        }
-    </style>
-</head>
-<body>
-<h2>{{ action }} Kategorie</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn">{{ action }}</button>
-    <a href="{% url 'list_categories' %}" class="btn">Zurück</a>
-</form>
-</body>
-</html>
+<div class="container">
+    <h2>{{ action }} Kategorie</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">{{ action }}</button>
+        <a href="{% url 'list_categories' %}" class="btn btn-secondary">Zurück</a>
+    </form>
+</div>
+{% endblock %}

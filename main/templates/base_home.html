@@ -123,6 +123,48 @@
       cursor: pointer;
     }
 
+    
+
+    .menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  nav#main-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    width: 70%;
+    height: 100vh;
+    background: var(--surface);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2rem 1rem;
+    gap: 1rem;
+    transition: transform 0.3s ease;
+    z-index: 10000;
+    display: flex; /* dauerhaft sichtbar, aber außerhalb */
+  }
+
+  nav#main-nav.open {
+    transform: translateX(0);
+  }
+
+  nav#main-nav a {
+    font-size: 1.2rem;
+  }
+}
+
     @media (max-width: 600px) {
       header, footer {
         flex-direction: column;
@@ -146,10 +188,16 @@
 
 <body>
 <header>
+  <div style="display: flex; align-items: center; gap: 1rem;">
+    <button class="menu-toggle" onclick="toggleMenu()">
+      <i class="fas fa-bars"></i>
+    </button>
     <a href="/">
-        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
+      <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
     </a>
-    <nav>
+  </div>
+      <nav id="main-nav">
+        <!-- Links bleiben gleich -->
         <a href="/wiki/">Wiki</a>
         <a href="/status/">Status</a>
         <a href="/services/">Services</a>
@@ -164,6 +212,7 @@
             {% endif %}
             {% if "Selling" in user_groups %}
                 <a href="/contact/admin-sales/">Admin: Sales</a>
+                <a href="/admin-sales/orders/">Admin: Orders</a>
             {% endif %}
             {% if "Support" in user_groups %}
                 <a href="/contact/admin-tickets/">Admin: Tickets</a>
@@ -174,6 +223,7 @@
         {% endif %}
     </nav>
 </header>
+
 
 <main>
     {% block content %}{% endblock %}
@@ -215,6 +265,26 @@
   </div>
 </div>
 
+<script>
+function toggleMenu() {
+  const nav = document.getElementById("main-nav");
+  nav.classList.toggle("open");
+}
+
+// Optional: Schließen bei Klick außerhalb des Menüs
+document.addEventListener("click", function (event) {
+  const nav = document.getElementById("main-nav");
+  const toggle = document.querySelector(".menu-toggle");
+
+  if (
+    nav.classList.contains("open") &&
+    !nav.contains(event.target) &&
+    !toggle.contains(event.target)
+  ) {
+    nav.classList.remove("open");
+  }
+});
+</script>
 <script>
   const translations = {
     de: {

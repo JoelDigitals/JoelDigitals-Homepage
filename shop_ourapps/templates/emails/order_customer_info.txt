@@ -1,0 +1,11 @@
+Hallo {{ order.first_name }},
+
+vielen Dank für Ihre Bestellung bei Joel Digitals!
+
+Ihre Bestellung ist bei uns eingegangen und wird derzeit bearbeitet.
+Die Rechnung sowie eventuelle Registrierungs-Codes erhalten Sie innerhalb von 10 Werktagen per E-Mail.
+
+Bei Fragen nutzen Sie bitte unseren Support: https://www.joel-digitals.de/contact
+
+Mit freundlichen Grüßen  
+Joel Digitals

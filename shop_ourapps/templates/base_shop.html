@@ -23,6 +23,7 @@
       font-family: "Segoe UI", sans-serif;
       background: var(--bg);
       color: var(--text);
+      min-height: 100vh;
     }
     header {
       background: #181818;
@@ -49,6 +50,7 @@
       transition: color .3s;
     }
     nav a:hover { color: var(--primary); }
+
     main {
       flex: 1;
       padding: 2rem;
@@ -57,29 +59,143 @@
     }
     footer {
       background: #181818;
-      padding: 1rem;
+      padding: 1rem 2rem;
       text-align: center;
-      font-size: 14px;
+      font-size: 0.9rem;
       border-top: 1px solid var(--border);
+      color: #ccc;
     }
     footer a {
-      color: var(--text);
-      margin: 0 .5rem;
+      color: #ccc;
+      margin: 0 0.5rem;
       text-decoration: none;
     }
-    footer a:hover { color: var(--primary); }
+    footer a:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    /* Cookie Banner */
+    #cookie-banner {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 1rem 2rem;
+      z-index: 9999;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    #cookie-banner a {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+    #cookie-banner label {
+      display: block;
+      margin: 0.3rem 0;
+      cursor: pointer;
+    }
+    #cookie-banner input[type=checkbox] {
+      margin-right: 0.5rem;
+    }
+    #cookie-banner button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      margin: 0.3rem 0.3rem 0 0;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+    #cookie-banner button:hover {
+      background-color: #0033a0;
+    }
+    #cookie-banner select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+
+    .menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  nav#main-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    width: 70%;
+    height: 100vh;
+    background: var(--surface);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2rem 1rem;
+    gap: 1rem;
+    transition: transform 0.3s ease;
+    z-index: 10000;
+    display: flex; /* dauerhaft sichtbar, aber außerhalb */
+  }
+
+  nav#main-nav.open {
+    transform: translateX(0);
+  }
+
+  nav#main-nav a {
+    font-size: 1.2rem;
+  }
+}
+
     @media (max-width: 600px) {
-      header { flex-direction: column; align-items: flex-start; }
+      header, footer {
+        flex-direction: column;
+        align-items: center;
+      }
+      nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+      main {
+        padding: 1rem;
+      }
+      #cookie-banner {
+        padding: 1rem;
+        font-size: 0.8rem;
+      }
     }
   </style>
-  {% block extra_head %}{% endblock %}
 </head>
-<body>
-  <header>
+
+{% block extra_head %}{% endblock %}
+</head>
+<header>
+  <div style="display: flex; align-items: center; gap: 1rem;">
+    <button class="menu-toggle" onclick="toggleMenu()">
+      <i class="fas fa-bars"></i>
+    </button>
     <a href="/">
-      <img src="{% static 'logo.png' %}" alt="Joel Digitals" class="logo-img">
+      <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
     </a>
-    <nav>
+  </div>
+  <nav id="main-nav">
       <a href="/shop/">Shop</a>
       <a href="/contact/">Contact</a>
       <a href="/downloads/">Downloads</a>
@@ -101,16 +217,198 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer>
-    <p>&copy; 2025 Joel Digitals – Alle Rechte vorbehalten</p>
-    <p>
-      <a href="/imprint/">Impressum</a> |
-      <a href="/privacy/">Datenschutz</a> |
-      <a href="/terms/">AGB</a> |
-      <a href="/">Home</a>
-    </p>
-  </footer>
+<footer>
+    <div>&copy; 2025 Joel Digitals. All rights reserved.</div>
+    <div>
+        <a href="/imprint/">Imprint</a> |
+        <a href="/privacy/">Privacy Policy</a> |
+        <a href="/terms/">Terms of Service</a> |
+        <a href="/">Home</a>
+    </div>
+</footer>
 
-  {% block extra_js %}{% endblock %}
+<!-- Cookie Banner -->
+<div id="cookie-banner" role="region" aria-label="Cookie Consent Banner">
+  <div style="display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center;">
+    <div style="flex: 1; min-width: 250px; margin-right: 1rem;">
+      <p id="cookie-message"></p>
+      <div id="cookie-options">
+        <label><input type="checkbox" id="essential" disabled checked> <span id="label-essential"></span></label>
+        <label><input type="checkbox" id="functional"> <span id="label-functional"></span></label>
+        <label><input type="checkbox" id="analytics"> <span id="label-analytics"></span></label>
+        <label><input type="checkbox" id="marketing"> <span id="label-marketing"></span></label>
+      </div>
+    </div>
+    <div style="min-width: 220px; display: flex; flex-direction: column; gap: 0.5rem;">
+      <select id="language-select" onchange="setLanguage(this.value)">
+        <option value="de">Deutsch</option>
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+      </select>
+      <button onclick="acceptAll()">Alle akzeptieren</button>
+      <button onclick="savePreferences()">Einstellungen speichern</button>
+      <button onclick="rejectEssentials()" style="background-color: #555;">Nur Essenzielle</button>
+      <a href="/privacy/" style="font-size: 0.8rem; margin-top: 0.5rem; text-align: center;">Datenschutzerklärung</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleMenu() {
+  const nav = document.getElementById("main-nav");
+  nav.classList.toggle("open");
+}
+
+// Optional: Schließen bei Klick außerhalb des Menüs
+document.addEventListener("click", function (event) {
+  const nav = document.getElementById("main-nav");
+  const toggle = document.querySelector(".menu-toggle");
+
+  if (
+    nav.classList.contains("open") &&
+    !nav.contains(event.target) &&
+    !toggle.contains(event.target)
+  ) {
+    nav.classList.remove("open");
+  }
+});
+</script>
+<script>
+  const translations = {
+    de: {
+      message: "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern. Sie können auswählen, welchen Kategorien Sie zustimmen.",
+      labels: {
+        essential: "Essenzielle Cookies (immer aktiv)",
+        functional: "Funktionale Cookies (z. B. Warenkorb speichern)",
+        analytics: "Analyse-Cookies (z. B. Besucherzahlen messen)",
+        marketing: "Marketing-Cookies (z. B. für Werbung & Tracking)"
+      },
+      buttons: {
+        acceptAll: "Alle akzeptieren",
+        save: "Einstellungen speichern",
+        essentialsOnly: "Nur Essenzielle"
+      }
+    },
+    en: {
+      message: "We use cookies to improve your experience. You can choose which categories to allow.",
+      labels: {
+        essential: "Essential cookies (always active)",
+        functional: "Functional cookies (e.g., save cart)",
+        analytics: "Analytics cookies (e.g., visitor stats)",
+        marketing: "Marketing cookies (e.g., ads & tracking)"
+      },
+      buttons: {
+        acceptAll: "Accept all",
+        save: "Save preferences",
+        essentialsOnly: "Essentials only"
+      }
+    },
+    fr: {
+      message: "Nous utilisons des cookies pour améliorer votre expérience. Choisissez les catégories que vous souhaitez autoriser.",
+      labels: {
+        essential: "Cookies essentiels (toujours actifs)",
+        functional: "Cookies fonctionnels (ex. sauvegarder panier)",
+        analytics: "Cookies analytiques (ex. statistiques visiteurs)",
+        marketing: "Cookies marketing (ex. pub & suivi)"
+      },
+      buttons: {
+        acceptAll: "Tout accepter",
+        save: "Enregistrer",
+        essentialsOnly: "Essentiels uniquement"
+      }
+    }
+  };
+
+  function setLanguage(lang) {
+    const t = translations[lang] || translations.de;
+    document.getElementById('cookie-message').textContent = t.message;
+    document.getElementById('label-essential').textContent = t.labels.essential;
+    document.getElementById('label-functional').textContent = t.labels.functional;
+    document.getElementById('label-analytics').textContent = t.labels.analytics;
+    document.getElementById('label-marketing').textContent = t.labels.marketing;
+    document.querySelector('#cookie-banner button:nth-child(2)').textContent = t.buttons.acceptAll;
+    document.querySelector('#cookie-banner button:nth-child(3)').textContent = t.buttons.save;
+    document.querySelector('#cookie-banner button:nth-child(4)').textContent = t.buttons.essentialsOnly;
+  }
+
+  function showBanner() {
+    document.getElementById('cookie-banner').style.display = 'block';
+  }
+
+  function getCookie(name) {
+    const value = "; " + document.cookie;
+    const parts = value.split("; " + name + "=");
+    if(parts.length === 2) return parts.pop().split(";").shift();
+  }
+
+  function setCookie(name, value, days) {
+    let expires = "";
+    if(days) {
+      const date = new Date();
+      date.setTime(date.getTime() + (days*24*60*60*1000));
+      expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Lax";
+  }
+
+  function loadPreferences() {
+    const prefs = getCookie('cookiePreferences');
+    if(!prefs) {
+      showBanner();
+      setLanguage('de');
+      return null;
+    }
+    try {
+      const obj = JSON.parse(prefs);
+      return obj;
+    } catch {
+      showBanner();
+      setLanguage('de');
+      return null;
+    }
+  }
+
+  function savePreferences() {
+    const prefs = {
+      essential: true,
+      functional: document.getElementById('functional').checked,
+      analytics: document.getElementById('analytics').checked,
+      marketing: document.getElementById('marketing').checked,
+      language: document.getElementById('language-select').value || 'de'
+    };
+    setCookie('cookiePreferences', JSON.stringify(prefs), 365);
+    document.getElementById('cookie-banner').style.display = 'none';
+  }
+
+  function acceptAll() {
+    document.getElementById('functional').checked = true;
+    document.getElementById('analytics').checked = true;
+    document.getElementById('marketing').checked = true;
+    savePreferences();
+  }
+
+  function rejectEssentials() {
+    document.getElementById('functional').checked = false;
+    document.getElementById('analytics').checked = false;
+    document.getElementById('marketing').checked = false;
+    savePreferences();
+  }
+
+  function applyPreferences(prefs) {
+    if(!prefs) return;
+    document.getElementById('functional').checked = !!prefs.functional;
+    document.getElementById('analytics').checked = !!prefs.analytics;
+    document.getElementById('marketing').checked = !!prefs.marketing;
+    document.getElementById('language-select').value = prefs.language || 'de';
+    setLanguage(prefs.language || 'de');
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const prefs = loadPreferences();
+    applyPreferences(prefs);
+    if(!prefs) showBanner();
+  });
+</script>
+
 </body>
 </html>

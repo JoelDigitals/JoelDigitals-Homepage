@@ -1,96 +1,88 @@
+{% extends "base_home.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Ticket {{ ticket.ticket_number }} – Archiv</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            font-family: Arial, sans-serif;
-            background-color: rgb(191, 185, 185);
-            color: #000;
-            font-size: 18px;
-        }
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .logo-img {
-            width: 250px;
-            height: 111px;
-            object-fit: contain;
-        }
-        main {
-            flex: 1 0 auto;
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        h2 {
-            margin-bottom: 25px;
-        }
-        p {
-            margin: 10px 0;
-            line-height: 1.5;
-        }
-        a.button {
-            display: inline-block;
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-top: 20px;
-        }
-        a.button:hover {
-            background-color: #1d00d9;
-        }
-        footer {
-            flex-shrink: 0;
-            background-color: #0044cc;
-            padding: 20px;
-            text-align: center;
-            color: #ccc;
-            border-top: 1px solid #ccc;
-            margin-top: 50px;
-        }
-        .note {
-            background: #f0f0f0;
-            border-left: 4px solid #0044cc;
-            margin: 15px 0;
-            padding: 10px 15px;
-            border-radius: 4px;
-        }
-        .note-meta {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 5px;
-        }
-    </style>
-</head>
-<body>
-<header>
-    <a href="/">
-        <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
-    </a>
-</header>
 
-<main>
+{% block title %}Ticket {{ ticket.ticket_number }} – Archiv{% endblock %}
+
+{% block content %}
+<style>
+    .ticket-detail-container {
+        background-color: #fff;
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    h2 {
+        margin-top: 0;
+        color: #0044cc;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 30px;
+    }
+
+    p {
+        margin: 10px 0;
+        line-height: 1.5;
+    }
+
+    .btn {
+        display: inline-block;
+        background-color: #0044cc;
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-top: 20px;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn:hover {
+        background-color: #1d00d9;
+    }
+
+    .note {
+        background: #f0f0f0;
+        border-left: 4px solid #0044cc;
+        margin: 15px 0;
+        padding: 10px 15px;
+        border-radius: 4px;
+    }
+
+    .note-meta {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 5px;
+    }
+
+    footer {
+        margin-top: 50px;
+        text-align: center;
+        color: #aaa;
+        font-size: 14px;
+    }
+
+    footer a {
+        color: #999;
+        text-decoration: none;
+        margin: 0 8px;
+    }
+
+    @media (max-width: 600px) {
+        .ticket-detail-container {
+            padding: 30px 20px;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+
+<div class="ticket-detail-container">
     <h2>🎫 Ticket-Details – {{ ticket.ticket_number }}</h2>
     <p><strong>Benutzer:</strong> {{ ticket.email }}</p>
     <p><strong>Betreff:</strong> {{ ticket.subject }}</p>
@@ -119,20 +111,10 @@
             </div>
         {% endfor %}
     {% else %}
-        <p>Keine Notizen vorhanden.</p>
+        <p><em>Keine Notizen vorhanden.</em></p>
     {% endif %}
 
-    <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="button">🗨️ Zum Chat</a>
-</main>
+    <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">🗨️ Zum Chat</a>
+</div>
 
-<footer>
-    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
-    <p>
-        <a href="/imprint/" style="color:#ccc; text-decoration:none;">Imprint</a> |
-        <a href="/privacy/" style="color:#ccc; text-decoration:none;">Privacy Policy</a> |
-        <a href="/terms/" style="color:#ccc; text-decoration:none;">Terms of Service</a> |
-        <a href="/" style="color:#ccc; text-decoration:none;">Home</a>
-    </p>
-</footer>
-</body>
-</html>
+{% endblock %}

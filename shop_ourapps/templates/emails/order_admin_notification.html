@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Neue Bestellung</title>
+</head>
+<body style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px;">
+  <div style="max-width: 600px; background: white; padding: 30px; margin: auto; border-radius: 8px;">
+    <h2>Neue Bestellung erhalten</h2>
+    <p><strong>Name:</strong> {{ order.first_name }} {{ order.last_name }}</p>
+    <p><strong>Email:</strong> {{ order.email }}</p>
+    <p><strong>Bestell-ID:</strong> {{ order.id }}</p>
+    <p><strong>Bestellt am:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+    <hr>
+    <p><a href="{{ order_url }}">Zur Bestellübersicht im Adminbereich</a></p>
+  </div>
+</body>
+</html>

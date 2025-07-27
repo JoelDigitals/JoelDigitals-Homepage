@@ -1,132 +1,96 @@
-<!-- blog/templates/blog/category_list.html -->
-
+{% extends "base_home.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>Kategorien</title>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
-            background-color: #bfb9b9;
-            color: #000;
-            font-size: 18px;
-        }
 
-        body {
-            display: flex;
-            flex-direction: column;
-        }
+{% block title %}Kategorien{% endblock %}
 
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-        }
+{% block content %}
+<style>
+    .container {
+        max-width: 700px;
+        margin: 40px auto;
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        font-size: 18px;
+        color: #000;
+    }
 
-        .logo-img {
-            width: 250px;
-            height: 111px;
-            object-fit: contain;
-        }
+    h2 {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
 
-        nav {
-            margin-left: auto;
-        }
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-left: 15px;
-        }
+    ul li {
+        padding: 12px 15px;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
 
-        nav a:hover {
-            text-decoration: underline;
-        }
+    ul li:last-child {
+        border-bottom: none;
+    }
 
-        main {
-            flex: 1;
-            padding: 40px 20px;
-            max-width: 800px;
-            margin: auto;
-        }
+    .btn {
+        background-color: #0044cc;
+        color: white;
+        padding: 7px 14px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+        margin-left: 10px;
+        transition: background-color 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
 
-        h2 {
-            margin-top: 0;
-            text-align: center;
-        }
+    .btn:hover {
+        background-color: #002a80;
+    }
 
-        form {
-            background-color: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
+    .btn-danger {
+        background-color: darkred;
+    }
 
-        form p {
-            margin-bottom: 20px;
-        }
+    .btn-danger:hover {
+        background-color: #a00000;
+    }
 
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-        }
+    .btn-add {
+        display: block;
+        max-width: 200px;
+        margin: 0 auto 30px auto;
+        text-align: center;
+        font-size: 16px;
+    }
+</style>
 
-        input[type="text"],
-        input[type="file"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 8px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+<div class="container">
+    <h2>Kategorien</h2>
+    <a href="{% url 'create_category' %}" class="btn btn-add">Neue Kategorie hinzufügen</a>
 
-        .btn {
-            display: inline-block;
-            background-color: #0044cc;
-            color: white;
-            padding: 8px 14px;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-right: 10px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background-color: #002a80;
-        }
-
-        .btn-secondary {
-            background-color: #aaa;
-        }
-
-        .btn-secondary:hover {
-            background-color: #888;
-        }
-    </style>
-<body>
-<h2>Kategorien</h2>
-<a href="{% url 'create_category' %}" class="btn">Neue Kategorie hinzufügen</a>
-<ul>
-    {% for category in categories %}
-        <li>
-            {{ category.name }}
-            <a href="{% url 'edit_category' category.pk %}" class="btn">Bearbeiten</a>
-            <a href="{% url 'delete_category' category.pk %}" class="btn btn-danger">Löschen</a>
-        </li>
-    {% empty %}
-        <p>Keine Kategorien verfügbar.</p>
-    {% endfor %}
-</ul>
-</body>
-</html>
+    {% if categories %}
+    <ul>
+        {% for category in categories %}
+            <li>
+                <span>{{ category.name }}</span>
+                <span>
+                    <a href="{% url 'edit_category' category.pk %}" class="btn">Bearbeiten</a>
+                    <a href="{% url 'delete_category' category.pk %}" class="btn btn-danger">Löschen</a>
+                </span>
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p style="text-align:center;">Keine Kategorien verfügbar.</p>
+    {% endif %}
+</div>
+{% endblock %}

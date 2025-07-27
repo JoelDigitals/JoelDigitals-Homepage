@@ -1,0 +1,8 @@
+Neue Bestellung erhalten
+
+Name: {{ order.first_name }} {{ order.last_name }}
+Email: {{ order.email }}
+Bestell-ID: {{ order.id }}
+Datum: {{ order.created_at|date:"d.m.Y H:i" }}
+
+Admin-Link: {{ order_url }}
