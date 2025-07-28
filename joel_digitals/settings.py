@@ -31,8 +31,7 @@ SECRET_KEY = 'django-insecure-7!2q=m-knqi1a#+7()qky&!*(*5k3^9(bb)*koh_y$&&i7x$da
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'joel-digitals.onrender.com',
+ALLOWED_HOSTS = ['joel-digitals.de', 'www.joel-digitals.de', 'joel-digitals.onrender.com',
     '127.0.0.1', 
     'localhost',
     ]
