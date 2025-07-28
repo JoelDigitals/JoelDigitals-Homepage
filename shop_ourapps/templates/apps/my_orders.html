@@ -54,11 +54,11 @@
                 <h2>Order #{{ order.id }} – <span class="order-status">{{ order.get_status_display }}</span></h2>
 
                 <p><strong>Date:</strong> {{ order.created_at|date:"Y-m-d H:i" }}</p>
-                <p><strong>Total:</strong> €{{ order.total_amount|floatformat:2 }}</p>
+                <p><strong>Total:</strong> {{ order.total_amount|floatformat:2 }}€</p>
                 <p><strong>Items:</strong></p>
                 <ul>
                     {% for item in order.items.all %}
-                        <li>{{ item.quantity }}× {{ item.app.name }} – €{{ item.app.price|floatformat:2 }}</li>
+                        <li>{{ item.quantity }}× {{ item.app.name }} – {{ item.app.price|floatformat:2 }}€</li>
                     {% endfor %}
                 </ul>
                 <a href="{% url 'order_confirmation' order.id %}" class="order-link">View Confirmation</a>

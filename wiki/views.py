@@ -24,18 +24,20 @@ def set_language(request, lang):
 # Wiki-Übersicht anzeigen
 def wiki_overview(request):
     lang = get_language(request)
-    
-    # Alle öffentlichen Wikis für die gewählte Sprache
-    wikis = Wiki.objects.filter(language=lang, is_developer_only=False)
 
-    # Entwickler sehen zusätzlich ihre internen Wikis
+    # Nur veröffentlichte öffentliche Wikis für die gewählte Sprache
+    wikis = Wiki.objects.filter(language=lang, is_developer_only=False, is_published=True)
+
+    # Entwickler sehen zusätzlich veröffentlichte interne Wikis
     if request.user.is_authenticated and is_developer(request.user):
-        wikis |= Wiki.objects.filter(language=lang, is_developer_only=True)
+        dev_wikis = Wiki.objects.filter(language=lang, is_developer_only=True, is_published=True)
+        wikis = wikis | dev_wikis  # Union der QuerySets
 
     return render(request, 'wiki/overview.html', {
         'wikis': wikis,
         'language': lang
     })
+
 
 
 # Detailansicht eines Wiki-Eintrags
