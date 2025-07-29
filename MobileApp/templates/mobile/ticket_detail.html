@@ -7,118 +7,224 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{% static 'styles.css' %}">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f0f2f5;
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --accent: #4f9dff;
+            --accent-hover: #1f78ff;
+            --text-color: #e0e0e0;
+            --muted: #999;
+            --admin-msg: #ffe0e0;
+            --user-msg: #d0e6ff;
+        }
+
+        html, body {
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
 
-        .container {
-            max-width: 900px;
-            margin: auto;
-            padding: 20px;
+        header {
+            background-color: #1a1a1a;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.7);
         }
 
-        .chat-box {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 12px rgba(0,0,0,0.05);
+        header strong {
+            font-size: 1.5rem;
+            color: white;
         }
 
-        h1, h2 {
-            color: #0044cc;
-            margin-top: 0;
-        }
-
-        .ticket-meta {
-            margin-bottom: 20px;
-            font-size: 15px;
-            color: #444;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin: 10px 0 20px;
+        nav.desktop-nav a,
+        nav.desktop-nav form button {
+            color: var(--accent);
+            background: none;
+            border: none;
             text-decoration: none;
-            color: #0044cc;
+            cursor: pointer;
+            font-size: 1em;
             font-weight: bold;
         }
 
-        .chat-history {
-            margin-bottom: 30px;
+        nav.desktop-nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+
+        nav.mobile-nav {
+            display: none;
+            flex-direction: column;
+            background: #1a1a1a;
+            padding: 10px 0;
+        }
+
+        nav.mobile-nav a,
+        nav.mobile-nav form button {
+            color: var(--accent);
+            padding: 12px 20px;
+            text-decoration: none;
+            background: none;
+            border: none;
+            text-align: left;
+            width: 100%;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        nav.mobile-nav.show {
+            display: flex;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .chat-box {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
 
         .message {
-            margin-bottom: 20px;
-            padding: 12px 15px;
-            border-radius: 10px;
-            max-width: 90%;
-            word-wrap: break-word;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
         }
 
         .from-user {
-            background-color: #e6f2ff;
-            align-self: flex-start;
+            background-color: var(--user-msg);
+            color: black;
         }
 
         .from-admin {
-            background-color: #ffeaea;
-            align-self: flex-end;
+            background-color: var(--admin-msg);
+            color: black;
         }
 
         .meta {
-            font-size: 13px;
-            color: #555;
-            margin-bottom: 6px;
-        }
-
-        .text {
-            font-size: 16px;
-            white-space: pre-wrap;
-        }
-
-        form {
-            margin-top: 30px;
+            font-size: 0.8em;
+            color: #333;
+            margin-bottom: 4px;
         }
 
         textarea {
             width: 100%;
-            padding: 12px;
-            font-size: 15px;
-            border: 1px solid #ccc;
+            padding: 10px;
             border-radius: 6px;
-            resize: vertical;
+            border: none;
+            font-size: 1em;
         }
 
         .btn {
-            margin-top: 10px;
-            padding: 10px 20px;
-            background: #0044cc;
+            background: var(--accent);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 4px;
+            padding: 10px 15px;
+            margin-top: 10px;
             cursor: pointer;
-            font-size: 16px;
         }
 
         .btn:hover {
-            background: #0033aa;
+            background: var(--accent-hover);
+        }
+
+        .back-link {
+            display: block;
+            margin: 20px 0;
+            color: var(--accent);
+        }
+
+        footer {
+            background-color: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--muted);
+            border-top: 1px solid #333;
+        }
+
+        footer a {
+            color: var(--muted);
+            margin: 0 8px;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--accent);
+        }
+
+        #cookie-banner {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        #cookie-banner button {
+            background-color: var(--accent);
+            border: none;
+            padding: 8px 16px;
+            margin-left: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+
+        #cookie-banner button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        #language-switch {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 1001;
+        }
+
+        #language-switch select {
+            font-size: 14px;
+            padding: 2px 6px;
         }
 
         @media (max-width: 768px) {
-            .chat-box, .container {
-                padding: 15px;
+            nav.desktop-nav {
+                display: none;
             }
 
-            .message {
-                max-width: 100%;
-                font-size: 15px;
-            }
-
-            .btn {
-                width: 100%;
+            .hamburger {
+                display: flex;
             }
         }
     </style>

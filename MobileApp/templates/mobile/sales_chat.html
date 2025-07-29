@@ -2,72 +2,179 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Auftrag #{{ entry.id }} – Chat</title>
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-        body {
-            font-family: Arial;
-            background: #f0f0f0;
-            padding: 20px;
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --accent: #4f9dff;
+            --accent-hover: #1f78ff;
+            --text-color: #e0e0e0;
+            --muted: #999;
+            --admin-msg: #ffe0e0;
+            --user-msg: #d0e6ff;
+        }
+
+        html, body {
             margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        header {
+            background-color: #1a1a1a;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.7);
+        }
+
+        header strong {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        nav.desktop-nav a,
+        nav.desktop-nav form button {
+            color: var(--accent);
+            background: none;
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        nav.desktop-nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+
+        nav.mobile-nav {
+            display: none;
+            flex-direction: column;
+            background: #1a1a1a;
+            padding: 10px 0;
+        }
+
+        nav.mobile-nav a,
+        nav.mobile-nav form button {
+            color: var(--accent);
+            padding: 12px 20px;
+            text-decoration: none;
+            background: none;
+            border: none;
+            text-align: left;
+            width: 100%;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        nav.mobile-nav.show {
+            display: flex;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
         }
 
         .chat-box {
-            background: white;
+            background: var(--card-bg);
             padding: 20px;
-            border-radius: 8px;
-            max-width: 800px;
-            margin: auto;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
 
         .message {
             margin-bottom: 15px;
             padding: 10px;
-            border-radius: 6px;
+            border-radius: 8px;
         }
 
         .from-user {
-            background-color: #d0e6ff;
-            text-align: left;
+            background-color: var(--user-msg);
+            color: black;
         }
 
         .from-admin {
-            background-color: #ffe0e0;
-            text-align: left;
+            background-color: var(--admin-msg);
+            color: black;
         }
 
         .meta {
-            font-size: 12px;
-            color: #555;
+            font-size: 0.8em;
+            color: #333;
             margin-bottom: 4px;
-        }
-
-        form {
-            margin-top: 20px;
         }
 
         textarea {
             width: 100%;
             padding: 10px;
+            border-radius: 6px;
+            border: none;
+            font-size: 1em;
         }
 
         .btn {
-            padding: 10px 15px;
-            background: #0044cc;
+            background: var(--accent);
             color: white;
             border: none;
             border-radius: 4px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            cursor: pointer;
         }
 
         .btn:hover {
-            background: #002c99;
+            background: var(--accent-hover);
         }
 
         .back-link {
-            margin-bottom: 20px;
             display: block;
+            margin: 20px 0;
+            color: var(--accent);
+        }
+
+        footer {
+            background-color: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--muted);
+            border-top: 1px solid #333;
+        }
+
+        footer a {
+            color: var(--muted);
+            margin: 0 8px;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--accent);
         }
 
         #cookie-banner {
@@ -82,17 +189,17 @@
         }
 
         #cookie-banner button {
-            background-color: #0044cc;
-            color: white;
+            background-color: var(--accent);
             border: none;
             padding: 8px 16px;
             margin-left: 10px;
             border-radius: 5px;
             cursor: pointer;
+            color: white;
         }
 
         #cookie-banner button:hover {
-            background-color: #002a80;
+            background-color: var(--accent-hover);
         }
 
         #language-switch {
@@ -110,50 +217,84 @@
             font-size: 14px;
             padding: 2px 6px;
         }
+
+        @media (max-width: 768px) {
+            nav.desktop-nav {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+        }
     </style>
 </head>
 <body>
+<!-- Header / Navigation -->
+<header>
+    <strong>Joel Digitals – Chat</strong>
+    <nav class="desktop-nav">
+        {% if user.is_authenticated %}
+            <form method="post" action="{% url 'logout_app' %}">{% csrf_token %}
+                <button type="submit">🚪 Logout ({{ user.username }})</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login_app' %}">🔐 Login</a>
+        {% endif %}
+    </nav>
+    <div class="hamburger" onclick="toggleMenu()"><div></div><div></div><div></div></div>
+</header>
 
-<!-- Sprachumschaltung -->
-<div id="language-switch">
-    <label for="language-select">🌐</label>
-    <select id="language-select">
-        <option value="de">Deutsch</option>
-        <option value="en">English</option>
-        <option value="fr">Français</option>
-    </select>
-</div>
-
-<!-- Chat-Fenster -->
-<div class="chat-box">
-    <h1>🧾 Auftrag #{{ entry.id }} – {{ entry.title }}</h1>
-    <p><strong>Status:</strong> {{ entry.status }}</p>
-    <p><strong>Erstellt von:</strong> {{ entry.user.username }}</p>
-
-    {% if user.is_staff %}
-        <a href="{% url 'admin_sales_app' %}" class="back-link">← Zurück zur Auftragsübersicht</a>
+<nav class="mobile-nav" id="mobileMenu">
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout_app' %}">{% csrf_token %}
+            <button type="submit">🚪 Logout ({{ user.username }})</button>
+        </form>
     {% else %}
-        <a href="{% url 'sales_app' %}" class="back-link">← Zurück zu meinen Aufträgen</a>
+        <a href="{% url 'login_app' %}">🔐 Login</a>
     {% endif %}
+</nav>
 
-    <h2>💬 Chatverlauf</h2>
-    <div class="chat-history">
-        {% for msg in messages %}
-            <div class="message {% if msg.user.is_staff %}from-admin{% else %}from-user{% endif %}">
-                <div class="meta">{{ msg.user.username }} – {{ msg.created_at|date:"d.m.Y H:i" }}</div>
-                <div class="text">{{ msg.message|linebreaks }}</div>
-            </div>
-        {% empty %}
-            <p>Noch keine Nachrichten vorhanden.</p>
-        {% endfor %}
+<main>
+    <div class="chat-box">
+        <h1>🧾 Auftrag #{{ entry.id }} – {{ entry.title }}</h1>
+        <p><strong>Status:</strong> {{ entry.status }}</p>
+        <p><strong>Erstellt von:</strong> {{ entry.user.username }}</p>
+
+        {% if user.is_staff %}
+            <a href="{% url 'admin_sales_app' %}" class="back-link">← Zurück zur Auftragsübersicht</a>
+        {% else %}
+            <a href="{% url 'sales_app' %}" class="back-link">← Zurück zu meinen Aufträgen</a>
+        {% endif %}
+
+        <h2>💬 Chatverlauf</h2>
+        <div class="chat-history">
+            {% for msg in messages %}
+                <div class="message {% if msg.user.is_staff %}from-admin{% else %}from-user{% endif %}">
+                    <div class="meta">{{ msg.user.username }} – {{ msg.created_at|date:"d.m.Y H:i" }}</div>
+                    <div class="text">{{ msg.message|linebreaks }}</div>
+                </div>
+            {% empty %}
+                <p>Noch keine Nachrichten vorhanden.</p>
+            {% endfor %}
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <textarea name="message" required placeholder="Nachricht eingeben..."></textarea>
+            <button type="submit" class="btn">Nachricht senden</button>
+        </form>
     </div>
+</main>
 
-    <form method="post">
-        {% csrf_token %}
-        <textarea name="message" required placeholder="Nachricht eingeben..."></textarea>
-        <button type="submit" class="btn">Nachricht senden</button>
-    </form>
-</div>
+<footer>
+    <a>&copy; 2025 Joel Digitals</a>
+    <p>
+        <a href="/imprint/">Impressum</a> |
+        <a href="/privacy/">Datenschutz</a> |
+        <a href="/terms/">AGB</a>
+    </p>
+</footer>
 
 <!-- Cookie-Banner -->
 <div id="cookie-banner">
@@ -161,8 +302,18 @@
     <button onclick="acceptCookies()">Akzeptieren</button>
 </div>
 
-<!-- Skript -->
 <script>
+    function toggleMenu() {
+        const menu = document.getElementById('mobileMenu');
+        menu.classList.toggle('show');
+    }
+
+    document.querySelectorAll('nav.mobile-nav a, nav.mobile-nav button').forEach(el => {
+        el.addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.remove('show');
+        });
+    });
+
     const cookieBanner = document.getElementById("cookie-banner");
     const cookieText = document.getElementById("cookie-text");
     const languageSelect = document.getElementById("language-select");
