@@ -119,7 +119,30 @@
           {% endif %}
           <p><strong>{{ app.description|truncatechars:100 }}</strong></p>
           <p>Version: {{ app.version }}</p>
-          <p>Price: €{{ app.price }}</p>
+          {% if app.discount_percent > 0 %}
+            <p style="margin-left: 80px; margin-bottom: 0.2rem;">
+              <span style="
+                display: inline-block;
+                background-color: #ffe8e8;
+                color: #d40000;
+                padding: 0.25rem 0.6rem;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 0.85rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);" class="badge-sale">
+                🔖 {{ app.discount_percent }}% OFF
+              </span>
+            </p>
+            <p style="margin-left: 80px; margin-top: 0.1rem;">
+              <span style="text-decoration: line-through; color: #888; font-size: 0.95rem;">€{{ app.price }}</span><br>
+              <strong style="color: #198754; font-size: 1.1rem;">€{{ app.discounted_price|floatformat:2 }}</strong>
+            </p>
+          {% else %}
+            <p style="margin-left: 80px;">
+              Price: <strong>€{{ app.price }}</strong>
+            </p>
+          {% endif %}
+
           <a class="btn-shop" href="{% url 'app_detail' slug=app.slug %}">Details</a>
           {% if app.link %}
             <a class="btn-shop" href="{{ app.link }}" target="_blank">Wiki</a>

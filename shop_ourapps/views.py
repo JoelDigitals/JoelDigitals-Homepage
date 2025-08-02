@@ -552,11 +552,14 @@ def add_to_cart(request, app_id):
     except ValueError:
         quantity = 1
 
+    # Verwende den rabattierten Preis, falls vorhanden
+    price_to_use = app.discounted_price
+
     cart_item, created = CartItem.objects.get_or_create(
         user=request.user,
         cart=cart,
         app=app,
-        defaults={'price': app.price, 'quantity': quantity}
+        defaults={'price': price_to_use, 'quantity': quantity}
     )
 
     if not created:
@@ -596,7 +599,7 @@ def remove_from_cart(request, item_id):
 def checkout(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
     items = cart.items.all()
-    subtotal = sum(item.app.price * item.quantity for item in items)
+    subtotal = sum(item.app.discounted_price * item.quantity for item in items)
 
     discount_amount = 0
     final_total = subtotal
@@ -668,7 +671,12 @@ def checkout(request):
         )
 
         for item in items:
-            OrderItem.objects.create(order=order, app=item.app, quantity=item.quantity, price=item.app.price)
+            OrderItem.objects.create(
+                order=order,
+                app=item.app,
+                quantity=item.quantity,
+                price=item.app.discounted_price  # rabattierte Preis verwenden
+            )
 
         if discount_code_obj:
             discount_code_obj.times_used += 1
@@ -690,7 +698,8 @@ def checkout(request):
 
     context = {
         'items': items,
-        'total': final_total,
+        'subtotal': subtotal,  # <--- Originalpreis ohne Rabatt
+        'total': final_total,  # <--- Endpreis nach Rabatt
         'discount_amount': discount_amount,
         'wallet_balance': wallet.balance if wallet else 0,
         'now': timezone.now(),
@@ -777,7 +786,7 @@ def order_confirmation(request, order_id):
 @login_required
 def validate_codes(request):
     data = json.loads(request.body)
-    subtotal = sum(item.app.price * item.quantity for item in request.user.cart.items.all())
+    subtotal = sum(item.price * item.quantity for item in request.user.cart.items.all)
     discount = 0
 
     try:

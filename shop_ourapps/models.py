@@ -119,6 +119,15 @@ class App(models.Model):
     link = models.URLField(blank=True, null=True)
     group = models.ForeignKey(AppGroup, null=True, blank=True, on_delete=models.SET_NULL)
 
+    discount_percent = models.PositiveIntegerField(default=0)
+
+    @property
+    def discounted_price(self):
+        if self.price and self.discount_percent > 0:
+            discount_multiplier = Decimal(1) - (Decimal(self.discount_percent) / Decimal(100))
+            return self.price * discount_multiplier
+        return self.price
+
     def __str__(self):
         return self.name
 

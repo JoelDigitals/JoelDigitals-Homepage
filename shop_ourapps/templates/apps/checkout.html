@@ -62,19 +62,46 @@
     <h2>Your Items</h2>
     <ul>
         {% for item in items %}
-            <li>{{ item.quantity }} × {{ item.app.name }} – €{{ item.app.price|floatformat:2 }}</li>
+            <li style="margin-bottom: 0.5rem;">
+                {{ item.quantity }} × {{ item.app.name }}
+                {% if item.app.discount_percent > 0 %}
+                    <span style="text-decoration: line-through; color: #888; font-size: 0.95rem; margin-left: 10px;">
+                      €{{ item.app.price|floatformat:2 }}
+                    </span>
+                    <strong style="color: #198754; margin-left: 4px;">
+                      €{{ item.app.discounted_price|floatformat:2 }}
+                    </strong>
+                    <span style="
+                      display: inline-block;
+                      background-color: #fff0f0;
+                      color: #c82333;
+                      padding: 2px 6px;
+                      border-radius: 4px;
+                      font-size: 0.8rem;
+                      margin-left: 6px;
+                    ">
+                      🔖 {{ item.app.discount_percent }}%
+                    </span>
+                {% else %}
+                    – {{ item.app.price|floatformat:2 }}€
+                {% endif %}
+            </li>
         {% empty %}
             <li>Your cart is empty.</li>
         {% endfor %}
     </ul>
 
     {% with discount_amount|default:0 as discount %}
-        <p><strong>Subtotal:</strong> €{{ total|add:discount|floatformat:2 }}</p>
+        <p><strong>Subtotal:</strong>{{ subtotal|floatformat:2 }}€</p>
+    {% endwith %}
+    {% with discount_amount|default:0 as discount %}
         <p id="discount-line" style="display: {% if discount > 0 %}block{% else %}none{% endif %};">
             <strong>Discount:</strong> -€<span id="discount-amount">{{ discount|floatformat:2 }}</span>
         </p>
     {% endwith %}
+
     <p><strong>Total:</strong> €<span id="total-amount">{{ total|floatformat:2 }}</span></p>
+
 
     <form method="post">
         {% csrf_token %}

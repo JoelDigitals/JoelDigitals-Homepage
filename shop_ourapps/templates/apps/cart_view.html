@@ -83,8 +83,24 @@
         {% for item in items %}
             <div class="cart-item">
                 <h2>{{ item.app.name }}</h2>
-                <p>{{ item.quantity }} x {{ item.app.price }} €</p>
-                <p><strong>Total (incl. VAT):</strong> {{ item.total_price }} €</p>
+                {% if item.app.discount_percent > 0 %}
+                    <p>
+                        <span style="font-size: 0.9rem; color: gray; text-decoration: line-through;">
+                            {{ item.quantity }} x €{{ item.app.price }}
+                        </span><br>
+                        <span style="font-size: 1rem; color: #198754; font-weight: bold;">
+                            {{ item.quantity }} x €{{ item.price }}
+                        </span><br>
+                        <span style="background-color: #ffe8e8; color: #d40000; font-size: 0.8rem; padding: 0.15rem 0.5rem; border-radius: 4px;">
+                            🔖 {{ item.app.discount_percent }}% 
+                        </span>
+                    </p>
+                {% else %}
+                    <p>{{ item.quantity }} x €{{ item.price }}</p>
+                {% endif %}
+                
+                <p><strong>Total (incl. VAT):</strong> €{{ item.total_price }}</p>
+                
                 <a href="{% url 'remove_from_cart' item.id %}">Remove</a>
             </div>
         {% endfor %}

@@ -75,7 +75,34 @@
         <p>{{ app.description }}</p>
     </div>
 
-    <p><strong>Price:</strong> {{ app.price }} €</p>
+    {% if app.discount_percent > 0 %}
+  <div style="margin-left: 80px; margin-top: 20px;">
+    <span style="
+      display: inline-block;
+      background-color: #fff0f0;
+      color: #c82333;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      margin-bottom: 6px;
+    ">
+      🔖 {{ app.discount_percent }}% Rabatt
+    </span>
+
+    <p style="margin: 4px 0 0;">
+      <span style="text-decoration: line-through; color: #999; font-size: 0.95rem;">€{{ app.price }}</span><br>
+      <strong style="color: #198754; font-size: 1.2rem;">€{{ app.discounted_price|floatformat:2 }}</strong>
+    </p>
+  </div>
+{% else %}
+  <p style="margin-left: 80px; margin-top: 20px;">
+    Price: <strong>€{{ app.price }}</strong>
+  </p>
+{% endif %}
+
+
 
     {% if user.is_authenticated %}
         <form method="post" action="{% url 'add_to_cart' app.id %}">
