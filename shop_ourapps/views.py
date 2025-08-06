@@ -226,9 +226,14 @@ def shop(request):
 
 def app_detail(request, slug):
     app = get_object_or_404(App, slug=slug)
+    wallet = None  # <--- Fix: Initialisiere wallet standardmäßig mit None
     if request.user.is_authenticated:
         wallet = Wallet.objects.filter(user=request.user).first()
-    return render(request, 'apps/app_detail.html', {'app': app, 'wallet_balance': wallet.balance if wallet else 0.00})
+    return render(request, 'apps/app_detail.html', {
+        'app': app,
+        'wallet_balance': wallet.balance if wallet else 0.00
+    })
+
 
 @login_required
 def wallet_view(request):
