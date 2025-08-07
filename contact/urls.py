@@ -18,5 +18,9 @@ urlpatterns = [
     path('admin-sales/<int:entry_id>/edit/<int:wish_id>/', views.edit_wish, name='edit_wish'),
     path('admin-sales/<int:entry_id>/delete/<int:wish_id>/', views.delete_wish, name='delete_wish'),
     path('admin-sales/<int:entry_id>/export/<int:wish_id>/', views.export_single_wish, name='export_single_wish'),
+    path('appointment/', views.appointment_create, name='appointment_create'),
+    path('appointment/success/', views.appointment_success, name='appointment_success'),
+    path('appointment/admin/', views.appointment_admin_view, name='appointment_admin'),
+    path('appointment/admin/update/<int:pk>/<str:status>/', views.update_appointment_status, name='update_appointment_status'),
 
 ]

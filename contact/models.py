@@ -115,3 +115,29 @@ class SalesChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.user.username}: {self.message[:30]}"
+
+class AppointmentType(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Appointment(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Ausstehend'),
+        ('accepted', 'Angenommen'),
+        ('rejected', 'Abgelehnt'),
+    ]
+
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    appointment_type = models.ForeignKey('AppointmentType', on_delete=models.SET_NULL, null=True)
+    appointment_datetime = models.DateTimeField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} – {self.appointment_datetime.strftime('%d.%m.%Y %H:%M')}"

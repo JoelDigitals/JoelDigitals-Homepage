@@ -23,6 +23,7 @@
     padding: 2rem;
     font-family: 'Inter', sans-serif;
     color: #1e1e1e;
+    overflow-x: hidden;
   }
 
   .white-wrapper {
@@ -30,6 +31,7 @@
     border-radius: 16px;
     padding: 2.5rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    overflow-x: hidden;
   }
 
   .section {
@@ -46,7 +48,7 @@
   }
 
   .section img {
-    width: 48%;
+    width: 100%;
     max-width: 500px;
     height: auto;
     border-radius: 16px;
@@ -59,7 +61,7 @@
   }
 
   .text {
-    flex: 1;
+    flex: 1 1 300px;
     min-width: 280px;
   }
 
@@ -104,7 +106,6 @@
     transform: translateY(-2px);
   }
 
-  /* Blog teaser styles */
   .blog-teaser {
     text-align: center;
     margin-top: 4rem;
@@ -130,13 +131,30 @@
 
     .section img {
       width: 100%;
+      max-width: 100%;
     }
 
     .text {
       padding-top: 1rem;
     }
   }
+
+  @media (max-width: 480px) {
+    .text h2 {
+      font-size: 1.5rem;
+    }
+
+    .button {
+      font-size: 0.9rem;
+      padding: 0.6rem 1.2rem;
+    }
+
+    .text ul {
+      padding-left: 1rem;
+    }
+  }
 </style>
+
 
 <main class="container">
   <div class="white-wrapper">

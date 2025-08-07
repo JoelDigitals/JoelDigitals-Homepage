@@ -1,0 +1,79 @@
+{% extends "base_home.html" %}
+{% load static %}
+
+{% block title %}Terminvereinbarung – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+    /* (Dein bereits mitgeliefertes Styling wird 1:1 übernommen) */
+    .contactform-container {
+        background-color: #fff;
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    h2 {
+        margin-top: 0;
+        color: #0044cc;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    form p {
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.4;
+    }
+
+    button.btn {
+        padding: 12px 20px;
+        background-color: #0044cc;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 68, 204, 0.4);
+    }
+
+    button.btn:hover,
+    button.btn:focus {
+        background-color: #0033a0;
+        box-shadow: 0 4px 12px rgba(0, 51, 160, 0.6);
+    }
+
+    @media (max-width: 480px) {
+        .contactform-container {
+            padding: 30px 20px;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+
+<div class="contactform-container">
+    <h2>Termin vereinbaren</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn" type="submit">Senden</button>
+    </form>
+</div>
+{% endblock %}

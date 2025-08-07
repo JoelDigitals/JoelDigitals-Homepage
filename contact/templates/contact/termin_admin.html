@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Terminverwaltung – Admin{% endblock %}
+
+{% block content %}
+<style>
+    .admin-section {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.1);
+    }
+
+    h2 {
+        color: #0044cc;
+        border-bottom: 2px solid #0044cc;
+        padding-bottom: 6px;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 40px;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f4f4f4;
+    }
+
+    .btn {
+        padding: 6px 10px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .accept { background-color: #28a745; color: #fff; }
+    .reject { background-color: #dc3545; color: #fff; }
+</style>
+
+<div class="admin-section">
+    <h2>🟡 Ausstehende Termine</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Datum & Uhrzeit</th>
+            <th>Art</th>
+            <th>Aktionen</th>
+        </tr>
+        {% for a in pending %}
+        <tr>
+            <td>{{ a.first_name }} {{ a.last_name }}</td>
+            <td>{{ a.email }}</td>
+            <td>{{ a.appointment_datetime|date:"d.m.Y H:i" }}</td>
+            <td>{{ a.appointment_type }}</td>
+            <td>
+                <a class="btn accept" href="{% url 'update_appointment_status' a.id 'accepted' %}">Annehmen</a>
+                <a class="btn reject" href="{% url 'update_appointment_status' a.id 'rejected' %}">Ablehnen</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">Keine ausstehenden Termine.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>🟢 Angenommene Termine</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Datum & Uhrzeit</th>
+            <th>Art</th>
+        </tr>
+        {% for a in accepted %}
+        <tr>
+            <td>{{ a.first_name }} {{ a.last_name }}</td>
+            <td>{{ a.email }}</td>
+            <td>{{ a.appointment_datetime|date:"d.m.Y H:i" }}</td>
+            <td>{{ a.appointment_type }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Keine angenommenen Termine.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>🔴 Abgelehnte Termine</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Datum & Uhrzeit</th>
+            <th>Art</th>
+        </tr>
+        {% for a in rejected %}
+        <tr>
+            <td>{{ a.first_name }} {{ a.last_name }}</td>
+            <td>{{ a.email }}</td>
+            <td>{{ a.appointment_datetime|date:"d.m.Y H:i" }}</td>
+            <td>{{ a.appointment_type }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Keine abgelehnten Termine.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

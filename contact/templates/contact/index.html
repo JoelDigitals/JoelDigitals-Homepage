@@ -47,7 +47,6 @@
         margin-top: 8px;
     }
 
-    /* Responsive */
     @media (max-width: 480px) {
         .contact-container {
             padding: 30px 20px;
@@ -68,21 +67,22 @@
         <p>Have a general inquiry or question? Send us a message via the contact form.</p>
     </section>
 
-    {% if user.is_authenticated %}
-        <section>
-            <h3><a href="{% url 'sales' %}">🛒 Sales / Wishlist</a></h3>
-            <p>Let us know what you would like to buy or have created. Wishlist items are collected and stored for export.</p>
-        </section>
+    <section>
+        <h3><a href="{% url 'appointment_create' %}">📅 Book an Appointment</a></h3>
+        <p>Choose a date and time to speak with us – appointments are available for various purposes.</p>
+    </section>
 
-        <section>
-            <h3><a href="{% url 'support_tickets' %}">🛠️ Support Ticket</a></h3>
-            <p>Having issues or technical questions? Create a support ticket, and we'll get back to you as soon as possible.</p>
-        </section>
-    {% else %}
-        <section>
-            <h3><a href="{% url 'login' %}">🔑 Login</a></h3>
-            <p>To access your tickets and wishlist, please log in.</p>
-        </section>
-    {% endif %}
+    <section>
+        <h3><a href="{% url 'sales' %}">🛒 Sales / Wishlist</a></h3>
+        <p>Let us know what you would like to buy or have created. Wishlist items are collected and stored for export.</p>
+    </section>
+    <section>
+        <h3><a href="{% url 'support_tickets' %}">🛠️ Support Ticket</a></h3>
+        <p>Having issues or technical questions? Create a support ticket, and we'll get back to you as soon as possible.</p>
+    </section>
+    <section>
+        <h3><a href="{% url 'login' %}">🔑 Login</a></h3>
+        <p>To access your tickets and wishlist, please log in.</p>
+    </section>
 </div>
 {% endblock %}

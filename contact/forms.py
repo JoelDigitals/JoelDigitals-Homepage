@@ -1,8 +1,15 @@
 from django import forms
-from .models import SalesEntry, SupportTicket, TicketMessage, SalesWish, TicketNote
+from .models import SalesEntry, SupportTicket, TicketMessage, SalesWish, TicketNote, Appointment
 from shop_ourapps.models import App
 from django.contrib.auth.models import User
 
+class AppointmentForm(forms.ModelForm):
+    class Meta:
+        model = Appointment
+        fields = ['first_name', 'last_name', 'email', 'phone', 'appointment_type', 'appointment_datetime']
+        widgets = {
+            'appointment_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
 
 class ContactForm(forms.Form):
     name = forms.CharField(max_length=100)
