@@ -1,100 +1,203 @@
 {% extends "base_home.html" %}
+{% load static %}
 
 {% block content %}
+<!-- AOS CDN -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    AOS.init({
+      duration: 800,
+      once: true
+    });
+  });
+</script>
+
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
   .container {
-    max-width: 900px;
+    max-width: 1100px;
     margin: 3rem auto;
-    padding: 2.5rem 2rem;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    font-family: 'Inter', sans-serif;
+    color: #1e1e1e;
   }
 
-  section {
-    margin-bottom: 3rem;
+  .white-wrapper {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   }
 
-  h2 {
+  .section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 4rem;
+    flex-wrap: wrap;
+  }
+
+  .section:nth-child(even) {
+    flex-direction: row-reverse;
+  }
+
+  .section img {
+    width: 48%;
+    max-width: 500px;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.6s ease;
+  }
+
+  .section img:hover {
+    transform: scale(1.03);
+  }
+
+  .text {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  .text h2 {
     font-size: 2rem;
-    margin-bottom: 0.75rem;
-    color: #004aad;
+    margin-bottom: 1rem;
+    color: #003366;
     font-weight: 700;
   }
 
-  p {
-    line-height: 1.7;
-    margin-bottom: 1.2rem;
+  .text p,
+  .text ul {
     font-size: 1.1rem;
-  }
-
-  ul {
-    margin-left: 1.5rem;
+    line-height: 1.7;
     margin-bottom: 1.5rem;
-    font-size: 1.05rem;
+    color: #333;
   }
 
-  ul li {
-    margin-bottom: 0.6rem;
+  .text ul {
+    padding-left: 1.5rem;
+  }
+
+  .text li {
+    margin-bottom: 0.5rem;
   }
 
   .button {
     display: inline-block;
     background: linear-gradient(135deg, #3a86ff, #0056b3);
     color: white !important;
-    padding: 0.65rem 1.4rem;
-    font-weight: 700;
+    padding: 0.7rem 1.4rem;
+    font-weight: 600;
     font-size: 1rem;
-    border-radius: 8px;
+    border-radius: 10px;
     text-decoration: none;
-    box-shadow: 0 4px 12px rgba(58, 134, 255, 0.4);
+    box-shadow: 0 4px 15px rgba(58, 134, 255, 0.4);
     transition: all 0.3s ease;
-    user-select: none;
   }
 
-  .button:hover,
-  .button:focus {
+  .button:hover {
     background: linear-gradient(135deg, #0056b3, #003d7a);
-    box-shadow: 0 6px 20px rgba(0, 86, 179, 0.6);
-    outline: none;
     transform: translateY(-2px);
+  }
+
+  /* Blog teaser styles */
+  .blog-teaser {
+    text-align: center;
+    margin-top: 4rem;
+  }
+
+  .blog-teaser h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #003366;
+  }
+
+  .blog-teaser p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+
+  @media (max-width: 768px) {
+    .section {
+      flex-direction: column !important;
+      text-align: center;
+    }
+
+    .section img {
+      width: 100%;
+    }
+
+    .text {
+      padding-top: 1rem;
+    }
   }
 </style>
 
-<main>
-  <div class="container">
-    <section>
-      <h2>Welcome to Joel Digitals</h2>
-      <p>
-        At Joel Digitals, we provide future-proof IT solutions for modern businesses. From full-stack web development to customized enterprise tools,
-        we transform your digital vision into reality. Our dedicated team ensures a smooth, scalable, and efficient experience for every client.
-      </p>
-      <a href="/about/" class="button">More about us</a>
-    </section>
+<main class="container">
+  <div class="white-wrapper">
 
-    <section>
-      <h2>What We Offer</h2>
-      <p>Our services are tailored to help businesses evolve digitally:</p>
-      <ul>
-        <li><strong>Web Development:</strong> Custom websites, portals & platforms.</li>
-        <li><strong>E-Commerce:</strong> Sell smart with tailored online shop systems.</li>
-        <li><strong>Cloud Services:</strong> Scalable, secure cloud integration and migration.</li>
-        <li><strong>IT Strategy:</strong> Comprehensive consulting for digital transformation.</li>
-        <li><strong>Support & Maintenance:</strong> Long-term technical care for peace of mind.</li>
-      </ul>
-      <a href="/services/" class="button">Explore our services</a>
-    </section>
+    <div class="section" data-aos="fade-up">
+      <img src="{% static 'images/wellcome.png' %}" alt="Welcome">
+      <div class="text">
+        <h2>Welcome to Joel Digitals</h2>
+        <p>At Joel Digitals, we deliver future-ready IT solutions. Whether it's full-stack web development or intelligent business automation, we help shape the digital backbone of modern companies.</p>
+        <a href="/about/" class="button">More About Us</a>
+      </div>
+    </div>
 
-    <section>
-      <h2>Join the Digital Evolution</h2>
-      <p>
-        Ready to elevate your business? Let’s work together to build something exceptional.
-        Contact us today and let's shape your digital future.
-      </p>
-      <a href="/contact/" class="button">Get in touch</a>
-    </section>
+    <div class="section" data-aos="fade-up">
+      <div class="text">
+        <h2>Our Services</h2>
+        <p>We support businesses in their digital evolution:</p>
+        <ul>
+          <li><strong>Web Development:</strong> Custom platforms & portals</li>
+          <li><strong>E-Commerce:</strong> Smart online shop systems</li>
+          <li><strong>Cloud Integration:</strong> Secure and scalable cloud solutions</li>
+          <li><strong>IT Strategy:</strong> Consulting & transformation</li>
+          <li><strong>Support:</strong> Ongoing care and maintenance</li>
+        </ul>
+        <a href="/services/" class="button">Explore Services</a>
+      </div>
+    </div>
+
+    <div class="section" data-aos="fade-up">
+      
+      <div class="text">
+        <h2>About Us</h2>
+        <p>Joel Digitals stands for clarity, modern technologies, and lasting partnerships. We turn your digital vision into reality — efficiently, transparently, and sustainably.</p>
+        <a href="/team/" class="button">Meet the Team</a>
+      </div>
+    </div>
+
+    <div class="section" data-aos="fade-up">
+      <img src="https://images.unsplash.com/photo-1603791440384-56cd371ee9a7" alt="Shop">
+      <div class="text">
+        <h2>Our Shop</h2>
+        <p>Discover our digital products, pre-built components, and smart automation tools for your business — all available in our online shop.</p>
+        <a href="/shop/" class="button">Visit the Shop</a>
+      </div>
+    </div>
+
+    <div class="section" data-aos="fade-up">
+      <img src="{% static 'images/wiki-bg.jpg' %}" alt="About Us">
+      <div class="text">
+        <h2>Ready to Start?</h2>
+        <p>Let’s create something great together. Reach out and begin your digital project today.</p>
+        <a href="/contact/" class="button">Get in Touch</a>
+      </div>
+    </div>
+
+    <div class="blog-teaser" data-aos="fade-up">
+      <h2>From Our Blog</h2>
+      <p>Explore our latest insights on technology, strategy and digital transformation.</p>
+      <a href="/blog/" class="button">Visit Blog</a>
+    </div>
+
   </div>
 </main>
 {% endblock %}

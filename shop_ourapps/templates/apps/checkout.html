@@ -124,6 +124,13 @@
                 <option value="paypal">PayPal</option>
             </select>
         </div>
+        <div class="form-input">
+            <label style="display: flex; align-items: center;">
+                <input type="checkbox" name="accept_terms" required style="margin-right: 10px;">
+                I have read and accept the <a href="{% url 'terms_en' %}" target="_blank">Terms and Conditions (English)</a>
+            </label>
+        </div>
+        
         <button class="button" type="submit">Place Order</button>
     </form>
 </div>

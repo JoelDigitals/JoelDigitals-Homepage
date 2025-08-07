@@ -1,0 +1,109 @@
+{% extends "base_home.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  .team-container {
+    max-width: 1100px;
+    margin: 3rem auto;
+    padding: 2rem;
+    font-family: 'Inter', sans-serif;
+    color: #1e1e1e;
+  }
+  h1 {
+    text-align: center;
+    color: #003366;
+    margin-bottom: 2rem;
+  }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+    gap: 2rem;
+  }
+  .member-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  .member-card:hover {
+    transform: translateY(-5px);
+  }
+  .member-photo {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  .member-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: #003366;
+  }
+  .member-position {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 1rem;
+  }
+  .member-bio {
+    font-size: 0.95rem;
+    color: #444;
+    margin-bottom: 1rem;
+    min-height: 70px;
+  }
+  .social-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: #3a86ff;
+    font-weight: 500;
+    flex-wrap: wrap;
+  }
+  .social-links a {
+    display: flex;
+    align-items: center;
+    color: #3a86ff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    gap: 0.3rem;
+  }
+  .social-links a:hover {
+    color: #0056b3;
+  }
+  .social-links svg {
+    fill: currentColor;
+  }
+</style>
+
+<main class="team-container">
+  <h1>Meet Our Team</h1>
+  <div class="team-grid">
+    {% for member in members %}
+    <div class="member-card">
+      <img class="member-photo" src="{{ member.photo.url }}" alt="{{ member.first_name }} {{ member.last_name }}">
+      <div class="member-name">{{ member.first_name }} {{ member.last_name }}</div>
+      <div class="member-position">{{ member.position }}</div>
+      <div class="member-bio">{{ member.bio|linebreaksbr }}</div>
+      <div class="social-links">
+        {% if member.email %}
+          <a href="mailto:{{ member.email }}" title="Email">
+            <svg height="16" width="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zM4 8l8 5 8-5v-2l-8 5-8-5v2z"/></svg>
+            <span>{{ member.email }}</span>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <p>No team members found.</p>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}

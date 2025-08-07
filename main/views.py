@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from .models import TeamMember
 
 def imprint_view(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
@@ -58,3 +59,7 @@ def about_view(request):
 def service_view(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     return render(request, 'main/services.html', {'user_groups': user_groups})
+
+def team_view(request):
+    members = TeamMember.objects.all()
+    return render(request, 'main/team.html', {'members': members})
