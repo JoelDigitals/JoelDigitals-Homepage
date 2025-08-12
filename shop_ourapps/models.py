@@ -101,6 +101,7 @@ class App(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
     description = models.TextField()
+    product_number = models.CharField(max_length=50, unique=True, blank=True, null=True)
     version = models.CharField(max_length=20)
     image = models.ImageField(upload_to='app_images/', null=True, blank=True)
     is_available_for_purchase = models.BooleanField(default=False)
@@ -225,6 +226,11 @@ class Order(models.Model):
 
     affiliate_code = models.ForeignKey('AffiliateCode', on_delete=models.SET_NULL, null=True, blank=True)
     discount_code = models.ForeignKey('DiscountCode', on_delete=models.SET_NULL, null=True, blank=True)
+
+    account_holder = models.CharField(max_length=255, blank=True, null=True)
+    iban = models.CharField(max_length=34, blank=True, null=True)
+    bic = models.CharField(max_length=11, blank=True, null=True)
+    bank_name = models.CharField(max_length=255, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

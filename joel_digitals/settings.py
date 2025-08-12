@@ -165,3 +165,7 @@ COMPANY_EMAIL = 'joel-digitals@gmx.de'
 
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+PAYPAL_CLIENT_ID = "AX7o18SnNzoZoP9IT2CYSoigBahHg-RBHlrysa1hf5iilolk434dHl_dXm8BrCl2af2XWF_gZ6-rgq5W"
+PAYPAL_CLIENT_SECRET = "EBHffuUYFnB_U8x2fwv7HPuiX9uDBanpfO2mRGFL7lJCiaw986yRBaXok-J8zp5AJlC6s6Yg3A3LsPVX"
+PAYPAL_ENVIRONMENT = "live"  # später "live" setzen

@@ -40,6 +40,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django import forms
 from contact.views import is_Sales_Editor
 from django.db.models import Q
+from django.template import TemplateDoesNotExist
+
 
 @login_required
 def buy_voucher(request):
@@ -294,7 +296,6 @@ def wallet_view(request):
         'wallet_balance': wallet.balance if wallet else 0.00
     })
 
-@login_required
 @login_required
 def purchase_app(request, slug):
     app = get_object_or_404(App, slug=slug, is_available_for_purchase=True)
@@ -598,7 +599,16 @@ def remove_from_cart(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
     cart_item.delete()
     return redirect('cart_view')
-
+# views.py (oder wo du den Checkout hast)
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from django.contrib import messages
+from django.utils import timezone
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
+from .paypal import create_paypal_order, capture_paypal_order
+from .models import Cart, Order, OrderItem, DiscountCode, AffiliateCode
 
 @login_required
 def checkout(request):
@@ -628,6 +638,11 @@ def checkout(request):
         affiliate_code_input = data.get('affiliate_code', '').strip()
         discount_code_input = data.get('discount_code', '').strip()
 
+        account_holder = data.get('account_holder') if payment_method == 'lastschrift' else None
+        iban = data.get('iban') if payment_method == 'lastschrift' else None
+        bic = data.get('bic') if payment_method == 'lastschrift' else None
+        bank_name = data.get('bank_name') if payment_method == 'lastschrift' else None
+
         # Rabattcode prüfen
         if discount_code_input:
             try:
@@ -654,6 +669,11 @@ def checkout(request):
             if not wallet or not wallet.has_funds(final_total):
                 messages.error(request, 'Nicht genügend Guthaben im Wallet.')
                 return redirect('checkout')
+            
+        if payment_method == 'lastschrift':
+            if not account_holder or not iban:
+                messages.error(request, 'Bitte Kontoinhaber und IBAN für Lastschrift angeben.')
+                return redirect('checkout')
 
         # Order erstellen
         order = Order.objects.create(
@@ -673,6 +693,10 @@ def checkout(request):
             total_amount=final_total,
             affiliate_code=affiliate_code_obj,
             discount_code=discount_code_obj,
+            account_holder=account_holder,
+            iban=iban,
+            bic=bic,
+            bank_name=bank_name
         )
 
         for item in items:
@@ -680,7 +704,7 @@ def checkout(request):
                 order=order,
                 app=item.app,
                 quantity=item.quantity,
-                price=item.app.discounted_price  # rabattierte Preis verwenden
+                price=item.app.discounted_price
             )
 
         if discount_code_obj:
@@ -692,41 +716,59 @@ def checkout(request):
             wallet.deduct(final_total)
             messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben.')
             cart.items.all().delete()
-            
-            send_order_emails(order, request)  # E-Mails verschicken
-            
+
+            send_order_emails(order, request)
             return redirect('order_confirmation', order_id=order.id)
+        
+        if payment_method == 'lastschrift':
+            # Lastschrift-Logik hier einfügen, z.B. SEPA-Lastschrift anstoßen
+            messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben. Die Lastschrift wird verarbeitet.')
+            cart.items.all().delete()
+
+        if payment_method == 'überweisung':
+            send_order_emails(order, request)
+            send_mail(
+                subject='Zahlungsinformationen – Joel Digitals',
+                message=f'Vielen Dank für Ihre Bestellung! Bitte überweisen Sie den Betrag von {final_total:.2f} € inerhalb von 7 Werktagen auf unser Konto mit der IBAN: DE53 1001 9000 1000 0072 91 und dem Verwendungszweck: Bestelllung #{order.id}.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False
+            )
+            # Überweisungs-Logik hier einfügen, z.B. Bankdaten anzeigen
+            messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben. Bitte überweisen Sie den Betrag auf unser Konto.')
+            cart.items.all().delete()
+
 
         if payment_method == 'paypal':
-            send_order_emails(order, request)  # E-Mails verschicken vor Weiterleitung
-            return redirect(reverse('paypal_checkout', args=[order.id]))
+            send_order_emails(order, request)
+            # PayPal Bestellung anlegen und zu PayPal weiterleiten
+            paypal_order = create_paypal_order(
+                amount=final_total,
+                invoice_id=order.id,
+                return_url=request.build_absolute_uri(reverse('paypal_execute')),
+                cancel_url=request.build_absolute_uri(reverse('checkout'))
+            )
+            cart.items.all().delete()
+            approval_url = next(link["href"] for link in paypal_order["links"] if link["rel"] == "approve")
+            return redirect(approval_url)
+            
 
     context = {
         'items': items,
-        'subtotal': subtotal,  # <--- Originalpreis ohne Rabatt
-        'total': final_total,  # <--- Endpreis nach Rabatt
+        'subtotal': subtotal,
+        'total': final_total,
         'discount_amount': discount_amount,
         'wallet_balance': wallet.balance if wallet else 0,
         'now': timezone.now(),
     }
     return render(request, 'apps/checkout.html', context)
 
-
 def send_order_emails(order, request):
-    """
-    Versand der Mails an Kunde und Admin mit Vorlagen.
-    """
-
-    # Mail an Kunde
     subject_customer = 'Bestellbestätigung – Joel Digitals'
     from_email = settings.DEFAULT_FROM_EMAIL
     to_email = [order.email]
 
-    context = {
-        'order': order,
-        'now': timezone.now(),
-    }
-
+    context = {'order': order, 'now': timezone.now()}
     html_content = render_to_string('emails/order_customer_info.html', context)
     text_content = render_to_string('emails/order_customer_info.txt', context)
 
@@ -734,13 +776,9 @@ def send_order_emails(order, request):
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
-    # Mail an Admin
     subject_admin = f'Neue Bestellung #{order.id} von {order.first_name} {order.last_name}'
     to_admin = ['buy.joel-digitals@gmx.de']
-    admin_context = {
-        'order': order,
-        'order_url': request.build_absolute_uri(reverse('order_admin')),
-    }
+    admin_context = {'order': order, 'order_url': request.build_absolute_uri(reverse('order_admin'))}
     admin_html = render_to_string('emails/order_admin_notification.html', admin_context)
     admin_text = render_to_string('emails/order_admin_notification.txt', admin_context)
 
@@ -749,43 +787,28 @@ def send_order_emails(order, request):
     admin_msg.send()
 
 @login_required
-def paypal_checkout(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user, payment_method='paypal')
-    paypal_url = (
-        f"https://www.paypal.com/cgi-bin/webscr?"
-        f"cmd=_xclick&"
-        f"business=buy.joel-digitals@gmx.de&"
-        f"amount={order.total_amount}&"
-        f"currency_code=EUR&"
-        f"item_name=Bestellung #{order.id}&"
-        f"invoice={order.id}&"
-        f"return={request.build_absolute_uri(reverse('order_confirmation', args=[order.id]))}&"
-        f"cancel_return={request.build_absolute_uri(reverse('checkout'))}"
-    )
-    return redirect(paypal_url)
+def paypal_execute(request):
+    token = request.GET.get('token')
+    payer_id = request.GET.get('PayerID')
 
-@csrf_exempt
-@login_required
-def paypal_confirm(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        order_id = data.get('order_id')
-        total = Decimal(data.get('total'))
+    if not token:
+        messages.error(request, "Fehler bei PayPal-Zahlung: Kein Token erhalten.")
+        return redirect('checkout')
 
-        # Hier kannst du die Bestellung finalisieren
-        order = Order.objects.create(
-            user=request.user,
-            payment_method='paypal',
-            total_amount=total,
-            # ... weitere Felder
-        )
+    result = capture_paypal_order(token)
 
-        return JsonResponse({'status': 'success', 'order_id': order.id})
+    if result.get("status") == "COMPLETED":
+        messages.success(request, "Zahlung erfolgreich!")
+        return redirect('my_orders')
+
+    messages.error(request, "Zahlung fehlgeschlagen.")
+    return redirect('checkout')
 
 @login_required
 def order_confirmation(request, order_id):
-    order = Order.objects.get(id=order_id)
+    order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'apps/order_confirmation.html', {'order': order})
+
 
 @require_POST
 @login_required
@@ -989,3 +1012,102 @@ def order_admin(request):
         'tab': tab,
         'mail_form': mail_form,
     })
+
+def my_order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    items = OrderItem.objects.filter(order=order)
+
+    context = {
+        'order': order,
+        'now': timezone.now(),
+        'items': items,
+    }
+    return render(request, 'apps/my_order_detail.html', context)
+
+TAX_PERCENT = Decimal('19.00')  # MwSt-Satz in Prozent
+
+def _as_decimal(value):
+    try:
+        return Decimal(str(value))
+    except Exception:
+        return Decimal('0.00')
+
+def _compute_totals_incl_tax(order):
+    """
+    Berechnet Netto, MwSt und Brutto, wenn Preise im Modell inkl. MwSt gespeichert sind.
+    """
+    tax_rate = TAX_PERCENT / Decimal('100')  # 0.19
+    brutto = Decimal('0.00')
+    items = OrderItem.objects.filter(order=order)
+
+    for item in items:
+        # Preis inkl. MwSt
+        if getattr(item, 'unit_price', None) not in (None, ''):
+            unit = _as_decimal(item.unit_price)
+        elif getattr(item, 'price', None) not in (None, ''):
+            unit = _as_decimal(item.price)
+        elif getattr(item, 'app', None) and getattr(item.app, 'price', None) not in (None, ''):
+            unit = _as_decimal(item.app.price)
+        else:
+            unit = Decimal('0.00')
+
+        qty = getattr(item, 'quantity', None) or getattr(item, 'qty', 1)
+        qty = _as_decimal(qty)
+
+        brutto += (unit * qty)
+
+    netto = (brutto / (Decimal('1.00') + tax_rate)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    mwst = (brutto - netto).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    brutto = brutto.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+    return {
+        'netto': netto,
+        'mwst': mwst,
+        'brutto': brutto,
+        'tax_percent': TAX_PERCENT,
+    }
+
+def invoice_view(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    items = OrderItem.objects.filter(order=order)
+    totals = _compute_totals_incl_tax(order)
+
+    context = {
+        'order': order,
+        'now': timezone.now(),
+        'items': items,
+        **totals
+    }
+    return render(request, 'apps/invoice.html', context)
+
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from xhtml2pdf import pisa
+import io
+
+def invoice_pdf(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    items = order.items.all()
+    totals = _compute_totals_incl_tax(order)
+
+    context = {
+        'order': order,
+        'now': timezone.now(),
+        'items': items,
+        **totals
+    }
+
+    try:
+        html_string = render_to_string('apps/invoice_pdf.html', context)
+    except TemplateDoesNotExist:
+        html_string = render_to_string('apps/invoice.html', context)
+
+    pdf_file = io.BytesIO()
+    pisa_status = pisa.CreatePDF(html_string, dest=pdf_file, encoding='UTF-8')
+
+    if pisa_status.err:
+        return HttpResponse('Error while creating PDF', status=500)
+
+    response = HttpResponse(pdf_file.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{order.id}.pdf"'
+    return response

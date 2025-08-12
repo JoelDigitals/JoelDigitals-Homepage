@@ -61,7 +61,7 @@
                         <li>{{ item.quantity }}× {{ item.app.name }} – {{ item.app.price|floatformat:2 }}€</li>
                     {% endfor %}
                 </ul>
-                <a href="{% url 'order_confirmation' order.id %}" class="order-link">View Confirmation</a>
+                <a href="{% url 'order_detail' order.id %}" class="order-link">View Order Details</a>
             </div>
         {% endfor %}
     {% else %}

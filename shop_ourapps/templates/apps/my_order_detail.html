@@ -1,0 +1,121 @@
+{% extends "base_shop.html" %}
+
+{% block title %}Order #{{ order.id }} — Details{% endblock %}
+
+{% block content %}
+<div style="max-width:1000px;margin:0 auto;background:transparent;padding:1rem;">
+  <section style="background:var(--surface);padding:1rem;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.4);">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;align-items:center;">
+      <div>
+        <h2 style="margin:0 0 .25rem 0;">Order #{{ order.id }}</h2>
+        <div style="color:#ccc;font-size:0.95rem;">
+          Created: {{ order.created_at|date:"Y-m-d H:i" }} &middot;
+          Status:
+          <strong style="color:{% if order.status == 'Paid' %}#66d17b{% else %}#f39c12{% endif %}">
+            {{ order.status }}
+          </strong>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <a href="{% url 'invoice' order.id %}" class="button" style="background:var(--primary);color:white;padding:.6rem .9rem;border-radius:8px;text-decoration:none;font-weight:700;">
+          <i class="fas fa-file-pdf"></i> Invoice
+        </a>
+        <a href="/shop/" class="button" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:.5rem .8rem;border-radius:8px;text-decoration:none;">
+          Continue Shopping
+        </a>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:1rem;margin-top:1rem;">
+      <!-- Left: Order Items -->
+      <div style="background:white;color:#111;padding:1rem;border-radius:6px;">
+        <h3 style="margin-top:0;">Items</h3>
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="text-align:left;color:#444;">
+              <th style="padding:.5rem .4rem;border-bottom:1px solid #eee;">Product</th>
+              <th style="padding:.5rem .4rem;border-bottom:1px solid #eee;width:80px;text-align:center;">Qty</th>
+              <th style="padding:.5rem .4rem;border-bottom:1px solid #eee;width:120px;text-align:right;">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td style="padding:.6rem .4rem;border-bottom:1px solid #f4f4f4;">
+                <strong>{{ item.app.name }}</strong><br>
+                <small style="color:#666">{{ item.app.product_number }}</small>
+              </td>
+              <td style="padding:.6rem .4rem;border-bottom:1px solid #f4f4f4;text-align:center;">
+                {{ item.quantity }}
+              </td>
+              <td style="padding:.6rem .4rem;border-bottom:1px solid #f4f4f4;text-align:right;">
+                {{ item.app.discounted_price|floatformat:2 }} €<br>
+                <small style="color:#888">Total: {{ item.price|floatformat:2 }} €</small>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3" style="padding:1.2rem;text-align:center;color:#666;">No items in this order.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Right: Summary / Addresses -->
+      <aside style="display:flex;flex-direction:column;gap:.75rem;">
+        <div style="background:white;padding:1rem;border-radius:6px;color:#111;">
+          <h4 style="margin:0 0 .5rem 0;">Payment & Summary</h4>
+          <div style="display:flex;justify-content:space-between;">
+            <span>Subtotal</span><strong>{{ order.subtotal|floatformat:2 }} €</strong>
+          </div>
+          {% if order.discount_amount > 0 %}
+          <div style="display:flex;justify-content:space-between;">
+            <span>Discount</span><strong>-{{ order.discount_amount|floatformat:2 }} €</strong>
+          </div>
+          {% endif %}
+          <div style="display:flex;justify-content:space-between;font-size:1.05rem;margin-top:.5rem;padding-top:.5rem;border-top:1px dashed #eee;">
+            <span>Total</span><strong>{{ order.total_amount|floatformat:2 }} €</strong>
+          </div>
+
+          <p style="margin:.5rem 0 0 0;color:#666;font-size:.95rem;">
+            Payment Method: <strong style="color:#222">{{ order.payment_method }}</strong>
+          </p>
+
+          {% if order.status == 'Paid' %}
+            <div style="margin-top:.6rem;padding:.5rem;border-radius:6px;background:#e8f9ee;color:#1b6b2b;font-weight:700;text-align:center;">
+              Paid
+            </div>
+          {% else %}
+            <div style="margin-top:.6rem;padding:.5rem;border-radius:6px;background:#fff4e6;color:#8a5a00;font-weight:700;text-align:center;">
+              Pending Payment
+            </div>
+          {% endif %}
+        </div>
+
+        <div style="background:white;padding:1rem;border-radius:6px;color:#111;">
+          <h4 style="margin:0 0 .5rem 0;">Billing Details</h4>
+          <div style="color:#333;">
+            {{ order.first_name }} {{ order.last_name }}<br>
+            {% if order.company_name %}<strong>{{ order.company_name }}</strong><br>{% endif %}
+            {{ order.address }}<br>
+            {{ order.zip_code }} {{ order.city }}<br>
+            {% if order.country %}{{ order.country }}<br>{% endif %}
+            {% if order.email %}<a href="mailto:{{ order.email }}" style="color:#0044cc;">{{ order.email }}</a><br>{% endif %}
+            {% if order.phone %}<span style="color:#666;">{{ order.phone }}</span><br>{% endif %}
+            {% if order.vat_number %}<span>VAT: {{ order.vat_number }}</span><br>{% endif %}
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    {% if order.notes %}
+      <div style="margin-top:1rem;background:transparent;color:#ddd;padding:1rem;border-radius:6px;">
+        <h4 style="margin:0 0 .5rem 0;color:#ccc;">Notes</h4>
+        <div style="background:#111;padding:1rem;border-radius:6px;color:#ddd;">{{ order.notes|linebreaksbr }}</div>
+      </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

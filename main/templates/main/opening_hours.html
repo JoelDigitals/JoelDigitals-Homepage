@@ -1,0 +1,80 @@
+{% extends "base_home.html" %}
+
+{% block title %}Opening Hours – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+    .info-container {
+        background-color: #fff;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 30px 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        text-align: center;
+    }
+
+    h2 {
+        color: #0044cc;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 1.5rem 0;
+        font-size: 1.1rem;
+        color: #222;
+        line-height: 1.5;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    ul li {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    ul li.closed {
+        color: #999;
+        font-style: italic;
+    }
+
+    .phone-number {
+        font-size: 1.3rem;
+        color: #2e7d32;
+        margin: 20px 0;
+        font-weight: 600;
+    }
+
+    p {
+        font-size: 1rem;
+        color: #555;
+        margin-top: 15px;
+    }
+</style>
+
+<div class="info-container">
+    <h2>Opening Hours & Important Info</h2>
+
+    <p>Phone: <a href="tel:{{ phone_number }}" class="phone-number">{{ phone_number }}</a></p>
+
+    <h3>Our Opening Hours</h3>
+    <ul>
+        {% for day, time in opening_times.items %}
+            <li><strong>{{ day }}:</strong> {{ time }}</li>
+        {% endfor %}
+        {% for day in closed_days %}
+            <li class="closed"><strong>{{ day }}:</strong> Closed</li>
+        {% endfor %}
+    </ul>
+
+    <p>We look forward to your call or visit during these hours.</p>
+    <p>If you have any questions, feel free to use our <a href="{% url 'contact_form' %}">contact form</a>.</p>
+</div>
+{% endblock %}

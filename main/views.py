@@ -63,3 +63,19 @@ def service_view(request):
 def team_view(request):
     members = TeamMember.objects.all()
     return render(request, 'main/team.html', {'members': members})
+
+def opening_hours(request):
+    # Hier kannst du bei Bedarf weitere Daten an das Template geben
+    opening_times = {
+        "Monday": "4 PM – 6 PM",
+        "Wednesday": "4 PM – 6 PM",
+        "Thursday": "4 PM – 5 PM",
+        "Saturday": "1 PM – 3 PM",
+    }
+    closed_days = ["Tuesday", "Friday", "Sunday"]
+    context = {
+        "opening_times": opening_times,
+        "closed_days": closed_days,
+        "phone_number": "+49 1525 3480270",
+    }
+    return render(request, "main/opening_hours.html", context)

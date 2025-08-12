@@ -10,4 +10,5 @@ urlpatterns = [
     path('about/', views.about_view, name='about'),
     path('team/', views.team_view, name='team'),
     path('accounts/login/', views.login_view, name='login'),
+    path('opening-hours/', views.opening_hours, name='opening_hours'),
 ]

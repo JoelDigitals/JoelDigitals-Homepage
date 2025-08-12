@@ -127,44 +127,44 @@
     
 
     .menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 1.8rem;
-  color: var(--text);
-  cursor: pointer;
-}
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: var(--text);
+      cursor: pointer;
+    }
 
-@media (max-width: 768px) {
-  .menu-toggle {
-    display: block;
-  }
-
-  nav#main-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    transform: translateX(-100%);
-    width: 70%;
-    height: 100vh;
-    background: var(--surface);
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 2rem 1rem;
-    gap: 1rem;
-    transition: transform 0.3s ease;
-    z-index: 10000;
-    display: flex; /* dauerhaft sichtbar, aber außerhalb */
-  }
-
-  nav#main-nav.open {
-    transform: translateX(0);
-  }
-
-  nav#main-nav a {
-    font-size: 1.2rem;
-  }
-}
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+    
+      nav#main-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+        width: 70%;
+        height: 100vh;
+        background: var(--surface);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 2rem 1rem;
+        gap: 1rem;
+        transition: transform 0.3s ease;
+        z-index: 10000;
+        display: flex; /* dauerhaft sichtbar, aber außerhalb */
+      }
+    
+      nav#main-nav.open {
+        transform: translateX(0);
+      }
+    
+      nav#main-nav a {
+        font-size: 1.2rem;
+      }
+    }
 
     @media (max-width: 600px) {
       header, footer {
@@ -178,6 +178,7 @@
       }
       main {
         padding: 1rem;
+        max-width: 100%;
       }
       #cookie-banner {
         padding: 1rem;

@@ -46,21 +46,17 @@
         line-height: 1.6;
         margin-top: 8px;
     }
-
-    @media (max-width: 480px) {
-        .contact-container {
-            padding: 30px 20px;
-        }
-
-        h2 {
-            font-size: 1.8rem;
-        }
-    }
 </style>
 
 <div class="contact-container">
     <h2>Welcome to the Joel Digitals Contact Center</h2>
     <p>Please choose an option:</p>
+
+    <section>
+        <h3>📞 <a href="tel:+4915253480270">Call +49 1525 3480270</a></h3>
+        <p>Prefer to talk directly? Call us at the above number.</p>
+        <p><a href="{% url 'opening_hours' %}" style="font-size: 0.9rem; color: #0044cc; text-decoration: underline;">View Opening Hours & Info</a></p>
+    </section>
 
     <section>
         <h3><a href="{% url 'contact_form' %}">📬 Contact Form</a></h3>
@@ -76,13 +72,10 @@
         <h3><a href="{% url 'sales' %}">🛒 Sales / Wishlist</a></h3>
         <p>Let us know what you would like to buy or have created. Wishlist items are collected and stored for export.</p>
     </section>
+
     <section>
         <h3><a href="{% url 'support_tickets' %}">🛠️ Support Ticket</a></h3>
         <p>Having issues or technical questions? Create a support ticket, and we'll get back to you as soon as possible.</p>
-    </section>
-    <section>
-        <h3><a href="{% url 'login' %}">🔑 Login</a></h3>
-        <p>To access your tickets and wishlist, please log in.</p>
     </section>
 </div>
 {% endblock %}

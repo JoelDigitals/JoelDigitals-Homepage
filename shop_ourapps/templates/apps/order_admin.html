@@ -59,6 +59,15 @@ form button.btn {
     <p><strong>Stadt:</strong> {{ order.city|linebreaksbr }}</p>
     <p><strong>Telefon:</strong> {{ order.phone }}</p>
     <p><strong>Zahlungsmethode:</strong> {{ order.payment_method }}</p>
+    {% if order.payment_method == 'lastschrift' %}
+        <p><strong>Bankname:</strong> {{ order.bank_name }}</p>
+        <p><strong>Kontoinhaber:</strong> {{ order.account_holder }}</p>
+        <p><strong>IBAN:</strong> {{ order.iban }}</p>
+        <p><strong>BIC:</strong> {{ order.bic }}</p>
+    {% endif %}
+
+    <p><strong>Bestelldatum:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+
     <p><strong>Gesamtbetrag:</strong> {{ order.total_amount }} €</p>
 
     <h4>Bestellte Apps:</h4>
