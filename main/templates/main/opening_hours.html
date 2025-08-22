@@ -40,8 +40,30 @@
         border-bottom: 1px solid #eee;
     }
 
-    ul li.closed {
-        color: #999;
+    ul li.highlight {
+        background-color: #e6f0ff;
+        font-weight: bold;
+        border-radius: 6px;
+    }
+
+    .day-label {
+        color: #000;
+        font-weight: 600;
+        margin-right: 8px;
+    }
+
+    .time-open {
+        color: green;
+        font-weight: 600;
+    }
+
+    .time-closed {
+        color: red;
+        font-weight: 600;
+    }
+
+    .special {
+        color: #ff6600;
         font-style: italic;
     }
 
@@ -50,6 +72,11 @@
         color: #2e7d32;
         margin: 20px 0;
         font-weight: 600;
+        text-decoration: none;
+    }
+
+    .phone-number:hover {
+        text-decoration: underline;
     }
 
     p {
@@ -67,14 +94,20 @@
     <h3>Our Opening Hours</h3>
     <ul>
         {% for day, time in opening_times.items %}
-            <li><strong>{{ day }}:</strong> {{ time }}</li>
-        {% endfor %}
-        {% for day in closed_days %}
-            <li class="closed"><strong>{{ day }}:</strong> Closed</li>
+            <li class="{% if day == today %}highlight{% endif %}">
+                <span class="day-label">{{ day }}:</span>
+                {% if "Closed" in time %}
+                    <span class="time-closed">{{ time }}</span>
+                {% else %}
+                    <span class="time-open">{{ time }}</span>
+                {% endif %}
+            </li>
         {% endfor %}
     </ul>
 
-    <p>We look forward to your call or visit during these hours.</p>
+    
+    <p>All times with "*" are special opening hours.</p>
+    <p>We look forward to your call during these hours.</p>
     <p>If you have any questions, feel free to use our <a href="{% url 'contact_form' %}">contact form</a>.</p>
 </div>
 {% endblock %}

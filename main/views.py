@@ -2,7 +2,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import TeamMember
+from .models import TeamMember, OpeningHour, SpecialOpeningHour
+from datetime import date
 
 def imprint_view(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
@@ -64,18 +65,54 @@ def team_view(request):
     members = TeamMember.objects.all()
     return render(request, 'main/team.html', {'members': members})
 
+
 def opening_hours(request):
-    # Hier kannst du bei Bedarf weitere Daten an das Template geben
-    opening_times = {
-        "Monday": "4 PM – 6 PM",
-        "Wednesday": "4 PM – 6 PM",
-        "Thursday": "4 PM – 5 PM",
-        "Saturday": "1 PM – 3 PM",
+    today = date.today()
+    today_name = today.strftime("%A")
+
+    # Basiszeiten (Normalplan)
+    base_hours = {
+        oh.weekday: (
+            "Closed"
+            if oh.closed
+            else f"{oh.open_time.strftime('%H:%M')} – {oh.close_time.strftime('%H:%M')}"
+        )
+        for oh in OpeningHour.objects.all()
     }
-    closed_days = ["Tuesday", "Friday", "Sunday"]
+
+    # Alle Sonderzeiten ab heute
+    specials = SpecialOpeningHour.objects.filter(date__gte=today).order_by("date")
+
+    # Mapping für kommende Sonderzeiten pro Wochentag (ab heute)
+    special_overrides = {}
+    for s in specials:
+        weekday_name = s.date.strftime("%A")
+        special_overrides[weekday_name] = (
+            "Closed"
+            if s.closed
+            else f"{s.open_time.strftime('%H:%M')} – {s.close_time.strftime('%H:%M')}"
+        )
+
+    # Heute überschreiben, falls Sonderzeit existiert
+    if today_name in special_overrides:
+        base_hours[today_name] = special_overrides[today_name]
+
+    # Immer Montag → Sonntag sortieren
+    days_order = [
+        "Monday", "Tuesday", "Wednesday", "Thursday",
+        "Friday", "Saturday", "Sunday",
+    ]
+
+    ordered_times = {}
+    for day in days_order:
+        if day in special_overrides:
+            ordered_times[day] = special_overrides[day] + " *"  # Sternchen markieren
+        else:
+            ordered_times[day] = base_hours.get(day, "Closed")
+
     context = {
-        "opening_times": opening_times,
-        "closed_days": closed_days,
+        "opening_times": ordered_times,
+        "today": today_name,
         "phone_number": "+49 1525 3480270",
     }
     return render(request, "main/opening_hours.html", context)

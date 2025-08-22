@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}{{ action }} Blogeintrag – Joel Digitals{% endblock %}
-
+{{ form.media }}
 {% block content %}
 <style>
     .container {
@@ -72,9 +72,18 @@
     <h2>{{ action }} Blogeintrag</h2>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form.title.label_tag }} {{ form.title }}
+        {{ form.teaser_image.label_tag }} {{ form.teaser_image }}
+        {{ form.content.label_tag }} {{ form.content }}  <!-- CKEditor Feld -->
+        {{ form.is_published.label_tag }} {{ form.is_published }}
+        {{ form.categories.label_tag }} {{ form.categories }}
+
         <button type="submit" class="btn">{{ action }}</button>
         <a href="{% url 'admin_blog' %}" class="btn btn-secondary">Zurück</a>
     </form>
 </div>
+
+<!-- CKEditor JS einbinden -->
+<script src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+<script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
 {% endblock %}

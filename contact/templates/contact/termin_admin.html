@@ -1,54 +1,135 @@
-{% extends "base.html" %}
+{% extends "base_home.html" %}
+{% load static %}
 
 {% block title %}Terminverwaltung – Admin{% endblock %}
 
 {% block content %}
 <style>
-    .admin-section {
+    .admin-container {
+        background-color: #fff;
         max-width: 900px;
         margin: 40px auto;
-        padding: 20px;
-        background: #fff;
+        padding: 40px 30px;
         border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
     }
 
     h2 {
+        margin-top: 0;
         color: #0044cc;
-        border-bottom: 2px solid #0044cc;
-        padding-bottom: 6px;
-        margin-bottom: 20px;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 25px;
+        text-align: center;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 40px;
+        margin-bottom: 30px;
+        font-size: 0.95rem;
     }
 
     th, td {
         padding: 10px;
         border: 1px solid #ddd;
+        text-align: left;
     }
 
     th {
         background-color: #f4f4f4;
+        font-weight: 600;
     }
 
     .btn {
-        padding: 6px 10px;
+        display: inline-block;
+        padding: 8px 12px;
         border: none;
         border-radius: 6px;
         font-weight: 600;
         cursor: pointer;
         text-decoration: none;
+        font-size: 0.9rem;
+        transition: background-color 0.2s ease;
+        margin-right: 5px;
     }
 
-    .accept { background-color: #28a745; color: #fff; }
-    .reject { background-color: #dc3545; color: #fff; }
+    .accept {
+        background-color: #28a745;
+        color: #fff;
+    }
+    .accept:hover {
+        background-color: #218838;
+    }
+
+    .reject {
+        background-color: #dc3545;
+        color: #fff;
+    }
+    .reject:hover {
+        background-color: #c82333;
+    }
+
+    @media (max-width: 768px) {
+        .admin-container {
+            padding: 30px 20px;
+            margin: 20px;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+        }
+
+        table, th, td {
+            font-size: 0.85rem;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+
+        th {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        td {
+            position: relative;
+            padding-left: 50%;
+            border: none;
+            border-bottom: 1px solid #eee;
+        }
+
+        td:before {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 45%;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        /* Labels für die einzelnen Spalten */
+        td:nth-of-type(1):before { content: "Name"; }
+        td:nth-of-type(2):before { content: "Email"; }
+        td:nth-of-type(3):before { content: "Datum & Uhrzeit"; }
+        td:nth-of-type(4):before { content: "Art"; }
+        td:nth-of-type(5):before { content: "Aktionen"; }
+    }
 </style>
 
-<div class="admin-section">
+<div class="admin-container">
     <h2>🟡 Ausstehende Termine</h2>
     <table>
         <tr>
