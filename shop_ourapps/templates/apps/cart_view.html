@@ -99,7 +99,7 @@
                     <p>{{ item.quantity }} x €{{ item.price }}</p>
                 {% endif %}
                 
-                <p><strong>Total (incl. VAT):</strong> €{{ item.total_price }}</p>
+                <p><strong>Total<!-- (incl. VAT)-->:</strong> €{{ item.total_price }}</p>
                 
                 <a href="{% url 'remove_from_cart' item.id %}">Remove</a>
             </div>
@@ -107,9 +107,9 @@
 
         <div class="totals">
             <hr>
-            <p><strong>Subtotal (Net):</strong> {{ total_netto }} €</p>
-            <p><strong>VAT (19%):</strong> {{ total_vat }} €</p>
-            <p><strong>Total (Gross):</strong> {{ total_brutto }} €</p>
+            <!--<p><strong>Subtotal (Net):</strong> {{ total_netto }} €</p>
+            <p><strong>VAT (19%):</strong> {{ total_vat }} €</p>-->
+            <p><strong>Total<!-- (Gross)-->:</strong> {{ total_brutto }} €</p>
             <hr>
         </div>
 

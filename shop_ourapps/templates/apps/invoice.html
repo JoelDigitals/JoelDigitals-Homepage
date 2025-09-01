@@ -200,7 +200,7 @@ Invoice Preview - Order #{{ order.id }} – Joel Digitals
         <td>{{ item.app.price|floatformat:2 }} €</td>
         <td>{{ item.app.discount_percent }}%</td>
         <td>{{ item.app.discounted_price|floatformat:2 }} €</td>
-        <td>{{ item.total_price|floatformat:2 }} €</td>
+        <td>{{ item.price|floatformat:2 }} €</td>
       </tr>
       {% empty %}
       <tr><td colspan="7" style="text-align:center;">No items available.</td></tr>
@@ -209,8 +209,10 @@ Invoice Preview - Order #{{ order.id }} – Joel Digitals
   </table>
 
   <div class="totals">
-    <div><span>Net amount:</span><span>{{ netto }} €</span></div>
-    <div><span>VAT ({{ tax_percent }}%):</span><span>{{ mwst }} €</span></div>
+    <p>As a small business owner within the meaning of Section 19 Paragraph 1 of the UStG, no VAT is charged.</p>
+    <p>Als Kleinunternehmer im Sinne von § 19 Abs. 1 UStG wird keine Umsatzsteuer berechnet.</p>
+    <!--<p><span>Net amount:</span><span>{{ netto }} €</span></p>
+    <p><span>VAT ({{ tax_percent }}%):</span><span>{{ mwst }} €</span></p>-->
     <div><strong>Total amount:</strong><strong>{{ brutto }} €</strong></div>
   </div>
 

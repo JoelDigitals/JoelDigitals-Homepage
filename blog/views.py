@@ -13,7 +13,10 @@ def is_blog_editor(user):
 def blog_list(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     # Holen wir uns alle Kategorien, die Blog-Beiträge enthalten
-    categories_with_posts = BlogCategory.objects.filter(posts__isnull=False)
+    categories_with_posts = BlogCategory.objects.filter(
+        posts__is_published=True
+    ).distinct()
+
 
     # Überprüfen, ob eine Filterung nach Kategorien erfolgt
     category_filters = request.GET.getlist('category')  # .getlist() holt alle ausgewählten Kategorien
@@ -37,7 +40,7 @@ def blog_detail(request, pk):
     return render(request, 'blog/blog_detail.html', {
         'post': post,
         'user_groups': user_groups
-    })
+    }) 
 
 @user_passes_test(is_blog_editor)
 def admin_blog(request):

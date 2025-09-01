@@ -55,10 +55,6 @@
 <div class="container">
     <h1>Checkout</h1>
 
-    {% for message in messages %}
-        <div class="message {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-
     <h2>Your Items</h2>
     <ul>
         {% for item in items %}
