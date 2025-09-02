@@ -83,13 +83,14 @@
             Payment Method: <strong style="color:#222">{{ order.payment_method }}</strong>
           </p>
 
-          {% if order.status == 'Paid' %}
-            <div style="margin-top:.6rem;padding:.5rem;border-radius:6px;background:#e8f9ee;color:#1b6b2b;font-weight:700;text-align:center;">
-              Paid
-            </div>
-          {% else %}
+          {% if order.status == 'pending' %}
+            
             <div style="margin-top:.6rem;padding:.5rem;border-radius:6px;background:#fff4e6;color:#8a5a00;font-weight:700;text-align:center;">
               Pending Payment
+            </div>
+          {% else %}
+            <div style="margin-top:.6rem;padding:.5rem;border-radius:6px;background:#e8f9ee;color:#1b6b2b;font-weight:700;text-align:center;">
+              Paid
             </div>
           {% endif %}
         </div>

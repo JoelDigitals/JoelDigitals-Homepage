@@ -895,27 +895,27 @@ def order_admin(request):
     tab = request.GET.get('tab', 'pending')
     query = request.GET.get('q', '').strip()
 
-    if tab == 'pending':
-        orders = Order.objects.filter(status='pending')
-    elif tab == 'completed':
-        orders = Order.objects.filter(status='completed')
-    elif tab == 'returns':
-        orders = Order.objects.filter(status__in=['cancelled', 'return', 'shipped'])
-    elif tab == 'shipping':
-        orders = Order.objects.filter(status__in=['in_delivery', 'delivered'])
-    elif tab == 'finished':
-        orders = Order.objects.filter(status__in=['finished'])
+    # Mapping Tabs -> Statuswerte
+    tab_map = {
+        "pending": ["Received"],               # Ausstehend
+        "completed": ["Paid"],                 # Bezahlt
+        "returns": ["Return", "Canceled", "Back"],   # Retouren
+        "shipping": ["In Delivery", "Delivered"],    # Versand
+        "finished": ["Finished"],              # Beendet
+    }
+
+    if tab in tab_map:
+        orders = Order.objects.filter(status__in=tab_map[tab])
     else:
-        orders = Order.objects.all() 
+        orders = Order.objects.all()
 
     if query:
-        filters &= (
+        orders = orders.filter(
             Q(id__icontains=query) |
             Q(first_name__icontains=query) |
             Q(last_name__icontains=query) |
             Q(email__icontains=query)
         )
-
 
     if request.method == 'POST':
         form = SendAccessMailForm(request.POST)
@@ -925,27 +925,29 @@ def order_admin(request):
         try:
             order = Order.objects.get(id=order_id)
 
-            # Statusaktualisierung (unabhängig vom E-Mail-Versand)
+            # Statusaktualisierung
             if new_status in dict(Order.STATUS_CHOICES):
                 old_status = order.status
                 order.status = new_status
                 order.save()
-                messages.success(request, f"Bestellung #{order.id}: Status geändert von '{old_status}' auf '{new_status}'.")
-                return redirect(f"{request.path}?tab={new_status}")
+                messages.success(
+                    request,
+                    f"Bestellung #{order.id}: Status geändert von '{old_status}' auf '{new_status}'."
+                )
+                return redirect(f"{request.path}?tab={tab}")
 
+            # Mail verschicken
             if form.is_valid():
                 message_type = form.cleaned_data["message_type"]
                 registration_codes_raw = form.cleaned_data["registration_codes"]
                 suggested_ids = form.cleaned_data.get("suggested_apps", [])
 
-                # Registrierungscodes parsen
                 codes = {}
                 for part in registration_codes_raw.split(','):
                     if ':' in part:
                         app, code = part.split(':', 1)
                         codes[app.strip()] = code.strip()
 
-                # Vorschläge aus IDs aufbauen
                 suggestion_map = {
                     'JDS Management': {
                         'title': 'JDS Management',
@@ -978,7 +980,6 @@ def order_admin(request):
                     'now': timezone.now(),
                 }
 
-                # E-Mail-Inhalt generieren
                 html_content = render_to_string(f'emails/{message_type}.html', context)
                 subject_map = {
                     'welcome': 'Willkommensnachricht zu Ihrer Bestellung',
@@ -1012,6 +1013,7 @@ def order_admin(request):
         'tab': tab,
         'mail_form': mail_form,
     })
+
 
 def my_order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
