@@ -3,7 +3,11 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import TeamMember, OpeningHour, SpecialOpeningHour
+from blog.models import BlogPost
+from shop_ourapps.models import App
 from datetime import date
+import random
+
 
 def imprint_view(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
@@ -20,7 +24,19 @@ def terms_view(request):
 # Create your views here.
 def home(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
-    return render(request, 'main/home.html', {'user_groups': user_groups})
+
+    # Neuster Blogartikel
+    latest_blog = BlogPost.objects.filter(is_published=True).order_by('-created_at').first()
+
+    # 3 zufällige Produkte
+    products = list(App.objects.filter(is_available_for_purchase=True))
+    random_products = random.sample(products, min(len(products), 3))
+
+    return render(request, 'main/home.html', {
+        'user_groups': user_groups,
+        'latest_blog': latest_blog,
+        'products': random_products
+    })
 
 #register 
 def register_view(request):

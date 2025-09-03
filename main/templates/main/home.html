@@ -2,220 +2,224 @@
 {% load static %}
 
 {% block content %}
-<!-- AOS CDN -->
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    AOS.init({
-      duration: 800,
-      once: true
-    });
+    AOS.init({ duration: 800, once: true });
   });
 </script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+body {
+  background: #1e1e1e;
+  color: #f5f5f5;
+  font-family: 'Inter', sans-serif;
+}
 
-  .container {
-    max-width: 100%; /* statt 1100px */
-    margin: 0 auto; /* kein riesiger Außenabstand */
-    padding: 1rem;  /* weniger Padding auf Mobil */
-    font-family: 'Inter', sans-serif;
-    color: #1e1e1e;
-    overflow-x: hidden;
-  }
+/* Container */
+.white-wrapper {
+  background: #2b2b2b;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+}
 
-  .white-wrapper {
-    background: #fff;
-    border-radius: 16px;
-    padding: 2.5rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    overflow-x: hidden;
-  }
+/* Headings */
+h1,h2,h3 { color:#fff; }
 
-  .section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-    margin-bottom: 4rem;
-    flex-wrap: wrap;
-  }
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, rgba(58,134,255,0.6), rgba(0,86,179,0.6)),
+              url("{% static 'images/hero-bg.jpg' %}") center/cover no-repeat;
+  border-radius: 16px;
+  text-align: center;
+  padding: 8rem 2rem;
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero-content { position: relative; z-index: 2; animation: fadeInUp 1s ease; }
+.hero h1 { font-size: 3.5rem; margin-bottom: 1rem; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+.hero p { font-size: 1.4rem; margin-bottom: 2rem; color:#fff; }
 
-  .section:nth-child(even) {
-    flex-direction: row-reverse;
-  }
+/* CTA Button Pulse */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(58,134,255,0.7); }
+  70% { box-shadow: 0 0 0 20px rgba(58,134,255,0); }
+  100% { box-shadow: 0 0 0 0 rgba(58,134,255,0); }
+}
+.cta-btn {
+  display:inline-block;
+  padding:0.7rem 1.6rem;
+  border-radius:10px;
+  font-weight:600;
+  color:#fff !important;
+  background: linear-gradient(135deg, #3a86ff, #0056b3);
+  text-decoration:none;
+  transition: all .3s;
+  animation: pulse 2s infinite;
+}
+.cta-btn:hover {
+  transform: scale(1.05) translateY(-3px);
+  box-shadow:0 0 25px rgba(58,134,255,0.8);
+  background: linear-gradient(135deg, #0056b3, #003366);
+}
 
-  .section img {
-    width: 100%;
-    max-width: 500px;
-    height: auto;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: transform 0.6s ease;
-  }
+/* Alternating Sections */
+.alt-section {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:2rem;
+  margin:3rem 0;
+}
+.alt-section img {
+  flex:1; max-width:450px;
+  border-radius:16px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  transition: transform .3s;
+}
+.alt-section img:hover { transform: scale(1.05); }
+.alt-section .text { flex:1; min-width:280px; }
+.alt-section:nth-child(even) { flex-direction: row-reverse; }
+.alt-section h2 { margin-bottom:1rem; }
+.alt-section p { margin-bottom:1.5rem; color:#ccc; }
 
-  .section img:hover {
-    transform: scale(1.03);
-  }
+/* Cards */
+.card-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;
+  margin:2rem 0;
+}
+.card {
+  background:#333;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 6px 18px rgba(0,0,0,0.3);
+  transition: transform .3s, box-shadow .3s;
+  display:flex;
+  flex-direction:column;
+}
+.card:hover { transform: translateY(-6px) scale(1.02); box-shadow:0 14px 36px rgba(0,0,0,0.5);}
+.card img { width:100%; aspect-ratio:16/10; object-fit:cover; transition: transform .3s; }
+.card img:hover { transform: scale(1.05); }
+.card-body { padding:1.2rem; flex:1; display:flex; flex-direction:column; color:#ddd; }
+.card-body h3 { font-size:1.2rem; margin-bottom:0.6rem; color:#fff; }
+.card-body p { flex:1; font-size:0.95rem; margin-bottom:1rem; color:#bbb; }
+.price { font-size:1.1rem; font-weight:bold; color:#3a86ff; margin-bottom:1rem; }
 
-  .text {
-    flex: 1 1 300px;
-    min-width: 280px;
-  }
+/* Blog & Services Grid */
+.blog-grid, .services-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+  gap:1.5rem;
+  margin-top:2rem;
+}
 
-  .text h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #003366;
-    font-weight: 700;
-  }
-
-  .text p,
-  .text ul {
-    font-size: 1.1rem;
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-    color: #333;
-  }
-
-  .text ul {
-    padding-left: 1.5rem;
-  }
-
-  .text li {
-    margin-bottom: 0.5rem;
-  }
-
-  .button {
-    display: inline-block;
-    background: linear-gradient(135deg, #3a86ff, #0056b3);
-    color: white !important;
-    padding: 0.7rem 1.4rem;
-    font-weight: 600;
-    font-size: 1rem;
-    border-radius: 10px;
-    text-decoration: none;
-    box-shadow: 0 4px 15px rgba(58, 134, 255, 0.4);
-    transition: all 0.3s ease;
-  }
-
-  .button:hover {
-    background: linear-gradient(135deg, #0056b3, #003d7a);
-    transform: translateY(-2px);
-  }
-
-  .blog-teaser {
-    text-align: center;
-    margin-top: 4rem;
-  }
-
-  .blog-teaser h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #003366;
-  }
-
-  .blog-teaser p {
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
-    color: #333;
-  }
-
-  @media (max-width: 768px) {
-    .section {
-      flex-direction: column !important;
-      text-align: center;
-    }
-
-    .section img {
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .text {
-      padding-top: 1rem;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .text h2 {
-      font-size: 1.5rem;
-    }
-
-    .button {
-      font-size: 0.9rem;
-      padding: 0.6rem 1.2rem;
-    }
-
-    .text ul {
-      padding-left: 1rem;
-    }
-  }
+/* Bottom CTA */
+.contact-section {
+  text-align:center;
+  margin-top:3rem;
+  padding:2.5rem 2rem;
+  background:#333;
+  border-radius:16px;
+}
 </style>
 
-
 <main class="container">
-  <div class="white-wrapper">
+<div class="white-wrapper">
 
-    <div class="section" data-aos="fade-up">
-      <img src="{% static 'images/wellcome.png' %}" alt="Welcome">
-      <div class="text">
-        <h2>Welcome to Joel Digitals</h2>
-        <p>At Joel Digitals, we deliver future-ready IT solutions. Whether it's full-stack web development or intelligent business automation, we help shape the digital backbone of modern companies.</p>
-        <a href="/about/" class="button">More About Us</a>
-      </div>
+  <!-- Hero -->
+  <div class="hero" data-aos="fade-up">
+    <div class="hero-content">
+      <h1>🚀 Joel Digitals – Digital Solutions for Tomorrow</h1>
+      <p>Websites • Automation • Marketing • IT Services – everything your business needs in the digital era.</p>
+      <a href="/shop/" class="cta-btn">🛒 Visit Our Shop</a>
     </div>
-
-    <div class="section" data-aos="fade-up">
-      <div class="text">
-        <h2>Our Services</h2>
-        <p>We support businesses in their digital evolution:</p>
-        <ul>
-          <li><strong>Web Development:</strong> Custom platforms & portals</li>
-          <li><strong>E-Commerce:</strong> Smart online shop systems</li>
-          <li><strong>Cloud Integration:</strong> Secure and scalable cloud solutions</li>
-          <li><strong>IT Strategy:</strong> Consulting & transformation</li>
-          <li><strong>Support:</strong> Ongoing care and maintenance</li>
-        </ul>
-        <a href="/services/" class="button">Explore Services</a>
-      </div>
-    </div>
-
-    <div class="section" data-aos="fade-up">
-      
-      <div class="text">
-        <h2>About Us</h2>
-        <p>Joel Digitals stands for clarity, modern technologies, and lasting partnerships. We turn your digital vision into reality — efficiently, transparently, and sustainably.</p>
-        <a href="/team/" class="button">Meet the Team</a>
-      </div>
-    </div>
-
-    <div class="section" data-aos="fade-up">
-      <img src="https://images.unsplash.com/photo-1603791440384-56cd371ee9a7" alt="Shop">
-      <div class="text">
-        <h2>Our Shop</h2>
-        <p>Discover our digital products, pre-built components, and smart automation tools for your business — all available in our online shop.</p>
-        <a href="/shop/" class="button">Visit the Shop</a>
-      </div>
-    </div>
-
-    <div class="section" data-aos="fade-up">
-      <img src="{% static 'images/wiki-bg.jpg' %}" alt="About Us">
-      <div class="text">
-        <h2>Ready to Start?</h2>
-        <p>Let’s create something great together. Reach out and begin your digital project today.</p>
-        <a href="/contact/" class="button">Get in Touch</a>
-      </div>
-    </div>
-
-    <div class="blog-teaser" data-aos="fade-up">
-      <h2>From Our Blog</h2>
-      <p>Explore our latest insights on technology, strategy and digital transformation.</p>
-      <a href="/blog/" class="button">Visit Blog</a>
-    </div>
-
   </div>
+
+  <!-- About / Team -->
+  <section class="alt-section" data-aos="fade-up">
+    <!--<img src="{% static 'images/team1.jpg' %}" alt="Our Team">-->
+    <div class="text">
+      <h2>👥 Meet Our Team</h2>
+      <p>We are passionate developers, designers, and strategists building modern digital products. Collaboration and innovation drive everything we do.</p>
+      <a href="/team/" class="cta-btn">Learn More</a>
+    </div>
+  </section>
+
+  <section class="alt-section" data-aos="fade-up">
+    <img src="{% static 'images/office.png' %}" alt="Our Mission">
+    <div class="text">
+      <h2>🎯 Our Mission</h2>
+      <p>Helping businesses thrive in the digital era with innovative web platforms, smart automation, and strong strategies.</p>
+    </div>
+  </section>
+
+  <!-- Our Services / Shop Preview -->
+  <!-- Our Services / Shop Preview -->
+<section data-aos="fade-up">
+  <h2 style="text-align:center; margin-top:2rem;">🔥 Our Shop</h2>
+  <div class="services-grid">
+    {% for product in products %}
+    <div class="card">
+      <img src="{{ product.image.url }}" alt="{{ product.name }}">
+      <div class="card-body">
+        <h3>{{ product.name }}</h3>
+        <p>{{ product.short_description|truncatewords:18 }}</p>
+
+        {% if product.discount_percent > 0 %}
+        <div class="price">
+          <span style="text-decoration: line-through; color:#888;">{{ product.price }} €</span>
+          <span style="color:#3a86ff; font-weight:bold; margin-left:0.5rem;">
+            {{ product.discounted_price|floatformat:2 }} €
+          </span>
+          <span style="background:#ff3e3e; color:#fff; font-size:0.8rem; padding:2px 6px; border-radius:6px; margin-left:5px;">
+            -{{ product.discount_percent }}%
+          </span>
+        </div>
+        {% else %}
+        <div class="price"><strong>{{ product.price }} €</strong></div>
+        {% endif %}
+
+        <a href="{{ product.get_absolute_url }}" class="cta-btn">Buy Now</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div style="text-align:center; margin-top:1rem;">
+    <a href="/shop/" class="cta-btn">View All Services</a>
+  </div>
+</section>
+
+
+  <!-- Blog -->
+  {% if latest_blog %}
+<section data-aos="fade-up">
+  <h2 style="text-align:center; margin-top:2rem;">📖 From Our Blog</h2>
+  <div class="blog-grid">
+    <div class="card">
+      <img src="{{ latest_blog.teaser_image.url }}" alt="{{ latest_blog.title }}">
+      <div class="card-body">
+        <h3>{{ latest_blog.title }}</h3>
+        <p>{{ latest_blog.teaser_text|safe }}</p>
+        <a href="{{ latest_blog.get_absolute_url }}" class="cta-btn">Read More</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
+  <!-- Bottom CTA -->
+  <section class="contact-section" data-aos="zoom-in">
+    <h2>📩 Let’s Work Together</h2>
+    <p>Have an idea or project? Reach out and let’s make it real.</p>
+    <a href="/contact/" class="cta-btn">Contact Us</a>
+  </section>
+
+</div>
 </main>
 {% endblock %}
