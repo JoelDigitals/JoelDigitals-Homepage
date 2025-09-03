@@ -15,6 +15,9 @@ body {
   background: #1e1e1e;
   color: #f5f5f5;
   font-family: 'Inter', sans-serif;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
 /* Container */
@@ -23,6 +26,10 @@ body {
   padding: 2rem;
   border-radius: 16px;
   box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: hidden;
+  width: 95%;
 }
 
 /* Headings */
@@ -34,14 +41,14 @@ h1,h2,h3 { color:#fff; }
               url("{% static 'images/hero-bg.jpg' %}") center/cover no-repeat;
   border-radius: 16px;
   text-align: center;
-  padding: 8rem 2rem;
+  padding: 6rem 1rem;
   margin-bottom: 3rem;
   position: relative;
   overflow: hidden;
 }
 .hero-content { position: relative; z-index: 2; animation: fadeInUp 1s ease; }
-.hero h1 { font-size: 3.5rem; margin-bottom: 1rem; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-.hero p { font-size: 1.4rem; margin-bottom: 2rem; color:#fff; }
+.hero h1 { font-size: 2.2rem; margin-bottom: 1rem; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+.hero p { font-size: 1rem; margin-bottom: 2rem; color:#fff; }
 
 /* CTA Button Pulse */
 @keyframes pulse {
@@ -75,7 +82,8 @@ h1,h2,h3 { color:#fff; }
   margin:3rem 0;
 }
 .alt-section img {
-  flex:1; max-width:450px;
+  flex:1; 
+  max-width:100%;
   border-radius:16px;
   box-shadow:0 8px 24px rgba(0,0,0,0.4);
   transition: transform .3s;
@@ -87,7 +95,7 @@ h1,h2,h3 { color:#fff; }
 .alt-section p { margin-bottom:1.5rem; color:#ccc; }
 
 /* Cards */
-.card-grid {
+.card-grid, .services-grid, .blog-grid {
   display:grid;
   grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
   gap:1.5rem;
@@ -110,14 +118,6 @@ h1,h2,h3 { color:#fff; }
 .card-body p { flex:1; font-size:0.95rem; margin-bottom:1rem; color:#bbb; }
 .price { font-size:1.1rem; font-weight:bold; color:#3a86ff; margin-bottom:1rem; }
 
-/* Blog & Services Grid */
-.blog-grid, .services-grid {
-  display:grid;
-  grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
-  gap:1.5rem;
-  margin-top:2rem;
-}
-
 /* Bottom CTA */
 .contact-section {
   text-align:center;
@@ -125,6 +125,16 @@ h1,h2,h3 { color:#fff; }
   padding:2.5rem 2rem;
   background:#333;
   border-radius:16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 1.8rem; }
+  .hero p { font-size: 0.95rem; }
+  .alt-section { flex-direction: column !important; }
+  .alt-section img, .alt-section .text { width: 100%; }
+  .cta-btn { padding:0.6rem 1.2rem; font-size:0.9rem; }
+  .white-wrapper { padding:1rem; }
 }
 </style>
 
@@ -159,7 +169,6 @@ h1,h2,h3 { color:#fff; }
   </section>
 
   <!-- Our Services / Shop Preview -->
-  <!-- Our Services / Shop Preview -->
 <section data-aos="fade-up">
   <h2 style="text-align:center; margin-top:2rem;">🔥 Our Shop</h2>
   <div class="services-grid">
@@ -190,10 +199,9 @@ h1,h2,h3 { color:#fff; }
     {% endfor %}
   </div>
   <div style="text-align:center; margin-top:1rem;">
-    <a href="/shop/" class="cta-btn">View All Services</a>
+    <a href="/shop/" class="cta-btn">View Shop</a>
   </div>
 </section>
-
 
   <!-- Blog -->
   {% if latest_blog %}
@@ -211,7 +219,6 @@ h1,h2,h3 { color:#fff; }
   </div>
 </section>
 {% endif %}
-
 
   <!-- Bottom CTA -->
   <section class="contact-section" data-aos="zoom-in">
