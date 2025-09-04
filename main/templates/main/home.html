@@ -193,7 +193,7 @@ h1,h2,h3 { color:#fff; }
         <div class="price"><strong>{{ product.price }} €</strong></div>
         {% endif %}
 
-        <a href="{{ product.get_absolute_url }}" class="cta-btn">Buy Now</a>
+        <a href="{% url 'app_detail' slug=product.slug %}" class="cta-btn">Buy Now</a>
       </div>
     </div>
     {% endfor %}
@@ -213,7 +213,7 @@ h1,h2,h3 { color:#fff; }
       <div class="card-body">
         <h3>{{ latest_blog.title }}</h3>
         <p>{{ latest_blog.teaser_text|safe }}</p>
-        <a href="{{ latest_blog.get_absolute_url }}" class="cta-btn">Read More</a>
+        <a href="{% url 'blog_detail' latest_blog.pk %}" class="cta-btn">Read More</a>
       </div>
     </div>
   </div>
