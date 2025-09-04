@@ -197,27 +197,46 @@ def our_apps(request):
         'user_groups': user_groups,
     })
 
+
 def shop(request):
-    # Nur aktive und kaufbare Apps laden
     apps = App.objects.filter(is_available_for_purchase=True)
+
+    # --- Suche nach q (Name oder Beschreibung) ---
+    q = request.GET.get("q", "").strip()
+    if q:
+        apps = apps.filter(
+            Q(name__icontains=q) |
+            Q(description__icontains=q)
+        )
+
+    # --- Kategorien-Filter ---
+    category = request.GET.get("category", "").strip().lower()
+    if category:
+        apps = apps.filter(
+            Q(group__name__iexact=category) |
+            Q(name__istartswith=category)  # für die 4-Buchstaben-Fallbacks
+        )
+
+    # --- Gruppenbildung ---
     grouped_apps = defaultdict(list)
     group_names = {}
 
     for app in apps:
         if app.group:
             group_key = app.group.name.strip().lower()
+            group_names[group_key] = app.group.name.strip()
         else:
-            # Standardgruppe: erste vier Buchstaben des App-Namens
             group_key = app.name[:4].strip().lower()
+            group_names[group_key] = app.name[:4].strip()
         grouped_apps[group_key].append(app)
 
-    # Gruppen alphabetisch sortieren
     grouped_apps = dict(sorted(grouped_apps.items()))
 
-    # Kontext vorbereiten
     context = {
         "grouped_apps": grouped_apps,
         "group_names": group_names,
+        "active_category": category,
+        "query": q,
     }
 
     if request.user.is_authenticated:

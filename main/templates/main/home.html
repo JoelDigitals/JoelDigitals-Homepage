@@ -82,14 +82,19 @@ h1,h2,h3 { color:#fff; }
   margin:3rem 0;
 }
 .alt-section img {
-  flex:1; 
-  max-width:100%;
+  flex: 0 0 45%;          /* Bild auf 45% der Breite */
+  max-width: 45%;
   border-radius:16px;
   box-shadow:0 8px 24px rgba(0,0,0,0.4);
   transition: transform .3s;
 }
 .alt-section img:hover { transform: scale(1.05); }
-.alt-section .text { flex:1; min-width:280px; }
+.alt-section .text {
+  flex: 1 1 50%;          /* Text nimmt den Rest */
+  min-width:280px;
+}
+
+/* Wechselt die Richtung für gerade Abschnitte */
 .alt-section:nth-child(even) { flex-direction: row-reverse; }
 .alt-section h2 { margin-bottom:1rem; }
 .alt-section p { margin-bottom:1.5rem; color:#ccc; }
@@ -131,8 +136,14 @@ h1,h2,h3 { color:#fff; }
 @media (max-width: 768px) {
   .hero h1 { font-size: 1.8rem; }
   .hero p { font-size: 0.95rem; }
-  .alt-section { flex-direction: column !important; }
-  .alt-section img, .alt-section .text { width: 100%; }
+  .alt-section {
+    flex-direction: column !important;
+    gap:1.5rem;
+  }
+  .alt-section img, .alt-section .text {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
   .cta-btn { padding:0.6rem 1.2rem; font-size:0.9rem; }
   .white-wrapper { padding:1rem; }
 }
@@ -152,7 +163,7 @@ h1,h2,h3 { color:#fff; }
 
   <!-- About / Team -->
   <section class="alt-section" data-aos="fade-up">
-    <!--<img src="{% static 'images/team1.jpg' %}" alt="Our Team">-->
+    <img src="{% static 'images/team1.png' %}" alt="Our Team">
     <div class="text">
       <h2>👥 Meet Our Team</h2>
       <p>We are passionate developers, designers, and strategists building modern digital products. Collaboration and innovation drive everything we do.</p>
@@ -165,6 +176,7 @@ h1,h2,h3 { color:#fff; }
     <div class="text">
       <h2>🎯 Our Mission</h2>
       <p>Helping businesses thrive in the digital era with innovative web platforms, smart automation, and strong strategies.</p>
+      <a href="/about/" class="cta-btn">About Us</a>
     </div>
   </section>
 
