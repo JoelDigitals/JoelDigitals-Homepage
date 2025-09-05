@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST
 from django.core.mail import send_mail, EmailMultiAlternatives
-from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder
+from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup
 from shop_ourapps.models import AffiliatePartner
 from .forms import PurchaseForm, VoucherPurchaseForm
 from django.contrib import messages
@@ -197,46 +197,60 @@ def our_apps(request):
         'user_groups': user_groups,
     })
 
-
 def shop(request):
+    # --- Parameter aus Query ---
+    query = request.GET.get("q", "").strip()
+    group = request.GET.get("group", "all")
+    sort = request.GET.get("sort", "name")
+    price_min = request.GET.get("min", "")
+    price_max = request.GET.get("max", "")
+    only_discount = request.GET.get("discount", "")
+
+    # --- Basis: nur kaufbare Apps ---
     apps = App.objects.filter(is_available_for_purchase=True)
 
-    # --- Suche nach q (Name oder Beschreibung) ---
-    q = request.GET.get("q", "").strip()
-    if q:
+    # --- Suche ---
+    if query:
         apps = apps.filter(
-            Q(name__icontains=q) |
-            Q(description__icontains=q)
+            Q(name__icontains=query) | Q(description__icontains=query)
         )
 
-    # --- Kategorien-Filter ---
-    category = request.GET.get("category", "").strip().lower()
-    if category:
-        apps = apps.filter(
-            Q(group__name__iexact=category) |
-            Q(name__istartswith=category)  # für die 4-Buchstaben-Fallbacks
-        )
-
-    # --- Gruppenbildung ---
-    grouped_apps = defaultdict(list)
-    group_names = {}
-
-    for app in apps:
-        if app.group:
-            group_key = app.group.name.strip().lower()
-            group_names[group_key] = app.group.name.strip()
+    # --- Gruppierung ---
+    if group != "all":
+        if group == "ohne_gruppe":
+            apps = apps.filter(group__isnull=True)
         else:
-            group_key = app.name[:4].strip().lower()
-            group_names[group_key] = app.name[:4].strip()
-        grouped_apps[group_key].append(app)
+            apps = apps.filter(group_id=group)
 
-    grouped_apps = dict(sorted(grouped_apps.items()))
+    # --- Preisfilter ---
+    if price_min:
+        apps = apps.filter(price__gte=price_min)
+    if price_max:
+        apps = apps.filter(price__lte=price_max)
+
+    # --- Nur Angebote ---
+    if only_discount:
+        apps = apps.exclude(discount_percent=0)
+
+    # --- Sortierung ---
+    if sort == "price":
+        apps = apps.order_by("discounted_price")
+    elif sort == "discount":
+        apps = apps.order_by("-discount_percent")
+    else:
+        apps = apps.order_by("name")
+
+    groups = AppGroup.objects.all().order_by("name")
 
     context = {
-        "grouped_apps": grouped_apps,
-        "group_names": group_names,
-        "active_category": category,
-        "query": q,
+        "apps": apps,
+        "groups": groups,
+        "active_group": group,
+        "query": query,
+        "price_min": price_min,
+        "price_max": price_max,
+        "only_discount": only_discount,
+        "sort": sort,
     }
 
     if request.user.is_authenticated:

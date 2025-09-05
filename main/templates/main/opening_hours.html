@@ -1,113 +1,130 @@
 {% extends "base_home.html" %}
+{% load static %}
 
 {% block title %}Opening Hours – Joel Digitals{% endblock %}
 
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    AOS.init({ duration: 800, once: true });
+  });
+</script>
+
 <style>
-    .info-container {
-        background-color: #fff;
-        max-width: 600px;
-        margin: 50px auto;
-        padding: 30px 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-        text-align: center;
-    }
+body {
+  background: #1e1e1e;
+  color: #f5f5f5;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    h2 {
-        color: #0044cc;
-        font-weight: 700;
-        font-size: 2rem;
-        margin-bottom: 20px;
-    }
+.white-wrapper {
+  background: #2b2b2b;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+  max-width: 800px;
+  margin: 2rem auto;
+  overflow: hidden;
+  width: 95%;
+  text-align: center;
+}
 
-    ul {
-        list-style: none;
-        padding: 0;
-        margin: 0 0 1.5rem 0;
-        font-size: 1.1rem;
-        color: #222;
-        line-height: 1.5;
-        max-width: 300px;
-        margin-left: auto;
-        margin-right: auto;
-    }
+h2, h3 {
+  color: #fff;
+  margin-bottom: 1rem;
+}
 
-    ul li {
-        padding: 8px 0;
-        border-bottom: 1px solid #eee;
-    }
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem auto 2rem auto;
+  max-width: 400px;
+}
 
-    ul li.highlight {
-        background-color: #e6f0ff;
-        font-weight: bold;
-        border-radius: 6px;
-    }
+ul li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #444;
+  border-radius: 6px;
+  transition: background 0.3s;
+}
 
-    .day-label {
-        color: #000;
-        font-weight: 600;
-        margin-right: 8px;
-    }
+ul li.highlight {
+  background: rgba(58,134,255,0.2);
+  font-weight: bold;
+}
 
-    .time-open {
-        color: green;
-        font-weight: 600;
-    }
+.day-label {
+  font-weight: 600;
+  color: #fff;
+}
 
-    .time-closed {
-        color: red;
-        font-weight: 600;
-    }
+.time-open { color: #4caf50; font-weight: 600; }
+.time-closed { color: #ff5252; font-weight: 600; }
+.special { color: #ff9800; font-style: italic; }
 
-    .special {
-        color: #ff6600;
-        font-style: italic;
-    }
+/* CTA Button */
+.cta-btn {
+  display:inline-block;
+  padding:0.6rem 1.4rem;
+  border-radius:10px;
+  font-weight:600;
+  color:#fff !important;
+  background: linear-gradient(135deg, #3a86ff, #0056b3);
+  text-decoration:none;
+  transition: all .3s;
+}
+.cta-btn:hover {
+  transform: scale(1.05) translateY(-3px);
+  box-shadow:0 0 20px rgba(58,134,255,0.7);
+  background: linear-gradient(135deg, #0056b3, #003366);
+}
 
-    .phone-number {
-        font-size: 1.3rem;
-        color: #2e7d32;
-        margin: 20px 0;
-        font-weight: 600;
-        text-decoration: none;
-    }
+.phone-number {
+  font-size: 1.3rem;
+  color: #4caf50;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+.phone-number:hover { text-decoration: underline; }
 
-    .phone-number:hover {
-        text-decoration: underline;
-    }
-
-    p {
-        font-size: 1rem;
-        color: #555;
-        margin-top: 15px;
-    }
+p {
+  color: #ccc;
+  margin-top: 0.8rem;
+}
 </style>
 
-<div class="info-container">
-    <h2>Opening Hours & Important Info</h2>
+<main class="container">
+  <div class="white-wrapper" data-aos="zoom-in">
+    <h2>🕒 Opening Hours & Contact</h2>
 
     <p>Phone: <a href="tel:{{ phone_number }}" class="phone-number">{{ phone_number }}</a></p>
 
-    <h3>Our Opening Hours</h3>
+    <h3 data-aos="fade-up">Our Opening Hours (Next 7 Days)</h3>
     <ul>
-        {% for day, time in opening_times.items %}
-            <li class="{% if day == today %}highlight{% endif %}">
-                <span class="day-label">{{ day }}:</span>
-                {% if "Closed" in time %}
-                    <span class="time-closed">{{ time }}</span>
-                {% else %}
-                    <span class="time-open">{{ time }}</span>
-                {% endif %}
-            </li>
-        {% endfor %}
+      {% for day, time in opening_times.items %}
+        <li class="{% if day == today %}highlight{% endif %}" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}">
+          <span class="day-label">{{ day }}</span>
+          {% if "Closed" in time %}
+            <span class="time-closed">{{ time }}</span>
+          {% else %}
+            <span class="time-open">{{ time }}</span>
+          {% endif %}
+        </li>
+      {% endfor %}
     </ul>
 
-    
-    <p>All times with "*" are special opening hours.</p>
+    <p>All times marked with <span class="special">*</span> are <strong>special opening hours</strong>.</p>
     <p>We look forward to your call during these hours.</p>
-    <p>If you have any questions, feel free to use our <a href="{% url 'contact_form' %}">contact form</a>.</p>
-</div>
+    <p>If you have any questions, feel free to use our <a href="{% url 'contact_form' %}" class="cta-btn">Contact Form</a>.</p>
+  </div>
+</main>
 {% endblock %}

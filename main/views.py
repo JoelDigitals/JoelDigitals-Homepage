@@ -5,7 +5,7 @@ from django.contrib import messages
 from .models import TeamMember, OpeningHour, SpecialOpeningHour
 from blog.models import BlogPost
 from shop_ourapps.models import App
-from datetime import date
+from datetime import date, timedelta
 import random
 
 
@@ -85,6 +85,7 @@ def team_view(request):
 def opening_hours(request):
     today = date.today()
     today_name = today.strftime("%A")
+    end_date = today + timedelta(days=6)  # heute + 6 Tage
 
     # Basiszeiten (Normalplan)
     base_hours = {
@@ -96,10 +97,12 @@ def opening_hours(request):
         for oh in OpeningHour.objects.all()
     }
 
-    # Alle Sonderzeiten ab heute
-    specials = SpecialOpeningHour.objects.filter(date__gte=today).order_by("date")
+    # Sonderzeiten nur für heute bis 6 Tage später
+    specials = SpecialOpeningHour.objects.filter(
+        date__gte=today, date__lte=end_date
+    ).order_by("date")
 
-    # Mapping für kommende Sonderzeiten pro Wochentag (ab heute)
+    # Mapping für kommende Sonderzeiten pro Wochentag
     special_overrides = {}
     for s in specials:
         weekday_name = s.date.strftime("%A")
@@ -113,7 +116,7 @@ def opening_hours(request):
     if today_name in special_overrides:
         base_hours[today_name] = special_overrides[today_name]
 
-    # Immer Montag → Sonntag sortieren
+    # Montag → Sonntag sortieren
     days_order = [
         "Monday", "Tuesday", "Wednesday", "Thursday",
         "Friday", "Saturday", "Sunday",
@@ -122,7 +125,7 @@ def opening_hours(request):
     ordered_times = {}
     for day in days_order:
         if day in special_overrides:
-            ordered_times[day] = special_overrides[day] + " *"  # Sternchen markieren
+            ordered_times[day] = " *" + special_overrides[day]  # Sternchen für Sonderzeit
         else:
             ordered_times[day] = base_hours.get(day, "Closed")
 
