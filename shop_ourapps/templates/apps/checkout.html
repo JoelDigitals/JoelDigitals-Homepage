@@ -82,7 +82,7 @@
                     – {{ item.app.price|floatformat:2 }}€
                 {% endif %}
             </li>
-        {% empty %}
+        {% empty %} 
             <li>Your cart is empty.</li>
         {% endfor %}
     </ul>
@@ -118,6 +118,7 @@
                 <option value="">-- Bitte wählen --</option>
                 <option value="wallet">Wallet (Balance: €{{ wallet_balance|floatformat:2 }})</option>
                 <option value="paypal">PayPal</option>
+                <option value="stripe">Apple Pay / Google Pay / Kreditkarte (Stripe)</option>
                 <option value="überweisung">Überweisung</option>
             </select>
         </div>

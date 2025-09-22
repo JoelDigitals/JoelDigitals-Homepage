@@ -70,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.locale.LocaleMiddleware",
 ]
 
 ROOT_URLCONF = 'joel_digitals.urls'
@@ -122,13 +123,23 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
 
+LANGUAGE_CODE = "en"
+
 USE_I18N = True
 
+LANGUAGES = [
+    ("en", "English"),
+    ("de", "Deutsch"),
+]
+
 USE_TZ = True
+
+LOCALE_PATHS = [
+    BASE_DIR / "locale",
+]
 
 
 # Static files (CSS, JavaScript, Images)
@@ -156,7 +167,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'mail.gmx.net'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'joel-digitals@gmx.de'
-EMAIL_HOST_PASSWORD = 'Jojo240207!'
+EMAIL_HOST_PASSWORD = 'Jo240207!'
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'joel-digitals@gmx.de'
 COMPANY_EMAIL = 'joel-digitals@gmx.de'
@@ -169,3 +180,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 PAYPAL_CLIENT_ID = "AX7o18SnNzoZoP9IT2CYSoigBahHg-RBHlrysa1hf5iilolk434dHl_dXm8BrCl2af2XWF_gZ6-rgq5W"
 PAYPAL_CLIENT_SECRET = "EBHffuUYFnB_U8x2fwv7HPuiX9uDBanpfO2mRGFL7lJCiaw986yRBaXok-J8zp5AJlC6s6Yg3A3LsPVX"
 PAYPAL_ENVIRONMENT = "live"  # später "live" setzen
+
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "")

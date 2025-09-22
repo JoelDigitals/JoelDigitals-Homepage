@@ -23,6 +23,7 @@ urlpatterns = [
     path('cart/add/<int:app_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/update/', views.update_cart, name='update_cart'),
     path('checkout/', views.checkout, name='checkout'),
+    path("create-stripe-payment/<int:order_id>/", views.create_stripe_payment, name="create_stripe_payment"),
     path('paypal/execute/', views.paypal_execute, name='paypal_execute'),
     path("checkout/validate-codes/", views.validate_codes, name="validate_codes"),
     path('remove_from_cart/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),

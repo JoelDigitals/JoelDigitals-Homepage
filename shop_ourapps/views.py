@@ -771,7 +771,39 @@ def checkout(request):
             messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben. Bitte überweisen Sie den Betrag auf unser Konto.')
             cart.items.all().delete()
 
-
+        if payment_method == "stripe":
+            send_order_emails(order, request)
+        
+            # Stripe Checkout Session erstellen
+            session = stripe.checkout.Session.create(
+                payment_method_types=["card"],  # Stripe kümmert sich um Apple Pay / Google Pay automatisch
+                mode="payment",
+                line_items=[
+                    {
+                        "price_data": {
+                            "currency": "eur",
+                            "product_data": {
+                                "name": f"Bestellung #{order.id}",
+                            },
+                            "unit_amount": int(final_total * 100),  # Euro → Cent
+                        },
+                        "quantity": 1,
+                    },
+                ],
+                metadata={"order_id": order.id, "user_id": request.user.id},
+                success_url=request.build_absolute_uri(
+                    reverse("order_confirmation", args=[order.id])
+                ) + "?session_id={CHECKOUT_SESSION_ID}",
+                cancel_url=request.build_absolute_uri(reverse("checkout")),
+            )
+        
+            cart.items.all().delete()
+        
+            order.stripe_session_id = session.id  # optional im Modell speichern
+            order.save()
+        
+            return redirect(session.url, code=303)
+        
         if payment_method == 'paypal':
             send_order_emails(order, request)
             # PayPal Bestellung anlegen und zu PayPal weiterleiten
@@ -785,7 +817,6 @@ def checkout(request):
             approval_url = next(link["href"] for link in paypal_order["links"] if link["rel"] == "approve")
             return redirect(approval_url)
             
-
     context = {
         'items': items,
         'subtotal': subtotal,
@@ -837,6 +868,25 @@ def paypal_execute(request):
     messages.error(request, "Zahlung fehlgeschlagen.")
     return redirect('checkout')
 
+import stripe
+from django.http import JsonResponse
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+@login_required
+def create_stripe_payment(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    intent = stripe.PaymentIntent.create(
+        amount=int(order.total_amount * 100),  # Betrag in Cent
+        currency="eur",
+        metadata={"order_id": order.id},
+        automatic_payment_methods={"enabled": True},  # aktiviert Apple Pay, Google Pay, Karten etc.
+    )
+
+    return JsonResponse({"clientSecret": intent.client_secret})
+
+
 @login_required
 def order_confirmation(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
@@ -869,7 +919,7 @@ def validate_codes(request):
     })
 
 def more_informations(request, slug):
-    app = get_object_or_404(App, slug=slug)
+    app = get_object_or_404(App, slug=slug) 
     return render(request, 'apps/app_infos.html', {'app': app})
 
 @login_required

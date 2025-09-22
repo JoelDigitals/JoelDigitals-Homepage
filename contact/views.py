@@ -35,7 +35,7 @@ def appointment_create(request):
                 subject=admin_subject,
                 message=admin_message,
                 from_email='joel-digitals@gmx.de',
-                recipient_list=['joel-digitals@gmx.de'],
+                recipient_list=['Info.joel-digitals@gmx.de'],
             )
 
             # Mail an Kunden (Bestätigung)
@@ -112,7 +112,7 @@ def update_appointment_status(request, pk, status):
             "Hier sind wir erreichbar:\n"
             "https://joel-digitals.de/contact/\n\n"
             "Telefon: +4915253480270\n\n"
-            "E-Mail: joel-digitals@gmx.de\n\n"
+            "E-Mail: info.joel-digitals@gmx.de\n\n"
 
             "Details Ihres Termins:\n"
             f"- Terminart: {appointment.appointment_type}\n"
@@ -162,7 +162,7 @@ def contact_view(request):
             subject=f"Kontaktanfrage von {name}, Email: {form.cleaned_data['email']}",
             message=message,
             from_email='joel-digitals@gmx.de',
-            recipient_list=['joel-digitals@gmx.de'],
+            recipient_list=['Info.joel-digitals@gmx.de'],
         )
 
         messages.success(request, "Deine Nachricht wurde erfolgreich gesendet.")
