@@ -1,0 +1,177 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Joel Digitals\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# ---------------- Home Page ----------------
+#: templates/home.html:26
+msgid "Digital Solutions for Tomorrow"
+msgstr "Digitale Lösungen für morgen"
+
+#: templates/home.html:27
+msgid "Websites • Automation • Marketing • IT Services – everything your business needs in the digital era."
+msgstr "Websites • Automatisierung • Marketing • IT-Dienstleistungen – alles, was Ihr Unternehmen in der digitalen Ära benötigt."
+
+#: templates/home.html:29
+msgid "Visit Our Shop"
+msgstr "Besuche unseren Shop"
+
+#: templates/home.html:37
+msgid "Meet Our Team"
+msgstr "Lerne unser Team kennen"
+
+#: templates/home.html:38
+msgid "We are passionate developers, designers, and strategists building modern digital products. Collaboration and innovation drive everything we do."
+msgstr "Wir sind leidenschaftliche Entwickler, Designer und Strategen, die moderne digitale Produkte erstellen. Zusammenarbeit und Innovation treiben alles, was wir tun."
+
+#: templates/home.html:40
+msgid "Learn More"
+msgstr "Mehr erfahren"
+
+#: templates/home.html:48
+msgid "Our Mission"
+msgstr "Unsere Mission"
+
+#: templates/home.html:49
+msgid "Helping businesses thrive in the digital era with innovative web platforms, smart automation, and strong strategies."
+msgstr "Wir helfen Unternehmen, in der digitalen Ära mit innovativen Webplattformen, intelligenter Automatisierung und starken Strategien erfolgreich zu sein."
+
+#: templates/home.html:51
+msgid "About Us"
+msgstr "Über uns"
+
+#: templates/home.html:58
+msgid "Our Shop"
+msgstr "Unser Shop"
+
+#: templates/home.html:84
+msgid "Buy Now"
+msgstr "Jetzt kaufen"
+
+#: templates/home.html:90
+msgid "View Shop"
+msgstr "Shop anzeigen"
+
+#: templates/home.html:95
+msgid "From Our Blog"
+msgstr "Aus unserem Blog"
+
+#: templates/home.html:107
+msgid "Read More"
+msgstr "Weiterlesen"
+
+#: templates/home.html:114
+msgid "Opening Hours"
+msgstr "Öffnungszeiten"
+
+#: templates/home.html:115
+msgid "You can always find our up-to-date opening hours on our"
+msgstr "Unsere aktuellen Öffnungszeiten finden Sie jederzeit auf unserer"
+
+#: templates/home.html:115
+msgid "Opening Hours Page"
+msgstr "Öffnungszeiten-Seite"
+
+#: templates/home.html:115
+msgid "or on our"
+msgstr "oder auf unserem"
+
+#: templates/home.html:118
+msgid "Let’s Work Together"
+msgstr "Lass uns zusammenarbeiten"
+
+#: templates/home.html:119
+msgid "Have an idea or project? Reach out and let’s make it real."
+msgstr "Haben Sie eine Idee oder ein Projekt? Kontaktieren Sie uns, und wir setzen es um."
+
+#: templates/home.html:120
+msgid "Contact Us"
+msgstr "Kontaktieren Sie uns"
+
+# ---------------- About Page ----------------
+#: templates/about.html:8
+msgid "About Us – Joel Digitals"
+msgstr "Über uns – Joel Digitals"
+
+#: templates/about.html:24
+msgid "About Joel Digitals"
+msgstr "Über Joel Digitals"
+
+#: templates/about.html:25
+msgid "Joel Digitals is a Germany-based digital technology company specializing in custom IT solutions for businesses of all sizes. Since our inception, we've been dedicated to delivering quality, reliability, and cutting-edge expertise."
+msgstr "Joel Digitals ist ein in Deutschland ansässiges Digitalunternehmen, das sich auf maßgeschneiderte IT-Lösungen für Unternehmen jeder Größe spezialisiert hat. Seit unserer Gründung setzen wir auf Qualität, Zuverlässigkeit und modernste Expertise."
+
+#: templates/about.html:28
+msgid "Our multidisciplinary team includes skilled developers, creative designers, and experienced project managers who work together to turn your ideas into real-world digital products. We support you throughout every stage — from concept and development to ongoing support and growth."
+msgstr "Unser multidisziplinäres Team umfasst erfahrene Entwickler, kreative Designer und Projektmanager, die zusammenarbeiten, um Ihre Ideen in reale digitale Produkte umzusetzen. Wir begleiten Sie in jeder Phase – von der Konzeption über die Entwicklung bis hin zu laufendem Support und Wachstum."
+
+#: templates/about.html:31
+msgid "What sets us apart is our ability to transform complex technical challenges into practical, user-friendly solutions. We take pride in understanding your goals and translating them into robust systems that are built to last."
+msgstr "Was uns auszeichnet, ist unsere Fähigkeit, komplexe technische Herausforderungen in praktische, benutzerfreundliche Lösungen zu verwandeln. Wir legen Wert darauf, Ihre Ziele zu verstehen und sie in robuste Systeme umzusetzen, die lange halten."
+
+#: templates/about.html:34
+msgid "At Joel Digitals, we don’t just provide services — we build partnerships. Our mission is to be a trusted companion in your digital journey, offering clear communication, transparency, and consistently high standards."
+msgstr "Bei Joel Digitals bieten wir nicht nur Dienstleistungen – wir bauen Partnerschaften auf. Unsere Mission ist es, ein vertrauenswürdiger Begleiter auf Ihrer digitalen Reise zu sein, mit klarer Kommunikation, Transparenz und konstant hohen Standards."
+
+#: templates/about.html:37
+msgid "Let us help you unlock your digital potential and drive long-term success through innovation and strategy."
+msgstr "Lassen Sie uns Ihnen helfen, Ihr digitales Potenzial zu entfalten und langfristigen Erfolg durch Innovation und Strategie zu erzielen."
+
+#: templates/services.html:12
+msgid "Our Services"
+msgstr "Unsere Dienstleistungen"
+
+#: templates/services.html:14
+msgid "At Joel Digitals, we believe technology should be a driving force for growth and efficiency. Our services are designed to tackle the challenges of a modern, interconnected world. From cutting-edge app development to expert IT consultancy, we ensure your business stays ahead of the competition."
+msgstr "Bei Joel Digitals glauben wir, dass Technologie ein Wachstumsmotor sein sollte. Unsere Dienstleistungen sind darauf ausgelegt, die Herausforderungen einer modernen, vernetzten Welt zu meistern. Von innovativer App-Entwicklung bis hin zu fachkundiger IT-Beratung – wir sorgen dafür, dass Ihr Unternehmen der Konkurrenz immer einen Schritt voraus ist."
+
+#: templates/services.html:17
+msgid "Custom Software Development"
+msgstr "Maßgeschneiderte Softwareentwicklung"
+
+#: templates/services.html:18
+msgid "At Joel Digitals, we focus on delivering custom software solutions that align perfectly with your business goals. We bring ideas to life with scalable, efficient, and secure applications that ensure long-term success."
+msgstr "Bei Joel Digitals konzentrieren wir uns darauf, maßgeschneiderte Softwarelösungen zu liefern, die perfekt zu Ihren Geschäftszielen passen. Wir setzen Ideen mit skalierbaren, effizienten und sicheren Anwendungen um, die langfristigen Erfolg sichern."
+
+#: templates/services.html:21
+msgid "Custom software development is at the heart of our offerings. We understand that every business is unique, and so are its challenges. That’s why we work closely with you to craft a solution tailored to your specific needs. Our team is well-versed in modern frameworks and agile methodologies, ensuring a smooth development process and delivering high-quality results. Whether you're building an internal tool, customer-facing platform, or enterprise-grade system, we have the experience to help you succeed. We take pride in our ability to seamlessly integrate various technologies to create a cohesive and scalable product."
+msgstr "Die maßgeschneiderte Softwareentwicklung steht im Mittelpunkt unseres Angebots. Wir verstehen, dass jedes Unternehmen einzigartig ist – genauso wie seine Herausforderungen. Deshalb arbeiten wir eng mit Ihnen zusammen, um eine Lösung zu entwickeln, die genau auf Ihre Bedürfnisse zugeschnitten ist. Unser Team ist erfahren in modernen Frameworks und agilen Methoden, um einen reibungslosen Entwicklungsprozess und hochwertige Ergebnisse sicherzustellen. Ob internes Tool, kundenorientierte Plattform oder Enterprise-System – wir haben die Erfahrung, um Ihren Erfolg zu sichern. Wir sind stolz darauf, verschiedene Technologien nahtlos zu integrieren, um ein kohärentes und skalierbares Produkt zu schaffen."
+
+#: templates/services.html:28
+msgid "IT Consultancy"
+msgstr "IT-Beratung"
+
+#: templates/services.html:29
+msgid "In a fast-changing digital landscape, expert IT consultancy is key to staying ahead. We offer strategic guidance to optimize your technology stack."
+msgstr "In einer sich schnell verändernden digitalen Landschaft ist fachkundige IT-Beratung der Schlüssel, um der Konkurrenz voraus zu sein. Wir bieten strategische Beratung, um Ihren Technologie-Stack zu optimieren."
+
+#: templates/services.html:32
+msgid "Our IT consultancy services are designed to guide businesses through the complexities of digital transformation. We assess your current technology infrastructure and recommend actionable steps to improve efficiency, reduce costs, and enhance overall performance. With our extensive knowledge of industry best practices, we help you implement innovative solutions that foster growth and drive success. Whether it’s selecting the right technology for a new project or optimizing your existing systems, our consultants provide tailored advice that aligns with your business objectives. Our goal is to ensure your IT investments support your long-term vision, enabling you to scale and stay ahead in a competitive marketplace."
+msgstr "Unsere IT-Beratung ist darauf ausgelegt, Unternehmen durch die Komplexität der digitalen Transformation zu führen. Wir analysieren Ihre aktuelle IT-Infrastruktur und empfehlen konkrete Schritte, um Effizienz zu steigern, Kosten zu senken und die Gesamtleistung zu verbessern. Mit unserem umfassenden Wissen über Best Practices unterstützen wir Sie bei der Implementierung innovativer Lösungen, die Wachstum fördern und Erfolg bringen. Ob Auswahl der richtigen Technologie für ein neues Projekt oder Optimierung bestehender Systeme – unsere Berater liefern maßgeschneiderte Empfehlungen, die zu Ihren Geschäftszielen passen. Unser Ziel ist es, sicherzustellen, dass Ihre IT-Investitionen Ihre langfristige Vision unterstützen und Ihnen helfen, in einem wettbewerbsintensiven Markt zu wachsen."
+
+#: templates/services.html:40
+msgid "Ongoing Support & Maintenance"
+msgstr "Fortlaufender Support & Wartung"
+
+#: templates/services.html:41
+msgid "With our ongoing support and maintenance, your systems will always be secure, up-to-date, and running at peak performance. We offer continuous care."
+msgstr "Mit unserem fortlaufenden Support und Wartung bleiben Ihre Systeme stets sicher, aktuell und leistungsfähig. Wir bieten kontinuierliche Betreuung."
+
+#: templates/services.html:44
+msgid "Technology is constantly evolving, and your systems must adapt to keep up. Our ongoing support and maintenance services ensure your software and infrastructure remain optimized and secure. From regular system updates and bug fixes to infrastructure scaling and performance monitoring, we provide comprehensive support for your digital assets. We understand the importance of minimizing downtime and maximizing productivity, which is why our team is always available to resolve issues promptly and implement improvements as needed. By partnering with us for long-term support, you can focus on your core business operations while we ensure your systems remain at their best."
+msgstr "Technologie entwickelt sich ständig weiter, und Ihre Systeme müssen Schritt halten. Unsere Support- und Wartungsdienste sorgen dafür, dass Ihre Software und Infrastruktur optimiert und sicher bleiben. Von regelmäßigen Systemupdates und Fehlerbehebungen bis hin zu Skalierung der Infrastruktur und Performance-Überwachung bieten wir umfassende Unterstützung für Ihre digitalen Assets. Wir wissen, wie wichtig es ist, Ausfallzeiten zu minimieren und Produktivität zu maximieren, weshalb unser Team stets bereitsteht, Probleme umgehend zu lösen und Verbesserungen umzusetzen. Durch eine langfristige Partnerschaft mit uns können Sie sich auf Ihr Kerngeschäft konzentrieren, während wir Ihre Systeme auf dem höchsten Niveau halten."
+
+#: templates/services.html:52
+msgid "Data Analytics & BI"
+msgstr "Datenanalyse & BI"
+
+#: templates/services.html:53
+msgid "Turn raw data into actionable insights with our analytics solutions."
+msgstr "Verwandeln Sie Rohdaten in umsetzbare Erkenntnisse mit unseren Analyse-Lösungen."
+
+#: templates/services.html:56
+msgid "Unlock the potential of your data. Our analytics and business intelligence services help you discover trends, measure performance, and make informed decisions. From dashboards to predictive analytics, we deliver the tools to compete smarter."
+msgstr "Entfalten Sie das Potenzial Ihrer Daten. Unsere Analytics- und Business-Intelligence-Dienste helfen Ihnen, Trends zu erkennen, Leistung zu messen und fundierte Entscheidungen zu treffen. Von Dashboards bis zu Predictive Analytics liefern wir die Werkzeuge, um intelligenter zu konkurrieren."

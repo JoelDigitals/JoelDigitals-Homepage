@@ -1,0 +1,177 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Joel Digitals\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# ---------------- Home Page ----------------
+#: templates/home.html:26
+msgid "Digital Solutions for Tomorrow"
+msgstr "Digital Solutions for Tomorrow"
+
+#: templates/home.html:27
+msgid "Websites • Automation • Marketing • IT Services – everything your business needs in the digital era."
+msgstr "Websites • Automation • Marketing • IT Services – everything your business needs in the digital era."
+
+#: templates/home.html:29
+msgid "Visit Our Shop"
+msgstr "Visit Our Shop"
+
+#: templates/home.html:37
+msgid "Meet Our Team"
+msgstr "Meet Our Team"
+
+#: templates/home.html:38
+msgid "We are passionate developers, designers, and strategists building modern digital products. Collaboration and innovation drive everything we do."
+msgstr "We are passionate developers, designers, and strategists building modern digital products. Collaboration and innovation drive everything we do."
+
+#: templates/home.html:40
+msgid "Learn More"
+msgstr "Learn More"
+
+#: templates/home.html:48
+msgid "Our Mission"
+msgstr "Our Mission"
+
+#: templates/home.html:49
+msgid "Helping businesses thrive in the digital era with innovative web platforms, smart automation, and strong strategies."
+msgstr "Helping businesses thrive in the digital era with innovative web platforms, smart automation, and strong strategies."
+
+#: templates/home.html:51
+msgid "About Us"
+msgstr "About Us"
+
+#: templates/home.html:58
+msgid "Our Shop"
+msgstr "Our Shop"
+
+#: templates/home.html:84
+msgid "Buy Now"
+msgstr "Buy Now"
+
+#: templates/home.html:90
+msgid "View Shop"
+msgstr "View Shop"
+
+#: templates/home.html:95
+msgid "From Our Blog"
+msgstr "From Our Blog"
+
+#: templates/home.html:107
+msgid "Read More"
+msgstr "Read More"
+
+#: templates/home.html:114
+msgid "Opening Hours"
+msgstr "Opening Hours"
+
+#: templates/home.html:115
+msgid "You can always find our up-to-date opening hours on our"
+msgstr "You can always find our up-to-date opening hours on our"
+
+#: templates/home.html:115
+msgid "Opening Hours Page"
+msgstr "Opening Hours Page"
+
+#: templates/home.html:115
+msgid "or on our"
+msgstr "or on our"
+
+#: templates/home.html:118
+msgid "Let’s Work Together"
+msgstr "Let’s Work Together"
+
+#: templates/home.html:119
+msgid "Have an idea or project? Reach out and let’s make it real."
+msgstr "Have an idea or project? Reach out and let’s make it real."
+
+#: templates/home.html:120
+msgid "Contact Us"
+msgstr "Contact Us"
+
+# ---------------- About Page ----------------
+#: templates/about.html:8
+msgid "About Us – Joel Digitals"
+msgstr "About Us – Joel Digitals"
+
+#: templates/about.html:24
+msgid "About Joel Digitals"
+msgstr "About Joel Digitals"
+
+#: templates/about.html:25
+msgid "Joel Digitals is a Germany-based digital technology company specializing in custom IT solutions for businesses of all sizes. Since our inception, we've been dedicated to delivering quality, reliability, and cutting-edge expertise."
+msgstr "Joel Digitals is a Germany-based digital technology company specializing in custom IT solutions for businesses of all sizes. Since our inception, we've been dedicated to delivering quality, reliability, and cutting-edge expertise."
+
+#: templates/about.html:28
+msgid "Our multidisciplinary team includes skilled developers, creative designers, and experienced project managers who work together to turn your ideas into real-world digital products. We support you throughout every stage — from concept and development to ongoing support and growth."
+msgstr "Our multidisciplinary team includes skilled developers, creative designers, and experienced project managers who work together to turn your ideas into real-world digital products. We support you throughout every stage — from concept and development to ongoing support and growth."
+
+#: templates/about.html:31
+msgid "What sets us apart is our ability to transform complex technical challenges into practical, user-friendly solutions. We take pride in understanding your goals and translating them into robust systems that are built to last."
+msgstr "What sets us apart is our ability to transform complex technical challenges into practical, user-friendly solutions. We take pride in understanding your goals and translating them into robust systems that are built to last."
+
+#: templates/about.html:34
+msgid "At Joel Digitals, we don’t just provide services — we build partnerships. Our mission is to be a trusted companion in your digital journey, offering clear communication, transparency, and consistently high standards."
+msgstr "At Joel Digitals, we don’t just provide services — we build partnerships. Our mission is to be a trusted companion in your digital journey, offering clear communication, transparency, and consistently high standards."
+
+#: templates/about.html:37
+msgid "Let us help you unlock your digital potential and drive long-term success through innovation and strategy."
+msgstr "Let us help you unlock your digital potential and drive long-term success through innovation and strategy."
+
+#: templates/services.html:12
+msgid "Our Services"
+msgstr "Our Services"
+
+#: templates/services.html:14
+msgid "At Joel Digitals, we believe technology should be a driving force for growth and efficiency. Our services are designed to tackle the challenges of a modern, interconnected world. From cutting-edge app development to expert IT consultancy, we ensure your business stays ahead of the competition."
+msgstr "At Joel Digitals, we believe technology should be a driving force for growth and efficiency. Our services are designed to tackle the challenges of a modern, interconnected world. From cutting-edge app development to expert IT consultancy, we ensure your business stays ahead of the competition."
+
+#: templates/services.html:17
+msgid "Custom Software Development"
+msgstr "Custom Software Development"
+
+#: templates/services.html:18
+msgid "At Joel Digitals, we focus on delivering custom software solutions that align perfectly with your business goals. We bring ideas to life with scalable, efficient, and secure applications that ensure long-term success."
+msgstr "At Joel Digitals, we focus on delivering custom software solutions that align perfectly with your business goals. We bring ideas to life with scalable, efficient, and secure applications that ensure long-term success."
+
+#: templates/services.html:21
+msgid "Custom software development is at the heart of our offerings. We understand that every business is unique, and so are its challenges. That’s why we work closely with you to craft a solution tailored to your specific needs. Our team is well-versed in modern frameworks and agile methodologies, ensuring a smooth development process and delivering high-quality results. Whether you're building an internal tool, customer-facing platform, or enterprise-grade system, we have the experience to help you succeed. We take pride in our ability to seamlessly integrate various technologies to create a cohesive and scalable product."
+msgstr "Custom software development is at the heart of our offerings. We understand that every business is unique, and so are its challenges. That’s why we work closely with you to craft a solution tailored to your specific needs. Our team is well-versed in modern frameworks and agile methodologies, ensuring a smooth development process and delivering high-quality results. Whether you're building an internal tool, customer-facing platform, or enterprise-grade system, we have the experience to help you succeed. We take pride in our ability to seamlessly integrate various technologies to create a cohesive and scalable product."
+
+#: templates/services.html:28
+msgid "IT Consultancy"
+msgstr "IT Consultancy"
+
+#: templates/services.html:29
+msgid "In a fast-changing digital landscape, expert IT consultancy is key to staying ahead. We offer strategic guidance to optimize your technology stack."
+msgstr "In a fast-changing digital landscape, expert IT consultancy is key to staying ahead. We offer strategic guidance to optimize your technology stack."
+
+#: templates/services.html:32
+msgid "Our IT consultancy services are designed to guide businesses through the complexities of digital transformation. We assess your current technology infrastructure and recommend actionable steps to improve efficiency, reduce costs, and enhance overall performance. With our extensive knowledge of industry best practices, we help you implement innovative solutions that foster growth and drive success. Whether it’s selecting the right technology for a new project or optimizing your existing systems, our consultants provide tailored advice that aligns with your business objectives. Our goal is to ensure your IT investments support your long-term vision, enabling you to scale and stay ahead in a competitive marketplace."
+msgstr "Our IT consultancy services are designed to guide businesses through the complexities of digital transformation. We assess your current technology infrastructure and recommend actionable steps to improve efficiency, reduce costs, and enhance overall performance. With our extensive knowledge of industry best practices, we help you implement innovative solutions that foster growth and drive success. Whether it’s selecting the right technology for a new project or optimizing your existing systems, our consultants provide tailored advice that aligns with your business objectives. Our goal is to ensure your IT investments support your long-term vision, enabling you to scale and stay ahead in a competitive marketplace."
+
+#: templates/services.html:40
+msgid "Ongoing Support & Maintenance"
+msgstr "Ongoing Support & Maintenance"
+
+#: templates/services.html:41
+msgid "With our ongoing support and maintenance, your systems will always be secure, up-to-date, and running at peak performance. We offer continuous care."
+msgstr "With our ongoing support and maintenance, your systems will always be secure, up-to-date, and running at peak performance. We offer continuous care."
+
+#: templates/services.html:44
+msgid "Technology is constantly evolving, and your systems must adapt to keep up. Our ongoing support and maintenance services ensure your software and infrastructure remain optimized and secure. From regular system updates and bug fixes to infrastructure scaling and performance monitoring, we provide comprehensive support for your digital assets. We understand the importance of minimizing downtime and maximizing productivity, which is why our team is always available to resolve issues promptly and implement improvements as needed. By partnering with us for long-term support, you can focus on your core business operations while we ensure your systems remain at their best."
+msgstr "Technology is constantly evolving, and your systems must adapt to keep up. Our ongoing support and maintenance services ensure your software and infrastructure remain optimized and secure. From regular system updates and bug fixes to infrastructure scaling and performance monitoring, we provide comprehensive support for your digital assets. We understand the importance of minimizing downtime and maximizing productivity, which is why our team is always available to resolve issues promptly and implement improvements as needed. By partnering with us for long-term support, you can focus on your core business operations while we ensure your systems remain at their best."
+
+#: templates/services.html:52
+msgid "Data Analytics & BI"
+msgstr "Data Analytics & BI"
+
+#: templates/services.html:53
+msgid "Turn raw data into actionable insights with our analytics solutions."
+msgstr "Turn raw data into actionable insights with our analytics solutions."
+
+#: templates/services.html:56
+msgid "Unlock the potential of your data. Our analytics and business intelligence services help you discover trends, measure performance, and make informed decisions. From dashboards to predictive analytics, we deliver the tools to compete smarter."
+msgstr "Unlock the potential of your data. Our analytics and business intelligence services help you discover trends, measure performance, and make informed decisions. From dashboards to predictive analytics, we deliver the tools to compete smarter."

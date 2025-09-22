@@ -1,59 +1,39 @@
 {% extends "base_home.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block content %}
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    AOS.init({
-      duration: 800,
-      once: false,
-      mirror: true
-    });
+    AOS.init({ duration: 800, once: false, mirror: true });
   });
 </script>
 
 <style>
-body {
-  background: #1e1e1e;
-  color: #f5f5f5;
-  font-family: 'Inter', sans-serif;
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-.white-wrapper {
-  background: #2b2b2b;
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.3);
-  max-width: 1200px;
-  margin: 0 auto;
-  overflow: hidden;
-  width: 95%;
-}
-h1,h2,h3 { color:#fff; }
+body { background:#1e1e1e; color:#f5f5f5; font-family:'Inter',sans-serif; margin:0; padding:0; box-sizing:border-box; }
+.white-wrapper { background:#2b2b2b; padding:2rem; border-radius:16px; box-shadow:0 8px 28px rgba(0,0,0,0.3); max-width:1200px; margin:0 auto; overflow:hidden; width:95%; }
+h1,h2,h3{color:#fff;}
 
 /* Hero */
 .hero {
   background: linear-gradient(135deg, rgba(58,134,255,0.6), rgba(0,86,179,0.6)),
               url("{% static 'images/wiki-bg.png' %}") center/cover no-repeat;
-  border-radius: 16px;
-  text-align: center;
-  padding: 6rem 1rem;
-  margin-bottom: 3rem;
-  position: relative;
+  border-radius:16px;
+  text-align:center;
+  padding:6rem 1rem;
+  margin-bottom:3rem;
+  position:relative;
 }
-.hero-content { position: relative; z-index: 2; }
-.hero h1 { font-size: 2.2rem; margin-bottom: 1rem; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-.hero p { font-size: 1rem; margin-bottom: 2rem; color:#fff; }
+.hero-content { position:relative; z-index:2; }
+.hero h1 { font-size:2.2rem; margin-bottom:1rem; text-shadow:0 4px 20px rgba(0,0,0,0.5); }
+.hero p { font-size:1rem; margin-bottom:2rem; color:#fff; }
 
 /* CTA Button */
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(58,134,255,0.7); }
-  70% { box-shadow: 0 0 0 20px rgba(58,134,255,0); }
-  100% { box-shadow: 0 0 0 0 rgba(58,134,255,0); }
+  0% { box-shadow:0 0 0 0 rgba(58,134,255,0.7); }
+  70% { box-shadow:0 0 0 20px rgba(58,134,255,0); }
+  100% { box-shadow:0 0 0 0 rgba(58,134,255,0); }
 }
 .cta-btn {
   display:inline-block;
@@ -81,38 +61,20 @@ h1,h2,h3 { color:#fff; }
   margin:3rem 0;
 }
 .alt-section img {
-  flex: 0 0 45%;
-  max-width: 45%;
+  flex:0 0 45%;
+  max-width:45%;
   border-radius:16px;
   box-shadow:0 8px 24px rgba(0,0,0,0.4);
   transition: transform .3s;
 }
 .alt-section img:hover { transform: scale(1.05); }
-.alt-section .text {
-  flex: 1 1 50%;
-  min-width:280px;
-}
+.alt-section .text { flex:1 1 50%; min-width:280px; }
 .alt-section:nth-child(even) { flex-direction: row-reverse; }
 .alt-section h2 { margin-bottom:1rem; }
 .alt-section p { margin-bottom:1.5rem; color:#ccc; }
 
-/* Opening Hours Section */
-.hours-section {
-  margin:4rem 0 2rem;
-  text-align:center;
-  padding:2rem;
-  background:#333;
-  border-radius:16px;
-}
-.hours-section p {
-  color:#ccc;
-  max-width:600px;
-  margin:1rem auto 0;
-  font-size:1rem;
-}
-
 /* Cards */
-.card-grid, .services-grid, .blog-grid {
+.services-grid, .blog-grid {
   display:grid;
   grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
   gap:1.5rem;
@@ -135,21 +97,22 @@ h1,h2,h3 { color:#fff; }
 .card-body p { flex:1; font-size:0.95rem; margin-bottom:1rem; color:#bbb; }
 .price { font-size:1.1rem; font-weight:bold; color:#3a86ff; margin-bottom:1rem; }
 
-/* Bottom CTA */
-.contact-section {
+/* Öffnungszeiten & Kontakt */
+.hours-section, .contact-section {
+  margin:4rem 0 2rem;
   text-align:center;
-  margin-top:3rem;
-  padding:2.5rem 2rem;
+  padding:2rem;
   background:#333;
   border-radius:16px;
 }
+.hours-section p, .contact-section p { color:#ccc; max-width:600px; margin:1rem auto 0; font-size:1rem; }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .hero h1 { font-size: 1.8rem; }
-  .hero p { font-size: 0.95rem; }
+  .hero h1 { font-size:1.8rem; }
+  .hero p { font-size:0.95rem; }
   .alt-section { flex-direction: column !important; gap:1.5rem; }
-  .alt-section img, .alt-section .text { flex: 1 1 100%; max-width: 100%; }
+  .alt-section img, .alt-section .text { flex:1 1 100%; max-width:100%; }
   .cta-btn { padding:0.6rem 1.2rem; font-size:0.9rem; }
   .white-wrapper { padding:1rem; }
 }
@@ -158,38 +121,38 @@ h1,h2,h3 { color:#fff; }
 <main class="container">
 <div class="white-wrapper">
 
-  <!-- Hero ohne AOS -->
-  <div class="hero">
+  <!-- Hero -->
+  <div class="hero"> 
     <div class="hero-content">
-      <h1>🚀 Joel Digitals – Digital Solutions for Tomorrow</h1>
-      <p>Websites • Automation • Marketing • IT Services – everything your business needs in the digital era.</p>
-      <a href="/shop/" class="cta-btn">🛒 Visit Our Shop</a>
+      <h1>🚀 Joel Digitals – {% trans "Digital Solutions for Tomorrow" %}</h1>
+      <p>{% trans "Websites • Automation • Marketing • IT Services – everything your business needs in the digital era." %}</p>
+      <a href="/shop/" class="cta-btn">🛒 {% trans "Visit Our Shop" %}</a>
     </div>
   </div>
 
-  <!-- About / Team ohne AOS -->
+  <!-- About / Team -->
   <section class="alt-section">
-    <img src="{% static 'images/team1.png' %}" alt="Our Team">
+    <img src="{% static 'images/team1.png' %}" alt="{% trans 'Our Team' %}">
     <div class="text">
-      <h2>👥 Meet Our Team</h2>
-      <p>We are passionate developers, designers, and strategists building modern digital products. Collaboration and innovation drive everything we do.</p>
-      <a href="/team/" class="cta-btn">Learn More</a>
+      <h2>👥 {% trans "Meet Our Team" %}</h2>
+      <p>{% trans "We are passionate developers, designers, and strategists building modern digital products. Collaboration and innovation drive everything we do." %}</p>
+      <a href="/team/" class="cta-btn">{% trans "Learn More" %}</a>
     </div>
   </section>
 
   <!-- Mission -->
   <section class="alt-section" data-aos="fade-up">
-    <img src="{% static 'images/office.png' %}" alt="Our Mission">
+    <img src="{% static 'images/office.png' %}" alt="{% trans 'Our Mission' %}">
     <div class="text">
-      <h2>🎯 Our Mission</h2>
-      <p>Helping businesses thrive in the digital era with innovative web platforms, smart automation, and strong strategies.</p>
-      <a href="/about/" class="cta-btn">About Us</a>
+      <h2>🎯 {% trans "Our Mission" %}</h2>
+      <p>{% trans "Helping businesses thrive in the digital era with innovative web platforms, smart automation, and strong strategies." %}</p>
+      <a href="/about/" class="cta-btn">{% trans "About Us" %}</a>
     </div>
   </section>
 
   <!-- Shop -->
   <section data-aos="fade-up">
-    <h2 style="text-align:center; margin-top:2rem;">🔥 Our Shop</h2>
+    <h2 style="text-align:center; margin-top:2rem;">🔥 {% trans "Our Shop" %}</h2>
     <div class="services-grid">
       {% for product in products %}
       <div class="card" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:100 }}">
@@ -200,9 +163,7 @@ h1,h2,h3 { color:#fff; }
           {% if product.discount_percent > 0 %}
           <div class="price">
             <span style="text-decoration: line-through; color:#888;">{{ product.price }} €</span>
-            <span style="color:#3a86ff; font-weight:bold; margin-left:0.5rem;">
-              {{ product.discounted_price|floatformat:2 }} €
-            </span>
+            <span style="color:#3a86ff; font-weight:bold; margin-left:0.5rem;">{{ product.discounted_price|floatformat:2 }} €</span>
             <span style="background:#ff3e3e; color:#fff; font-size:0.8rem; padding:2px 6px; border-radius:6px; margin-left:5px;">
               -{{ product.discount_percent }}%
             </span>
@@ -210,44 +171,44 @@ h1,h2,h3 { color:#fff; }
           {% else %}
           <div class="price"><strong>{{ product.price }} €</strong></div>
           {% endif %}
-          <a href="{% url 'app_detail' slug=product.slug %}" class="cta-btn">Buy Now</a>
+          <a href="{% url 'app_detail' slug=product.slug %}" class="cta-btn">{% trans "Buy Now" %}</a>
         </div>
       </div>
       {% endfor %}
     </div>
     <div style="text-align:center; margin-top:1rem;">
-      <a href="/shop/" class="cta-btn">View Shop</a>
+      <a href="/shop/" class="cta-btn">{% trans "View Shop" %}</a>
     </div>
   </section>
 
   <!-- Blog -->
   {% if latest_blog %}
   <section data-aos="fade-up">
-    <h2 style="text-align:center; margin-top:2rem;">📖 From Our Blog</h2>
+    <h2 style="text-align:center; margin-top:2rem;">📖 {% trans "From Our Blog" %}</h2>
     <div class="blog-grid">
       <div class="card" data-aos="zoom-in">
         <img src="{{ latest_blog.teaser_image.url }}" alt="{{ latest_blog.title }}">
         <div class="card-body">
           <h3>{{ latest_blog.title }}</h3>
           <p>{{ latest_blog.teaser_text|safe }}</p>
-          <a href="{% url 'blog_detail' latest_blog.pk %}" class="cta-btn">Read More</a>
+          <a href="{% url 'blog_detail' latest_blog.pk %}" class="cta-btn">{% trans "Read More" %}</a>
         </div>
       </div>
     </div>
   </section>
   {% endif %}
 
-  <!-- Opening Hours Hinweis -->
+  <!-- Öffnungszeiten -->
   <section class="hours-section" data-aos="fade-up">
-    <h2>🕒 Opening Hours</h2>
-    <p>You can always find our up-to-date opening hours on our <a href="/opening-hours/" class="cta-btn">Openin Hours Page</a> or on our <a href="https://share.google/KbSv1wxc4geGIpGFX" target="_blank" class="cta-btn">Google Profile</a>.</p>
+    <h2>🕒 {% trans "Opening Hours" %}</h2>
+    <p>{% trans "You can always find our up-to-date opening hours on our" %} <a href="/opening-hours/" class="cta-btn">{% trans "Opening Hours Page" %}</a> {% trans "or on our" %} <a href="https://share.google/KbSv1wxc4geGIpGFX" target="_blank" class="cta-btn">Google</a>.</p>
   </section>
 
-  <!-- Contact -->
+  <!-- Kontakt -->
   <section class="contact-section" data-aos="zoom-in">
-    <h2>📩 Let’s Work Together</h2>
-    <p>Have an idea or project? Reach out and let’s make it real.</p>
-    <a href="/contact/" class="cta-btn">Contact Us</a>
+    <h2>📩 {% trans "Let’s Work Together" %}</h2>
+    <p>{% trans "Have an idea or project? Reach out and let’s make it real." %}</p>
+    <a href="/contact/" class="cta-btn">{% trans "Contact Us" %}</a>
   </section>
 
 </div>

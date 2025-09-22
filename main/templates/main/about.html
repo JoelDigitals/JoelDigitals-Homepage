@@ -1,7 +1,8 @@
 {% extends "base_home.html" %}
-{% load static %}
+{% load static i18n %}
+{% load i18n %}
 
-{% block title %}About Us – Joel Digitals{% endblock %}
+{% block title %}{% trans "About Us – Joel Digitals" %}{% endblock %}
 
 {% block content %}
 <style>
@@ -45,28 +46,12 @@
 
 <main>
     <div class="container">
-        <h2>About Joel Digitals</h2>
-        <p>
-            Joel Digitals is a Germany-based digital technology company specializing in custom IT solutions for businesses of all sizes.
-            Since our inception, we've been dedicated to delivering quality, reliability, and cutting-edge expertise.
-        </p>
-        <p>
-            Our multidisciplinary team includes skilled developers, creative designers, and experienced project managers who work together
-            to turn your ideas into real-world digital products. We support you throughout every stage — from concept and development to
-            ongoing support and growth.
-        </p>
-        <p>
-            What sets us apart is our ability to transform complex technical challenges into practical, user-friendly solutions.
-            We take pride in understanding your goals and translating them into robust systems that are built to last.
-        </p>
-        <p>
-            At Joel Digitals, we don’t just provide services — we build partnerships.
-            Our mission is to be a trusted companion in your digital journey, offering clear communication, transparency, and
-            consistently high standards.
-        </p>
-        <p>
-            Let us help you unlock your digital potential and drive long-term success through innovation and strategy.
-        </p>
+        <h2>{% trans "About Joel Digitals" %}</h2>
+        <p>{% trans "Joel Digitals is a Germany-based digital technology company specializing in custom IT solutions for businesses of all sizes. Since our inception, we've been dedicated to delivering quality, reliability, and cutting-edge expertise." %}</p>
+        <p>{% trans "Our multidisciplinary team includes skilled developers, creative designers, and experienced project managers who work together to turn your ideas into real-world digital products. We support you throughout every stage — from concept and development to ongoing support and growth." %}</p>
+        <p>{% trans "What sets us apart is our ability to transform complex technical challenges into practical, user-friendly solutions. We take pride in understanding your goals and translating them into robust systems that are built to last." %}</p>
+        <p>{% trans "At Joel Digitals, we don’t just provide services — we build partnerships. Our mission is to be a trusted companion in your digital journey, offering clear communication, transparency, and consistently high standards." %}</p>
+        <p>{% trans "Let us help you unlock your digital potential and drive long-term success through innovation and strategy." %}</p>
     </div>
 </main>
 {% endblock %}

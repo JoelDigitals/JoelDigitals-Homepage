@@ -1,5 +1,5 @@
 {% extends "base_home.html" %}
-
+{% load i18n %}
 {% block content %}
     <style>
         body {
@@ -110,72 +110,48 @@
 
 <main>
     <div class="container">
-        <h1>Our Services</h1>
+        <h1>{% trans "Our Services" %}</h1>
         <p>
-            At Joel Digitals, we believe technology should be a driving force for growth and efficiency. Our services are designed to tackle the challenges of a modern, interconnected world. From cutting-edge app development to expert IT consultancy, we ensure your business stays ahead of the competition.
+            {% trans "At Joel Digitals, we believe technology should be a driving force for growth and efficiency. Our services are designed to tackle the challenges of a modern, interconnected world. From cutting-edge app development to expert IT consultancy, we ensure your business stays ahead of the competition." %}
         </p>
 
         <div id="service1" class="service-section">
             <div class="toggle" onclick="toggleSection('service1')">
-                <h3>Custom Software Development <span class="arrow">▶</span></h3>
-                <br>
-                <p>
-                    At Joel Digitals, we focus on delivering custom software solutions that align perfectly with your business goals. 
-                    We bring ideas to life with scalable, efficient, and secure applications that ensure long-term success.
-                </p>
-                
+                <h3>{% trans "Custom Software Development" %} <span class="arrow">▶</span></h3>
+                <p>{% trans "At Joel Digitals, we focus on delivering custom software solutions that align perfectly with your business goals. We bring ideas to life with scalable, efficient, and secure applications that ensure long-term success." %}</p>
             </div>
             <div class="content">
-        
-                <p>
-                    Custom software development is at the heart of our offerings. We understand that every business is unique, and so are its challenges. That’s why we work closely with you to craft a solution tailored to your specific needs. Our team is well-versed in modern frameworks and agile methodologies, ensuring a smooth development process and delivering high-quality results. 
-                    Whether you're building an internal tool, customer-facing platform, or enterprise-grade system, we have the experience to help you succeed. We take pride in our ability to seamlessly integrate various technologies to create a cohesive and scalable product.
-                </p>
+                <p>{% trans "Custom software development is at the heart of our offerings. We understand that every business is unique, and so are its challenges. That’s why we work closely with you to craft a solution tailored to your specific needs. Our team is well-versed in modern frameworks and agile methodologies, ensuring a smooth development process and delivering high-quality results. Whether you're building an internal tool, customer-facing platform, or enterprise-grade system, we have the experience to help you succeed. We take pride in our ability to seamlessly integrate various technologies to create a cohesive and scalable product." %}</p>
             </div>
         </div>
 
         <div id="service2" class="service-section">
             <div class="toggle" onclick="toggleSection('service2')">
-                <h3>IT Consultancy<span class="arrow">▶</span></h3>
-                <p>
-                    In a fast-changing digital landscape, expert IT consultancy is key to staying ahead. We offer strategic guidance to optimize your technology stack.
-                </p>
-                
+                <h3>{% trans "IT Consultancy" %} <span class="arrow">▶</span></h3>
+                <p>{% trans "In a fast-changing digital landscape, expert IT consultancy is key to staying ahead. We offer strategic guidance to optimize your technology stack." %}</p>
             </div>
             <div class="content">
-                <p>
-                    Our IT consultancy services are designed to guide businesses through the complexities of digital transformation. We assess your current technology infrastructure and recommend actionable steps to improve efficiency, reduce costs, and enhance overall performance. With our extensive knowledge of industry best practices, we help you implement innovative solutions that foster growth and drive success. 
-                    Whether it’s selecting the right technology for a new project or optimizing your existing systems, our consultants provide tailored advice that aligns with your business objectives. Our goal is to ensure your IT investments support your long-term vision, enabling you to scale and stay ahead in a competitive marketplace.
-                </p>
+                <p>{% trans "Our IT consultancy services are designed to guide businesses through the complexities of digital transformation. We assess your current technology infrastructure and recommend actionable steps to improve efficiency, reduce costs, and enhance overall performance. With our extensive knowledge of industry best practices, we help you implement innovative solutions that foster growth and drive success. Whether it’s selecting the right technology for a new project or optimizing your existing systems, our consultants provide tailored advice that aligns with your business objectives. Our goal is to ensure your IT investments support your long-term vision, enabling you to scale and stay ahead in a competitive marketplace." %}</p>
             </div>
         </div>
 
         <div id="service3" class="service-section">
             <div class="toggle" onclick="toggleSection('service3')">
-                <h3>Ongoing Support & Maintenance <span class="arrow">▶</span></h3>
-                <p>
-                    With our ongoing support and maintenance, your systems will always be secure, up-to-date, and running at peak performance. We offer continuous care.
-                </p>
-               
+                <h3>{% trans "Ongoing Support & Maintenance" %} <span class="arrow">▶</span></h3>
+                <p>{% trans "With our ongoing support and maintenance, your systems will always be secure, up-to-date, and running at peak performance. We offer continuous care." %}</p>
             </div>
             <div class="content">
-                <p>
-                    Technology is constantly evolving, and your systems must adapt to keep up. Our ongoing support and maintenance services ensure your software and infrastructure remain optimized and secure. From regular system updates and bug fixes to infrastructure scaling and performance monitoring, we provide comprehensive support for your digital assets.
-                    We understand the importance of minimizing downtime and maximizing productivity, which is why our team is always available to resolve issues promptly and implement improvements as needed. By partnering with us for long-term support, you can focus on your core business operations while we ensure your systems remain at their best.
-                </p>
+                <p>{% trans "Technology is constantly evolving, and your systems must adapt to keep up. Our ongoing support and maintenance services ensure your software and infrastructure remain optimized and secure. From regular system updates and bug fixes to infrastructure scaling and performance monitoring, we provide comprehensive support for your digital assets. We understand the importance of minimizing downtime and maximizing productivity, which is why our team is always available to resolve issues promptly and implement improvements as needed. By partnering with us for long-term support, you can focus on your core business operations while we ensure your systems remain at their best." %}</p>
             </div>
         </div>
 
         <div id="service5" class="service-section">
             <div class="toggle" onclick="toggleSection('service5')">
-                <h3>Data Analytics & BI <span class="arrow">▶</span></h3>
-                <p>Turn raw data into actionable insights with our analytics solutions.</p>
+                <h3>{% trans "Data Analytics & BI" %} <span class="arrow">▶</span></h3>
+                <p>{% trans "Turn raw data into actionable insights with our analytics solutions." %}</p>
             </div>
             <div class="content">
-                <p>
-                    Unlock the potential of your data. Our analytics and business intelligence services help you discover trends,
-                    measure performance, and make informed decisions. From dashboards to predictive analytics, we deliver the tools to compete smarter.
-                </p>
+                <p>{% trans "Unlock the potential of your data. Our analytics and business intelligence services help you discover trends, measure performance, and make informed decisions. From dashboards to predictive analytics, we deliver the tools to compete smarter." %}</p>
             </div>
         </div>
 

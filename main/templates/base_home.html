@@ -209,6 +209,55 @@
         font-size: 0.8rem;
       }
     }
+    .language-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropbtn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .flag-icon {
+      width: 24px;
+      height: auto;
+      vertical-align: middle;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: var(--surface);
+      min-width: 120px;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+      z-index: 1000;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .dropdown-content a {
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+    }
+
+    .dropdown-content a:hover {
+      background-color: var(--primary);
+      color: #fff;
+    }
+
+    .language-dropdown:hover .dropdown-content {
+      display: block;
+    }
+
   </style>
 
 <!-- Grundlegende SEO-Tags -->
@@ -266,13 +315,64 @@
             {% endif %}
             {% if "Support" in user_groups %}
                 <a href="/contact/admin-tickets/">Admin: Tickets</a>
-                <a href="/contact/appointment/admin/">Admin: Termin</a>
             {% endif %}
             <a href="/auth/logout/">Logout</a>
         {% else %}
             <a href="/auth/login/">Login</a>
         {% endif %}
+
+        <div class="language-dropdown">
+          <button class="dropbtn">
+            <img src="{% static 'flags/' %}de.png" alt="de" class="flag-icon" id="current-flag">
+          </button>
+          <div class="dropdown-content">
+            <a href="/de/" onclick="switchLanguage('de')"><img src="{% static 'flags/de.png' %}" class="flag-icon"> Deutsch</a>
+            <a href="/en/" onclick="switchLanguage('en')"><img src="{% static 'flags/en.png' %}" class="flag-icon"> English</a>
+          </div>
+        </div>
+
     </nav>
+    <script>
+      function switchLanguage(lang) {
+        // Cookie speichern
+        document.cookie = "language=" + lang + "; path=/; SameSite=Lax; max-age=" + 365*24*60*60;
+      
+        // Flagge im Header aktualisieren
+        const flag = document.getElementById('current-flag');
+        if (flag) {
+          flag.src = "{% static 'flags/' %}" + lang + ".png";
+          flag.alt = lang;
+        }
+      
+        // Aktuelle URL
+        let path = window.location.pathname;
+      
+        // Prüfen, ob ein Sprachprefix existiert (/de/, /en/, ...)
+        const match = path.match(/^\/(de|en|fr)(\/.*|$)/);
+        if(match) {
+          // Sprachprefix ersetzen
+          path = "/" + lang + match[2];
+        } else {
+          // Keinen Prefix? Einfach lang vorne hinzufügen
+          path = "/" + lang + path;
+        }
+      
+        // Seite neu laden mit Sprach-Prefix
+        window.location.href = path + window.location.search + window.location.hash;
+      }
+
+      // Beim Laden der Seite Flagge nach Cookie setzen
+      document.addEventListener("DOMContentLoaded", () => {
+        const matches = document.cookie.match(/(^|;)\s*language=([^;]+)/);
+        const lang = matches ? matches[2] : 'de';
+        const flag = document.getElementById('current-flag');
+        if(flag) {
+          flag.src = "{% static 'flags/' %}" + lang + ".png";
+          flag.alt = lang;
+        }
+      });
+    </script>
+
 </header>
 
 
@@ -329,6 +429,30 @@
 </div>
 
 <script>
+function updateHeaderFlag(lang) {
+  const btn = document.querySelector('.language-dropdown .dropbtn img');
+  if (btn) {
+    btn.src = "{% static 'flags/' %}" + lang + ".png";
+    btn.alt = lang;
+  }
+}
+
+// Im switchLanguage einbauen:
+function switchLanguage(lang) {
+  document.getElementById('language-select').value = lang;
+  setLanguage(lang);
+  savePreferences();
+  updateHeaderFlag(lang);
+}
+
+// Beim Laden der Präferenzen:
+document.addEventListener("DOMContentLoaded", () => {
+  const prefs = loadPreferences();
+  applyPreferences(prefs);
+  updateHeaderFlag(prefs?.language || 'de');
+  if(!prefs) showBanner();
+});
+
 function toggleMenu() {
   const nav = document.getElementById("main-nav");
   nav.classList.toggle("open");
@@ -347,6 +471,13 @@ document.addEventListener("click", function (event) {
     nav.classList.remove("open");
   }
 });
+
+function switchLanguage(lang) {
+  document.getElementById('language-select').value = lang;
+  setLanguage(lang);
+  savePreferences();
+}
+
 </script>
 <script>
   const translations = {

@@ -130,10 +130,14 @@ LANGUAGE_CODE = "en"
 
 USE_I18N = True
 
+from django.utils.translation import gettext_lazy as _
+
 LANGUAGES = [
-    ("en", "English"),
-    ("de", "Deutsch"),
+    ("en", _("English")),
+    ("de", _("Deutsch")),
 ]
+
+LOCALE_PATHS = [ BASE_DIR / "locale" ]
 
 USE_TZ = True
 
