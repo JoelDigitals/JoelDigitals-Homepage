@@ -1,5 +1,7 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load static i18n %}
+
 
 {% block title %}Contact – Joel Digitals{% endblock %}
 
@@ -49,33 +51,34 @@
 </style>
 
 <div class="contact-container">
-    <h2>Welcome to the Joel Digitals Contact Center</h2>
-    <p>Please choose an option:</p>
+    <h2>{% trans "Welcome to the Joel Digitals Contact Center" %}</h2>
+    <p>{% trans "Please choose an option:" %}</p>
 
     <section>
-        <h3>📞 <a href="tel:+4915253480270">Call +49 1525 3480270</a></h3>
-        <p>Prefer to talk directly? Call us at the above number.</p>
-        <p><a href="{% url 'opening_hours' %}" style="font-size: 0.9rem; color: #0044cc; text-decoration: underline;">View Opening Hours & Info</a></p>
+        <h3>📞 <a href="tel:+4915253480270">{% trans "Call" %} +49 1525 3480270</a></h3>
+        <p>{% trans "Prefer to talk directly? Call us at the above number." %}</p>
+        <p><a href="{% url 'opening_hours' %}" style="font-size: 0.9rem; color: #0044cc; text-decoration: underline;">{% trans "View Opening Hours & Info" %}</a></p>
     </section>
 
     <section>
-        <h3><a href="{% url 'contact_form' %}">📬 Contact Form</a></h3>
-        <p>Have a general inquiry or question? Send us a message via the contact form.</p>
+        <h3><a href="{% url 'contact_form' %}">📬 {% trans "Contact Form" %}</a></h3>
+        <p>{% trans "Have a general inquiry or question? Send us a message via the contact form." %}</p>
     </section>
 
     <section>
-        <h3><a href="{% url 'appointment_create' %}">📅 Book an Appointment</a></h3>
-        <p>Choose a date and time to speak with us – appointments are available for various purposes.</p>
+        <h3><a href="{% url 'appointment_create' %}">📅 {% trans "Book an Appointment" %}</a></h3>
+        <p>{% trans "Choose a date and time to speak with us – appointments are available for various purposes." %}</p>
     </section>
 
     <section>
-        <h3><a href="{% url 'sales' %}">🛒 Sales / Wishlist</a></h3>
-        <p>Let us know what you would like to buy or have created. Wishlist items are collected and stored for export.</p>
+        <h3><a href="{% url 'sales' %}">🛒 {% trans "Sales / Wishlist" %}</a></h3>
+        <p>{% trans "Let us know what you would like to buy or have created. Wishlist items are collected and stored for export" %}.</p>
     </section>
 
     <section>
         <h3><a href="{% url 'support_tickets' %}">🛠️ Support Ticket</a></h3>
-        <p>Having issues or technical questions? Create a support ticket, and we'll get back to you as soon as possible.</p>
+        <p>{% trans "Having issues or technical questions? Create a support ticket, and we'll get back to you as soon as possible." %}</p>
     </section>
 </div>
 {% endblock %}
+ 

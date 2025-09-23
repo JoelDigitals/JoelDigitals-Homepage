@@ -1,7 +1,7 @@
 {% extends "base_home.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Privacy Policy – Joel Digitals{% endblock %}
+{% block title %}{% trans "Privacy Policy – Joel Digitals" %}{% endblock %}
 
 {% block content %}
 <style>
@@ -15,84 +15,64 @@
         font-size: 18px;
         color: #000;
     }
-
-    h2 {
-        margin-top: 0;
-    }
-
-    a.mail-link {
-        color: #0044cc;
-        text-decoration: none;
-    }
-
-    a.mail-link:hover {
-        text-decoration: underline;
-    }
-
+    h2 { margin-top: 0; }
+    a.mail-link { color: #0044cc; text-decoration: none; }
+    a.mail-link:hover { text-decoration: underline; }
     .contact-button {
-        background-color: #0044cc;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 18px;
-        margin-top: 20px;
+        background-color: #0044cc; color: white;
+        padding: 10px 20px; border: none; border-radius: 5px;
+        cursor: pointer; text-decoration: none;
+        display: inline-block; font-size: 18px; margin-top: 20px;
     }
-
-    .contact-button:hover {
-        background-color: #0033a0;
-    }
+    .contact-button:hover { background-color: #0033a0; }
 </style>
 <main>
     <div class="container">
-        <h2>Privacy Policy</h2>
-        <p>Your privacy is important to us. This privacy policy explains how we collect, use, and protect your personal data in accordance with the General Data Protection Regulation (GDPR).</p>
+        <h2>{% trans "Privacy Policy" %}</h2>
+        <p>{% trans "Your privacy is important to us. This privacy policy explains how we collect, use, and protect your personal data in accordance with the General Data Protection Regulation (GDPR)." %}</p>
 
-        <h3>1. Data Controller</h3>
-        <p>The data controller is:<br>
+        <h3>{% trans "1. Data Controller" %}</h3>
+        <p>{% trans "The data controller is:" %}<br>
         Joel Nicolay<br>
-        Email: <a class="mail-link" href="mailto:Info.joel-digitals@gmx.de">Info.joel-digitals@gmx.de</a></p>
+        {% trans "Email:" %} <a class="mail-link" href="mailto:Info.joel-digitals@gmx.de">Info.joel-digitals@gmx.de</a></p>
 
-        <h3>2. What Personal Data We Collect</h3>
+        <h3>{% trans "2. What Personal Data We Collect" %}</h3>
         <ul>
-            <li>Contact details (name, email, phone number)</li>
-            <li>IP address and browser user agent for analytics and security</li>
-            <li>Any other data you voluntarily provide (e.g. via contact form)</li>
+            <li>{% trans "Contact details (name, email, phone number)" %}</li>
+            <li>{% trans "IP address and browser user agent for analytics and security" %}</li>
+            <li>{% trans "Any other data you voluntarily provide (e.g. via contact form)" %}</li>
         </ul>
 
-        <h3>3. Why We Process Your Data</h3>
+        <h3>{% trans "3. Why We Process Your Data" %}</h3>
         <ul>
-            <li>To provide our services</li>
-            <li>To respond to inquiries</li>
-            <li>To improve our website</li>
-            <li>To comply with legal obligations</li>
+            <li>{% trans "To provide our services" %}</li>
+            <li>{% trans "To respond to inquiries" %}</li>
+            <li>{% trans "To improve our website" %}</li>
+            <li>{% trans "To comply with legal obligations" %}</li>
         </ul>
 
-        <h3>4. Legal Basis</h3>
-        <p>We process your data based on Article 6 GDPR – especially based on your consent, contractual necessity, and legal obligations.</p>
+        <h3>{% trans "4. Legal Basis" %}</h3>
+        <p>{% trans "We process your data based on Article 6 GDPR – especially based on your consent, contractual necessity, and legal obligations." %}</p>
 
-        <h3>5. Data Sharing</h3>
-        <p>We do not sell or rent your personal data. Data may be shared with service providers under data processing agreements.</p>
+        <h3>{% trans "5. Data Sharing" %}</h3>
+        <p>{% trans "We do not sell or rent your personal data. Data may be shared with service providers under data processing agreements." %}</p>
 
-        <h3>6. Your Rights</h3>
+        <h3>{% trans "6. Your Rights" %}</h3>
         <ul>
-            <li>Access, correction, and deletion of your data</li>
-            <li>Withdrawal of consent</li>
-            <li>Data portability</li>
-            <li>Right to lodge a complaint with a supervisory authority</li>
+            <li>{% trans "Access, correction, and deletion of your data" %}</li>
+            <li>{% trans "Withdrawal of consent" %}</li>
+            <li>{% trans "Data portability" %}</li>
+            <li>{% trans "Right to lodge a complaint with a supervisory authority" %}</li>
         </ul>
 
-        <h3>7. Data Security</h3>
-        <p>We use technical and organizational measures to protect your data.</p>
+        <h3>{% trans "7. Data Security" %}</h3>
+        <p>{% trans "We use technical and organizational measures to protect your data." %}</p>
 
-        <h3>8. Retention</h3>
-        <p>We store your data only as long as necessary for the purposes stated above or as required by law.</p>
+        <h3>{% trans "8. Retention" %}</h3>
+        <p>{% trans "We store your data only as long as necessary for the purposes stated above or as required by law." %}</p>
 
-        <h3>9. Contact</h3>
-        <p>For any data protection concerns, contact us at <a class="mail-link" href="mailto:joel-digitals@gmx.de">joel-digitals@gmx.de</a>.</p>
+        <h3>{% trans "9. Contact" %}</h3>
+        <p>{% trans "For any data protection concerns, contact us at" %} <a class="mail-link" href="mailto:joel-digitals@gmx.de">joel-digitals@gmx.de</a>.</p>
     </div>
 </main>
 {% endblock %}

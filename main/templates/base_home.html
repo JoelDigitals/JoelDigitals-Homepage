@@ -1,4 +1,6 @@
 {% load static %}
+{% load i18n %}
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -296,29 +298,30 @@
   </div>
       <nav id="main-nav">
         <!-- Links bleiben gleich -->
-        <a href="/wiki/">Wiki</a>
-        <a href="/status/">Status</a>
-        <a href="/services/">Services</a>
-        <a href="/about/">About Us</a>
-        <a href="/contact/">Contact</a>
-        <a href="/blog/">Blog</a>
-        <a href="/our-apps/">Our Apps</a>
-        <a href="/shop/">Shop</a>
+        <a href="/wiki/">{% trans "Wiki" %}</a>
+        <a href="/status/">{% trans "Status" %}</a>
+        <a href="/services/">{% trans "Services" %}</a>
+        <a href="/about/">{% trans "About Us" %}</a>
+        <a href="/contact/">{% trans "Contact" %}</a>
+        <a href="/blog/">{% trans "Blog" %}</a>
+        <a href="/our-apps/">{% trans "Our Apps" %}</a>
+        <a href="/shop/">{% trans "Shop" %}</a>
+
         {% if user.is_authenticated %}
             {% if "Marketing" in user_groups %}
-                <a href="/blog/admin-blog/">Admin: Blog</a>
+                <a href="/blog/admin-blog/">{% trans "Admin: Blog" %}</a>
             {% endif %}
             {% if "Selling" in user_groups %}
-                <a href="/contact/admin-sales/">Admin: Sales</a>
-                <a href="/admin-sales/orders/">Admin: Orders</a>
-                <a href="/contact/appointment/admin/">Admin: Termin</a>
+                <a href="/contact/admin-sales/">{% trans "Admin: Sales" %}</a>
+                <a href="/admin-sales/orders/">{% trans "Admin: Orders" %}</a>
+                <a href="/contact/appointment/admin/">{% trans "Admin: Termin" %}</a>
             {% endif %}
             {% if "Support" in user_groups %}
-                <a href="/contact/admin-tickets/">Admin: Tickets</a>
+                <a href="/contact/admin-tickets/">{% trans "Admin: Tickets" %}</a>
             {% endif %}
-            <a href="/auth/logout/">Logout</a>
+            <a href="/auth/logout/">{% trans "Logout" %}</a>
         {% else %}
-            <a href="/auth/login/">Login</a>
+            <a href="/auth/login/">{% trans "Login" %}</a>
         {% endif %}
 
         <div class="language-dropdown">
@@ -384,11 +387,12 @@
   <div>&copy; 2025 Joel Digitals. All rights reserved.</div>
   
   <div class="footer-links">
-    <a href="/imprint/">Imprint</a> |
-    <a href="/privacy/">Privacy Policy</a> |
-    <a href="/terms/">Terms of Service</a> |
-    <a href="/">Home</a>
+    <a href="/imprint/">{% trans "Imprint" %}</a> |
+    <a href="/privacy/">{% trans "Privacy Policy" %}</a> |
+    <a href="/terms/">{% trans "Terms of Service" %}</a> |
+    <a href="/">{% trans "Home" %}</a>
   </div>
+
 
   <div class="socials">
     <!--<a href="https://facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>

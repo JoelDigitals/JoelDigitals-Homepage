@@ -1,7 +1,7 @@
 {% extends "base_home.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Imprint – Joel Digitals{% endblock %}
+{% block title %}{% trans "Imprint – Joel Digitals" %}{% endblock %}
 
 {% block content %}
 <style>
@@ -15,66 +15,46 @@
         font-size: 18px;
         color: #000;
     }
-
-    h2 {
-        margin-top: 0;
-    }
-
-    a.mail-link {
-        color: #0044cc;
-        text-decoration: none;
-    }
-
-    a.mail-link:hover {
-        text-decoration: underline;
-    }
-
+    h2 { margin-top: 0; }
+    a.mail-link { color: #0044cc; text-decoration: none; }
+    a.mail-link:hover { text-decoration: underline; }
     .contact-button {
-        background-color: #0044cc;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 18px;
-        margin-top: 20px;
+        background-color: #0044cc; color: white;
+        padding: 10px 20px; border: none; border-radius: 5px;
+        cursor: pointer; text-decoration: none;
+        display: inline-block; font-size: 18px; margin-top: 20px;
     }
-
-    .contact-button:hover {
-        background-color: #0033a0;
-    }
+    .contact-button:hover { background-color: #0033a0; }
 </style>
 
 <div class="container">
-    <h2>Imprint</h2>
-    <p>This website is operated by:</p>
+    <h2>{% trans "Imprint" %}</h2>
+    <p>{% trans "This website is operated by:" %}</p>
     <p>
         <strong>Joel Nicolay</strong><br>
         Niederwiesstraße 20<br>
-        66822 Lebach, Germany<br>
+        66822 Lebach, {% trans "Germany" %}<br>
         <strong>Joel Digitals</strong><br>
-        Smart. Digital. Reliable
+        {% trans "Smart. Digital. Reliable" %}
     </p>
     <p>
-        Email: <a class="mail-link" href="mailto:Info.joel-digitals@gmx.de">Info.joel-digitals@gmx.de</a>
+        {% trans "Email:" %} <a class="mail-link" href="mailto:Info.joel-digitals@gmx.de">Info.joel-digitals@gmx.de</a>
     </p>
     <p>
-        VAT ID according to § 27 a German VAT Act: <strong>Soon</strong>
+        {% trans "VAT ID according to § 27 a German VAT Act:" %} <strong>{% trans "Soon" %}</strong>
     </p>
     <p>
-        Responsible for content according to § 55 Abs. 2 RStV:<br>
-        Joel Nicolay, address as above.
+        {% trans "Responsible for content according to § 55 Abs. 2 RStV:" %}<br>
+        Joel Nicolay, {% trans "address as above." %}
     </p>
     <p>
-        EU Dispute Resolution:<br>
-        The European Commission provides a platform for online dispute resolution (ODR):<br>
+        {% trans "EU Dispute Resolution:" %}<br>
+        {% trans "The European Commission provides a platform for online dispute resolution (ODR):" %}<br>
         <a href="https://ec.europa.eu/consumers/odr" target="_blank">https://ec.europa.eu/consumers/odr</a><br>
-        We are neither obligated nor willing to participate in dispute resolution proceedings before a consumer arbitration board.
+        {% trans "We are neither obligated nor willing to participate in dispute resolution proceedings before a consumer arbitration board." %}
     </p>
 
-    <h3>Contact Us</h3>
-    <p>If you would like to get in touch, please visit our <a href="/contact/">Contact Form</a> page.</p>
+    <h3>{% trans "Contact Us" %}</h3>
+    <p>{% trans "If you would like to get in touch, please visit our" %} <a href="/contact/">{% trans "Contact Form" %}</a> {% trans "page." %}</p>
 </div>
 {% endblock %}

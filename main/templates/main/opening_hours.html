@@ -1,6 +1,8 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load static i18n %}
 
+{% load i18n %}
 {% block title %}Opening Hours – Joel Digitals{% endblock %}
 
 {% block content %}
@@ -104,11 +106,11 @@ p {
 
 <main class="container">
   <div class="white-wrapper" data-aos="zoom-in">
-    <h2>🕒 Opening Hours & Contact</h2>
+    <h2>🕒 {% trans "Opening Hours & Contact" %}</h2>
 
-    <p>Phone: <a href="tel:{{ phone_number }}" class="phone-number">{{ phone_number }}</a></p>
+    <p>{% trans "Phone:" %} <a href="tel:{{ phone_number }}" class="phone-number">{{ phone_number }}</a></p>
 
-    <h3 data-aos="fade-up">Our Opening Hours (Next 7 Days)</h3>
+    <h3 data-aos="fade-up">{% trans "Our Opening Hours (Next 7 Days)" %}</h3>
     <ul>
       {% for day, time in opening_times.items %}
         <li class="{% if day == today %}highlight{% endif %}" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}">
@@ -122,9 +124,13 @@ p {
       {% endfor %}
     </ul>
 
-    <p>All times marked with <span class="special">*</span> are <strong>special opening hours</strong>.</p>
-    <p>We look forward to your call during these hours.</p>
-    <p>If you have any questions, feel free to use our <a href="{% url 'contact_form' %}" class="cta-btn">Contact Form</a>.</p>
+    <p>{% blocktrans %}All times marked with <span class="special">*</span> are <strong>special opening hours</strong>.{% endblocktrans %}</p>
+    <p>{% trans "We look forward to your call during these hours." %}</p>
+    {% url 'contact_form' as contact_url %}
+    <p>{% blocktrans with contact_url=contact_url %}
+    If you have any questions, feel free to use our <a href="{{ contact_url }}" class="cta-btn">Contact Form</a>.
+    {% endblocktrans %}</p>
+    
   </div>
 </main>
 {% endblock %}

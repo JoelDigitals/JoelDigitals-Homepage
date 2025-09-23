@@ -175,3 +175,392 @@ msgstr "Verwandeln Sie Rohdaten in umsetzbare Erkenntnisse mit unseren Analyse-L
 #: templates/services.html:56
 msgid "Unlock the potential of your data. Our analytics and business intelligence services help you discover trends, measure performance, and make informed decisions. From dashboards to predictive analytics, we deliver the tools to compete smarter."
 msgstr "Entfalten Sie das Potenzial Ihrer Daten. Unsere Analytics- und Business-Intelligence-Dienste helfen Ihnen, Trends zu erkennen, Leistung zu messen und fundierte Entscheidungen zu treffen. Von Dashboards bis zu Predictive Analytics liefern wir die Werkzeuge, um intelligenter zu konkurrieren."
+
+#: templates/contact.html:54
+msgid "Welcome to the Joel Digitals Contact Center"
+msgstr "Willkommen im Joel Digitals Kontaktzentrum"
+
+#: templates/contact.html:55
+msgid "Please choose an option:"
+msgstr "Bitte wählen Sie eine Option:"
+
+#: templates/contact.html:59
+msgid "Call"
+msgstr "Anrufen"
+
+#: templates/contact.html:60
+msgid "Prefer to talk directly? Call us at the above number."
+msgstr "Möchten Sie direkt sprechen? Rufen Sie uns unter der obigen Nummer an."
+
+#: templates/contact.html:61
+msgid "View Opening Hours & Info"
+msgstr "Öffnungszeiten & Infos ansehen"
+
+#: templates/contact.html:66
+msgid "Contact Form"
+msgstr "Kontaktformular"
+
+#: templates/contact.html:67
+msgid "Have a general inquiry or question? Send us a message via the contact form."
+msgstr "Haben Sie eine allgemeine Anfrage oder Frage? Senden Sie uns eine Nachricht über das Kontaktformular."
+
+#: templates/contact.html:72
+msgid "Book an Appointment"
+msgstr "Termin buchen"
+
+#: templates/contact.html:73
+msgid "Choose a date and time to speak with us – appointments are available for various purposes."
+msgstr "Wählen Sie ein Datum und eine Uhrzeit, um mit uns zu sprechen – Termine stehen für verschiedene Zwecke zur Verfügung."
+
+#: templates/contact.html:78
+msgid "Sales / Wishlist"
+msgstr "Verkauf / Wunschliste"
+
+#: templates/contact.html:79
+msgid "Let us know what you would like to buy or have created. Wishlist items are collected and stored for export"
+msgstr "Teilen Sie uns mit, was Sie kaufen oder erstellt haben möchten. Wunschlisten-Einträge werden gesammelt und für den Export gespeichert"
+
+#: templates/contact.html:84
+msgid "Having issues or technical questions? Create a support ticket, and we'll get back to you as soon as possible."
+msgstr "Haben Sie Probleme oder technische Fragen? Erstellen Sie ein Support-Ticket, und wir melden uns so schnell wie möglich."
+
+#: templates/imprint.html:54
+msgid "Imprint"
+msgstr "Impressum"
+
+#: templates/imprint.html:55
+msgid "This website is operated by:"
+msgstr "Diese Website wird betrieben von:"
+
+#: templates/imprint.html:61
+msgid "Smart. Digital. Reliable"
+msgstr "Smart. Digital. Reliable"
+
+#: templates/imprint.html:67
+msgid "VAT ID according to § 27 a German VAT Act: <strong>Soon</strong>"
+msgstr "USt-IdNr. gemäß § 27 a UStG: <strong>Bald verfügbar</strong>"
+
+#: templates/imprint.html:71
+msgid "Responsible for content according to § 55 Abs. 2 RStV:"
+msgstr "Verantwortlich für den Inhalt gemäß § 55 Abs. 2 RStV:"
+
+#: templates/imprint.html:77
+msgid "EU Dispute Resolution:"
+msgstr "EU-Streitschlichtung:"
+
+#: templates/imprint.html:78
+msgid "The European Commission provides a platform for online dispute resolution (ODR):"
+msgstr "Die Europäische Kommission stellt eine Plattform für Online-Streitbeilegung (OS) bereit:"
+
+#: templates/imprint.html:80
+msgid "We are neither obligated nor willing to participate in dispute resolution proceedings before a consumer arbitration board."
+msgstr "Wir sind weder verpflichtet noch bereit, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."
+
+#: templates/imprint.html:85
+msgid "Contact Us"
+msgstr "Kontakt aufnehmen"
+
+#: templates/imprint.html:86
+msgid "If you would like to get in touch, please visit our <a href='/contact/'>Contact Form</a> page."
+msgstr "Wenn Sie Kontakt aufnehmen möchten, besuchen Sie bitte unsere Seite <a href='/contact/'>Kontaktformular</a>."
+
+#: templates/privacy.html:34
+msgid "Privacy Policy – Joel Digitals"
+msgstr "Datenschutzerklärung – Joel Digitals"
+
+#: templates/privacy.html:54
+msgid "Privacy Policy"
+msgstr "Datenschutzerklärung"
+
+#: templates/privacy.html:55
+msgid "Your privacy is important to us. This privacy policy explains how we collect, use, and protect your personal data in accordance with the General Data Protection Regulation (GDPR)."
+msgstr "Ihre Privatsphäre ist uns wichtig. Diese Datenschutzerklärung erläutert, wie wir Ihre personenbezogenen Daten gemäß der Datenschutz-Grundverordnung (DSGVO) erheben, verwenden und schützen."
+
+#: templates/privacy.html:58
+msgid "1. Data Controller"
+msgstr "1. Verantwortlicher"
+
+#: templates/privacy.html:59
+msgid "The data controller is:"
+msgstr "Der Verantwortliche ist:"
+
+#: templates/privacy.html:61
+msgid "Email:"
+msgstr "E-Mail:"
+
+#: templates/privacy.html:64
+msgid "2. What Personal Data We Collect"
+msgstr "2. Welche personenbezogenen Daten wir erheben"
+
+#: templates/privacy.html:66
+msgid "Contact details (name, email, phone number)"
+msgstr "Kontaktdaten (Name, E-Mail, Telefonnummer)"
+
+#: templates/privacy.html:67
+msgid "IP address and browser user agent for analytics and security"
+msgstr "IP-Adresse und Browser-User-Agent für Analyse und Sicherheit"
+
+#: templates/privacy.html:68
+msgid "Any other data you voluntarily provide (e.g. via contact form)"
+msgstr "Alle weiteren Daten, die Sie freiwillig angeben (z. B. über das Kontaktformular)"
+
+#: templates/privacy.html:71
+msgid "3. Why We Process Your Data"
+msgstr "3. Warum wir Ihre Daten verarbeiten"
+
+#: templates/privacy.html:73
+msgid "To provide our services"
+msgstr "Zur Bereitstellung unserer Dienstleistungen"
+
+#: templates/privacy.html:74
+msgid "To respond to inquiries"
+msgstr "Zur Beantwortung von Anfragen"
+
+#: templates/privacy.html:75
+msgid "To improve our website"
+msgstr "Zur Verbesserung unserer Website"
+
+#: templates/privacy.html:76
+msgid "To comply with legal obligations"
+msgstr "Zur Erfüllung gesetzlicher Verpflichtungen"
+
+#: templates/privacy.html:79
+msgid "4. Legal Basis"
+msgstr "4. Rechtsgrundlage"
+
+#: templates/privacy.html:80
+msgid "We process your data based on Article 6 GDPR – especially based on your consent, contractual necessity, and legal obligations."
+msgstr "Wir verarbeiten Ihre Daten auf Grundlage von Artikel 6 DSGVO – insbesondere aufgrund Ihrer Einwilligung, vertraglicher Notwendigkeit und gesetzlicher Verpflichtungen."
+
+#: templates/privacy.html:83
+msgid "5. Data Sharing"
+msgstr "5. Datenweitergabe"
+
+#: templates/privacy.html:84
+msgid "We do not sell or rent your personal data. Data may be shared with service providers under data processing agreements."
+msgstr "Wir verkaufen oder vermieten Ihre personenbezogenen Daten nicht. Daten können mit Dienstleistern im Rahmen von Auftragsverarbeitungsverträgen geteilt werden."
+
+#: templates/privacy.html:87
+msgid "6. Your Rights"
+msgstr "6. Ihre Rechte"
+
+#: templates/privacy.html:89
+msgid "Access, correction, and deletion of your data"
+msgstr "Auskunft, Berichtigung und Löschung Ihrer Daten"
+
+#: templates/privacy.html:90
+msgid "Withdrawal of consent"
+msgstr "Widerruf der Einwilligung"
+
+#: templates/privacy.html:91
+msgid "Data portability"
+msgstr "Datenübertragbarkeit"
+
+#: templates/privacy.html:92
+msgid "Right to lodge a complaint with a supervisory authority"
+msgstr "Recht auf Beschwerde bei einer Aufsichtsbehörde"
+
+#: templates/privacy.html:95
+msgid "7. Data Security"
+msgstr "7. Datensicherheit"
+
+#: templates/privacy.html:96
+msgid "We use technical and organizational measures to protect your data."
+msgstr "Wir verwenden technische und organisatorische Maßnahmen, um Ihre Daten zu schützen."
+
+#: templates/privacy.html:99
+msgid "8. Retention"
+msgstr "8. Aufbewahrung"
+
+#: templates/privacy.html:100
+msgid "We store your data only as long as necessary for the purposes stated above or as required by law."
+msgstr "Wir speichern Ihre Daten nur so lange, wie es für die oben genannten Zwecke erforderlich ist oder gesetzlich vorgeschrieben ist."
+
+#: templates/privacy.html:103
+msgid "9. Contact"
+msgstr "9. Kontakt"
+
+#: templates/privacy.html:104
+msgid "For any data protection concerns, contact us at"
+msgstr "Bei Fragen zum Datenschutz kontaktieren Sie uns unter"
+
+#: templates/terms.html:10
+msgid "Terms and Conditions – Joel Digitals"
+msgstr "AGB – Joel Digitals"
+
+#: templates/terms.html:35
+msgid "Terms and Conditions"
+msgstr "Allgemeine Geschäftsbedingungen (AGB)"
+
+msgid "operates an online store for digital products and services. By accessing this website or making a purchase, you agree to the following terms."
+msgstr "betreibt einen Online-Shop für digitale Produkte und Dienstleistungen. Mit dem Zugriff auf unsere Website oder dem Tätigen eines Kaufs erklären Sie sich mit den folgenden Bedingungen einverstanden."
+
+msgid "Scope"
+msgstr "Geltungsbereich"
+
+msgid "These terms apply to all users and purchases. Specific contracts may override individual sections."
+msgstr "Diese AGB gelten für alle Bestellungen und Nutzer der Plattform. Individuelle Vereinbarungen im Rahmen von Verträgen haben Vorrang."
+
+msgid "Services"
+msgstr "Leistungen"
+
+msgid "Joel Digitals provides digital products, components, services, and consulting. Prices are defined per product or by individual contract."
+msgstr "Joel Digitals bietet digitale Produkte, Komponenten, Dienstleistungen und Beratung an. Preise werden je Produkt oder individuell vertraglich festgelegt."
+
+msgid "Payment Methods"
+msgstr "Zahlungsarten"
+
+msgid "Available and planned payment methods include:"
+msgstr "Folgende Zahlungsmethoden stehen zur Verfügung:"
+
+msgid "Bank Transfer (coming soon)"
+msgstr "Überweisung"
+
+msgid "Paysafecard (coming soon)"
+msgstr "Paysafecard (in Kürze verfügbar)"
+
+msgid "Google Pay & Apple Pay (planned)"
+msgstr "Google Pay / Apple Pay & Kreditkarte"
+
+msgid "User Obligations"
+msgstr "Nutzungsverpflichtungen"
+
+msgid "No unauthorized access or misuse"
+msgstr "Keine unzulässige Nutzung oder Umgehung der Systeme"
+
+msgid "Accurate and truthful information when placing orders"
+msgstr "Wahrheitsgemäße Angaben bei der Bestellung"
+
+msgid "Intellectual Property"
+msgstr "Urheberrecht"
+
+msgid "All content (texts, designs, software, etc.) is owned by Joel Digitals or licensed partners. Use without permission is prohibited."
+msgstr "Alle Inhalte (Texte, Designs, Software etc.) sind Eigentum von Joel Digitals oder lizenzierten Partnern und dürfen nicht ohne Genehmigung genutzt werden."
+
+msgid "Liability"
+msgstr "Haftung"
+
+msgid "We are not liable for indirect damages, data loss, or loss of profit, unless caused by gross negligence or intent."
+msgstr "Wir haften nicht für indirekte Schäden, Datenverluste oder entgangenen Gewinn, es sei denn, es liegt Vorsatz oder grobe Fahrlässigkeit vor."
+
+msgid "Right of Withdrawal"
+msgstr "Widerrufsrecht"
+
+msgid "EU consumers have a 14-day withdrawal right unless they waive it for instant digital delivery."
+msgstr "Verbraucher aus der EU haben ein 14-tägiges Widerrufsrecht, sofern keine sofortige digitale Auslieferung mit Verzicht erfolgt ist."
+
+msgid "Governing Law"
+msgstr "Anwendbares Recht"
+
+msgid "German law applies, excluding the UN Sales Convention. Jurisdiction: Berlin."
+msgstr "Es gilt deutsches Recht unter Ausschluss des UN-Kaufrechts. Gerichtsstand ist Berlin."
+
+msgid "Contact"
+msgstr "Kontakt"
+
+msgid "For inquiries, email us at:"
+msgstr "Bei Fragen wenden Sie sich bitte an:"
+
+#: templates/opening_hours.html:16
+msgid "Opening Hours – Joel Digitals"
+msgstr "Öffnungszeiten – Joel Digitals"
+
+#: templates/opening_hours.html:24
+msgid "Opening Hours & Contact"
+msgstr "Öffnungszeiten & Kontakt"
+
+#: templates/opening_hours.html:26
+msgid "Phone:"
+msgstr "Telefon:"
+
+#: templates/opening_hours.html:28
+msgid "Our Opening Hours (Next 7 Days)"
+msgstr "Unsere Öffnungszeiten (nächste 7 Tage)"
+
+#: templates/opening_hours.html:42
+msgid "All times marked with <span class=\"special\">*</span> are <strong>special opening hours</strong>."
+msgstr "Alle Zeiten, die mit <span class=\"special\">*</span> markiert sind, sind <strong>besondere Öffnungszeiten</strong>."
+
+#: templates/opening_hours.html:43
+msgid "We look forward to your call during these hours."
+msgstr "Wir freuen uns auf Ihren Anruf während dieser Zeiten."
+
+#: templates/opening_hours.html:44
+msgid "If you have any questions, feel free to use our <a href=\"{% url 'contact_form' %}\" class=\"cta-btn\">Contact Form</a>."
+msgstr "Wenn Sie Fragen haben, nutzen Sie gerne unser <a href=\"{% url 'contact_form' %}\" class=\"cta-btn\">Kontaktformular</a>."
+
+#: templates/base.html:152
+msgid "Wiki"
+msgstr "Wiki"
+
+#: templates/base.html:153
+msgid "Status"
+msgstr "Status"
+
+#: templates/base.html:154
+msgid "Services"
+msgstr "Dienstleistungen"
+
+#: templates/base.html:155
+msgid "About Us"
+msgstr "Über uns"
+
+#: templates/base.html:156
+msgid "Contact"
+msgstr "Kontakt"
+
+#: templates/base.html:157
+msgid "Blog"
+msgstr "Blog"
+
+#: templates/base.html:158
+msgid "Our Apps"
+msgstr "Unsere Apps"
+
+#: templates/base.html:159
+msgid "Shop"
+msgstr "Shop"
+
+#: templates/base.html:161
+msgid "Admin: Blog"
+msgstr "Admin: Blog"
+
+#: templates/base.html:163
+msgid "Admin: Sales"
+msgstr "Admin: Vertrieb"
+
+#: templates/base.html:164
+msgid "Admin: Orders"
+msgstr "Admin: Bestellungen"
+
+#: templates/base.html:165
+msgid "Admin: Termin"
+msgstr "Admin: Termine"
+
+#: templates/base.html:168
+msgid "Admin: Tickets"
+msgstr "Admin: Tickets"
+
+#: templates/base.html:167
+msgid "Logout"
+msgstr "Abmelden"
+
+#: templates/base.html:170
+msgid "Login"
+msgstr "Anmelden"
+
+#: templates/base.html:225
+msgid "Imprint"
+msgstr "Impressum"
+
+#: templates/base.html:226
+msgid "Privacy Policy"
+msgstr "Datenschutz"
+
+#: templates/base.html:227
+msgid "Terms of Service"
+msgstr "AGB"
+
+#: templates/base.html:228
+msgid "Home"
+msgstr "Startseite"
