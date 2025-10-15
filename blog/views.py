@@ -5,27 +5,34 @@ from django.contrib.auth.decorators import user_passes_test
 from .models import BlogPost, BlogCategory
 from .forms import BlogPostForm, BlogCategoryForm
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import user_passes_test, login_required
+from django.db.models import Count
+from .models import BlogPost, BlogCategory, Comment
+from .forms import BlogPostForm, BlogCategoryForm
+from django import forms
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Schreibe einen Kommentar...'})
+        }
+
+
 def is_blog_editor(user):
     return user.is_authenticated and user.groups.filter(name='Marketing').exists()
 
 
-
 def blog_list(request):
-    user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
-    # Holen wir uns alle Kategorien, die Blog-Beiträge enthalten
-    categories_with_posts = BlogCategory.objects.filter(
-        posts__is_published=True
-    ).distinct()
-
-
-    # Überprüfen, ob eine Filterung nach Kategorien erfolgt
-    category_filters = request.GET.getlist('category')  # .getlist() holt alle ausgewählten Kategorien
+    categories_with_posts = BlogCategory.objects.filter(posts__is_published=True).distinct()
+    category_filters = request.GET.getlist('category')
 
     if category_filters:
-        # Wir filtern die Posts, die eine der ausgewählten Kategorien enthalten
         posts = BlogPost.objects.filter(is_published=True, categories__id__in=category_filters).distinct().order_by('-created_at')
     else:
-        # Wenn keine Kategorie ausgewählt ist, zeigen wir alle Posts an
         posts = BlogPost.objects.filter(is_published=True).order_by('-created_at')
 
     return render(request, 'blog/blog_list.html', {
@@ -34,13 +41,41 @@ def blog_list(request):
         'category_filters': category_filters
     })
 
+
 def blog_detail(request, pk):
-    user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     post = get_object_or_404(BlogPost, pk=pk, is_published=True)
+
+    # 👁️ Aufrufzähler erhöhen
+    post.views += 1
+    post.save(update_fields=['views'])
+
+    # 💬 Kommentare
+    comments = post.comments.order_by('-created_at')
+    form = CommentForm()
+
+    if request.method == 'POST' and request.user.is_authenticated:
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.user = request.user
+            comment.save()
+            return redirect('blog_detail', pk=pk)
+
+    # 🔁 Vorschläge
+    related_posts = BlogPost.objects.filter(
+        is_published=True
+    ).exclude(pk=pk).annotate(
+        same_categories=Count('categories')
+    ).order_by('-same_categories', '-created_at')[:3]
+
     return render(request, 'blog/blog_detail.html', {
         'post': post,
-        'user_groups': user_groups
-    }) 
+        'comments': comments,
+        'form': form,
+        'related_posts': related_posts,
+    })
+
 
 @user_passes_test(is_blog_editor)
 def admin_blog(request):

@@ -1,24 +1,23 @@
 {% extends "base_home.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}Joel Digitals – Blog{% endblock %}
 
 {% block content %}
 <style>
     h2 {
-        margin-bottom: 15px;
+        margin-bottom: 20px;
         color: #ffffff;
-    }
-
-    h3 {
-        margin-bottom: 15px;
-        color: #000;
+        text-align: center;
+        font-size: 2em;
+        font-weight: 600;
     }
 
     .category-buttons {
-        margin-bottom: 20px;
+        margin-bottom: 30px;
         display: flex;
         flex-wrap: wrap;
+        justify-content: center;
         gap: 10px;
     }
 
@@ -27,34 +26,91 @@
         color: #fff !important;
         padding: 10px 20px;
         border: none;
-        margin: 5px;
+        border-radius: 6px;
         cursor: pointer;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-        display: inline-block;
         text-decoration: none;
+        transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
     .category-button:hover,
     .category-button.selected {
         background-color: #0044cc;
-        color: #fff !important;
+        transform: translateY(-2px);
     }
 
-    section {
-        background-color: white; /* weißer Container */
-        color: #000 !important;   /* schwarzer Text */
+    .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 25px;
+        justify-content: center;
+        align-items: stretch;
+    }
+
+    .blog-card {
+        background-color: #fff;
+        color: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        height: 100%;
+    }
+
+    .blog-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+    }
+
+    /* 🔹 Bilddarstellung */
+    .blog-card img {
+        width: 100%;
+        height: 220px;
+        border-bottom: 1px solid #ddd;
+        display: block;
+        object-fit: cover;
+        background-color: #f5f5f5;
+        transition: object-fit 0.2s ease;
+    }
+
+    /* 🔹 Wenn das Bild quadratisch ist, zeige es vollständig */
+    .blog-card img:is([data-aspect="square"]) {
+        object-fit: contain;
+        background-color: #fff;
+    }
+
+    .blog-card-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        flex-grow: 1;
         padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
-    img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 4px;
-        margin: 10px 0;
+    .blog-card h3 {
+        margin-bottom: 10px;
+        font-size: 1.3em;
+        color: #000;
+        font-weight: 600;
+        min-height: 48px;
+    }
+
+    .blog-card p.teaser {
+        color: #333;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 10px;
+    }
+
+    .blog-meta {
+        font-size: 0.9em;
+        color: #666;
+        margin-top: auto;
     }
 
     .btn {
@@ -63,8 +119,11 @@
         color: #fff !important;
         padding: 10px 15px;
         text-decoration: none;
-        border-radius: 4px;
-        margin-top: 10px;
+        border-radius: 6px;
+        margin-top: 15px;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        align-self: flex-start;
     }
 
     .btn:hover {
@@ -72,60 +131,66 @@
     }
 
     @media (max-width: 600px) {
-        .category-buttons {
-            flex-direction: column;
+        .blog-card-content {
+            padding: 15px;
         }
-    }
-
-    @media (max-width: 1000px) {
-        main {
-            padding: 20px;
+        .blog-card img {
+            height: 180px;
         }
-
-        .category-buttons {
-            flex-direction: column;
+        h2 {
+            font-size: 1.6em;
         }
     }
 </style>
 
+<h2>📘 {% trans "Blog" %}</h2>
 
-
-<h2>📘 Blog</h2>
-
-<!-- Kategorien Filter als Buttons -->
+<!-- Kategorien Filter -->
 <div class="category-buttons">
-    <p>Filter by Categories:</p>
+    <p style="color:white; margin-right:10px;">{% trans "Filter by Categories" %}:</p>
     {% if category_filters %}
-        <a href="?" class="category-button">All Categories</a>
+        <a href="?" class="category-button">{% trans "All Categories" %}</a>
     {% else %}
-        <a href="?" class="category-button selected">All Categories</a>
+        <a href="?" class="category-button selected">{% trans "All Categories" %}</a>
     {% endif %}
-
     {% for category in categories_with_posts %}
-        <a href="?category={{ category.id }}{% if category.id|stringformat:"s" in category_filters %}&category={{ category.id }}{% endif %}"
-           class="category-button {% if category.id|stringformat:"s" in category_filters %}selected{% endif %}">
+        <a href="?category={{ category.id }}"
+           class="category-button {% if category.id|stringformat:'s' in category_filters %}selected{% endif %}">
             {{ category.name }}
         </a>
     {% endfor %}
 </div>
 
+<div class="blog-grid">
 {% for post in posts %}
-<section>
-    <h3>{{ post.title }}</h3>
-    <p><strong>Categories:</strong>
-        {% for cat in post.categories.all %}
-            {{ cat.name }}{% if not forloop.last %}, {% endif %}
-        {% empty %}
-            None
-        {% endfor %}
-    </p>
-    <img src="{{ post.teaser_image.url }}" alt="Image for {{ post.title }}">
-    <p>{{ post.teaser_text|safe }}</p>
-    <a href="{% url 'blog_detail' post.pk %}" class="btn">Read more</a>
-</section>
+    <div class="blog-card">
+        {% if post.teaser_image %}
+            {% comment %}
+            Wenn du willst, kannst du in deinem Model oder Template-Bereich serverseitig erkennen,
+            ob das Bild quadratisch ist, z. B. durch post.image_width == post.image_height,
+            und dann data-aspect="square" setzen.
+            {% endcomment %}
+            <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}"
+                 {% if post.teaser_image.width == post.teaser_image.height %}data-aspect="square"{% endif %}>
+        {% endif %}
+        <div class="blog-card-content">
+            <div>
+                <h3>{{ post.title }}</h3>
+                <p class="teaser">{{ post.teaser_text|striptags }}</p>
+            </div>
+            <div>
+                <p class="blog-meta">
+                    <em>{% trans "Published on" %} {{ post.created_at|date:"d.m.Y" }}</em>
+                    {% if post.views %}
+                        • {{ post.views }} {% trans "views" %}
+                    {% endif %}
+                </p>
+                <a href="{% url 'blog_detail' post.pk %}" class="btn">{% trans "Read more" %}</a>
+            </div>
+        </div>
+    </div>
 {% empty %}
-<section>
-    <p>No blog posts available yet.</p>
-</section>
+    <p style="color:white; text-align:center;">{% trans "No blog posts available yet." %}</p>
 {% endfor %}
+</div>
 {% endblock %}

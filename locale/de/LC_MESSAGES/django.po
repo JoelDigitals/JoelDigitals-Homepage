@@ -564,3 +564,95 @@ msgstr "AGB"
 #: templates/base.html:228
 msgid "Home"
 msgstr "Startseite"
+
+#: templates/blog/blog_list.html:65
+msgid "Blog"
+msgstr "Blog"
+
+#: templates/blog/blog_list.html:69
+msgid "Filter by Categories"
+msgstr "Nach Kategorien filtern"
+
+#: templates/blog/blog_list.html:72
+msgid "All Categories"
+msgstr "Alle Kategorien"
+
+#: templates/blog/blog_list.html:115
+msgid "Published on"
+msgstr "Veröffentlicht am"
+
+#: templates/blog/blog_list.html:118
+msgid "views"
+msgstr "Aufrufe"
+
+#: templates/blog/blog_list.html:123
+msgid "Read more"
+msgstr "Weiterlesen"
+
+#: templates/blog/blog_list.html:129
+msgid "No blog posts available yet."
+msgstr "Noch keine Blog-Beiträge vorhanden."
+
+#: templates/blog/blog_detail.html:27
+msgid "Back to Blog Overview"
+msgstr "← Zurück zur Blog-Übersicht"
+
+#: templates/blog/blog_detail.html:41
+msgid "Comments"
+msgstr "Kommentare"
+
+#: templates/blog/blog_detail.html:45
+msgid "Submit Comment"
+msgstr "Kommentar senden"
+
+#: templates/blog/blog_detail.html:48
+msgid "Log in"
+msgstr "Einloggen"
+
+#: templates/blog/blog_detail.html:48
+msgid "to write a comment."
+msgstr "um einen Kommentar zu schreiben."
+
+#: templates/blog/blog_detail.html:57
+msgid "on"
+msgstr "am"
+
+#: templates/blog/blog_detail.html:66
+msgid "No comments yet."
+msgstr "Noch keine Kommentare."
+
+#: templates/blog/blog_detail.html:75
+msgid "Read next"
+msgstr "Als Nächstes lesen"
+
+#: templates/blog/blog_detail.html:86
+msgid "Read"
+msgstr "Lesen"
+
+#: templates/blog/blog_detail.html:89
+msgid "No further articles found."
+msgstr "Keine weiteren Artikel gefunden."
+
+#: templates/blog/blog_detail.html:33
+msgid "Views"
+msgstr "Aufrufe"
+
+#: templates/main/home.html:5
+msgid "Current Job Openings"
+msgstr "Aktuelle Stellenangebote"
+
+#: templates/main/home.html:6
+msgid "We are always looking for talented professionals to join our team. Check out our current positions on JDS Management:"
+msgstr "Wir suchen stets talentierte Fachkräfte für unser Team. Sieh dir unsere aktuellen Stellen im JDS Management an:"
+
+#: templates/main/home.html:8
+msgid "View Current Jobs"
+msgstr "Zu den aktuellen Stellen"
+
+#: templates/main/home.html:12
+msgid "From Our Blog"
+msgstr "Aus unserem Blog"
+
+#: templates/main/home.html:20
+msgid "Read More"
+msgstr "Weiterlesen"

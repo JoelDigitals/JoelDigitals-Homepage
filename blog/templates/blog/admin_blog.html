@@ -97,6 +97,8 @@
           {{ cat.name }}{% if not forloop.last %}, {% endif %}
         {% empty %}Keine{% endfor %}
       </small><br>
+      <small>Views:{{ post.views }}
+      </small><br>
 
       <a href="{% url 'edit' post.pk %}" class="btn">✏️ Bearbeiten</a>
       <a href="{% url 'delete' post.pk %}" class="btn btn-danger">🗑 Löschen</a>
