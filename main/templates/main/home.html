@@ -186,14 +186,22 @@ h1,h2,h3{color:#fff;}
   <section data-aos="fade-up">
     <h2 style="text-align:center; margin-top:2rem;">📖 {% trans "From Our Blog" %}</h2>
     <div class="blog-grid">
-      <div class="card" data-aos="zoom-in">
-        <img src="{{ latest_blog.teaser_image.url }}" alt="{{ latest_blog.title }}">
-        <div class="card-body">
-          <h3>{{ latest_blog.title }}</h3>
-          <p>{{ latest_blog.teaser_text|safe }}</p>
-          <a href="{% url 'blog_detail' latest_blog.pk %}" class="cta-btn">{% trans "Read More" %}</a>
+      {% for blog in latest_blog %}
+        <div class="card" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:100 }}">
+          {% if blog.teaser_image %}
+            <img src="{{ blog.teaser_image.url }}" alt="{{ blog.title }}">
+          {% endif %}
+          <div class="card-body">
+            <h3>{{ blog.title }}</h3>
+            <p>{{ blog.teaser_text|truncatewords_html:25|safe }}</p>
+            <a href="{% url 'blog_detail' blog.pk %}" class="cta-btn">{% trans "Read More" %}</a>
+          </div>
         </div>
-      </div>
+      {% endfor %}
+    </div>
+  
+    <div style="text-align:center; margin-top:1rem;">
+      <a href="{% url 'blog_list' %}" class="cta-btn">{% trans "View All Articles" %}</a>
     </div>
   </section>
   {% endif %}

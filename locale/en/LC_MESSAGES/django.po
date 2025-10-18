@@ -656,3 +656,90 @@ msgstr "From Our Blog"
 #: templates/main/home.html:20
 msgid "Read More"
 msgstr "Read More"
+
+msgid "Our Services"
+msgstr "Our Services"
+
+msgid "At Joel Digitals, we offer a wide range of services to help your business succeed in the digital world. Our team combines creativity and technical expertise to deliver solutions tailored to your needs."
+msgstr "At Joel Digitals, we offer a wide range of services to help your business succeed in the digital world. Our team combines creativity and technical expertise to deliver solutions tailored to your needs."
+
+msgid "Design (Brand, Product & Marketing)"
+msgstr "Design (Brand, Product & Marketing)"
+
+msgid "Creative design solutions for your brand, products, and marketing campaigns."
+msgstr "Creative design solutions for your brand, products, and marketing campaigns."
+
+msgid "We provide end-to-end design services including brand identity, product packaging, and marketing materials. Our designs are crafted to enhance your visibility and make a lasting impression."
+msgstr "We provide end-to-end design services including brand identity, product packaging, and marketing materials. Our designs are crafted to enhance your visibility and make a lasting impression."
+
+msgid "Digitalization of Workflows"
+msgstr "Digitalization of Workflows"
+
+msgid "Optimize and automate your business processes through digital solutions."
+msgstr "Optimize and automate your business processes through digital solutions."
+
+msgid "We help you transform manual workflows into efficient digital processes. From document management to task automation, our solutions save time, reduce errors, and increase productivity."
+msgstr "We help you transform manual workflows into efficient digital processes. From document management to task automation, our solutions save time, reduce errors, and increase productivity."
+
+msgid "Web Development & Web Design"
+msgstr "Web Development & Web Design"
+
+msgid "Modern, responsive websites that showcase your business."
+msgstr "Modern, responsive websites that showcase your business."
+
+msgid "We design and develop websites that are visually appealing, user-friendly, and optimized for search engines. Our web solutions help you attract and retain customers."
+msgstr "We design and develop websites that are visually appealing, user-friendly, and optimized for search engines. Our web solutions help you attract and retain customers."
+
+msgid "Logo Design"
+msgstr "Logo Design"
+
+msgid "Unique logos that reflect your brand identity."
+msgstr "Unique logos that reflect your brand identity."
+
+msgid "Our logo designs are created to convey your brand values and make your business memorable. We work closely with you to ensure your logo stands out in the market."
+msgstr "Our logo designs are created to convey your brand values and make your business memorable. We work closely with you to ensure your logo stands out in the market."
+
+msgid "Web Applications"
+msgstr "Web Applications"
+
+msgid "Custom web applications to enhance your business operations."
+msgstr "Custom web applications to enhance your business operations."
+
+msgid "We build scalable and secure web applications tailored to your business needs. Our solutions improve efficiency, user engagement, and data management."
+msgstr "We build scalable and secure web applications tailored to your business needs. Our solutions improve efficiency, user engagement, and data management."
+
+msgid "Mobile & Windows Apps"
+msgstr "Mobile & Windows Apps"
+
+msgid "Cross-platform apps for mobile and desktop environments."
+msgstr "Cross-platform apps for mobile and desktop environments."
+
+msgid "Our development team creates high-performance applications for iOS, Android, and Windows. We focus on usability, performance, and seamless integration with your systems."
+msgstr "Our development team creates high-performance applications for iOS, Android, and Windows. We focus on usability, performance, and seamless integration with your systems."
+
+msgid "Applications"
+msgstr "Applications"
+
+msgid "Custom software solutions to meet your specific business needs."
+msgstr "Custom software solutions to meet your specific business needs."
+
+msgid "Whether it’s internal tools, customer platforms, or enterprise software, we develop robust applications that align with your operational goals."
+msgstr "Whether it’s internal tools, customer platforms, or enterprise software, we develop robust applications that align with your operational goals."
+
+msgid "Server Maintenance"
+msgstr "Server Maintenance"
+
+msgid "Keep your servers secure, updated, and running smoothly."
+msgstr "Keep your servers secure, updated, and running smoothly."
+
+msgid "Our server maintenance services include updates, monitoring, backups, and performance tuning to ensure your systems remain reliable and secure."
+msgstr "Our server maintenance services include updates, monitoring, backups, and performance tuning to ensure your systems remain reliable and secure."
+
+msgid "Hosting & Domains"
+msgstr "Hosting & Domains"
+
+msgid "Reliable hosting and domain management for your online presence."
+msgstr "Reliable hosting and domain management for your online presence."
+
+msgid "We provide secure hosting solutions and help you manage your domain names. Our services ensure your website and applications are always accessible and fast."
+msgstr "We provide secure hosting solutions and help you manage your domain names. Our services ensure your website and applications are always accessible and fast."

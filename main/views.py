@@ -26,7 +26,7 @@ def home(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
 
     # Neuster Blogartikel
-    latest_blog = BlogPost.objects.filter(is_published=True).order_by('-created_at').first()
+    latest_blog = BlogPost.objects.filter(is_published=True).order_by('-created_at')[:2]
 
     # 3 zufällige Produkte
     products = list(App.objects.filter(is_available_for_purchase=True))

@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'wiki',  # Deine Wiki-App
     'status',
     'download',
-    'MobileApp'
+    'MobileApp',
+    'chat',
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"

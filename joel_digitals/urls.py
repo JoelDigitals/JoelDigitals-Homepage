@@ -24,6 +24,8 @@ urlpatterns += i18n_patterns(
     path('status/', include('status.urls')),
     path('downloads/', include('download.urls')),
     path('mobile/', include('MobileApp.urls')),
+    path('chat/', include('chat.urls')),  # Pfad bleibt /de/chat/api/
+
 )
 
 # Medien-Dateien

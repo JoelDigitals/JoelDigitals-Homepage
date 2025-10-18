@@ -656,3 +656,90 @@ msgstr "Aus unserem Blog"
 #: templates/main/home.html:20
 msgid "Read More"
 msgstr "Weiterlesen"
+
+msgid "Our Services"
+msgstr "Unsere Leistungen"
+
+msgid "At Joel Digitals, we offer a wide range of services to help your business succeed in the digital world. Our team combines creativity and technical expertise to deliver solutions tailored to your needs."
+msgstr "Bei Joel Digitals bieten wir eine breite Palette an Leistungen, um Ihr Unternehmen in der digitalen Welt erfolgreich zu machen. Unser Team kombiniert Kreativität und technisches Know-how, um maßgeschneiderte Lösungen zu liefern."
+
+msgid "Design (Brand, Product & Marketing)"
+msgstr "Design (Marke, Produkt & Marketing)"
+
+msgid "Creative design solutions for your brand, products, and marketing campaigns."
+msgstr "Kreative Designlösungen für Ihre Marke, Produkte und Marketingkampagnen."
+
+msgid "We provide end-to-end design services including brand identity, product packaging, and marketing materials. Our designs are crafted to enhance your visibility and make a lasting impression."
+msgstr "Wir bieten umfassende Designleistungen, einschließlich Markenidentität, Produktverpackungen und Marketingmaterialien. Unsere Designs steigern Ihre Sichtbarkeit und hinterlassen einen bleibenden Eindruck."
+
+msgid "Digitalization of Workflows"
+msgstr "Digitalisierung von Arbeitsabläufen"
+
+msgid "Optimize and automate your business processes through digital solutions."
+msgstr "Optimieren und automatisieren Sie Ihre Geschäftsprozesse mit digitalen Lösungen."
+
+msgid "We help you transform manual workflows into efficient digital processes. From document management to task automation, our solutions save time, reduce errors, and increase productivity."
+msgstr "Wir helfen Ihnen, manuelle Arbeitsabläufe in effiziente digitale Prozesse zu verwandeln. Von Dokumentenmanagement bis Aufgabenautomatisierung – unsere Lösungen sparen Zeit, reduzieren Fehler und steigern die Produktivität."
+
+msgid "Web Development & Web Design"
+msgstr "Webentwicklung & Webdesign"
+
+msgid "Modern, responsive websites that showcase your business."
+msgstr "Moderne, responsive Websites, die Ihr Unternehmen präsentieren."
+
+msgid "We design and develop websites that are visually appealing, user-friendly, and optimized for search engines. Our web solutions help you attract and retain customers."
+msgstr "Wir entwerfen und entwickeln Websites, die optisch ansprechend, benutzerfreundlich und suchmaschinenoptimiert sind. Unsere Weblösungen helfen Ihnen, Kunden zu gewinnen und zu halten."
+
+msgid "Logo Design"
+msgstr "Logo Design"
+
+msgid "Unique logos that reflect your brand identity."
+msgstr "Einzigartige Logos, die Ihre Markenidentität widerspiegeln."
+
+msgid "Our logo designs are created to convey your brand values and make your business memorable. We work closely with you to ensure your logo stands out in the market."
+msgstr "Unsere Logos vermitteln Ihre Markenwerte und machen Ihr Unternehmen unvergesslich. Wir arbeiten eng mit Ihnen zusammen, um sicherzustellen, dass Ihr Logo auffällt."
+
+msgid "Web Applications"
+msgstr "Webanwendungen"
+
+msgid "Custom web applications to enhance your business operations."
+msgstr "Individuelle Webanwendungen zur Optimierung Ihrer Geschäftsprozesse."
+
+msgid "We build scalable and secure web applications tailored to your business needs. Our solutions improve efficiency, user engagement, and data management."
+msgstr "Wir entwickeln skalierbare und sichere Webanwendungen, die auf Ihre Geschäftsanforderungen zugeschnitten sind. Unsere Lösungen steigern Effizienz, Benutzerinteraktion und Datenmanagement."
+
+msgid "Mobile & Windows Apps"
+msgstr "Mobile & Windows Apps"
+
+msgid "Cross-platform apps for mobile and desktop environments."
+msgstr "Plattformübergreifende Apps für mobile Geräte und Desktop."
+
+msgid "Our development team creates high-performance applications for iOS, Android, and Windows. We focus on usability, performance, and seamless integration with your systems."
+msgstr "Unser Entwicklungsteam erstellt leistungsstarke Anwendungen für iOS, Android und Windows. Wir legen Wert auf Benutzerfreundlichkeit, Leistung und nahtlose Integration in Ihre Systeme."
+
+msgid "Applications"
+msgstr "Anwendungen"
+
+msgid "Custom software solutions to meet your specific business needs."
+msgstr "Maßgeschneiderte Softwarelösungen für Ihre spezifischen Geschäftsanforderungen."
+
+msgid "Whether it’s internal tools, customer platforms, or enterprise software, we develop robust applications that align with your operational goals."
+msgstr "Ob interne Tools, Kundenplattformen oder Unternehmenssoftware – wir entwickeln robuste Anwendungen, die Ihre Betriebsziele unterstützen."
+
+msgid "Server Maintenance"
+msgstr "Serverpflege"
+
+msgid "Keep your servers secure, updated, and running smoothly."
+msgstr "Halten Sie Ihre Server sicher, aktuell und leistungsfähig."
+
+msgid "Our server maintenance services include updates, monitoring, backups, and performance tuning to ensure your systems remain reliable and secure."
+msgstr "Unsere Serverpflege umfasst Updates, Überwachung, Backups und Performance-Optimierung, um die Zuverlässigkeit und Sicherheit Ihrer Systeme zu gewährleisten."
+
+msgid "Hosting & Domains"
+msgstr "Hosting & Domains"
+
+msgid "Reliable hosting and domain management for your online presence."
+msgstr "Zuverlässiges Hosting und Domain-Management für Ihre Online-Präsenz."
+
+msgid "We provide secure hosting solutions and help you manage your domain names. Our services ensure your website and applications are always accessible and fast."
+msgstr "Wir bieten sichere Hosting-Lösungen und unterstützen Sie bei der Verwaltung Ihrer Domainnamen. Unsere Dienste sorgen dafür, dass Ihre Website und Anwendungen stets erreichbar und schnell sind."

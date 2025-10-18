@@ -1,0 +1,183 @@
+{
+  "de": {
+    "meta": {
+      "company": "Joel Digitals",
+      "website": "https://joel-digitals.de",
+      "contact": "https://joel-digitals.de/contact",
+      "email": "info@joel-digitals.de",
+      "telefon": "+49 1525 3480270",
+      "öffnungszeiten": {
+        "montag": "16:00 - 18:00",
+        "dienstag": "geschlossen",
+        "mittwoch": "16:00 - 18:00",
+        "donnerstag": "16:00 - 18:00",
+        "freitag": "geschlossen",
+        "samstag": "geschlossen",
+        "sonntag": "geschlossen",
+
+        "aktuelle_öffnungszeiten": "https://joel-digitals.de/opening-hours"
+      }
+    },
+    "begrüßung": [
+      "Hallo! Schön, dass du da bist.",
+      "Hi! Wie kann ich dir helfen?",
+      "Willkommen bei Joel Digitals! Ich bin dein digitaler Assistent."
+    ],
+    "danke": [
+      "Danke für deine Anfrage!",
+      "Vielen Dank für dein Vertrauen.",
+      "Wir schätzen deine Kontaktaufnahme sehr."
+    ],
+    "verabschiedung": [
+      "Auf Wiedersehen!",
+      "Bis bald!",
+      "Wir freuen uns auf das nächste Mal!"
+    ],
+    "unternehmen": {
+      "beschreibung": "Joel Digitals ist eine Full-Service Digitalagentur aus Deutschland, die innovative Web- und App-Lösungen bietet.",
+      "leistungen": [
+        "Webdesign & Entwicklung",
+        "Mobile App-Entwicklung",
+        "Softwarelösungen & Automatisierung",
+        "Hosting, Wartung & Support",
+        "Digitales Marketing & SEO",
+        "Logo- & Grafikdesign",
+        "UX/UI-Design",
+        "Beratung & Strategieentwicklung"
+      ],
+      "gründung": "24.07.2025",
+      "sitz": "Lebach, Deutschland",
+      "mission": "Digitale Lösungen entwickeln, die begeistern, Mehrwert schaffen und Prozesse vereinfachen.",
+      "vision": "Eine digitale Welt, in der jeder Zugriff auf einfache, effiziente und kreative Lösungen hat."
+    },
+    "jds_management": {
+      "name": "JDS Management",
+      "kurz": "Tool für Verwaltung von Arbeitszeiten, Aufgaben, Mitarbeiter, Rechnnungen & Kunden",
+      "beschreibung": "JDS Management ist ein webbasiertes Tool für Projektplanung, Aufgabenmanagement, Zeiterfassung, Kundenverwaltung und Rechnungsstellung.",
+      "features": {
+        "projekte": "Projekterstellung, Meilensteine, Gantt-Diagramme, Fortschrittsanzeigen",
+        "aufgaben": "Aufgaben mit Prioritäten, Zuweisungen, Fälligkeitsdaten, Status-Updates",
+        "zeiterfassung": "Manuelle und automatische Zeiterfassung pro Aufgabe und Projekt",
+        "kundenverwaltung": "Kundendaten, Kontakte, Adressen, PDF Export, History Tracking",
+        "rapporte": "Projekt- und Mitarbeiterstatistiken, Download als CSV/PDF, Dashboards"
+      },
+      "docs": "https://joel-digitals.de/our-apps/JDS-Management/"
+    },
+    "auftragnetz": {
+      "beschreibung": "AuftragNetz verbindet Auftraggeber und Dienstleister; Filter, Angebote, Auftragsverfolgung und Bewertungen.",
+      "features": {
+        "angebote": "Erstellen & Veröffentlichen von Aufträgen",
+        "matching": "Matching-Algorithmus nach Skills & Region",
+        "bewertungen": "Bewertungssystem für Auftragnehmer",
+        "benachrichtigungen": "E-Mail- & Push-Benachrichtigungen",
+        "tracking": "Auftragsfortschritt in Echtzeit"
+      },
+      "docs": "https://joel-digitals.de/our-apps/auftragnetz/"
+    },
+    "jds_appstore": {
+      "beschreibung": "Zentrale Plattform, um Apps von Joel Digitals zu entdecken, zu installieren und zu verwalten.",
+      "website": "https://jds-appstore.de/",
+      "apps": ["JDS Management", "AuftragNetz", "CallHub", "JDS CRM", "JDS Analytics"]
+    },
+    "callhub": {
+      "beschreibung": "Cloud-basiertes Telefonsystem für interne und externe Anrufe, Warteschleifen, Weiterleitungen und Kurzwahlen.",
+      "features": ["Interne & externe Anrufe", "Kurzwahlverzeichnis", "Warteschleifen", "Abwesenheitsansagen", "Twilio-Integration"],
+      "docs": "https://joel-digitals.de/our-apps/callhub/"
+    },
+    "logo_design": {
+      "beschreibung": "Professionelle Logo-Entwicklung und Branding für Unternehmen, Startups und Projekte.",
+      "services": ["Logo-Design", "Corporate Identity", "Branding-Strategie", "Design-Guidelines"]
+    }
+  },
+  "en": {
+    "meta": {
+      "company": "Joel Digitals",
+      "website": "https://joel-digitals.de/en",
+      "contact": "https://joel-digitals.de/en/contact",
+      "email": "info@joel-digitals.de",
+      "phone": "+49 1525 3480270",
+      "opening_hours": {
+        "monday": "16:00 - 18:00",
+        "tuesday": "closed",
+        "wednesday": "16:00 - 18:00",
+        "thursday": "16:00 - 18:00",
+        "friday": "closed",
+        "saturday": "closed",
+        "sunday": "closed",
+
+        "actual_opening_hours": "https://joel-digitals.de/opening-hours"
+      }
+    },
+    "greeting": [
+      "Hello! Nice to see you here.",
+      "Hi! How can I help you?",
+      "Welcome to Joel Digitals! I am your digital assistant."
+    ],
+    "thanks": [
+      "Thank you for your inquiry!",
+      "We appreciate your trust.",
+      "Thank you for contacting us."
+    ],
+    "farewell": [
+      "Goodbye!",
+      "See you soon!",
+      "We look forward to the next time!"
+    ],
+    "company": {
+      "description": "Joel Digitals is a full-service digital agency from Germany, offering innovative web and app solutions.",
+      "services": [
+        "Web Design & Development",
+        "Mobile App Development",
+        "Software Solutions & Automation",
+        "Hosting, Maintenance & Support",
+        "Digital Marketing & SEO",
+        "Logo & Graphic Design",
+        "UX/UI Design",
+        "Consulting & Strategy"
+      ],
+      "founded": "24.07.2025",
+      "headquarters": "Lebach, Germany",
+      "mission": "Develop digital solutions that delight, create value, and simplify processes.",
+      "vision": "A digital world where everyone has access to simple, efficient, and creative solutions."
+    },
+    "jds_management": {
+      "name": "JDS Management",
+      "short": "Project & Client Management Tool",
+      "description": "JDS Management is a web-based tool for project planning, task management, time tracking, client management, and invoicing.",
+      "features": {
+        "projects": "Project creation, milestones, Gantt charts, progress tracking",
+        "tasks": "Tasks with priorities, assignments, due dates, status updates",
+        "time_tracking": "Manual and automatic time tracking per task and project",
+        "client_management": "Client data, contacts, addresses, PDF export, history tracking",
+        "reports": "Project and employee statistics, CSV/PDF downloads, dashboards",
+        "integrations": ["Twilio (Callhub)", "Stripe", "Mailgun", "Google Calendar", "Slack"]
+      },
+      "docs": "https://joel-digitals.de/our-apps/JDS-Management/"
+    },
+    "auftragnetz": {
+      "description": "AuftragNetz connects clients and service providers with filters, offers, tracking, and ratings.",
+      "features": {
+        "offers": "Create & publish projects",
+        "matching": "Skill & region-based matching algorithm",
+        "ratings": "Contractor rating system",
+        "notifications": "Email & push notifications",
+        "tracking": "Real-time project progress"
+      },
+      "docs": "https://joel-digitals.de/our-apps/auftragnetz/"
+    },
+    "jds_appstore": {
+      "description": "Central platform to discover, install, and manage apps from Joel Digitals.",
+      "website": "https://jds-appstore.de/",
+      "apps": ["JDS Management", "AuftragNetz", "CallHub", "JDS CRM", "JDS Analytics"]
+    },
+    "callhub": {
+      "description": "Cloud-based phone system for internal and external calls, queues, forwarding, and speed dials.",
+      "features": ["Internal & external calls", "Speed dial directory", "Call queues", "Absence announcements", "Twilio integration"],
+      "docs": "https://joel-digitals.de/our-apps/callhub/"
+    },
+    "logo_design": {
+      "description": "Professional logo creation and branding for companies, startups, and projects.",
+      "services": ["Logo design", "Corporate identity", "Branding strategy", "Design guidelines"]
+    }
+  }
+}

@@ -210,21 +210,21 @@
 
 <!-- Grundlegende SEO-Tags -->
 <meta name="description" content="Joel Digitals – Ihr Partner für digitale Lösungen, Webentwicklung, Marketing & IT-Services.">
-<meta name="keywords" content="Webentwicklung, Digitalisierung, IT-Services, Joel Digitals, Marketing, Online-Shop">
+<meta name="keywords" content="Webentwicklung, Anwendungen, Auftäge finden, Produkt Design, Management, AuftragNetz, Markendesign, JDS Appstore, Django leicht gemacht, Support, KI ChatBots, CRM, Kunden Managemnt, E-Rechnung, DATEV, Digitalisierung, IT-Services, Joel Digitals, Marketing, Online-Shop, Marketing, Logo design, Websites, Rundum Service, Germany, Saaland, Lebach, Joel Digitals, JDS Management, Joel Digitas Shop">
 <meta name="author" content="Joel Digitals">
 
 <!-- Open Graph für Social Media -->
 <meta property="og:title" content="Joel Digitals – Digitale Lösungen für Ihr Business">
 <meta property="og:description" content="Professionelle Webentwicklung, Marketing & IT-Dienstleistungen.">
-<meta property="og:image" content="{% static 'logo.png' %}">
-<meta property="og:url" content="https://www.joel-digitals.de/">
+<meta property="og:image" content="{% static 'images/office.png' %}">
+<meta property="og:url" content="https://www.joel-digitals.de/"> 
 <meta property="og:type" content="website">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Joel Digitals – Digitale Lösungen für Ihr Business">
 <meta name="twitter:description" content="Professionelle Webentwicklung, Marketing & IT-Dienstleistungen.">
-<meta name="twitter:image" content="{% static 'logo.png' %}">
+<meta name="twitter:image" content="{% static 'images/office.png' %}">
 
 
 <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17401744435"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-17401744435'); </script> 
@@ -468,6 +468,100 @@ document.addEventListener("click", function (event) {
     applyPreferences(prefs);
     if(!prefs) showBanner();
   });
+</script>
+<div id="chatbot-container">
+  <div id="chatbot-toggle"><i class="fa-solid fa-comments"></i></div>
+  <div id="chatbot-box">
+    <div id="chatbot-header">Joel Digitals Assistant</div>
+    <div id="chatbot-messages"></div>
+    <input type="text" id="chatbot-input" placeholder="Schreib mir etwas..." />
+  </div>
+</div>
+
+<style>
+#chatbot-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: 'Poppins', sans-serif; }
+#chatbot-toggle { background: linear-gradient(135deg, #007bff, #00c6ff); color: white; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); transition: transform 0.3s ease; position: fixed; bottom: 20px; right: 20px; }
+#chatbot-toggle:hover { transform: scale(1.1); }
+#chatbot-box { display: none; flex-direction: column; width: 350px; height: 450px; background: #1a1a1a; color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.6); position: fixed; bottom: 90px; right: 20px; z-index: 9999; }
+#chatbot-header { background: #007bff; padding: 0.8rem; text-align: center; font-weight: 700; }
+#chatbot-messages { flex: 1; padding: 0.8rem; overflow-y: auto; font-size: 0.9rem; display: flex; flex-direction: column; }
+#chatbot-input { border: none; outline: none; padding: 0.7rem; background: #2a2a2a; color: white; width: 100%; box-sizing: border-box; }
+.chat-msg { margin-bottom: 0.6rem; padding: 0.4rem 0.8rem; border-radius: 12px; max-width: 75%; word-wrap: break-word; }
+.chat-msg.user { background: #00c6ff33; color: #00c6ff; align-self: flex-end; text-align: right; }
+.chat-msg.bot { background: #333333; color: #fff; align-self: flex-start; text-align: left; }
+.chat-msg a { color: #00c6ff; text-decoration: underline; }
+</style>
+
+<script>
+const chatBox = document.getElementById("chatbot-box");
+const chatToggle = document.getElementById("chatbot-toggle");
+const chatMessages = document.getElementById("chatbot-messages");
+const input = document.getElementById("chatbot-input");
+
+// Local Storage: 48 Stunden
+const STORAGE_KEY = "joel_chat_history";
+const EXPIRY_KEY = "joel_chat_expiry";
+
+function loadHistory() {
+    const expiry = localStorage.getItem(EXPIRY_KEY);
+    if (expiry && Date.now() > parseInt(expiry)) {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(EXPIRY_KEY);
+        return [];
+    }
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+}
+
+function saveHistory() {
+    const messages = Array.from(chatMessages.children).map(m => ({
+        role: m.classList.contains("user") ? "user" : "bot",
+        text: m.innerHTML
+    }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    localStorage.setItem(EXPIRY_KEY, Date.now() + 48*60*60*1000); // 48h
+}
+
+function linkify(text) {
+    // URLs klickbar machen
+    return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+}
+
+function appendMessage(role, text) {
+    const div = document.createElement("div");
+    div.classList.add("chat-msg", role);
+    div.innerHTML = linkify(text);
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    saveHistory();
+}
+
+// Lade Verlauf
+loadHistory().forEach(msg => appendMessage(msg.role, msg.text));
+
+// Toggle Chat
+chatToggle.onclick = () => { chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex"; };
+
+// Nachricht senden
+input.addEventListener("keypress", async function(e) {
+    if (e.key === "Enter" && this.value.trim()) {
+        const msg = this.value.trim();
+        appendMessage("user", msg);
+        this.value = "";
+
+        try {
+            const response = await fetch("/de/chat/api/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: msg, lang: document.documentElement.lang.startsWith("en") ? "en" : "de" })
+            });
+            const data = await response.json();
+            appendMessage("bot", data.reply);
+        } catch (err) {
+            appendMessage("bot", "Entschuldigung, ich konnte gerade nicht antworten.");
+            console.error(err);
+        }
+    }
+});
 </script>
 
 </body>
