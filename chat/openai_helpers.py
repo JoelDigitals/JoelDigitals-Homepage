@@ -1,146 +1,233 @@
-import json, os, datetime, re, random
+import json, os, re, random, difflib
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 KNOWLEDGE_FILE = os.path.join(BASE_DIR, "knowledge.json")
-LEARN_FILE = os.path.join(BASE_DIR, "learned.json")
 
-# Lade Knowledge
 with open(KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
     KNOWLEDGE = json.load(f)
 
-# Lade Learned
-if os.path.exists(LEARN_FILE):
-    with open(LEARN_FILE, "r", encoding="utf-8") as f:
-        try:
-            LEARNED = json.load(f)
-        except:
-            LEARNED = {}
-else:
-    LEARNED = {}
+PRODUCTS = ["jds_management", "auftragnetz", "jds_appstore", "logo_design", "support", "Hosting", "webentwicklung", "Digitalisierung"]
+CHAT_CONTEXT = []
+
+# ---------------------------
+# Hilfsfunktionen
+# ---------------------------
+
+def remember_context(question, answer, max_len=5):
+    CHAT_CONTEXT.append({"question": question, "answer": answer})
+    if len(CHAT_CONTEXT) > max_len:
+        CHAT_CONTEXT.pop(0)
 
 def _normalize(text):
-    return text.lower().strip() if isinstance(text, str) else ""
+    return text.lower().replace(" ", "")
 
-def _search_value(val, query_norm):
-    results = []
-    if isinstance(val, str):
-        if query_norm in val.lower():
-            results.append(val)
-    elif isinstance(val, list):
-        for item in val:
-            results.extend(_search_value(item, query_norm))
-    elif isinstance(val, dict):
-        for v in val.values():
-            results.extend(_search_value(v, query_norm))
-    return results
+def fuzzy_match_keywords(question, keywords, cutoff=0.6):
+    words = re.findall(r'\w+', question.lower())
+    for word in words:
+        if difflib.get_close_matches(word, keywords, n=1, cutoff=cutoff):
+            return True
+    return False
 
-def extract_keywords(question):
-    return [w for w in re.findall(r'\w+', question) if len(w) > 3]
+def is_price_question(q):
+    keywords = ["preis", "kosten", "was kostet", "wie viel", "kostenlos", "gebühr"]
+    return fuzzy_match_keywords(q, keywords, cutoff=0.5)
 
-def lookup_database(keywords, lang="de"):
-    kb = KNOWLEDGE.get(lang, KNOWLEDGE.get("de", {}))
-    facts = []
+def is_feature_question(q):
+    keywords = ["features", "funktion", "funktionen", "eigenschaft", "was kann", "enthalten"]
+    return fuzzy_match_keywords(q, keywords, cutoff=0.5)
 
-    for kw in keywords:
-        kw_norm = _normalize(kw)
-        for key, val in kb.items():
-            key_norm = _normalize(key).replace(" ", "_")
-            if kw_norm in key_norm:
-                # Wenn val ein Dict mit Beschreibung
-                if isinstance(val, dict) and "beschreibung" in val:
-                    facts.append(val["beschreibung"])
-                # Wenn val String
-                elif isinstance(val, str):
-                    facts.append(val)
-                # Wenn val Dict ohne Beschreibung
-                elif isinstance(val, dict):
-                    facts.append(str(val))
-
-    # Duplikate entfernen
-    return list(dict.fromkeys(facts))
-
-def generate_answer(question, db_facts, lang="de"):
-    kb = KNOWLEDGE.get(lang, KNOWLEDGE.get("de", {}))
+def detect_product(question, kb):
+    """Erkennt das Produkt basierend auf Namen oder typischen Keywords"""
     q_norm = _normalize(question)
+    best_score = 0
+    best_prod = None
+    for key in PRODUCTS:
+        prod = kb.get(key, {})
+        prod_name = prod.get("name", "").lower().replace(" ", "")
+        prod_keywords = [prod_name] + [kw.lower().replace(" ", "") for kw in prod.get("keywords", [])]
 
-    response_parts = []
+        # Direkter Name oder Keyword Match
+        if any(kw in q_norm for kw in prod_keywords):
+            return key
 
-    # 1. Begrüßung
-    greetings = kb.get("begrüßung", ["Hallo!"])
-    if any(w in q_norm for w in ["hi", "hallo", "hey"]):
-        return random.choice(greetings)
+        # Fuzzy Match
+        for kw in prod_keywords:
+            score = difflib.SequenceMatcher(None, kw, q_norm).ratio()
+            if score > best_score:
+                best_score = score
+                best_prod = key
+    return best_prod if best_score > 0.65 else None
 
-    # 2. Verabschiedung
-    farewells = kb.get("verabschiedung", ["Auf Wiedersehen!"])
-    if any(w in q_norm for w in ["tschüss", "auf wiedersehen", "bye"]):
-        return random.choice(farewells)
+def get_last_product():
+    for context in reversed(CHAT_CONTEXT):
+        detected = detect_product(context["question"], KNOWLEDGE["de"])
+        if detected:
+            return detected
+    return None
 
-    # 3. Dank
-    thanks = kb.get("danke", ["Danke!"])
-    if any(w in q_norm for w in ["danke", "thank you"]):
-        return random.choice(thanks)
+# ---------------------------
+# Hauptfunktion
+# ---------------------------
 
-    # 4. Prüfen auf bekannte Themen
-    if "jds management" in q_norm or "jds" in q_norm:
-        jds = kb.get("jds_management", {})
-        text = f"{jds.get('beschreibung', '')}"
-        if "docs" in jds:
-            text += f" Weitere Informationen findest du hier: {jds['docs']}"
-        response_parts.append(text)
+import re, random, difflib
 
-    if "auftragnetz" in q_norm:
-        auftrag = kb.get("auftragnetz", {})
-        text = f"{auftrag.get('beschreibung', '')}"
-        if "docs" in auftrag:
-            text += f" Mehr Infos: {auftrag['docs']}"
-        response_parts.append(text)
+def detect_language(text):
+    """Erkennt automatisch, ob der Text deutsch oder englisch ist."""
+    de_keywords = ["was", "wie", "preis", "kosten", "funktion", "hallo", "danke"]
+    en_keywords = ["what", "how", "price", "cost", "feature", "hello", "thanks"]
+    text_lower = text.lower()
 
-    if "öffnungszeiten" in q_norm or "opening hours" in q_norm:
-        o = kb.get("meta", {}).get("öffnungszeiten", {})
-        if o:
-            today_hours = o.get("aktuelle_öffnungszeiten", "")
-            response_parts.append(f"Die aktuellen Öffnungszeiten findest du hier: {today_hours}")
+    de_score = sum(1 for k in de_keywords if k in text_lower)
+    en_score = sum(1 for k in en_keywords if k in text_lower)
 
-    if "kontakt" in q_norm or "email" in q_norm or "telefon" in q_norm:
-        contact = kb.get("meta", {}).get("contact", "")
-        email = kb.get("meta", {}).get("email", "")
-        phone = kb.get("meta", {}).get("telefon", "")
-        contact_text = f"Du kannst uns kontaktieren über die Seite {contact}"
-        if email:
-            contact_text += f" oder per E-Mail: {email}"
-        if phone:
-            contact_text += f", Telefon: {phone}"
-        response_parts.append(contact_text)
+    if de_score > en_score:
+        return "de"
+    elif en_score > de_score:
+        return "en"
+    else:
+        return "de"  # Standard: Deutsch
 
-    # 5. Wenn keine bekannten Themen gefunden
-    if not response_parts:
-        response_parts.append("Leider konnte ich dazu keine Informationen finden.")
+import datetime
+import difflib
 
-    # 6. Antwort zusammenführen
-    answer = " ".join(response_parts)
+def correct_spelling(text, vocabulary, cutoff=0.75):
+    """Korrigiert einfache Rechtschreibfehler anhand einer Wortliste."""
+    words = text.split()
+    corrected = []
+    for w in words:
+        match = difflib.get_close_matches(w.lower(), vocabulary, n=1, cutoff=cutoff)
+        corrected.append(match[0] if match else w)
+    return " ".join(corrected)
 
-    # Learned speichern
-    key = _normalize(question)
-    if lang not in LEARNED:
-        LEARNED[lang] = {}
-    LEARNED[lang][key] = {"beschreibung": answer, "timestamp": datetime.datetime.now().isoformat()}
-    with open(LEARN_FILE, "w", encoding="utf-8") as f:
-        json.dump(LEARNED, f, ensure_ascii=False, indent=2)
+def generate_answer(question, lang=None):
+    q = question.strip()
+    # -----------------------------
+    # Rechtschreibkorrektur
+    # -----------------------------
+    vocab = ["joel", "digitals", "jds", "management", "auftragnetz", "appstore",
+             "logo", "design", "support", "hosting", "webentwicklung", "digitalisierung"]
+    q = correct_spelling(q, vocab)
 
-    return answer
+    lang = lang or detect_language(q)
+    kb = KNOWLEDGE.get(lang, KNOWLEDGE.get("de", {}))
+    answers = []
 
+    q_lower = q.lower()
+
+    # -------------------------
+    # 1️⃣ Begrüßung, Danke, Verabschiedung
+    # -------------------------
+    greetings = {"de": ["hallo","hi","hey","guten tag","guten morgen","guten abend"],
+                 "en": ["hello","hi","hey","good morning","good evening"]}
+    thanks = {"de": ["danke","vielen dank","merci","thx"], 
+              "en": ["thanks","thank you","thx","cheers"]}
+    farewells = {"de": ["tschüss","ciao","auf wiedersehen"], 
+                 "en": ["bye","goodbye","see you"]}
+    
+    if any(word in q_lower for word in greetings[lang]):
+        return random.choice(kb.get("begrüßung", kb.get("greeting", ["Hallo! Wie kann ich helfen?"])))
+    if any(word in q_lower for word in thanks[lang]):
+        return random.choice(kb.get("danke", kb.get("thanks", ["Gerne!"])))
+    if any(word in q_lower for word in farewells[lang]):
+        return random.choice(kb.get("verabschiedung", kb.get("farewell", ["Bis bald!"])))
+
+    # -------------------------
+    # 2️⃣ Öffnungszeiten & Unternehmensinfos
+    # -------------------------
+    if any(word in q_lower for word in ["öffnungszeiten","geöffnet","open","hours","geschäftszeiten","office hours"]):
+        oh = kb.get("meta", {}).get("öffnungszeiten", kb.get("meta", {}).get("opening_hours", {}))
+        today = datetime.datetime.now().strftime("%A").lower()
+        # Aktueller Tag
+        today_hours = oh.get(today, "geschlossen")
+        # Alle Wochentage
+        all_days = [f"{tag.title()}: {zeit}" for tag, zeit in oh.items() if tag not in ["aktuelle_öffnungszeiten","actual_opening_hours"]]
+        return ("🕓 Öffnungszeiten heute:\n" + today_hours + "\n\n🕓 Öffnungszeiten Woche:\n" + "\n".join(all_days)) if lang=="de" else ("🕓 Opening hours today:\n" + today_hours + "\n\n🕓 Opening hours week:\n" + "\n".join(all_days))
+
+    if "joel digitals" in q_lower and any(x in q_lower for x in ["wer","was","ist","who","what","unternehmen","company"]):
+        u = kb.get("unternehmen", kb.get("company", {}))
+        if lang=="de":
+            return f"🏢 Joel Digitals – {u.get('beschreibung', u.get('description',''))}\n📍 Sitz: {u.get('sitz', u.get('headquarters',''))}\n🎯 Mission: {u.get('mission','')}"
+        else:
+            return f"🏢 Joel Digitals – {u.get('description','')}\n📍 Location: {u.get('headquarters','')}\n🎯 Mission: {u.get('mission','')}"
+
+    # -------------------------
+    # 3️⃣ Hilfe / Support
+    # -------------------------
+    help_keywords = {
+        "de": ["hilfe", "support", "kontakt", "problem", "hilfe bekommen", "fragen", "beratung"],
+        "en": ["help", "support", "contact", "problem", "faq", "assistance", "question"]
+    }
+    if any(word in q_lower for word in help_keywords[lang]):
+        help_prod = kb.get("support") or kb.get("joel digitals support")
+        if help_prod:
+            desc = help_prod.get("beschreibung") or help_prod.get("description", "")
+            url = help_prod.get("url") or help_prod.get("website") or "https://joel-digitals.de/contact"
+            name = help_prod.get("name") or "Joel Digitals Support"
+            return f"🆘 {name}\n{desc}\nWeitere Hilfe findest du unter: {url}"
+
+    # -------------------------
+    # 4️⃣ Produkt erkennen
+    # -------------------------
+    detected_products = []
+    for key in PRODUCTS:
+        prod = kb.get(key, {})
+        prod_keywords = [key.lower()]
+        if "name" in prod:
+            prod_keywords.append(prod["name"].lower().replace(" ",""))
+        prod_keywords += [kw.lower().replace(" ","") for kw in prod.get("keywords", [])]
+        if any(kw in q_lower.replace(" ","") for kw in prod_keywords):
+            detected_products.append(key)
+
+    if not detected_products:
+        detected = detect_product(q, kb)
+        if detected:
+            detected_products = [detected]
+        elif (last := get_last_product()):
+            detected_products = [last]
+
+    # -------------------------
+    # 5️⃣ Frageart erkennen
+    # -------------------------
+    wants_price = is_price_question(q_lower)
+    wants_features = is_feature_question(q_lower)
+
+    # -------------------------
+    # 6️⃣ Antwort generieren
+    # -------------------------
+    for key in detected_products:
+        prod = kb.get(key, {})
+        name = prod.get("name", key)
+        desc = prod.get("beschreibung") or prod.get("description", "")
+        short = prod.get("kurz") or prod.get("short", "")
+        
+        # 🔹 Preis zuerst
+        if wants_price and prod.get("preis") or prod.get("price"):
+            preis = prod.get("preis") or prod.get("price")
+            answers.append(f"💰 Preis für {name}: {preis}")
+            continue
+
+        # 🔹 Features
+        if wants_features:
+            feats = prod.get("features") or prod.get("services")
+            if isinstance(feats, dict):
+                lines = [f"• {k.capitalize()}: {v}" for k,v in feats.items()]
+            elif isinstance(feats, list):
+                lines = [f"• {x}" for x in feats]
+            else:
+                lines = ["Keine Funktionen verfügbar." if lang=="de" else "No features available."]
+            answers.append(f"⚙️ Funktionen von {name}:\n" + "\n".join(lines))
+            continue
+
+        # 🔹 Standardbeschreibung
+        if desc or short:
+            answers.append(f"📘 {name}\n{desc}\n{short}")
+    
+    if not answers:
+        return "Ich konnte dazu leider keine passenden Informationen finden." if lang=="de" else "I couldn't find matching information."
+    
+    final_answer = "\n\n".join(answers)
+    remember_context(question, final_answer)
+    return final_answer
 
 def chatbot_answer(question, lang="de"):
-    keywords = extract_keywords(question)
-    db_facts = lookup_database(keywords, lang)
-    answer = generate_answer(question, db_facts, lang)
-
-    # Speichern in learned.json (optional)
-    key = _normalize(question)
-    if lang not in LEARNED:
-        LEARNED[lang] = {}
-    LEARNED[lang][key] = {"beschreibung": answer, "timestamp": datetime.datetime.now().isoformat()}
-    with open(LEARN_FILE, "w", encoding="utf-8") as f:
-        json.dump(LEARNED, f, ensure_ascii=False, indent=2)
-
-    return answer
+    return generate_answer(question, lang)

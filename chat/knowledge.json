@@ -4,6 +4,8 @@
       "company": "Joel Digitals",
       "website": "https://joel-digitals.de",
       "contact": "https://joel-digitals.de/contact",
+      "shop": "https://joel-digitals.de/shop",
+      "rabatte": "https://joel-digitals.de/shop/?q=&min=&max=&discount=1&sort=name",
       "email": "info@joel-digitals.de",
       "telefon": "+49 1525 3480270",
       "öffnungszeiten": {
@@ -14,7 +16,6 @@
         "freitag": "geschlossen",
         "samstag": "geschlossen",
         "sonntag": "geschlossen",
-
         "aktuelle_öffnungszeiten": "https://joel-digitals.de/opening-hours"
       }
     },
@@ -23,10 +24,15 @@
       "Hi! Wie kann ich dir helfen?",
       "Willkommen bei Joel Digitals! Ich bin dein digitaler Assistent."
     ],
+    "hilfe": [
+      "Wie kann ich dir helfen?",
+      "Wobei kann ich dich unterstützen?",
+      "Was möchtest du wissen?"
+    ],
     "danke": [
-      "Danke für deine Anfrage!",
-      "Vielen Dank für dein Vertrauen.",
-      "Wir schätzen deine Kontaktaufnahme sehr."
+      "Immer wieder gerne!",
+      "Bitteschön!",
+      "Gerne doch!"
     ],
     "verabschiedung": [
       "Auf Wiedersehen!",
@@ -34,59 +40,131 @@
       "Wir freuen uns auf das nächste Mal!"
     ],
     "unternehmen": {
-      "beschreibung": "Joel Digitals ist eine Full-Service Digitalagentur aus Deutschland, die innovative Web- und App-Lösungen bietet.",
+      "beschreibung": "Joel Digitals ist eine Full-Service Digitalagentur aus Deutschland, die innovative Web- und App-Lösungen bietet und Unternehmen hilft, digital zu wachsen.",
       "leistungen": [
-        "Webdesign & Entwicklung",
-        "Mobile App-Entwicklung",
-        "Softwarelösungen & Automatisierung",
-        "Hosting, Wartung & Support",
-        "Digitales Marketing & SEO",
-        "Logo- & Grafikdesign",
-        "UX/UI-Design",
-        "Beratung & Strategieentwicklung"
+        "Webdesign & Entwicklung (Responsive, SEO-optimiert, CMS-Integration)",
+        "Mobile App-Entwicklung (iOS, Android, Cross-Platform)",
+        "Softwarelösungen & Automatisierung (B2B & B2C Anwendungen)",
+        "Hosting, Wartung & Support (Server-Management, Backups, Sicherheit)",
+        "Digitales Marketing & SEO (Content-Marketing, SEA, Social Media Ads)",
+        "Logo- & Grafikdesign (Branding, Corporate Identity, Print & Digital)",
+        "UX/UI-Design (User Experience, User Interface, Prototyping)",
+        "Beratung & Strategieentwicklung (Digitalstrategie, Prozessoptimierung)",
+        "Webshops & E-Commerce-Lösungen (Shop-Systeme, Zahlungsintegration, Produktmanagement)",
+        "KI & Automatisierung (Chatbots, Prozessautomatisierung, Datenanalyse)"
       ],
+      "about_us": "https://joel-digitals.de/about",
       "gründung": "24.07.2025",
       "sitz": "Lebach, Deutschland",
+      "team": "Klein aber fein aus 2 engagierten Mitgliedern. Joel Nicolay (Gründer & Entwickler) & Ayuki Iokawa (Mitgründerin & Designerin)",
       "mission": "Digitale Lösungen entwickeln, die begeistern, Mehrwert schaffen und Prozesse vereinfachen.",
-      "vision": "Eine digitale Welt, in der jeder Zugriff auf einfache, effiziente und kreative Lösungen hat."
+      "vision": "Eine digitale Welt, in der jeder Zugriff auf einfache, effiziente und kreative Lösungen hat.",
+      "Apps": [
+        "JDS Management",
+        "AuftragNetz",
+        "JDS AppStore",
+        "Joel Digitals Support"
+      ]
     },
     "jds_management": {
       "name": "JDS Management",
-      "kurz": "Tool für Verwaltung von Arbeitszeiten, Aufgaben, Mitarbeiter, Rechnnungen & Kunden",
-      "beschreibung": "JDS Management ist ein webbasiertes Tool für Projektplanung, Aufgabenmanagement, Zeiterfassung, Kundenverwaltung und Rechnungsstellung.",
+      "kurz": "Tool für Verwaltung von Arbeitszeiten, Aufgaben, Mitarbeiter, Rechnungen & Kunden",
+      "beschreibung": "JDS Management ist ein webbasiertes Tool für Projektplanung, Aufgabenmanagement, Zeiterfassung, Kundenverwaltung und Rechnungsstellung. Ideal für kleine und mittlere Unternehmen.",
       "features": {
         "projekte": "Projekterstellung, Meilensteine, Gantt-Diagramme, Fortschrittsanzeigen",
         "aufgaben": "Aufgaben mit Prioritäten, Zuweisungen, Fälligkeitsdaten, Status-Updates",
         "zeiterfassung": "Manuelle und automatische Zeiterfassung pro Aufgabe und Projekt",
         "kundenverwaltung": "Kundendaten, Kontakte, Adressen, PDF Export, History Tracking",
-        "rapporte": "Projekt- und Mitarbeiterstatistiken, Download als CSV/PDF, Dashboards"
+        "rapporte": "Projekt- und Mitarbeiterstatistiken, Download als CSV/PDF, Dashboards",
+        "rechnungen": "Erstellen, Versenden und Verwalten von Rechnungen direkt aus dem Tool",
+        "benachrichtigungen": "E-Mail-Erinnerungen für Deadlines, Aufgaben und Meetings",
+        "mobile_app": "iOS & Android App zur mobilen Verwaltung unterwegs"
       },
-      "docs": "https://joel-digitals.de/our-apps/JDS-Management/"
+      "preis": "Kostenlos testen für 14 Tage, anschließend einmalg bezahlen. Alle Peise im Shop: https://joel-digitals.de/de/shop/?group=1",
+      "docs": "https://joel-digitals.de/our-apps/JDS-Management/",
+      "register": "https://jds-management.de/register",
+      "testversion": "Kostenlos testen mit dem Registrierungs Code: Test_14. https://jds-management.de/register"
     },
     "auftragnetz": {
-      "beschreibung": "AuftragNetz verbindet Auftraggeber und Dienstleister; Filter, Angebote, Auftragsverfolgung und Bewertungen.",
+      "name": "AuftragNetz",
+      "beschreibung": "AuftragNetz verbindet Auftraggeber und Dienstleister; Filter, Angebote, Auftragsverfolgung und Bewertungen. Optimal für Freelancer und kleine Firmen.",
       "features": {
         "angebote": "Erstellen & Veröffentlichen von Aufträgen",
-        "matching": "Matching-Algorithmus nach Skills & Region",
-        "bewertungen": "Bewertungssystem für Auftragnehmer",
-        "benachrichtigungen": "E-Mail- & Push-Benachrichtigungen",
-        "tracking": "Auftragsfortschritt in Echtzeit"
+        "bewertungen": "Bewertungssystem für Auftragnehmer (soon)",
+        "benachrichtigungen": "E-Mail Benachrichtigungen",
+        "tracking": "Auftragsfortschritt in Echtzeit",
+        "messaging": "Direktnachrichten zwischen Auftraggeber und Dienstleister",
+        "statistiken": "Übersicht über vergangene Aufträge, Auslastung und Budget",
+        "leadlist": "Liste mit Suchen nach deinen Produkten"
       },
+      "preis": "Kostenlos mit eingeschränkten Funktionen. Medium-Version: 199,99€/Jahr, Company-Version: 399,99€/Jahr",
       "docs": "https://joel-digitals.de/our-apps/auftragnetz/"
     },
     "jds_appstore": {
-      "beschreibung": "Zentrale Plattform, um Apps von Joel Digitals zu entdecken, zu installieren und zu verwalten.",
+      "name": "JDS AppStore",
+      "beschreibung": "Zentrale Plattform, um Apps von Joel Digitals und anderen  zu entdecken, zu installieren und zu verwalten.",
       "website": "https://jds-appstore.de/",
-      "apps": ["JDS Management", "AuftragNetz", "CallHub", "JDS CRM", "JDS Analytics"]
-    },
-    "callhub": {
-      "beschreibung": "Cloud-basiertes Telefonsystem für interne und externe Anrufe, Warteschleifen, Weiterleitungen und Kurzwahlen.",
-      "features": ["Interne & externe Anrufe", "Kurzwahlverzeichnis", "Warteschleifen", "Abwesenheitsansagen", "Twilio-Integration"],
-      "docs": "https://joel-digitals.de/our-apps/callhub/"
+      "apps": ["JDS Management", "AuftragNetz", "JDS AppStore"],
+      "features": ["App-Installation mit Klick", "Updates", "Zentrale Verwaltung von Lizenzen und Nutzerrechten"],
+      "preis": "Kostenlos"
     },
     "logo_design": {
-      "beschreibung": "Professionelle Logo-Entwicklung und Branding für Unternehmen, Startups und Projekte.",
-      "services": ["Logo-Design", "Corporate Identity", "Branding-Strategie", "Design-Guidelines"]
+      "name": "Logo Design",
+      "beschreibung": "Professionelle Logo-Entwicklung und Branding für Unternehmen, Startups und Projekte. Inklusive CI-Manual.",
+      "services": [
+        "Logo-Design",
+        "Corporate Identity",
+        "Branding-Strategie",
+        "Design-Guidelines",
+        "Social Media Branding",
+        "Print-Materialien (Visitenkarten, Flyer, Broschüren)"
+      ],
+      "preis": "je nach Umfang",
+      "kontakt": "https://joel-digitals.de/our-apps/logo/"
+    },
+    "support": {
+      "name": "Joel Digitals Support",
+      "beschreibung": "Support-Portal für Kunden von Joel Digitals. Ticket-System, FAQs, Dokumentation und Kontaktmöglichkeiten.",
+      "features": [
+        "Ticket-System zur schnellen Problemlösung",
+        "FAQs zu häufig gestellten Fragen",
+        "Dokumentation zu unseren Produkten und Dienstleistungen",
+        "Direkter Kontakt zu unserem Support-Team"
+      ],
+      "website": "https://joel-digitals.de/our-apps/joel-digitals-support/",
+      "preis": "Kostenlos für alle Kunden von Joel Digitals"
+    },
+    "Hosting": {
+      "name": "Joel Digitals Hosting",
+      "beschreibung": "Zuverlässiges und sicheres Webhosting für Websites, Apps und Online-Shops. Verschiedene Pakete für unterschiedliche Bedürfnisse.",
+      "features": [
+        "SSD-Speicher für schnelle Ladezeiten",
+        "SSL-Zertifikate für sichere Verbindungen",
+        "24/7 Support durch unser Hosting-Team"
+      ],
+      "preis": "Je nach Paket"
+    },
+    "Digitalisierung": {
+      "name": "Digitalisierungsberatung",
+      "beschreibung": "Beratung und Unterstützung bei der Digitalisierung von Geschäftsprozessen. Analyse, Strategieentwicklung und Implementierung.",
+      "services": [
+        "Analyse bestehender Prozesse",
+        "Entwicklung von Digitalisierungsstrategien",
+        "Implementierung digitaler Lösungen",
+        "Meistens Dank Förderprogrammen kostengünstig oder kostenlos"
+      ],
+      "preis": "Je nach Umfang des Projekts"
+    },
+    "webentwicklung": {
+      "name": "Webentwicklung",
+      "beschreibung": "Individuelle Webentwicklung für Websites, Webanwendungen und Online-Shops. Modernste Technologien und best practices.",
+      "services": [
+        "Responsive Webdesign mit Django",
+        "E-Commerce-Lösungen",
+        "Performance-Optimierung",
+        "SEO-Optimierung"
+      ],
+      "preis": "80€/Stunde oder Pauschalpreise je nach Projekt"
     }
   },
   "en": {
@@ -104,7 +182,6 @@
         "friday": "closed",
         "saturday": "closed",
         "sunday": "closed",
-
         "actual_opening_hours": "https://joel-digitals.de/opening-hours"
       }
     },
@@ -124,16 +201,16 @@
       "We look forward to the next time!"
     ],
     "company": {
-      "description": "Joel Digitals is a full-service digital agency from Germany, offering innovative web and app solutions.",
+      "description": "Joel Digitals is a full-service digital agency from Germany, offering innovative web and app solutions and helping companies grow digitally.",
       "services": [
-        "Web Design & Development",
-        "Mobile App Development",
-        "Software Solutions & Automation",
-        "Hosting, Maintenance & Support",
-        "Digital Marketing & SEO",
-        "Logo & Graphic Design",
-        "UX/UI Design",
-        "Consulting & Strategy"
+        "Web Design & Development (Responsive, SEO-optimized, CMS integration)",
+        "Mobile App Development (iOS, Android, Cross-Platform)",
+        "Software Solutions & Automation (B2B & B2C apps)",
+        "Hosting, Maintenance & Support (Server management, backups, security)",
+        "Digital Marketing & SEO (Content marketing, SEA, Social Media Ads)",
+        "Logo & Graphic Design (Branding, Corporate Identity, Print & Digital)",
+        "UX/UI Design (User Experience, Interface Design, Prototyping)",
+        "Consulting & Strategy (Digital strategy, process optimization)"
       ],
       "founded": "24.07.2025",
       "headquarters": "Lebach, Germany",
@@ -143,41 +220,72 @@
     "jds_management": {
       "name": "JDS Management",
       "short": "Project & Client Management Tool",
-      "description": "JDS Management is a web-based tool for project planning, task management, time tracking, client management, and invoicing.",
+      "description": "JDS Management is a web-based tool for project planning, task management, time tracking, client management, and invoicing. Ideal for small and medium-sized businesses.",
       "features": {
         "projects": "Project creation, milestones, Gantt charts, progress tracking",
         "tasks": "Tasks with priorities, assignments, due dates, status updates",
         "time_tracking": "Manual and automatic time tracking per task and project",
         "client_management": "Client data, contacts, addresses, PDF export, history tracking",
         "reports": "Project and employee statistics, CSV/PDF downloads, dashboards",
-        "integrations": ["Twilio (Callhub)", "Stripe", "Mailgun", "Google Calendar", "Slack"]
+        "invoices": "Create, send, and manage invoices directly from the tool",
+        "notifications": "Email reminders for deadlines, tasks, and meetings",
+        "mobile_app": "iOS & Android app for managing projects on the go"
       },
-      "docs": "https://joel-digitals.de/our-apps/JDS-Management/"
+      "price": "Free 14-day trial, then from €9.99/month",
+      "docs": "https://joel-digitals.de/our-apps/JDS-Management/",
+      "trial": "https://joel-digitals.de/our-apps/JDS-Management/test"
     },
     "auftragnetz": {
-      "description": "AuftragNetz connects clients and service providers with filters, offers, tracking, and ratings.",
+      "description": "AuftragNetz connects clients and service providers with filters, offers, tracking, and ratings. Perfect for freelancers and small businesses.",
       "features": {
         "offers": "Create & publish projects",
         "matching": "Skill & region-based matching algorithm",
         "ratings": "Contractor rating system",
         "notifications": "Email & push notifications",
-        "tracking": "Real-time project progress"
+        "tracking": "Real-time project progress",
+        "messaging": "Direct messaging between clients and service providers",
+        "statistics": "Overview of past projects, workload, and budget"
       },
-      "docs": "https://joel-digitals.de/our-apps/auftragnetz/"
+      "price": "Free with limited features, Pro version from €19.99/month",
+      "docs": "https://joel-digitals.de/our-apps/auftragnetz/",
+      "trial": "https://joel-digitals.de/our-apps/auftragnetz/test"
     },
     "jds_appstore": {
       "description": "Central platform to discover, install, and manage apps from Joel Digitals.",
       "website": "https://jds-appstore.de/",
-      "apps": ["JDS Management", "AuftragNetz", "CallHub", "JDS CRM", "JDS Analytics"]
+      "apps": ["JDS Management", "AuftragNetz", "CallHub", "JDS CRM", "JDS Analytics"],
+      "features": [
+        "One-click app installation",
+        "Automatic updates",
+        "Central management of licenses and user rights"
+      ]
     },
     "callhub": {
-      "description": "Cloud-based phone system for internal and external calls, queues, forwarding, and speed dials.",
-      "features": ["Internal & external calls", "Speed dial directory", "Call queues", "Absence announcements", "Twilio integration"],
-      "docs": "https://joel-digitals.de/our-apps/callhub/"
+      "description": "Cloud-based phone system for internal and external calls, queues, forwarding, and speed dials. Suitable for teams of all sizes.",
+      "features": [
+        "Internal & external calls",
+        "Speed dial directory",
+        "Call queues & prioritization",
+        "Absence announcements & IVR menus",
+        "Twilio integration for reliable telephony",
+        "Call recording & reporting"
+      ],
+      "price": "Free 7-day trial, then from €12.99/month",
+      "docs": "https://joel-digitals.de/our-apps/callhub/",
+      "trial": "https://joel-digitals.de/our-apps/callhub/test"
     },
     "logo_design": {
-      "description": "Professional logo creation and branding for companies, startups, and projects.",
-      "services": ["Logo design", "Corporate identity", "Branding strategy", "Design guidelines"]
+      "description": "Professional logo creation and branding for companies, startups, and projects. Includes CI manual.",
+      "services": [
+        "Logo design",
+        "Corporate identity",
+        "Branding strategy",
+        "Design guidelines",
+        "Social media branding",
+        "Print materials (business cards, flyers, brochures)"
+      ],
+      "price": "Packages from €299",
+      "contact": "https://joel-digitals.de/contact#logo"
     }
   }
 }
