@@ -11,8 +11,8 @@ from django.template.loader import render_to_string
 from decimal import Decimal, ROUND_HALF_UP
 from django.http import JsonResponse
 from django.utils.timezone import now
-from django.db.models.functions import TruncMonth
-from django.db.models import Sum
+from django.db.models.functions import TruncMonth, Coalesce
+from django.db.models import Sum, Case, When, F, CharField
 import json
 from django.utils import timezone
 from collections import defaultdict
@@ -41,6 +41,7 @@ from django import forms
 from contact.views import is_Sales_Editor
 from django.db.models import Q
 from django.template import TemplateDoesNotExist
+from django.utils.translation import get_language
 
 
 @login_required
@@ -189,16 +190,24 @@ def redeem_voucher(code, user):
     voucher.save()
 
 def our_apps(request):
-    apps = App.objects.filter(is_active=True)  # Nur aktive Apps
+    lang = get_language()  # 'de' oder 'en'
+    apps = App.objects.filter(is_active=True)
     user_groups = request.user.groups.values_list('name', flat=True) if request.user.is_authenticated else []
+
+    for app in apps:
+        app.display_name = app.name_english if lang == 'en' and app.name_english else app.name
+        app.display_description = app.description_english if lang == 'en' and app.description_english else app.description
 
     return render(request, 'apps/our_apps.html', {
         'apps': apps,
         'user_groups': user_groups,
+        'lang': lang
     })
-
+    
 def shop(request):
-    # --- Parameter aus Query ---
+    lang = get_language()
+
+    # --- GET Parameter ---
     query = request.GET.get("q", "").strip()
     group = request.GET.get("group", "all")
     sort = request.GET.get("sort", "name")
@@ -208,6 +217,26 @@ def shop(request):
 
     # --- Basis: nur kaufbare Apps ---
     apps = App.objects.filter(is_available_for_purchase=True)
+
+    # --- Sprachlogik ---
+    if lang == 'en':
+        apps = apps.annotate(
+            display_name=Case(
+                When(name_english__isnull=False, then=F('name_english')),
+                default=F('name'),
+                output_field=CharField()
+            ),
+            display_description=Case(
+                When(description_english__isnull=False, then=F('description_english')),
+                default=F('description'),
+                output_field=CharField()
+            )
+        )
+    else:
+        apps = apps.annotate(
+            display_name=F('name'),
+            display_description=F('description')
+        )
 
     # --- Suche ---
     if query:
@@ -224,9 +253,15 @@ def shop(request):
 
     # --- Preisfilter ---
     if price_min:
-        apps = apps.filter(price__gte=price_min)
+        try:
+            apps = apps.filter(price__gte=Decimal(price_min))
+        except:
+            pass
     if price_max:
-        apps = apps.filter(price__lte=price_max)
+        try:
+            apps = apps.filter(price__lte=Decimal(price_max))
+        except:
+            pass
 
     # --- Nur Angebote ---
     if only_discount:
@@ -234,13 +269,20 @@ def shop(request):
 
     # --- Sortierung ---
     if sort == "price":
-        apps = apps.order_by("discounted_price")
+        apps = sorted(apps, key=lambda x: x.discounted_price or Decimal('0.00'))
     elif sort == "discount":
         apps = apps.order_by("-discount_percent")
     else:
         apps = apps.order_by("name")
 
+    # --- Gruppen für Tabs ---
     groups = AppGroup.objects.all().order_by("name")
+
+    # --- Wallet (falls angemeldet) ---
+    wallet_balance = 0.00
+    if request.user.is_authenticated:
+        wallet = Wallet.objects.filter(user=request.user).first()
+        wallet_balance = wallet.balance if wallet else 0.00
 
     context = {
         "apps": apps,
@@ -251,24 +293,28 @@ def shop(request):
         "price_max": price_max,
         "only_discount": only_discount,
         "sort": sort,
+        "lang": lang,
+        "wallet_balance": wallet_balance,
     }
-
-    if request.user.is_authenticated:
-        wallet = Wallet.objects.filter(user=request.user).first()
-        context["wallet_balance"] = wallet.balance if wallet else 0.00
 
     return render(request, "apps/shop.html", context)
 
 def app_detail(request, slug):
+    lang = get_language()
     app = get_object_or_404(App, slug=slug)
-    wallet = None  # <--- Fix: Initialisiere wallet standardmäßig mit None
+
+    app.display_name = app.name_english if lang == 'en' and app.name_english else app.name
+    app.display_description = app.description_english if lang == 'en' and app.description_english else app.description
+
+    wallet = None
     if request.user.is_authenticated:
         wallet = Wallet.objects.filter(user=request.user).first()
+
     return render(request, 'apps/app_detail.html', {
         'app': app,
-        'wallet_balance': wallet.balance if wallet else 0.00
+        'wallet_balance': wallet.balance if wallet else 0.00,
+        'lang': lang
     })
-
 
 @login_required
 def wallet_view(request):
@@ -919,8 +965,18 @@ def validate_codes(request):
     })
 
 def more_informations(request, slug):
-    app = get_object_or_404(App, slug=slug) 
-    return render(request, 'apps/app_infos.html', {'app': app})
+    lang = get_language()
+    app = get_object_or_404(App, slug=slug)
+
+    display_name = app.name_english if lang == 'en' and app.name_english else app.name
+    display_description = app.description_english if lang == 'en' and app.description_english else app.description
+
+    return render(request, 'apps/app_infos.html', {
+        'app': app,
+        'display_name': display_name,
+        'display_description': display_description,
+        'lang': lang
+    })
 
 @login_required
 def my_orders(request):

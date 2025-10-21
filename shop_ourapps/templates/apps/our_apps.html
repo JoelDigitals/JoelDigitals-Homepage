@@ -143,11 +143,11 @@
         <div class="apps-grid">
             {% for app in apps %}
                 <div class="shop-item">
-                    <h2>{{ app.name }}</h2>
+                    <h2>{{ app.display_name  }}</h2>
                     {% if app.image %}
                         <img src="{{ app.image.url }}" alt="{{ app.name }} Image" class="app-image">
                     {% endif %}
-                    <p>{{ app.description|truncatewords:50 }}</p>
+                    <p>{{ app.display_description|truncatewords:50|linebreaks }}</p>
                     <p>Version: {{ app.version }}</p>
                     <div>
                         {% if app.link %}

@@ -26,56 +26,64 @@ def is_blog_editor(user):
     return user.is_authenticated and user.groups.filter(name='Marketing').exists()
 
 
-def blog_list(request, lang='de'):
+def blog_list(request):
+    lang = request.LANGUAGE_CODE  # automatisch ermittelt, z. B. 'de' oder 'en'
     categories_with_posts = BlogCategory.objects.filter(posts__is_published=True).distinct()
-    category_filters = request.GET.getlist('category')
+    category_filters = request.GET.getlist("category")
 
     if category_filters:
-        posts = BlogPost.objects.filter(is_published=True, categories__id__in=category_filters).distinct().order_by('-created_at')
+        posts = BlogPost.objects.filter(is_published=True, categories__id__in=category_filters).distinct().order_by("-created_at")
     else:
-        posts = BlogPost.objects.filter(is_published=True).order_by('-created_at')
+        posts = BlogPost.objects.filter(is_published=True).order_by("-created_at")
 
-    return render(request, 'blog/blog_list.html', {
-        'posts': posts,
-        'categories_with_posts': categories_with_posts,
-        'category_filters': category_filters,
-        'lang': lang
+    # Titel je nach Sprache
+    for post in posts:
+        post.title = post.title_en if lang == "en" else post.title_de
+        post.teaser_text = (post.content_en if lang == "en" else post.content_de)[:250]
+
+    return render(request, "blog/blog_list.html", {
+        "posts": posts,
+        "categories_with_posts": categories_with_posts,
+        "category_filters": category_filters,
+        "lang": lang,
     })
 
 
-def blog_detail(request, pk, lang='de'):
+def blog_detail(request, pk):
+    lang = request.LANGUAGE_CODE
     post = get_object_or_404(BlogPost, pk=pk, is_published=True)
     post.views += 1
-    post.save(update_fields=['views'])
+    post.save(update_fields=["views"])
 
-    comments = post.comments.order_by('-created_at')
+    comments = post.comments.order_by("-created_at")
     form = CommentForm()
 
-    if request.method == 'POST' and request.user.is_authenticated:
+    if request.method == "POST" and request.user.is_authenticated:
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.post = post
             comment.user = request.user
             comment.save()
-            return redirect('blog_detail', pk=pk, lang=lang)
+            return redirect("blog:blog_detail", pk=pk)
 
-    related_posts = BlogPost.objects.filter(is_published=True).exclude(pk=pk).annotate(
-        same_categories=Count('categories')
-    ).order_by('-same_categories', '-created_at')[:3]
+    related_posts = (
+        BlogPost.objects.filter(is_published=True)
+        .exclude(pk=pk)
+        .annotate(same_categories=Count("categories"))
+        .order_by("-same_categories", "-created_at")[:3]
+    )
 
-    # dynamisch Titel und Content nach Sprache
-    title = post.title_en if lang == 'en' else post.title_de
-    content = post.content_en if lang == 'en' else post.content_de
+    # Sprachabhängiger Inhalt
+    post.title = post.title_en if lang == "en" else post.title_de
+    post.content = post.content_en if lang == "en" else post.content_de
 
-    return render(request, 'blog/blog_detail.html', {
-        'post': post,
-        'comments': comments,
-        'form': form,
-        'related_posts': related_posts,
-        'lang': lang,
-        'title': title,
-        'content': content
+    return render(request, "blog/blog_detail.html", {
+        "post": post,
+        "comments": comments,
+        "form": form,
+        "related_posts": related_posts,
+        "lang": lang,
     })
 
 

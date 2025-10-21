@@ -99,8 +99,10 @@ class WalletCode(models.Model):
 
 class App(models.Model):
     name = models.CharField(max_length=255)
+    name_english = models.CharField(max_length=255, blank=True, null=True)
     slug = models.SlugField(unique=True)
     description = models.TextField()
+    description_english = models.TextField(blank=True, null=True)
     product_number = models.CharField(max_length=50, unique=True, blank=True, null=True)
     version = models.CharField(max_length=20)
     image = models.ImageField(upload_to='app_images/', null=True, blank=True)

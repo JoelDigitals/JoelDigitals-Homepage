@@ -1,11 +1,11 @@
 <div class="shop-card"
-     data-name="{{ app.name|lower }}"
-     data-desc="{{ app.description|default_if_none:''|lower }}"
+     data-name="{{ app.display_name|lower }}"
+     data-desc="{{ app.display_description|default_if_none:''|lower }}"
      data-price="{{ app.discounted_price|floatformat:2 }}"
      data-discount="{{ app.discount_percent|default:0 }}">
-  {% if app.image %}<img src="{{ app.image.url }}" alt="{{ app.name }}">{% endif %}
-  <h2>{{ app.name }}</h2>
-  <p>{{ app.description|truncatechars:80 }}</p>
+  {% if app.image %}<img src="{{ app.image.url }}" alt="{{ app.display_name }}">{% endif %}
+  <h2>{{ app.display_name }}</h2>
+  <p>{{ app.display_description|truncatechars:80 }}</p>
   <p>Version: {{ app.version }}</p>
 
   {% if app.discount_percent > 0 %}

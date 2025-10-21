@@ -743,3 +743,6 @@ msgstr "Reliable hosting and domain management for your online presence."
 
 msgid "We provide secure hosting solutions and help you manage your domain names. Our services ensure your website and applications are always accessible and fast."
 msgstr "We provide secure hosting solutions and help you manage your domain names. Our services ensure your website and applications are always accessible and fast."
+
+msgid "View All Articles"
+msgstr "View All Articles"

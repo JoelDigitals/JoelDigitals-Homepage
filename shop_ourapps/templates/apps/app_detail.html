@@ -62,7 +62,7 @@
 </style>
 
 <div class="container">
-    <h1>{{ app.name }}</h1>
+    <h1>{{ app.display_name  }}</h1>
 
     {% if app.image %}
         <img src="{{ app.image.url }}" alt="{{ app.name }}" class="feature">
@@ -72,7 +72,7 @@
 
     <div style="white-space: pre-line; margin-top: 20px;">
         <strong>Description:</strong>
-        <p>{{ app.description }}</p>
+        <p>{{ app.display_description }}</p>
     </div>
 
     {% if app.discount_percent > 0 %}

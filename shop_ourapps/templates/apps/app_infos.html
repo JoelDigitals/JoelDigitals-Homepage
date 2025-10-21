@@ -1,7 +1,7 @@
 {% extends "base_home.html" %}
 {% load static %}
 
-{% block title %}{{ app.name }} – Details{% endblock %}
+{% block title %}{{ app.display_name }} – Details{% endblock %}
 
 {% block content %}
 <style>
@@ -91,13 +91,13 @@
 </style>
 
 <div class="app-container">
-    <h1>{{ app.name }}</h1>
+    <h1>{{ display_name }}</h1>
     {% if app.image %}
         <img src="{{ app.image.url }}" alt="{{ app.name }}">
     {% endif %}
 
     <p><strong>Version:</strong> {{ app.version }}</p>
-    <p>{{ app.description|linebreaks }}</p>
+    <p>{{ display_description|linebreaks }}</p>
 
     <div class="buttons">
         <a href="{% url 'shop' %}" target="_blank" rel="noopener noreferrer">Zum Shop   </a>

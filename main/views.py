@@ -24,9 +24,15 @@ def terms_view(request):
 # Create your views here.
 def home(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
+    lang = request.LANGUAGE_CODE  # ← aktuelle Sprache (z. B. "de" oder "en")
 
-    # Neuster Blogartikel
+    # Neuste Blogartikel
     latest_blog = BlogPost.objects.filter(is_published=True).order_by('-created_at')[:2]
+
+    # Sprachabhängige Titel + Teasertext
+    for post in latest_blog:
+        post.title = post.title_en if lang == "en" else post.title_de
+        post.teaser_text = (post.content_en if lang == "en" else post.content_de)[:200]
 
     # 3 zufällige Produkte
     products = list(App.objects.filter(is_available_for_purchase=True))
@@ -35,8 +41,10 @@ def home(request):
     return render(request, 'main/home.html', {
         'user_groups': user_groups,
         'latest_blog': latest_blog,
-        'products': random_products
+        'products': random_products,
+        'lang': lang,  # optional, falls du sie im Template brauchst
     })
+
 
 #register 
 def register_view(request):
