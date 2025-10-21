@@ -11,20 +11,25 @@ class BlogCategory(models.Model):
 
 
 class BlogPost(models.Model):
-    title = models.CharField(max_length=200)
+    title_de = models.CharField(max_length=200, verbose_name="Titel (DE)")
+    title_en = models.CharField(max_length=200, verbose_name="Titel (EN)")
     teaser_image = models.ImageField(upload_to='blog_teasers/')
-    content = RichTextField()
+    content_de = RichTextField(verbose_name="Inhalt (DE)")
+    content_en = RichTextField(verbose_name="Inhalt (EN)")
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     is_published = models.BooleanField(default=True)
     categories = models.ManyToManyField(BlogCategory, related_name='posts', blank=True)
-    views = models.PositiveIntegerField(default=0)  # 👈 Aufrufe zählen
+    views = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return self.title
+        return self.title_de  # oder dynamisch nach Sprache
 
-    def teaser_text(self):
-        return self.content[:300] + "..."
+    def teaser_text(self, lang='de'):
+        if lang == 'en':
+            return self.content_en[:300] + "..."
+        return self.content_de[:300] + "..."
+
 
 
 class Comment(models.Model):

@@ -26,7 +26,7 @@ def is_blog_editor(user):
     return user.is_authenticated and user.groups.filter(name='Marketing').exists()
 
 
-def blog_list(request):
+def blog_list(request, lang='de'):
     categories_with_posts = BlogCategory.objects.filter(posts__is_published=True).distinct()
     category_filters = request.GET.getlist('category')
 
@@ -38,18 +38,16 @@ def blog_list(request):
     return render(request, 'blog/blog_list.html', {
         'posts': posts,
         'categories_with_posts': categories_with_posts,
-        'category_filters': category_filters
+        'category_filters': category_filters,
+        'lang': lang
     })
 
 
-def blog_detail(request, pk):
+def blog_detail(request, pk, lang='de'):
     post = get_object_or_404(BlogPost, pk=pk, is_published=True)
-
-    # 👁️ Aufrufzähler erhöhen
     post.views += 1
     post.save(update_fields=['views'])
 
-    # 💬 Kommentare
     comments = post.comments.order_by('-created_at')
     form = CommentForm()
 
@@ -60,21 +58,26 @@ def blog_detail(request, pk):
             comment.post = post
             comment.user = request.user
             comment.save()
-            return redirect('blog_detail', pk=pk)
+            return redirect('blog_detail', pk=pk, lang=lang)
 
-    # 🔁 Vorschläge
-    related_posts = BlogPost.objects.filter(
-        is_published=True
-    ).exclude(pk=pk).annotate(
+    related_posts = BlogPost.objects.filter(is_published=True).exclude(pk=pk).annotate(
         same_categories=Count('categories')
     ).order_by('-same_categories', '-created_at')[:3]
+
+    # dynamisch Titel und Content nach Sprache
+    title = post.title_en if lang == 'en' else post.title_de
+    content = post.content_en if lang == 'en' else post.content_de
 
     return render(request, 'blog/blog_detail.html', {
         'post': post,
         'comments': comments,
         'form': form,
         'related_posts': related_posts,
+        'lang': lang,
+        'title': title,
+        'content': content
     })
+
 
 
 @user_passes_test(is_blog_editor)

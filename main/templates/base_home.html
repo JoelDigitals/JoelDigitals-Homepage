@@ -39,13 +39,22 @@
       min-height: 100vh;
     }
     header {
-      background: #181818;
+      position: relative;
+      z-index: 10002; /* höher als nav */
+      background: #181818; /* oder rgba(24,24,24,0.95) für leichte Transparenz */
       padding: 1rem 2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       box-shadow: 0 2px 6px rgba(0,0,0,.6);
     }
+
+    /* Hamburger/X & Logo immer über Slide-Bar */
+    .menu-toggle, .logo-img {
+      position: relative;
+      z-index: 10003;
+    }
+
     .logo-img {
       width: 200px;
       height: auto;
@@ -175,31 +184,41 @@
       .menu-toggle {
         display: block;
       }
-    
       nav#main-nav {
         position: fixed;
         top: 0;
         left: 0;
-        transform: translateX(-100%);
         width: 70%;
         height: 100vh;
-        background: var(--surface);
+        transform: translateX(-100%);
+        background: rgba(30, 30, 30, 0.85); /* halbtransparent */
         flex-direction: column;
-        align-items: flex-start;
         padding: 2rem 1rem;
         gap: 1rem;
         transition: transform 0.3s ease;
-        z-index: 10000;
-        display: flex; /* dauerhaft sichtbar, aber außerhalb */
+        z-index: 10001; /* unter Header */
+        display: flex;
+        overflow-y: auto; /* scrollbar falls Inhalt zu lang */
+        padding-top: calc(1rem + 60px); /* Abstand, dass Content unter Header startet */
       }
     
       nav#main-nav.open {
         transform: translateX(0);
       }
     
+      /* Links größer für mobiles Menü */
       nav#main-nav a {
         font-size: 1.2rem;
       }
+    }
+    
+    /* Optional: scrollbar schön */
+    nav#main-nav::-webkit-scrollbar {
+      width: 6px;
+    }
+    nav#main-nav::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
     }
 
     @media (max-width: 600px) {
@@ -297,96 +316,99 @@
 </head>
 
 <body>
+<!-- Header -->
 <header>
   <div style="display: flex; align-items: center; gap: 1rem;">
     <button class="menu-toggle" onclick="toggleMenu()">
-      <i class="fas fa-bars"></i>
+      <i class="fas fa-bars" id="menu-icon"></i>
     </button>
     <a href="/">
       <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
     </a>
   </div>
-      <nav id="main-nav">
-        <!-- Links bleiben gleich -->
-        <a href="/wiki/">{% trans "Wiki" %}</a>
-        <a href="/status/">{% trans "Status" %}</a>
-        <a href="/services/">{% trans "Services" %}</a>
-        <a href="/about/">{% trans "About Us" %}</a>
-        <a href="/contact/">{% trans "Contact" %}</a>
-        <a href="/blog/">{% trans "Blog" %}</a>
-        <a href="/our-apps/">{% trans "Our Apps" %}</a>
-        <a href="/shop/">{% trans "Shop" %}</a>
+  <nav id="main-nav">
+    <!-- Home-Link nur im Hamburger-Menü -->
+    <a href="/" class="mobile-home">{% trans "Home" %}</a>
 
-        {% if user.is_authenticated %}
-            {% if "Marketing" in user_groups %}
-                <a href="/blog/admin-blog/">{% trans "Admin: Blog" %}</a>
-            {% endif %}
-            {% if "Selling" in user_groups %}
-                <a href="/contact/admin-sales/">{% trans "Admin: Sales" %}</a>
-                <a href="/admin-sales/orders/">{% trans "Admin: Orders" %}</a>
-                <a href="/contact/appointment/admin/">{% trans "Admin: Termin" %}</a>
-            {% endif %}
-            {% if "Support" in user_groups %}
-                <a href="/contact/admin-tickets/">{% trans "Admin: Tickets" %}</a>
-            {% endif %}
-            <a href="/auth/logout/">{% trans "Logout" %}</a>
-        {% else %}
-            <a href="/auth/login/">{% trans "Login" %}</a>
+    <!-- Andere Links bleiben gleich -->
+    <a href="/wiki/">{% trans "Wiki" %}</a>
+    <a href="/status/">{% trans "Status" %}</a>
+    <a href="/services/">{% trans "Services" %}</a>
+    <a href="/about/">{% trans "About Us" %}</a>
+    <a href="/contact/">{% trans "Contact" %}</a>
+    <a href="/blog/">{% trans "Blog" %}</a>
+    <a href="/our-apps/">{% trans "Our Apps" %}</a>
+    <a href="/shop/">{% trans "Shop" %}</a>
+
+    {% if user.is_authenticated %}
+        {% if "Marketing" in user_groups %}
+            <a href="/blog/admin-blog/">{% trans "Admin: Blog" %}</a>
         {% endif %}
+        {% if "Selling" in user_groups %}
+            <a href="/contact/admin-sales/">{% trans "Admin: Sales" %}</a>
+            <a href="/admin-sales/orders/">{% trans "Admin: Orders" %}</a>
+            <a href="/contact/appointment/admin/">{% trans "Admin: Termin" %}</a>
+        {% endif %}
+        {% if "Support" in user_groups %}
+            <a href="/contact/admin-tickets/">{% trans "Admin: Tickets" %}</a>
+        {% endif %}
+        <a href="/auth/logout/">{% trans "Logout" %}</a>
+    {% else %}
+        <a href="/auth/login/">{% trans "Login" %}</a>
+    {% endif %}
 
-        <div class="language-dropdown">
-          <button class="dropbtn">
-            <img src="{% static 'flags/' %}de.png" alt="de" class="flag-icon" id="current-flag">
-          </button>
-          <div class="dropdown-content">
-            <a href="/de/" onclick="switchLanguage('de')"><img src="{% static 'flags/de.png' %}" class="flag-icon"> Deutsch</a>
-            <a href="/en/" onclick="switchLanguage('en')"><img src="{% static 'flags/en.png' %}" class="flag-icon"> English</a>
-          </div>
-        </div>
-
-    </nav>
-    <script>
-      function switchLanguage(lang) {
-        // Cookie speichern
-        document.cookie = "language=" + lang + "; path=/; SameSite=Lax; max-age=" + 365*24*60*60;
-      
-        // Flagge im Header aktualisieren
-        const flag = document.getElementById('current-flag');
-        if (flag) {
-          flag.src = "{% static 'flags/' %}" + lang + ".png";
-          flag.alt = lang;
-        }
-      
-        // Aktuelle URL
-        let path = window.location.pathname;
-      
-        // Prüfen, ob ein Sprachprefix existiert (/de/, /en/, ...)
-        const match = path.match(/^\/(de|en|fr)(\/.*|$)/);
-        if(match) {
-          // Sprachprefix ersetzen
-          path = "/" + lang + match[2];
-        } else {
-          // Keinen Prefix? Einfach lang vorne hinzufügen
-          path = "/" + lang + path;
-        }
-      
-        // Seite neu laden mit Sprach-Prefix
-        window.location.href = path + window.location.search + window.location.hash;
-      }
-
-      // Beim Laden der Seite Flagge nach Cookie setzen
-      document.addEventListener("DOMContentLoaded", () => {
-        const matches = document.cookie.match(/(^|;)\s*language=([^;]+)/);
-        const lang = matches ? matches[2] : 'de';
-        const flag = document.getElementById('current-flag');
-        if(flag) {
-          flag.src = "{% static 'flags/' %}" + lang + ".png";
-          flag.alt = lang;
-        }
-      });
-    </script>
-
+    <div class="language-dropdown">
+      <button class="dropbtn">
+        <img src="{% static 'flags/' %}de.png" alt="de" class="flag-icon" id="current-flag">
+      </button>
+      <div class="dropdown-content">
+        <a href="/de/" onclick="switchLanguage('de')"><img src="{% static 'flags/de.png' %}" class="flag-icon"> Deutsch</a>
+        <a href="/en/" onclick="switchLanguage('en')"><img src="{% static 'flags/en.png' %}" class="flag-icon"> English</a>
+      </div>
+    </div>
+  </nav>
 </header>
+
+<style>
+/* Home-Link nur im Hamburger-Menü sichtbar */
+nav#main-nav .mobile-home { display: none; }
+
+@media (max-width: 768px) {
+  nav#main-nav .mobile-home { display: block; font-weight: bold; }
+}
+</style>
+
+<script>
+function toggleMenu() {
+  const nav = document.getElementById("main-nav");
+  const icon = document.getElementById("menu-icon");
+  nav.classList.toggle("open");
+
+  // Hamburger ↔ ×
+  if(nav.classList.contains("open")) {
+    icon.classList.remove("fa-bars");
+    icon.classList.add("fa-times");
+  } else {
+    icon.classList.remove("fa-times");
+    icon.classList.add("fa-bars");
+  }
+}
+
+// Schließen bei Klick außerhalb
+document.addEventListener("click", function(event) {
+  const nav = document.getElementById("main-nav");
+  const toggle = document.querySelector(".menu-toggle");
+  const icon = document.getElementById("menu-icon");
+
+  if(nav.classList.contains("open") && !nav.contains(event.target) && !toggle.contains(event.target)) {
+    nav.classList.remove("open");
+    icon.classList.remove("fa-times");
+    icon.classList.add("fa-bars");
+  }
+});
+</script>
+
+
 
 
 <main>
@@ -410,8 +432,8 @@
     <a href="https://instagram.com/joel_digitals_official" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
     <!--<a href="https://linkedin.com" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>-->
     <a href="https://www.youtube.com/@JoelDigitals" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-    <!--<a href="https://tiktok.com" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-    <a href="https://github.com" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>-->
+    <a href="https://www.tiktok.com/@joel_digitals_official" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+    <a href="https://wa.me/4915253480270" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
   </div>
 </footer>
 
@@ -466,11 +488,6 @@ document.addEventListener("DOMContentLoaded", () => {
   updateHeaderFlag(prefs?.language || 'de');
   if(!prefs) showBanner();
 });
-
-function toggleMenu() {
-  const nav = document.getElementById("main-nav");
-  nav.classList.toggle("open");
-}
 
 // Optional: Schließen bei Klick außerhalb des Menüs
 document.addEventListener("click", function (event) {

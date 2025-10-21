@@ -26,12 +26,20 @@
       min-height: 100vh;
     }
     header {
-      background: #181818;
+      position: relative;
+      z-index: 10002; /* höher als nav */
+      background: #181818; /* oder rgba(24,24,24,0.95) für leichte Transparenz */
       padding: 1rem 2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       box-shadow: 0 2px 6px rgba(0,0,0,.6);
+    }
+
+    /* Hamburger/X & Logo immer über Slide-Bar */
+    .menu-toggle, .logo-img {
+      position: relative;
+      z-index: 10003;
     }
     .logo-img {
       width: 200px;
@@ -164,19 +172,18 @@
 
   nav#main-nav {
     position: fixed;
-    top: 0;
-    left: 0;
-    transform: translateX(-100%);
+    top: 0; left: 0;
     width: 70%;
     height: 100vh;
-    background: var(--surface);
+    transform: translateX(-100%);
+    background: rgba(30, 30, 30, 0.85); /* halbtransparent */
     flex-direction: column;
-    align-items: flex-start;
     padding: 2rem 1rem;
     gap: 1rem;
     transition: transform 0.3s ease;
-    z-index: 10000;
-    display: flex; /* dauerhaft sichtbar, aber außerhalb */
+    z-index: 10001; /* unter Header */
+    display: flex;
+    overflow-y: auto; /* scrollbar falls Inhalt zu lang */
   }
 
   nav#main-nav.open {
@@ -186,6 +193,23 @@
   nav#main-nav a {
     font-size: 1.2rem;
   }
+
+  /* Damit Content unter Header sichtbar bleibt */
+  nav#main-nav::before {
+    content: '';
+    display: block;
+    height: 70px; /* Höhe des Headers */
+    flex-shrink: 0;
+  }
+}
+
+/* Optional: scrollbar schön */
+nav#main-nav::-webkit-scrollbar {
+  width: 6px;
+}
+nav#main-nav::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
 }
 
     @media (max-width: 600px) {
@@ -282,8 +306,8 @@
     <a href="https://instagram.com/joel_digitals_official" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
     <!--<a href="https://linkedin.com" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>-->
     <a href="https://www.youtube.com/@JoelDigitals" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-    <!--<a href="https://tiktok.com" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-    <a href="https://github.com" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>-->
+    <a href="https://www.tiktok.com/@joel_digitals_official" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+    <a href="https://wa.me/4915253480270" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
   </div>
 </footer>
 

@@ -6,26 +6,20 @@ from .models import BlogPost, BlogCategory
 
 
 class BlogPostForm(forms.ModelForm):
-    content = forms.CharField(widget=CKEditorWidget(), label="Inhalt")
+    content_de = forms.CharField(widget=CKEditorWidget(), label="Inhalt (DE)")
+    content_en = forms.CharField(widget=CKEditorWidget(), label="Inhalt (EN)")
 
     class Meta:
         model = BlogPost
-        fields = ['title', 'teaser_image', 'content', 'is_published', 'categories']
+        fields = ['title_de', 'title_en', 'teaser_image', 'content_de', 'content_en', 'is_published', 'categories']
         labels = {
-            'title': 'Titel',
+            'title_de': 'Titel (DE)',
+            'title_en': 'Titel (EN)',
             'teaser_image': 'Teaser-Bild',
             'is_published': 'Veröffentlicht?',
             'categories': 'Kategorien',
         }
-        widgets = {
-            'categories': forms.CheckboxSelectMultiple(),
-        }
-        help_texts = {
-            'title': 'Geben Sie den Titel des Blogbeitrags ein.',
-            'teaser_image': 'Wählen Sie ein Bild für die Vorschau aus.',
-            'is_published': 'Aktivieren Sie dieses Feld, um den Beitrag zu veröffentlichen.',
-            'categories': 'Wählen Sie eine oder mehrere Kategorien aus.',
-        }
+
 
 class BlogCategoryForm(forms.ModelForm):
     class Meta:
