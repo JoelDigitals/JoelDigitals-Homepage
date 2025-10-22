@@ -267,6 +267,8 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     app = models.ForeignKey(App, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
+    discount_percent = models.PositiveIntegerField(default=0)
+    discount_price = models.DecimalField(max_digits=10, decimal_places=2)  # Preis nach Rabatt2
     price = models.DecimalField(max_digits=10, decimal_places=2)  # Preis zum Zeitpunkt der Bestellung
 
     def __str__(self):

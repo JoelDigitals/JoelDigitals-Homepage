@@ -1,98 +1,79 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Status – {{ app.name }} – Joel Digitals{% endblock %}
+{% block title %}{% trans "Status" %} – {{ app.name }} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    main {
-        padding: 40px 20px;
-        max-width: 1000px;
-        margin: auto;
-        flex: 1;
-    }
+main {
+    padding: 40px 20px;
+    max-width: 1000px;
+    margin: auto;
+    flex: 1;
+}
 
-    .container {
-        background-color: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        color: #000;
-    }
+.container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    color: #000;
+}
 
-    h1, h2 {
-        color: #0044cc;
-    }
+h1, h2 {
+    color: #0044cc;
+}
 
-    ul {
-        list-style-type: none;
-        padding-left: 0;
-    }
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
 
-    .status-green {
-        color: green;
-        font-weight: bold;
-    }
+.status-green { color: green; font-weight: bold; }
+.status-red   { color: red; font-weight: bold; }
+.response-green  { color: green; }
+.response-orange { color: orange; }
+.response-red    { color: red; }
 
-    .status-red {
-        color: red;
-        font-weight: bold;
-    }
+a.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #0044cc;
+    text-decoration: none;
+    font-weight: bold;
+}
 
-    .response-green {
-        color: green;
-    }
+a.back-link:hover {
+    text-decoration: underline;
+}
 
-    .response-orange {
-        color: orange;
-    }
+@media (max-width: 600px) {
+    .container { padding: 20px; }
+}
 
-    .response-red {
-        color: red;
-    }
-
-    a.back-link {
-        display: inline-block;
-        margin-top: 20px;
-        color: #0044cc;
-        text-decoration: none;
-        font-weight: bold;
-    }
-
-    a.back-link:hover {
-        text-decoration: underline;
-    }
-
-    @media (max-width: 600px) {
-        .container {
-            padding: 20px;
-        }
-    }
-
-    @media (max-width: 400px) {
-        h1, h2 {
-            font-size: 24px;
-        }
-    }
+@media (max-width: 400px) {
+    h1, h2 { font-size: 24px; }
+}
 </style>
 
 <main>
     <div class="container">
-        <h1>Status of {{ app.name }}</h1>
+        <h1>{% blocktrans %}Status of {{ app.name }}{% endblocktrans %}</h1>
 
-        <p>Status:
+        <p>{% trans "Status" %}:
             <strong class="{% if status == 'online' %}status-green{% else %}status-red{% endif %}">
                 {{ status|capfirst }}
             </strong>
         </p>
 
-        <p>Response time:
+        <p>{% trans "Response time" %}:
             <span class="{% if response_time <= 700 %}response-green{% elif response_time <= 1500 %}response-orange{% else %}response-red{% endif %}">
                 {{ response_time }} ms
             </span>
         </p>
 
-        <h2>Known issues</h2>
+        <h2>{% trans "Known issues" %}</h2>
         {% if issues %}
             <ul>
                 {% for issue in issues %}
@@ -100,10 +81,10 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <p>No known issues.</p>
+            <p>{% trans "No known issues." %}</p>
         {% endif %}
 
-        <p><a href="{% url 'status_overview' %}" class="back-link">&larr; Back to overview</a></p>
+        <p><a href="{% url 'status_overview' %}" class="back-link">&larr; {% trans "Back to overview" %}</a></p>
     </div>
 </main>
 {% endblock %}

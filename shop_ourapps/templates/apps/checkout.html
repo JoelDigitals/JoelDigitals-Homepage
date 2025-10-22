@@ -1,7 +1,8 @@
 {% extends "base_shop.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Checkout – Joel Digitals{% endblock %}
+{% block title %}{% trans "Checkout" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
@@ -51,15 +52,15 @@
     .message.success { background-color: #d4edda; color: #155724; }
     .message.warning { background-color: #fff3cd; color: #856404; }
 </style>
-
 <div class="container">
-    <h1>Checkout</h1>
+    <h1>{% trans "Checkout" %}</h1>
 
-    <h2>Your Items</h2>
+    <h2>{% trans "Your Items" %}</h2>
     <ul>
         {% for item in items %}
             <li style="margin-bottom: 0.5rem;">
-                {{ item.quantity }} × {{ item.app.name }}
+                {{ item.quantity }} × 
+                {% if "de" in lang %}{{ item.app.name }}{% else %}{{ item.app.name_english }}{% endif %}
                 {% if item.app.discount_percent > 0 %}
                     <span style="text-decoration: line-through; color: #888; font-size: 0.95rem; margin-left: 10px;">
                       €{{ item.app.price|floatformat:2 }}
@@ -79,62 +80,43 @@
                       🔖 {{ item.app.discount_percent }}%
                     </span>
                 {% else %}
-                    – {{ item.app.price|floatformat:2 }}€
+                    – €{{ item.app.price|floatformat:2 }}
                 {% endif %}
             </li>
         {% empty %} 
-            <li>Your cart is empty.</li>
+            <li>{% trans "Your cart is empty." %}</li>
         {% endfor %}
     </ul>
 
-    {% with discount_amount|default:0 as discount %}
-        <p><strong>Subtotal:</strong>{{ subtotal|floatformat:2 }}€</p>
-    {% endwith %}
-    {% with discount_amount|default:0 as discount %}
-        <p id="discount-line" style="display: {% if discount > 0 %}block{% else %}none{% endif %};">
-            <strong>Discount:</strong> -€<span id="discount-amount">{{ discount|floatformat:2 }}</span>
-        </p>
-    {% endwith %}
-
-    <p><strong>Total:</strong> €<span id="total-amount">{{ total|floatformat:2 }}</span></p>
-
+    <p><strong>{% trans "Subtotal" %}:</strong> €{{ subtotal|floatformat:2 }}</p>
+    <p id="discount-line" style="display: {% if discount_amount > 0 %}block{% else %}none{% endif %};">
+        <strong>{% trans "Discount" %}:</strong> -€<span id="discount-amount">{{ discount_amount|floatformat:2 }}</span>
+    </p>
+    <p><strong>{% trans "Total" %}:</strong> €<span id="total-amount">{{ total|floatformat:2 }}</span></p>
 
     <form method="post">
         {% csrf_token %}
-        <div class="form-input"><label>First Name</label><input type="text" name="first_name" required></div>
-        <div class="form-input"><label>Last Name</label><input type="text" name="last_name" required></div>
-        <div class="form-input"><label>Company Name (optional)</label><input type="text" name="company_name"></div>
-        <div class="form-input"><label>VAT Number (optional)</label><input type="text" name="vat_number"></div>
-        <div class="form-input"><label>Phone Number</label><input type="text" name="phone" required></div>
-        <div class="form-input"><label>Email</label><input type="email" name="email" required></div>
-        <div class="form-input"><label>Street Address</label><input type="text" name="address" required></div>
-        <div class="form-input"><label>ZIP / Postcode</label><input type="text" name="zip_code" required></div>
-        <div class="form-input"><label>City</label><input type="text" name="city" required></div>
-        <div class="form-input"><label>Affiliate Code</label><input type="text" name="affiliate_code" placeholder="Affiliate-Code"></div>
-        <div class="form-input"><label>Discount Code</label><input type="text" name="discount_code" placeholder="Rabattcode" id="discount-code-input"></div>
+        <div class="form-input"><label>{% trans "First Name" %}</label><input type="text" name="first_name" required></div>
+        <div class="form-input"><label>{% trans "Last Name" %}</label><input type="text" name="last_name" required></div>
+        <div class="form-input"><label>{% trans "Company Name (optional)" %}</label><input type="text" name="company_name"></div>
+        <div class="form-input"><label>{% trans "VAT Number (optional)" %}</label><input type="text" name="vat_number"></div>
+        <div class="form-input"><label>{% trans "Phone Number" %}</label><input type="text" name="phone" required></div>
+        <div class="form-input"><label>{% trans "Email" %}</label><input type="email" name="email" required></div>
+        <div class="form-input"><label>{% trans "Street Address" %}</label><input type="text" name="address" required></div>
+        <div class="form-input"><label>{% trans "ZIP / Postcode" %}</label><input type="text" name="zip_code" required></div>
+        <div class="form-input"><label>{% trans "City" %}</label><input type="text" name="city" required></div>
+        <div class="form-input"><label>{% trans "Affiliate Code" %}</label><input type="text" name="affiliate_code" placeholder="{% trans "Affiliate-Code" %}"></div>
+        <div class="form-input"><label>{% trans "Discount Code" %}</label><input type="text" name="discount_code" placeholder="{% trans "Discount code" %}" id="discount-code-input"></div>
         <div class="form-input">
-            <label>Zahlungsmethode</label>
+            <label>{% trans "Payment Method" %}</label>
             <select name="payment_method" required>
-                <option value="">-- Bitte wählen --</option>
-                <option value="wallet">Wallet (Balance: €{{ wallet_balance|floatformat:2 }})</option>
+                <option value="">{% trans "-- Please choose --" %}</option>
+                <option value="wallet">{% trans "Wallet" %} (Balance: €{{ wallet_balance|floatformat:2 }})</option>
                 <option value="paypal">PayPal</option>
-                <option value="stripe">Apple Pay / Google Pay / Kreditkarte (Stripe)</option>
-                <option value="überweisung">Überweisung</option>
+                <option value="stripe">{% trans "Apple Pay / Google Pay / Credit Card (Stripe)" %}</option>
+                <option value="bank_transfer">{% trans "Bank Transfer" %}</option>
+                <!--<option value="lastschrift">{% trans "SEPA LAstschrift" %}</option>-->
             </select>
-        </div>
-        <div class="form-input" id="lastschrift-details" style="display:none;">
-            <h3>Lastschrift Informationen</h3>
-            <label>Kontoinhaber</label>
-            <input type="text" name="account_holder" autocomplete="off">
-
-            <label>IBAN</label>
-            <input type="text" name="iban" autocomplete="off" pattern="[A-Z]{2}\d{2}[A-Z0-9]{1,30}" title="IBAN (z.B. DE89370400440532013000)" >
-
-            <label>BIC (optional)</label>
-            <input type="text" name="bic" autocomplete="off" pattern="[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?" title="BIC (z.B. COBADEFFXXX)">
-
-            <label>Bankname (optional)</label>
-            <input type="text" name="bank_name" autocomplete="off">
         </div>
 
         <script>
@@ -153,19 +135,19 @@
         <div class="form-input">
             <label style="display: flex; align-items: center;">
                 <input type="checkbox" name="accept_terms" required style="margin-right: 10px;">
-                I have read and accept the <a href="{% url 'terms' %}" target="_blank">Terms and Conditions</a>
+                {% trans "I have read and accept the" %} <a href="{% url 'terms' %}" target="_blank">{% trans "Terms and Conditions" %}</a>
             </label>
             <label style="display: flex; align-items: center;">
                 <input type="checkbox" name="accept_privacy" required style="margin-right: 10px;">
-                I have read and accept the <a href="{% url 'privacy' %}" target="_blank">Privacy Policy</a>
+                {% trans "I have read and accept the" %} <a href="{% url 'privacy' %}" target="_blank">{% trans "Privacy Policy" %}</a>
             </label>
-            <label style="display: flex; align-items: center;">
+            <!--<label style="display: flex; align-items: center;">
                 <input type="checkbox" name="accept_newsletter" style="margin-right: 10px;">
-                I want to receive the newsletter
-            </label>
+                {% trans "I want to receive the newsletter" %}
+            </label>-->
         </div>
         
-        <button class="button" type="submit">Place Order</button>
+        <button class="button" type="submit">{% trans "Place Order" %}</button>
     </form>
 </div>
 

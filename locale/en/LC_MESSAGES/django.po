@@ -746,3 +746,489 @@ msgstr "We provide secure hosting solutions and help you manage your domain name
 
 msgid "View All Articles"
 msgstr "View All Articles"
+
+msgid "Website Speedtest"
+msgstr "Website Speed Test"
+
+msgid "Teste die Erreichbarkeit, Geschwindigkeit und Sicherheit einer beliebigen Website."
+msgstr "Test the availability, speed, and security of any website."
+
+msgid "Test starten"
+msgstr "Start Test"
+
+msgid "Speedtest Ergebnis"
+msgstr "Speed Test Result"
+
+msgid "Website-Speedtest Ergebnis"
+msgstr "Website Speed Test Result"
+
+msgid "Hier erhältst du eine leicht verständliche Auswertung deiner Website-Geschwindigkeit – inklusive Tipps, was verbessert werden kann."
+msgstr "Here you get an easy-to-understand analysis of your website's speed – including tips on what can be improved."
+
+msgid "Fehler:"
+msgstr "Error:"
+
+msgid "Geprüfte URL"
+msgstr "Tested URL"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Online"
+msgstr "Online"
+
+msgid "Die Website antwortet korrekt und ist erreichbar."
+msgstr "The website responds correctly and is reachable."
+
+msgid "Die Website konnte nicht erreicht werden."
+msgstr "The website could not be reached."
+
+msgid "Antwortzeit"
+msgstr "Response Time"
+
+msgid "Sehr schnell – ideal für eine gute Nutzererfahrung."
+msgstr "Very fast – ideal for a great user experience."
+
+msgid "Akzeptabel – mit Optimierungen kann sie verbessert werden."
+msgstr "Acceptable – can be improved with some optimization."
+
+msgid "Langsam – mögliche Ursachen sind große Bilder oder viele externe Skripte."
+msgstr "Slow – possible causes include large images or many external scripts."
+
+msgid "Keine Antwort"
+msgstr "No response"
+
+msgid "HTTP-Code"
+msgstr "HTTP Code"
+
+msgid "200 bedeutet: Alles in Ordnung. Andere Werte deuten auf technische Fehler hin."
+msgstr "200 means everything is fine. Other values indicate technical issues."
+
+msgid "SSL-Verschlüsselung"
+msgstr "SSL Encryption"
+
+msgid "Gültig"
+msgstr "Valid"
+
+msgid "Die Verbindung ist sicher – gut für Vertrauen und SEO."
+msgstr "The connection is secure – good for trust and SEO."
+
+msgid "Ungültig"
+msgstr "Invalid"
+
+msgid "Unsicher – es sollte ein SSL-Zertifikat installiert werden."
+msgstr "Insecure – an SSL certificate should be installed."
+
+msgid "Gesamtbewertung"
+msgstr "Overall Rating"
+
+msgid "Bewertung:"
+msgstr "Rating:"
+
+msgid "Ein Wert über 80 gilt als ausgezeichnet. Unter 50 sollte dringend optimiert werden."
+msgstr "A value above 80 is considered excellent. Below 50 should be optimized urgently."
+
+msgid "Deine Website ist optimierungsbedürftig!"
+msgstr "Your website needs optimization!"
+
+msgid "Wir helfen dir, die Geschwindigkeit, Sicherheit und Nutzerfreundlichkeit deiner Website zu verbessern."
+msgstr "We help you improve the speed, security, and user-friendliness of your website."
+
+msgid "Anfrage stellen"
+msgstr "Send Request"
+
+msgid "Gespräch buchen"
+msgstr "Book a Call"
+
+msgid "Technische Details (HTTP Header)"
+msgstr "Technical Details (HTTP Headers)"
+
+msgid "Diese Daten zeigen, wie dein Server Anfragen beantwortet. Sie sind vor allem für Entwickler relevant."
+msgstr "This data shows how your server responds to requests. Mainly relevant for developers."
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Wert"
+msgstr "Value"
+
+msgid "Neue URL prüfen"
+msgstr "Check New URL"
+
+msgid "Invoice Preview - Order #{{ order.id }} – Joel Digitals"
+msgstr "Invoice Preview - Order #{{ order.id }} – Joel Digitals"
+
+msgid "Invoice #{{ order.id }}"
+msgstr "Invoice #{{ order.id }}"
+
+msgid "Download PDF"
+msgstr "Download PDF"
+
+msgid "Joel Digitals"
+msgstr "Joel Digitals"
+
+msgid "Niederwiesstraße 20"
+msgstr "Niederwiesstraße 20"
+
+msgid "Tel: +49 1525 3480270"
+msgstr "Tel: +49 1525 3480270"
+
+msgid "Email: buy.joel-digitals@gmx.de"
+msgstr "Email: buy.joel-digitals@gmx.de"
+
+msgid "Date:"
+msgstr "Date:"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Product No."
+msgstr "Product No."
+
+msgid "Quantity"
+msgstr "Quantity"
+
+msgid "Unit Price"
+msgstr "Unit Price"
+
+msgid "Discount"
+msgstr "Discount"
+
+msgid "Price after Discount"
+msgstr "Price after Discount"
+
+msgid "Total Price"
+msgstr "Total Price"
+
+msgid "No items available."
+msgstr "No items available."
+
+msgid "Als Kleinunternehmer im Sinne von § 19 Abs. 1 UStG wird keine Umsatzsteuer berechnet."
+msgstr "As a small business under § 19 (1) of the German VAT Act, no VAT is charged."
+
+msgid "Total amount:"
+msgstr "Total amount:"
+
+msgid "Please transfer the total amount within 14 days."
+msgstr "Please transfer the total amount within 14 days."
+
+msgid "The Return has been requested!"
+msgstr "A return has been requested!"
+
+msgid "The amount was refunded."
+msgstr "The amount was refunded."
+
+msgid "Cancellation successful. The amount will be/has been refunded."
+msgstr "Cancellation successful. The amount will be or has been refunded."
+
+msgid "This invoice has already been paid. Thank you!"
+msgstr "This invoice has already been paid. Thank you!"
+
+msgid "Bank details: Banking Circle S.A. - German Branch | IBAN: DE35 2022 0800 0056 4323 94 | BIC: SXPYDEHHXXX"
+msgstr "Bank details: Banking Circle S.A. - German Branch | IBAN: DE35 2022 0800 0056 4323 94 | BIC: SXPYDEHHXXX"
+
+msgid "PayPal: buy.joel-digitals@gmx.de"
+msgstr "PayPal: buy.joel-digitals@gmx.de"
+
+msgid "Joel Digitals | Niederwiesstraße 20 | 66822 Lebach"
+msgstr "Joel Digitals | Niederwiesstraße 20 | 66822 Lebach"
+
+msgid "Delivery Note"
+msgstr "Delivery Note"
+
+msgid "Invoice"
+msgstr "Invoice"
+
+msgid "Joel Digitals • Niederwiesstraße 20 • 66822 Lebach"
+msgstr "Joel Digitals • Niederwiesstraße 20 • 66822 Lebach"
+
+msgid "Email:"
+msgstr "Email:"
+
+msgid "Phone:"
+msgstr "Phone:"
+
+msgid "Joel Digitals"
+msgstr "Joel Digitals"
+
+msgid "Niederwiesstraße 20"
+msgstr "Niederwiesstraße 20"
+
+msgid "Tel:"
+msgstr "Tel:"
+
+msgid "Invoice for Order"
+msgstr "Invoice for Order"
+
+msgid "Lebach"
+msgstr "Lebach"
+
+msgid "Please find attached our invoice for your order"
+msgstr "Please find attached our invoice for your order"
+
+msgid "regarding the services provided."
+msgstr "regarding the services provided."
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Product No."
+msgstr "Product No."
+
+msgid "Quantity"
+msgstr "Quantity"
+
+msgid "Unit Price"
+msgstr "Unit Price"
+
+msgid "Discount"
+msgstr "Discount"
+
+msgid "Price after Discount"
+msgstr "Price after Discount"
+
+msgid "Total Price"
+msgstr "Total Price"
+
+msgid "No items available."
+msgstr "No items available."
+
+msgid "As a small business owner within the meaning of Section 19 Paragraph 1 of the UStG, no VAT is charged."
+msgstr "As a small business owner within the meaning of Section 19 Paragraph 1 of the UStG, no VAT is charged."
+
+msgid "Total amount:"
+msgstr "Total amount:"
+
+msgid "Thank you for your trust!"
+msgstr "Thank you for your trust!"
+
+msgid "Bank details: Banking Circle S.A. - German Branch | IBAN: DE35 2022 0800 0056 4323 94 | BIC: SXPYDEHHXXX"
+msgstr "Bank details: Banking Circle S.A. - German Branch | IBAN: DE35 2022 0800 0056 4323 94 | BIC: SXPYDEHHXXX"
+
+msgid "PayPal: buy.joel-digitals@gmx.de"
+msgstr "PayPal: buy.joel-digitals@gmx.de"
+
+msgid "Joel Digitals | Niederwiesstraße 20 | 66822 Lebach"
+msgstr "Joel Digitals | Niederwiesstraße 20 | 66822 Lebach"
+
+msgid "Order"
+msgstr "Order"
+
+msgid "Details"
+msgstr "Details"
+
+msgid "Created"
+msgstr "Created"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Invoice"
+msgstr "Invoice"
+
+msgid "Continue Shopping"
+msgstr "Continue Shopping"
+
+msgid "Items"
+msgstr "Items"
+
+msgid "Product"
+msgstr "Product"
+
+msgid "Qty"
+msgstr "Qty"
+
+msgid "Price"
+msgstr "Price"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "No items in this order."
+msgstr "No items in this order."
+
+msgid "Payment & Summary"
+msgstr "Payment & Summary"
+
+msgid "Subtotal"
+msgstr "Subtotal"
+
+msgid "Discount"
+msgstr "Discount"
+
+msgid "Payment Method"
+msgstr "Payment Method"
+
+msgid "Pending Payment"
+msgstr "Pending Payment"
+
+msgid "Refunded"
+msgstr "Refunded"
+
+msgid "Paid"
+msgstr "Paid"
+
+msgid "Billing Details"
+msgstr "Billing Details"
+
+msgid "Notes"
+msgstr "Notes"
+
+msgid "Add to Cart"
+msgstr "Add to Cart"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Your Cart"
+msgstr "Your Cart"
+
+msgid "Remove"
+msgstr "Remove"
+
+msgid "Proceed to Checkout"
+msgstr "Proceed to Checkout"
+
+msgid "Back to Shop"
+msgstr "Back to Shop"
+
+msgid "Your cart is currently empty"
+msgstr "Your cart is currently empty"
+
+msgid "Checkout"
+msgstr "Checkout"
+
+msgid "Your Items"
+msgstr "Your Items"
+
+msgid "Your cart is empty."
+msgstr "Your cart is empty."
+
+msgid "Subtotal"
+msgstr "Subtotal"
+
+msgid "Discount"
+msgstr "Discount"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "First Name"
+msgstr "First Name"
+
+msgid "Last Name"
+msgstr "Last Name"
+
+msgid "Company Name (optional)"
+msgstr "Company Name (optional)"
+
+msgid "VAT Number (optional)"
+msgstr "VAT Number (optional)"
+
+msgid "Phone Number"
+msgstr "Phone Number"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Street Address"
+msgstr "Street Address"
+
+msgid "ZIP / Postcode"
+msgstr "ZIP / Postcode"
+
+msgid "City"
+msgstr "City"
+
+msgid "Affiliate Code"
+msgstr "Affiliate Code"
+
+msgid "Discount Code"
+msgstr "Discount Code"
+
+msgid "Payment Method"
+msgstr "Payment Method"
+
+msgid "-- Please choose --"
+msgstr "-- Please choose --"
+
+msgid "Wallet"
+msgstr "Wallet"
+
+msgid "Apple Pay / Google Pay / Credit Card (Stripe)"
+msgstr "Apple Pay / Google Pay / Credit Card (Stripe)"
+
+msgid "Bank Transfer"
+msgstr "Bank Transfer"
+
+msgid "I have read and accept the"
+msgstr "I have read and accept the"
+
+msgid "Terms and Conditions"
+msgstr "Terms and Conditions"
+
+msgid "Privacy Policy"
+msgstr "Privacy Policy"
+
+msgid "I want to receive the newsletter"
+msgstr "I want to receive the newsletter"
+
+msgid "Place Order"
+msgstr "Place Order"
+
+msgid "My Orders"
+msgstr "My Orders"
+
+msgid "Order"
+msgstr "Order"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Items"
+msgstr "Items"
+
+msgid "View Order Details"
+msgstr "View Order Details"
+
+msgid "You have no orders yet."
+msgstr "You have no orders yet."
+
+msgid "System Status"
+msgstr "System Status"
+
+msgid "Speedtest"
+msgstr "Speedtest"
+
+msgid "Global Issues"
+msgstr "Global Issues"
+
+msgid "No global issues reported."
+msgstr "No global issues reported."
+
+msgid "Apps"
+msgstr "Apps"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Response time"
+msgstr "Response time"
+
+msgid "Known issues"
+msgstr "Known issues"
+
+msgid "No known issues."
+msgstr "No known issues."
+
+msgid "Back to overview"
+msgstr "Back to overview"
+
+msgid "Quantity"
+msgstr "Quantity"
+
+msgid "My Orders"
+msgstr "My Orders"

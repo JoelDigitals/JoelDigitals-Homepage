@@ -1,5 +1,6 @@
 {% extends "base_shop.html" %}
 {% load static %}
+{% load static i18n %}
 {% block title %}Your Cart – Joel Digitals{% endblock %}
 
 {% block content %}
@@ -78,7 +79,7 @@
 </style>
 
 <div class="container">
-    <h1>Your Cart</h1>
+    <h1>{% trans "Your Cart" %}</h1>
     {% if items %}
         {% for item in items %}
             <div class="cart-item">
@@ -101,7 +102,7 @@
                 
                 <p><strong>Total<!-- (incl. VAT)-->:</strong> €{{ item.total_price }}</p>
                 
-                <a href="{% url 'remove_from_cart' item.id %}">Remove</a>
+                <a href="{% url 'remove_from_cart' item.id %}">{% trans "Remove" %}</a>
             </div>
         {% endfor %}
 
@@ -115,12 +116,12 @@
 
         <form method="POST">
             {% csrf_token %}
-            <button type="submit" class="button">Proceed to Checkout</button>
-            <a href="{% url 'shop' %}" class="button">Back to Shop</a>
+            <button type="submit" class="button">{% trans "Proceed to Checkout" %}</button>
+            <a href="{% url 'shop' %}" class="button">{% trans "Back to Shop" %}</a>
         </form>
     {% else %}
-        <p class="empty-cart">Your cart is currently empty.</p>
-        <a href="{% url 'shop' %}" class="button">Back to Shop</a>
+        <p class="empty-cart">{% trans "Your cart is currently empty" %}.</p>
+        <a href="{% url 'shop' %}" class="button">{% trans "Back to Shop" %}</a>
     {% endif %}
 </div>
 {% endblock %}

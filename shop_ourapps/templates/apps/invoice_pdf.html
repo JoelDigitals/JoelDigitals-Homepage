@@ -1,136 +1,47 @@
+{% load static %}
+{% load i18n %}
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
-    <title>{% if invoice.is_delivery_note %}Delivery Note{% else %}Invoice{% endif %} – {{ invoice.invoice_number }}</title>
+    <title>
+        {% if invoice.is_delivery_note %}
+            {% trans "Delivery Note" %}
+        {% else %}
+            {% trans "Invoice" %}
+        {% endif %} – {{ invoice.invoice_number }}
+    </title>
     <style>
-        :root{
-            --green: #2e7d32;        /* keep them for your own reference */
-            --light-green: #e8f5e9;
-        }
+        /* Style unverändert */
+        :root{--green:#2e7d32;--light-green:#e8f5e9;}
         @page{size:A4;margin:20mm;}
-        body{
-            font-family:Arial,Helvetica,sans-serif;
-            font-size:10pt;
-            line-height:1.4;
-            color:#333;
-            margin:0;
-            position:relative;
-        }
-        .window-area{
-            position:absolute;
-            top:45mm;left:20mm;
-            width:85mm;height:45mm;
-            border:1px solid transparent;
-            pointer-events:none;
-        }
-        .sender-field{
-            display:flex;
-            align-items:center;
-            position:absolute;
-            top:10mm;left:20mm;
-            font-size:9pt;
-            color:#666;
-            gap:5mm;
-        }
-        /* LOGO */
-        .logo{
-            max-width:10mm;   /* <- changed from 25 mm */
-            height:auto;
-            display:block;
-        }
-
-        /* RECIPIENT ADDRESS */
-        .recipient-address{
-            position:absolute;
-            top:27mm;         /* <- changed from 45 mm */
-            left:20mm;
-            width:85mm;
-            font-size:11pt;
-            line-height:1.3;
-        }
-
-        /* optional guide line to mark the window */
-        .window-area{
-            position:absolute;
-            top:27mm;         /* also set to 27 mm */
-            left:20mm;
-            width:85mm;
-            height:45mm;
-            border:1px dashed #ccc;  /* changed from 'transparent' to 'dashed' */
-            pointer-events:none;
-        }
-        .content{
-            position:absolute;
-            top:100mm;
-            left:20mm;
-            right:20mm;
-        }
-        .letter-header{
-            display:flex;
-            justify-content:space-between;
-            align-items:flex-start;
-            margin-bottom:15mm;
-        }
-        .letter-header h1{
-            font-size:18pt;
-            margin:0 0 3mm;
-            color: #2e7d32;  
-        }
+        body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;line-height:1.4;color:#333;margin:0;position:relative;}
+        .window-area{position:absolute;top:27mm;left:20mm;width:85mm;height:45mm;border:1px dashed #ccc;pointer-events:none;}
+        .sender-field{display:flex;align-items:center;position:absolute;top:10mm;left:20mm;font-size:9pt;color:#666;gap:5mm;}
+        .logo{max-width:10mm;height:auto;display:block;}
+        .recipient-address{position:absolute;top:27mm;left:20mm;width:85mm;font-size:11pt;line-height:1.3;}
+        .content{position:absolute;top:100mm;left:20mm;right:20mm;}
+        .letter-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15mm;}
+        .letter-header h1{font-size:18pt;margin:0 0 3mm;color:#2e7d32;}
         .letter-header p{margin:1mm 0;}
-        .sender-info{
-            text-align:right;
-            font-size:9pt;
-            color:#666;
-            margin-bottom:5mm;
-        }
-        table{
-            width:100%;
-            border-collapse:collapse;
-            margin:8mm 0;
-        }
+        .sender-info{text-align:right;font-size:9pt;color:#666;margin-bottom:5mm;}
+        table{width:100%;border-collapse:collapse;margin:8mm 0;}
         th,td{padding:2.5mm 2mm;border-bottom:1px solid #ddd;}
-        th{
-            background: #e8f5e9;
-            color: #2e7d32;
-            font-weight:bold;
-        }
-        .totals{
-            width:50%;
-            margin-left:auto;
-            margin-top:8mm;
-        }
-        .totals p{
-            display:flex;
-            justify-content:space-between;
-        }
-        .signature{
-            margin-top:20mm;
-            font-size:10pt;
-        }
-        .signature-line{
-            width:60mm;
-            border-top:1px solid #333;
-            margin-top:5mm;
-        }
-        .footer{
-            position:absolute;
-            bottom:20mm;
-            left:20mm;
-            right:20mm;
-            font-size:9pt;
-            color:#666;
-            border-top: 2px solid #2e7d32;
-            padding-top:3mm;
-        }
+        th{background:#e8f5e9;color:#2e7d32;font-weight:bold;}
+        .totals{width:50%;margin-left:auto;margin-top:8mm;}
+        .totals p{display:flex;justify-content:space-between;}
+        .signature{margin-top:20mm;font-size:10pt;}
+        .signature-line{width:60mm;border-top:1px solid #333;margin-top:5mm;}
+        .footer{position:absolute;bottom:20mm;left:20mm;right:20mm;font-size:9pt;color:#666;border-top:2px solid #2e7d32;padding-top:3mm;}
     </style>
 </head>
 <body>
     <div class="window-area"></div>
- 
+
     <!-- Sender & Logo -->
     <div class="sender-field">
-        <span>Joel Digitals • Niederwiesstraße 20 • 66822 Lebach</span>
+        <span>{% trans "Joel Digitals • Niederwiesstraße 20 • 66822 Lebach" %}</span>
     </div>
 
     <div class="recipient-address">
@@ -144,49 +55,57 @@
             <p>{{ order.country }}</p>
         {% endif %}
         {% if order.email %}
-            <p>Email: {{ order.email }}</p>
+            <p>{% trans "Email:" %} {{ order.email }}</p>
         {% endif %}
         {% if order.phone %}
-            <p>Phone: {{ order.phone }}</p>
+            <p>{% trans "Phone:" %} {{ order.phone }}</p>
         {% endif %}
     </div>
 
     <div class="content">
         <div class="sender-info">
-            <strong>Joel Digitals</strong><br>
-            Niederwiesstraße 20<br>
+            <strong>{% trans "Joel Digitals" %}</strong><br>
+            {% trans "Niederwiesstraße 20" %}<br>
             66822 Lebach<br>
-            Tel: +49 1525 3480270<br>
-            Email: buy.joel-digitals@gmx.de
+            {% trans "Tel:" %} +49 1525 3480270<br>
+            {% trans "Email:" %} buy.joel-digitals@gmx.de
         </div>
 
         <div class="letter-header">
             <div>
-                <h1>Invoice for Order #{{ order.id }}</h1>
-                <p>Lebach, {{ now|date:"d.m.Y" }}</p>
+                <h1>{% trans "Invoice for Order" %} #{{ order.id }}</h1>
+                <p>{% trans "Lebach" %}, {{ now|date:"d.m.Y" }}</p>
             </div>
         </div>
 
         <p style="margin-bottom:8mm;">
-            Please find attached our invoice for your order #{{ order.id }} regarding the services provided.    
+            {% trans "Please find attached our invoice for your order" %} #{{ order.id }} {% trans "regarding the services provided." %}
         </p>
 
         <table>
             <thead>
                 <tr>
-                    <th style="width:35%">Description</th>
-                    <th style="width:15%">Product No.</th>
-                    <th style="width:10%">Quantity</th>
-                    <th style="width:15%">Unit Price</th>
-                    <th style="width:10%">Discount</th>
-                    <th style="width:15%">Price after Discount</th>
-                    <th style="width:15%">Total Price</th>
+                    <th style="width:35%">{% trans "Description" %}</th>
+                    <th style="width:15%">{% trans "Product No." %}</th>
+                    <th style="width:10%">{% trans "Quantity" %}</th>
+                    <th style="width:15%">{% trans "Unit Price" %}</th>
+                    <th style="width:10%">{% trans "Discount" %}</th>
+                    <th style="width:15%">{% trans "Price after Discount" %}</th>
+                    <th style="width:15%">{% trans "Total Price" %}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in items %}
                 <tr>
-                    <td>{{ item.app.name }}</td>
+                    <td>
+          {% if lang == "de" or lang|slice:":2" == "de" %}
+            {{ item.app.name }}
+          {% elif lang == "en" or lang|slice:":2" == "en" %}
+            {{ item.app.name_english }}
+          {% else %}
+            {{ item.app.name }}
+          {% endif %}
+        </td>
                     <td>{{ item.app.product_number }}</td>
                     <td>{{ item.quantity }}</td>
                     <td>{{ item.app.price|floatformat:2 }} €</td>
@@ -195,32 +114,28 @@
                     <td>{{ item.price|floatformat:2 }} €</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="7" style="text-align:center;">No items available.</td></tr>
+                <tr><td colspan="7" style="text-align:center;">{% trans "No items available." %}</td></tr>
                 {% endfor %}
             </tbody>
         </table>
 
         <div class="totals">
-            <p>As a small business owner within the meaning of Section 19 Paragraph 1 of the UStG, no VAT is charged.</p>
-            <p>Als Kleinunternehmer im Sinne von § 19 Abs. 1 UStG wird keine Umsatzsteuer berechnet.</p><br>
-            <!--<p><span>Net amount:</span><span>{{ netto }} €</span></p>
-            <p><span>VAT ({{ tax_percent }}%):</span><span>{{ mwst }} €</span></p>-->
-            <p><strong>Total amount:</strong><strong>{{ brutto }} €</strong></p>
+            <p>{% trans "As a small business owner within the meaning of Section 19 Paragraph 1 of the UStG, no VAT is charged." %}</p>
+            <p><strong>{% trans "Total amount:" %}</strong><strong>{{ brutto }} €</strong></p>
         </div>
 
-        <p style="margin-top:20mm;">Thank you for your trust!</p>
+        <p style="margin-top:20mm;">{% trans "Thank you for your trust!" %}</p>
 
         <div class="signature">
-            <p>Joel Digitals</p>
+            <p>{% trans "Joel Digitals" %}</p>
             <div class="signature-line"></div>
         </div>
     </div>
 
     <footer class="footer">
-        <p>Bank details: Tide | IBAN: DE53 1001 9000 1000 0072 91 | BIC: ADYBDEB2</p>
-        <p>PayPal: buy.joel-digitals@gmx.de</p>
-        <p>Joel Digitals | Niederwiesstraße 20 | 66822 Lebach</p>
-        <p>Tax number: ---</p>
+        <p>{% trans "Bank details: Banking Circle S.A. - German Branch | IBAN: DE35 2022 0800 0056 4323 94 | BIC: SXPYDEHHXXX" %}</p>
+        <p>{% trans "PayPal: buy.joel-digitals@gmx.de" %}</p>
+        <p>{% trans "Joel Digitals | Niederwiesstraße 20 | 66822 Lebach" %}</p>
     </footer>
 </body>
 </html>

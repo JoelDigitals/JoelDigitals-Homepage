@@ -1,8 +1,8 @@
 {% extends "base_shop.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}
-Invoice Preview - Order #{{ order.id }} – Joel Digitals
+{% trans "Invoice Preview" %} - {% trans "Order" %} #{{ order.id }} – Joel Digitals
 {% endblock %}
 
 {% block content %}
@@ -14,7 +14,6 @@ Invoice Preview - Order #{{ order.id }} – Joel Digitals
     margin: 2rem auto;
     max-width: 900px;
   }
-
   .invoice-container {
     background: white;
     padding: 2rem 3rem;
@@ -22,7 +21,6 @@ Invoice Preview - Order #{{ order.id }} – Joel Digitals
     box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
     position: relative;
   }
-
   header.invoice-header {
     display: flex;
     justify-content: space-between;
@@ -31,23 +29,19 @@ Invoice Preview - Order #{{ order.id }} – Joel Digitals
     border-bottom: 2px solid #2e7d32;
     padding-bottom: 1rem;
   }
-
   header.invoice-header h1 {
     color: #2e7d32;
     margin: 0;
     font-size: 1.8rem;
   }
-
   .invoice-header img {
     max-height: 60px;
   }
-
   .download-button {
     position: absolute;
     top: 1.5rem;
     right: 1.5rem;
   }
-
   .download-button a {
     background: #2e7d32;
     color: white;
@@ -57,80 +51,62 @@ Invoice Preview - Order #{{ order.id }} – Joel Digitals
     font-weight: 600;
     transition: background-color 0.3s ease;
   }
-
   .download-button a:hover {
     background: #1b4d1b;
   }
-
   section.addresses {
     display: flex;
     justify-content: space-between;
     margin-bottom: 2rem;
   }
-
   .address-block {
     width: 45%;
     font-size: 0.95rem;
   }
-
   .address-block strong {
     font-size: 1.1rem;
     margin-bottom: 0.4rem;
     display: block;
   }
-
   table.invoice-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 2rem;
     font-size: 0.95rem;
   }
-
   table.invoice-table th, table.invoice-table td {
     border: 1px solid #ddd;
     padding: 0.75rem 1rem;
   }
-
   table.invoice-table th {
     background: #e8f5e9;
     color: #2e7d32;
     font-weight: 600;
     text-align: left;
   }
-
   table.invoice-table td:nth-child(4),
   table.invoice-table td:nth-child(5),
   table.invoice-table td:nth-child(6),
   table.invoice-table td:nth-child(7) {
     text-align: right;
   }
-
   .totals {
     width: 40%;
     margin-left: auto;
     font-size: 1rem;
     font-weight: 600;
   }
-
   .totals div {
     display: flex;
     justify-content: space-between;
     padding: 0.4rem 0;
   }
-
   .payment-status {
     margin-top: 1.5rem;
     font-weight: 700;
   }
-
-  .payment-status.paid {
-    color: #2e7d32;
-  }
-
-  .payment-status.unpaid {
-    color: #b83232;
-  }
-
+  .payment-status.paid { color: #2e7d32; }
+  .payment-status.unpaid { color: #b83232; }
   footer.invoice-footer {
     margin-top: 3rem;
     font-size: 0.85rem;
@@ -139,19 +115,17 @@ Invoice Preview - Order #{{ order.id }} – Joel Digitals
     border-top: 1px solid #ddd;
     padding-top: 1rem;
   }
-
 </style>
 
 <div class="invoice-container">
   <header class="invoice-header">
-    <h1>Invoice #{{ order.id }}</h1>
-    <!-- You can insert your logo here if available -->
+    <h1>{% trans "Invoice" %} #{{ order.id }}</h1>
     <img src="{% static 'images/logo.png' %}" alt="Joel Digitals Logo" /> 
   </header>
 
   <div class="download-button">
     <a href="{% url 'download_invoice' order.id %}" target="_blank" rel="noopener">
-      Download PDF
+      {% trans "Download PDF" %}
     </a>
   </div>
 
@@ -160,8 +134,8 @@ Invoice Preview - Order #{{ order.id }} – Joel Digitals
       <strong>Joel Digitals</strong>
       Niederwiesstraße 20<br>
       66822 Lebach<br>
-      Tel: +49 1525 3480270<br>
-      Email: buy.joel-digitals@gmx.de
+      {% trans "Tel" %}: +49 1525 3480270<br>
+      {% trans "Email" %}: buy.joel-digitals@gmx.de
     </div>
 
     <div class="address-block recipient">
@@ -170,63 +144,73 @@ Invoice Preview - Order #{{ order.id }} – Joel Digitals
       {{ order.address }}<br>
       {{ order.zip_code }} {{ order.city }}<br>
       {% if order.country %}{{ order.country }}<br>{% endif %}
-      {% if order.email %}Email: {{ order.email }}<br>{% endif %}
-      {% if order.phone %}Phone: {{ order.phone }}<br>{% endif %}
+      {% if order.email %}{% trans "Email" %}: {{ order.email }}<br>{% endif %}
+      {% if order.phone %}{% trans "Phone" %}: {{ order.phone }}<br>{% endif %}
     </div>
   </section>
 
   <section>
-    <p>Date: {{ now|date:"d.m.Y" }}</p>
+    <p>{% trans "Date" %}: {{ now|date:"d.m.Y" }}</p>
   </section>
 
   <table class="invoice-table">
     <thead>
       <tr>
-        <th>Description</th>
-        <th>Product No.</th>
-        <th>Quantity</th>
-        <th>Unit Price</th>
-        <th>Discount</th>
-        <th>Price after Discount</th>
-        <th>Total Price</th>
+        <th>{% trans "Description" %}</th>
+        <th>{% trans "Product No." %}</th>
+        <th>{% trans "Quantity" %}</th>
+        <th>{% trans "Unit Price" %}</th>
+        <th>{% trans "Discount" %}</th>
+        <th>{% trans "Price after Discount" %}</th>
+        <th>{% trans "Total Price" %}</th>
       </tr>
     </thead>
     <tbody>
       {% for item in items %}
       <tr>
-        <td>{{ item.app.name }}</td>
+        <td>
+          {% if lang == "de" or lang|slice:":2" == "de" %}
+            {{ item.app.name }}
+          {% elif lang == "en" or lang|slice:":2" == "en" %}
+            {{ item.app.name_english }}
+          {% else %}
+            {{ item.app.name }}
+          {% endif %}
+        </td>
         <td>{{ item.app.product_number }}</td>
         <td>{{ item.quantity }}</td>
         <td>{{ item.app.price|floatformat:2 }} €</td>
-        <td>{{ item.app.discount_percent }}%</td>
-        <td>{{ item.app.discounted_price|floatformat:2 }} €</td>
+        <td>{{ item.discount_percent }}%</td>
+        <td>{{ item.discount_price|floatformat:2 }} €</td>
         <td>{{ item.price|floatformat:2 }} €</td>
       </tr>
       {% empty %}
-      <tr><td colspan="7" style="text-align:center;">No items available.</td></tr>
+      <tr><td colspan="7" style="text-align:center;">{% trans "No items available." %}</td></tr>
       {% endfor %}
     </tbody>
   </table>
 
   <div class="totals">
-    <p>As a small business owner within the meaning of Section 19 Paragraph 1 of the UStG, no VAT is charged.</p>
-    <p>Als Kleinunternehmer im Sinne von § 19 Abs. 1 UStG wird keine Umsatzsteuer berechnet.</p>
-    <!--<p><span>Net amount:</span><span>{{ netto }} €</span></p>
-    <p><span>VAT ({{ tax_percent }}%):</span><span>{{ mwst }} €</span></p>-->
-    <div><strong>Total amount:</strong><strong>{{ brutto }} €</strong></div>
+    <p>{% trans "As a small business according to §19 UStG, no VAT is charged." %}</p>
+    <div><strong>{% trans "Total amount" %}:</strong><strong>{{ brutto }} €</strong></div>
   </div>
 
-  {% if order.status == 'Paid' %}
-    <p class="payment-status paid">This invoice has already been paid. Thank you!</p>
+  {% if order.status == 'Received' %}
+    <p class="payment-status unpaid">{% trans "Please transfer the total amount within 14 days." %}</p>
+  {% elif order.status == 'Return' %}
+    <p class="payment-status unpaid">{% trans "The return has been requested!" %}</p>
+  {% elif order.status == 'Back at Joel Digitals' %}
+    <p class="payment-status paid">{% trans "The amount was refunded." %}</p>
+  {% elif order.status == 'Canceled' %}
+    <p class="payment-status paid">{% trans "Cancellation successful. The amount will be/has been refunded." %}</p>
   {% else %}
-    <p class="payment-status unpaid">Please transfer the total amount within 14 days.</p>
+    <p class="payment-status paid">{% trans "This invoice has already been paid. Thank you!" %}</p>
   {% endif %}
 
   <footer class="invoice-footer">
-    <p>Bank details: Tide | IBAN: DE53 1001 9000 1000 0072 91 | BIC: ADYBDEB2</p>
+    <p>{% trans "Bank details" %}: Banking Circle S.A. - German Branch | IBAN: DE35 2022 0800 0056 4323 94 | BIC: SXPYDEHHXXX</p>
     <p>PayPal: buy.joel-digitals@gmx.de</p>
     <p>Joel Digitals | Niederwiesstraße 20 | 66822 Lebach</p>
-    <p>Tax number: ---</p>
   </footer>
 </div>
 {% endblock %}

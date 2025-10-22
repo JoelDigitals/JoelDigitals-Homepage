@@ -754,7 +754,7 @@ def checkout(request):
                 messages.error(request, 'Bitte Kontoinhaber und IBAN für Lastschrift angeben.')
                 return redirect('checkout')
 
-        # Order erstellen
+        # Bestellung erstellen
         order = Order.objects.create(
             user=request.user,
             first_name=first_name,
@@ -783,76 +783,73 @@ def checkout(request):
                 order=order,
                 app=item.app,
                 quantity=item.quantity,
-                price=item.app.discounted_price
+                discount_percent=item.app.discount_percent,
+                discount_price=item.app.discounted_price,
+                price=item.quantity * item.app.discounted_price
             )
 
         if discount_code_obj:
             discount_code_obj.times_used += 1
             discount_code_obj.save()
 
-        # Wallet-Abzug und Abschluss
+        # Mails versenden
+        try:
+            send_order_emails(order, request)
+        except Exception as e:
+            messages.error(request, f"Fehler beim Mailversand: {e}")
+
+        # Wallet-Zahlung
         if payment_method == 'wallet':
             wallet.deduct(final_total)
             messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben.')
             cart.items.all().delete()
-
-            send_order_emails(order, request)
             return redirect('order_confirmation', order_id=order.id)
-        
+
+        # Lastschrift
         if payment_method == 'lastschrift':
-            # Lastschrift-Logik hier einfügen, z.B. SEPA-Lastschrift anstoßen
             messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben. Die Lastschrift wird verarbeitet.')
             cart.items.all().delete()
+            return redirect('order_confirmation', order_id=order.id)
 
+        # Banküberweisung
         if payment_method == 'überweisung':
-            send_order_emails(order, request)
             send_mail(
                 subject='Zahlungsinformationen – Joel Digitals',
-                message=f'Vielen Dank für Ihre Bestellung! Bitte überweisen Sie den Betrag von {final_total:.2f} € inerhalb von 7 Werktagen auf unser Konto mit der IBAN: DE53 1001 9000 1000 0072 91 und dem Verwendungszweck: Bestelllung #{order.id}.',
+                message=f'Bitte überweisen Sie {final_total:.2f} € auf unser Konto DE35 2022 0800 0056 4323 94. Verwendungszweck: Bestelllung #{order.id}.',
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[email],
                 fail_silently=False
             )
-            # Überweisungs-Logik hier einfügen, z.B. Bankdaten anzeigen
             messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben. Bitte überweisen Sie den Betrag auf unser Konto.')
             cart.items.all().delete()
+            return redirect('order_confirmation', order_id=order.id)
 
+        # Stripe
         if payment_method == "stripe":
-            send_order_emails(order, request)
-        
-            # Stripe Checkout Session erstellen
             session = stripe.checkout.Session.create(
-                payment_method_types=["card"],  # Stripe kümmert sich um Apple Pay / Google Pay automatisch
+                payment_method_types=["card"],
                 mode="payment",
-                line_items=[
-                    {
-                        "price_data": {
-                            "currency": "eur",
-                            "product_data": {
-                                "name": f"Bestellung #{order.id}",
-                            },
-                            "unit_amount": int(final_total * 100),  # Euro → Cent
-                        },
-                        "quantity": 1,
+                line_items=[{
+                    "price_data": {
+                        "currency": "eur",
+                        "product_data": {"name": f"Bestellung #{order.id}"},
+                        "unit_amount": int(final_total * 100),
                     },
-                ],
+                    "quantity": 1,
+                }],
                 metadata={"order_id": order.id, "user_id": request.user.id},
                 success_url=request.build_absolute_uri(
                     reverse("order_confirmation", args=[order.id])
                 ) + "?session_id={CHECKOUT_SESSION_ID}",
                 cancel_url=request.build_absolute_uri(reverse("checkout")),
             )
-        
             cart.items.all().delete()
-        
-            order.stripe_session_id = session.id  # optional im Modell speichern
+            order.stripe_session_id = session.id
             order.save()
-        
             return redirect(session.url, code=303)
-        
+
+        # PayPal
         if payment_method == 'paypal':
-            send_order_emails(order, request)
-            # PayPal Bestellung anlegen und zu PayPal weiterleiten
             paypal_order = create_paypal_order(
                 amount=final_total,
                 invoice_id=order.id,
@@ -862,7 +859,8 @@ def checkout(request):
             cart.items.all().delete()
             approval_url = next(link["href"] for link in paypal_order["links"] if link["rel"] == "approve")
             return redirect(approval_url)
-            
+
+    # GET-Request / Anzeige Checkout
     context = {
         'items': items,
         'subtotal': subtotal,
@@ -872,6 +870,7 @@ def checkout(request):
         'now': timezone.now(),
     }
     return render(request, 'apps/checkout.html', context)
+
 
 def send_order_emails(order, request):
     subject_customer = 'Bestellbestätigung – Joel Digitals'
@@ -1018,6 +1017,7 @@ class SendAccessMailForm(forms.Form):
         # Dynamische Vorschläge (kann auch aus DB stammen)
         self.fields['suggested_apps'].choices = [
             ('JDS Management', 'JDS Management – Easy, smart and fast.'),
+            ('AuftragNetz', 'OrderNetwork - connect smart for the future.'),
         ]
 
     def extract_app_names(self):
@@ -1036,7 +1036,7 @@ def order_admin(request):
 
     # Mapping Tabs -> Statuswerte
     tab_map = {
-        "pending": ["Received"],               # Ausstehend
+        "pending": ["Received", "pending"],               # Ausstehend
         "completed": ["Paid"],                 # Bezahlt
         "returns": ["Return", "Canceled", "Back"],   # Retouren
         "shipping": ["In Delivery", "Delivered"],    # Versand
@@ -1090,15 +1090,15 @@ def order_admin(request):
                 suggestion_map = {
                     'JDS Management': {
                         'title': 'JDS Management',
-                        'description': 'Manage fast, easy und ',
+                        'description': 'Manage fast, easy & smart.',
                         'url': 'https://www.joel-digitals.de/our-apps/ManagementApp/',
                         'btn_text': 'Jetzt entdecken',
                     },
-                    'editorx': {
-                        'title': 'Editor X',
-                        'description': 'Ein leistungsstarker Editor für Code & Markdown.',
-                        'url': 'https://joel-digitals.de/store/editorx',
-                        'btn_text': 'Jetzt ansehen',
+                    'AuftragNetz': {
+                        'title': 'OrderNetwork',
+                        'description': 'Find Companys, Freelancer and Contract',
+                        'url': 'https://joel-digitals.de/our-apps/auftragnetz/',
+                        'btn_text': '',
                     },
                     'weatherai': {
                         'title': 'Weather AI',
@@ -1157,14 +1157,15 @@ def order_admin(request):
 def my_order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     items = OrderItem.objects.filter(order=order)
+    lang = get_language()  # 👈 Sprache abrufen
 
     context = {
         'order': order,
         'now': timezone.now(),
         'items': items,
+        'lang': lang,  # 👈 Sprache ans Template übergeben
     }
     return render(request, 'apps/my_order_detail.html', context)
-
 TAX_PERCENT = Decimal('19.00')  # MwSt-Satz in Prozent
 
 def _as_decimal(value):
@@ -1225,30 +1226,53 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from xhtml2pdf import pisa
 import io
+from django.utils.translation import get_language, activate, deactivate
+from django.utils import translation
 
 def invoice_pdf(request, order_id):
+    # 获取订单
     order = get_object_or_404(Order, id=order_id, user=request.user)
     items = order.items.all()
     totals = _compute_totals_incl_tax(order)
 
+    # 尝试从会话或 Cookie 中获取语言代码
+    lang = (
+        getattr(request, "LANGUAGE_CODE", None)
+        or request.session.get("django_language")
+        or request.COOKIES.get("django_language")
+        or "de"  # 默认语言为德语
+    )
+
+    # 激活语言
+    activate(lang)
+
+    # 准备上下文
     context = {
         'order': order,
         'now': timezone.now(),
         'items': items,
-        **totals
+        'lang': lang,  # 现在一定有值
+        **totals,
     }
 
+    # 渲染模板
     try:
         html_string = render_to_string('apps/invoice_pdf.html', context)
     except TemplateDoesNotExist:
         html_string = render_to_string('apps/invoice.html', context)
 
-    pdf_file = io.BytesIO()
+    # 创建 PDF 文件
+    pdf_file = BytesIO()
     pisa_status = pisa.CreatePDF(html_string, dest=pdf_file, encoding='UTF-8')
 
+    # 离开时停用语言（可选，用于关闭上下文）
+    deactivate()
+
+    # 检查 PDF 是否生成成功
     if pisa_status.err:
         return HttpResponse('Error while creating PDF', status=500)
 
+    # 返回 PDF 文件
     response = HttpResponse(pdf_file.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="invoice_{order.id}.pdf"'
     return response

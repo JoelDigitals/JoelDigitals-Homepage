@@ -1,71 +1,52 @@
 {% extends "base_shop.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}My Orders – Joel Digitals{% endblock %}
+{% block title %}{% trans "My Orders" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    .orders-container {
-        background-color: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        max-width: 1000px;
-        margin: auto;
-        color: #000;
-    }
-    h1 {
-        color: #0044cc;
-        margin-bottom: 20px;
-    }
-    .order {
-        border: 1px solid #ccc;
-        padding: 15px;
-        margin-bottom: 15px;
-        border-radius: 8px;
-    }
-    .order h2 {
-        font-size: 18px;
-        margin: 0 0 10px 0;
-    }
-    .order ul {
-        margin: 0;
-        padding-left: 20px;
-    }
-    .order-status {
-        font-weight: bold;
-        color: #0044cc;
-    }
-    .order-link {
-        margin-top: 10px;
-        display: inline-block;
-        color: #0044cc;
-        text-decoration: underline;
-        font-weight: 500;
-    }
+.orders-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+    margin: auto;
+    color: #000;
+}
+h1 { color: #0044cc; margin-bottom: 20px; }
+.order { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+.order h2 { font-size: 18px; margin: 0 0 10px 0; }
+.order ul { margin: 0; padding-left: 20px; }
+.order-status { font-weight: bold; color: #0044cc; }
+.order-link { margin-top: 10px; display: inline-block; color: #0044cc; text-decoration: underline; font-weight: 500; }
 </style>
 
 <div class="orders-container">
-    <h1><i class="fas fa-box"></i> My Orders</h1>
+    <h1><i class="fas fa-box"></i> {% trans "My Orders" %}</h1>
 
     {% if orders %}
         {% for order in orders %}
             <div class="order">
-                <h2>Order #{{ order.id }} – <span class="order-status">{{ order.get_status_display }}</span></h2>
+                <h2>{% trans "Order" %} #{{ order.id }} – <span class="order-status">{{ order.get_status_display }}</span></h2>
 
-                <p><strong>Date:</strong> {{ order.created_at|date:"Y-m-d H:i" }}</p>
-                <p><strong>Total:</strong> {{ order.total_amount|floatformat:2 }}€</p>
-                <p><strong>Items:</strong></p>
+                <p><strong>{% trans "Date" %}:</strong> {{ order.created_at|date:"Y-m-d H:i" }}</p>
+                <p><strong>{% trans "Total" %}:</strong> {{ order.total_amount|floatformat:2 }}€</p>
+                <p><strong>{% trans "Items" %}:</strong></p>
                 <ul>
                     {% for item in order.items.all %}
-                        <li>{{ item.quantity }}× {{ item.app.name }} – {{ item.app.price|floatformat:2 }}€</li>
+                        <li>{{ item.quantity }}× 
+                            {% if "de" in lang %}{{ item.app.name }}{% else %}{{ item.app.name_english }}{% endif %}
+                            – {{ item.app.price|floatformat:2 }}€
+                        </li>
                     {% endfor %}
                 </ul>
-                <a href="{% url 'order_detail' order.id %}" class="order-link">View Order Details</a>
+                <a href="{% url 'order_detail' order.id %}" class="order-link">{% trans "View Order Details" %}</a>
             </div>
         {% endfor %}
     {% else %}
-        <p>You have no orders yet.</p>
+        <p>{% trans "You have no orders yet." %}</p>
     {% endif %}
 </div>
 {% endblock %}

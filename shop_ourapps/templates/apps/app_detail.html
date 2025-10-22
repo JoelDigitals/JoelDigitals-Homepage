@@ -1,5 +1,6 @@
 {% extends "base_shop.html" %}
 {% load static %}
+{% load static i18n %}
 {% block title %}{{ app.name }} – Joel Digitals Shop{% endblock %}
 
 {% block content %}
@@ -71,7 +72,7 @@
     <p><strong>Version:</strong> {{ app.version }}</p>
 
     <div style="white-space: pre-line; margin-top: 20px;">
-        <strong>Description:</strong>
+        <strong>{% trans "Description" %}:</strong>
         <p>{{ app.display_description }}</p>
     </div>
 
@@ -88,17 +89,17 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
       margin-bottom: 6px;
     ">
-      🔖 {{ app.discount_percent }}% Rabatt
+      🔖 {{ app.discount_percent }}% {% trans "Discount" %}
     </span>
 
     <p style="margin: 4px 0 0;">
-      <span style="text-decoration: line-through; color: #999; font-size: 0.95rem;">€{{ app.price }}</span><br>
+      <span style="text-decoration: line-through; color: #999; font-size: 0.95rem;">{{ app.price }}€</span><br>
       <strong style="color: #198754; font-size: 1.2rem;">€{{ app.discounted_price|floatformat:2 }}</strong>
     </p>
   </div>
 {% else %}
   <p style="margin-left: 80px; margin-top: 20px;">
-    Price: <strong>€{{ app.price }}</strong>
+    {% trans "Price" %}: <strong>{{ app.price }}€</strong>
   </p>
 {% endif %}
 
@@ -108,15 +109,15 @@
         <form method="post" action="{% url 'add_to_cart' app.id %}">
             {% csrf_token %}
             <div style="display: flex; align-items: center; margin-top: 20px;">
-                <label for="quantity" style="margin-right: 10px;">Quantity:</label>
+                <label for="quantity" style="margin-right: 10px;">{% trans "Quantity" %}:</label>
                 <button type="button" onclick="changeQuantity(-1)">−</button>
                 <input type="number" id="quantity" name="quantity" value="1" min="1">
                 <button type="button" onclick="changeQuantity(1)">+</button>
             </div>
-            <button type="submit" class="button">Add to Cart</button>
+            <button type="submit" class="button">{% trans "Add to Cart" %}</button>
         </form>
     {% else %}
-        <p><a href="/login/">Please log in to purchase this item</a></p>
+        <p><a href="/login/">Log in</a></p>
     {% endif %}
 </div>
 

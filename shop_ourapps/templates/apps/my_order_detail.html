@@ -1,17 +1,28 @@
 {% extends "base_shop.html" %}
+{% load i18n %}
+{% get_current_language as lang %}
 
-{% block title %}Order #{{ order.id }} — Details{% endblock %}
+{% block title %}{% trans "Order" %} #{{ order.id }} — {% trans "Details" %}{% endblock %}
 
 {% block content %}
 <div style="max-width:1000px;margin:0 auto;background:transparent;padding:1rem;">
   <section style="background:var(--surface);padding:1rem;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.4);">
+    
+    <!-- Header -->
     <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;align-items:center;">
       <div>
-        <h2 style="margin:0 0 .25rem 0;">Order #{{ order.id }}</h2>
+        <h2 style="margin:0 0 .25rem 0;">{% trans "Order" %} #{{ order.id }}</h2>
         <div style="color:#ccc;font-size:0.95rem;">
-          Created: {{ order.created_at|date:"Y-m-d H:i" }} &middot;
-          Status:
-          <strong style="color:{% if order.status == 'Paid' %}#66d17b{% else %}#f39c12{% endif %}">
+          {% trans "Created" %}: {{ order.created_at|date:"Y-m-d H:i" }} &middot;
+          {% trans "Status" %}:
+          <strong style="
+            color:
+              {% if order.status == 'Paid' %}#66d17b
+              {% elif order.status == 'Canceled' or order.status == 'Return' %}#e74c3c
+              {% elif order.status == 'In Delivery' or order.status == 'Received' %}#f39c12
+              {% elif order.status == 'Finished' or order.status == 'Delivered' %}#3498db
+              {% else %}#aaa{% endif %}
+          ">
             {{ order.status }}
           </strong>
         </div>
@@ -19,84 +30,109 @@
 
       <div style="display:flex;gap:.5rem;align-items:center;">
         <a href="{% url 'invoice' order.id %}" class="button" style="background:var(--primary);color:white;padding:.6rem .9rem;border-radius:8px;text-decoration:none;font-weight:700;">
-          <i class="fas fa-file-pdf"></i> Invoice
+          <i class="fas fa-file-pdf"></i> {% trans "Invoice" %}
         </a>
         <a href="/shop/" class="button" style="background:transparent;border:1px solid var(--border);color:var(--text);padding:.5rem .8rem;border-radius:8px;text-decoration:none;">
-          Continue Shopping
+          {% trans "Continue Shopping" %}
         </a>
       </div>
     </div>
 
+    <!-- Content -->
     <div style="display:grid;grid-template-columns:1fr 320px;gap:1rem;margin-top:1rem;">
+      
       <!-- Left: Order Items -->
       <div style="background:white;color:#111;padding:1rem;border-radius:6px;">
-        <h3 style="margin-top:0;">Items</h3>
+        <h3 style="margin-top:0;">{% trans "Items" %}</h3>
         <table style="width:100%;border-collapse:collapse;">
           <thead>
             <tr style="text-align:left;color:#444;">
-              <th style="padding:.5rem .4rem;border-bottom:1px solid #eee;">Product</th>
-              <th style="padding:.5rem .4rem;border-bottom:1px solid #eee;width:80px;text-align:center;">Qty</th>
-              <th style="padding:.5rem .4rem;border-bottom:1px solid #eee;width:120px;text-align:right;">Price</th>
+              <th style="padding:.5rem .4rem;border-bottom:1px solid #eee;">{% trans "Product" %}</th>
+              <th style="padding:.5rem .4rem;border-bottom:1px solid #eee;width:80px;text-align:center;">{% trans "Qty" %}</th>
+              <th style="padding:.5rem .4rem;border-bottom:1px solid #eee;width:120px;text-align:right;">{% trans "Price" %}</th>
             </tr>
           </thead>
           <tbody>
             {% for item in items %}
             <tr>
               <td style="padding:.6rem .4rem;border-bottom:1px solid #f4f4f4;">
-                <strong>{{ item.app.name }}</strong><br>
+                <!-- Sprachabhängiger Name -->
+                <strong>
+                  {% if "de" in lang %}
+                    {{ item.app.name }}
+                  {% elif "en" in lang %}
+                    {{ item.app.name_english }}
+                  {% else %}
+                    {{ item.app.name }}
+                  {% endif %}
+                </strong><br>
                 <small style="color:#666">{{ item.app.product_number }}</small>
               </td>
               <td style="padding:.6rem .4rem;border-bottom:1px solid #f4f4f4;text-align:center;">
                 {{ item.quantity }}
               </td>
               <td style="padding:.6rem .4rem;border-bottom:1px solid #f4f4f4;text-align:right;">
-                {{ item.app.discounted_price|floatformat:2 }} €<br>
-                <small style="color:#888">Total: {{ item.price|floatformat:2 }} €</small>
+                {% if item.discount_percent > 0 %}
+                  <span style="text-decoration:line-through;color:#999;">
+                    {{ item.app.price|floatformat:2 }} €
+                  </span><br>
+                  <small style="color:#d33;">-{{ item.discount_percent }}%</small><br>
+                  <strong>{{ item.discount_price|floatformat:2 }} €</strong><br>
+                {% else %}
+                  {{ item.app.price|floatformat:2 }} €
+                {% endif %}
+                <br>
+                <small style="color:#888;">{% trans "Total" %}: {{ item.price|floatformat:2 }} €</small>
               </td>
             </tr>
             {% empty %}
             <tr>
-              <td colspan="3" style="padding:1.2rem;text-align:center;color:#666;">No items in this order.</td>
+              <td colspan="3" style="padding:1.2rem;text-align:center;color:#666;">{% trans "No items in this order." %}</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
 
-      <!-- Right: Summary / Addresses -->
+      <!-- Right: Summary -->
       <aside style="display:flex;flex-direction:column;gap:.75rem;">
         <div style="background:white;padding:1rem;border-radius:6px;color:#111;">
-          <h4 style="margin:0 0 .5rem 0;">Payment & Summary</h4>
+          <h4 style="margin:0 0 .5rem 0;">{% trans "Payment & Summary" %}</h4>
           <div style="display:flex;justify-content:space-between;">
-            <span>Subtotal</span><strong>{{ order.subtotal|floatformat:2 }} €</strong>
+            <span>{% trans "Subtotal" %}</span><strong>{{ order.subtotal|floatformat:2 }} €</strong>
           </div>
           {% if order.discount_amount > 0 %}
           <div style="display:flex;justify-content:space-between;">
-            <span>Discount</span><strong>-{{ order.discount_amount|floatformat:2 }} €</strong>
+            <span>{% trans "Discount" %}</span><strong>-{{ order.discount_amount|floatformat:2 }} €</strong>
           </div>
           {% endif %}
           <div style="display:flex;justify-content:space-between;font-size:1.05rem;margin-top:.5rem;padding-top:.5rem;border-top:1px dashed #eee;">
-            <span>Total</span><strong>{{ order.total_amount|floatformat:2 }} €</strong>
+            <span>{% trans "Total" %}</span><strong>{{ order.total_amount|floatformat:2 }} €</strong>
           </div>
 
           <p style="margin:.5rem 0 0 0;color:#666;font-size:.95rem;">
-            Payment Method: <strong style="color:#222">{{ order.payment_method }}</strong>
+            {% trans "Payment Method" %}: <strong style="color:#222">{{ order.payment_method }}</strong>
           </p>
 
-          {% if order.status == 'pending' %}
-            
-            <div style="margin-top:.6rem;padding:.5rem;border-radius:6px;background:#fff4e6;color:#8a5a00;font-weight:700;text-align:center;">
-              Pending Payment
+          {% if order.status == 'Received' or order.status == 'pending' %}
+            <div class="payment-status" style="margin-top:.6rem;padding:.6rem;border-radius:6px;background:#fff4e6;color:#8a5a00;font-weight:700;text-align:center;">
+              {% trans "Pending Payment" %}
+            </div>
+          {% elif order.status == 'Return' or order.status == 'Canceled' or order.status == 'Back at Joel Digitals' %}
+            <div class="payment-status" style="margin-top:.6rem;padding:.6rem;border-radius:6px;background:#ffeaea;color:#a33;font-weight:700;text-align:center;">
+              {% trans "Refunded" %}
             </div>
           {% else %}
-            <div style="margin-top:.6rem;padding:.5rem;border-radius:6px;background:#e8f9ee;color:#1b6b2b;font-weight:700;text-align:center;">
-              Paid
+            <div class="payment-status" style="margin-top:.6rem;padding:.6rem;border-radius:6px;background:#e8f9ee;color:#1b6b2b;font-weight:700;text-align:center;">
+              {% trans "Paid" %}
             </div>
           {% endif %}
+          
         </div>
 
+        <!-- Billing -->
         <div style="background:white;padding:1rem;border-radius:6px;color:#111;">
-          <h4 style="margin:0 0 .5rem 0;">Billing Details</h4>
+          <h4 style="margin:0 0 .5rem 0;">{% trans "Billing Details" %}</h4>
           <div style="color:#333;">
             {{ order.first_name }} {{ order.last_name }}<br>
             {% if order.company_name %}<strong>{{ order.company_name }}</strong><br>{% endif %}
@@ -113,7 +149,7 @@
 
     {% if order.notes %}
       <div style="margin-top:1rem;background:transparent;color:#ddd;padding:1rem;border-radius:6px;">
-        <h4 style="margin:0 0 .5rem 0;color:#ccc;">Notes</h4>
+        <h4 style="margin:0 0 .5rem 0;color:#ccc;">{% trans "Notes" %}</h4>
         <div style="background:#111;padding:1rem;border-radius:6px;color:#ddd;">{{ order.notes|linebreaksbr }}</div>
       </div>
     {% endif %}

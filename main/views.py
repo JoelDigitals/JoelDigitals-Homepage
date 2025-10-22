@@ -38,6 +38,9 @@ def home(request):
     products = list(App.objects.filter(is_available_for_purchase=True))
     random_products = random.sample(products, min(len(products), 3))
 
+    for product in random_products:
+        product.name = product.name if lang =='de' else product.name_english
+
     return render(request, 'main/home.html', {
         'user_groups': user_groups,
         'latest_blog': latest_blog,

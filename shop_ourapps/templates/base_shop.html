@@ -1,4 +1,5 @@
 {% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -230,6 +231,54 @@ nav#main-nav::-webkit-scrollbar-thumb {
         font-size: 0.8rem;
       }
     }
+    .language-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropbtn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .flag-icon {
+      width: 24px;
+      height: auto;
+      vertical-align: middle;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: var(--surface);
+      min-width: 120px;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+      z-index: 1000;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .dropdown-content a {
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+    }
+
+    .dropdown-content a:hover {
+      background-color: var(--primary);
+      color: #fff;
+    }
+
+    .language-dropdown:hover .dropdown-content {
+      display: block;
+    }
   </style>
 
 <!-- Grundlegende SEO-Tags -->
@@ -270,10 +319,10 @@ nav#main-nav::-webkit-scrollbar-thumb {
   </div>
   <nav id="main-nav">
       <a href="/shop/">Shop</a>
-      <a href="/contact/">Contact</a>
+      <a href="/contact/">{% trans "Contact" %}</a>
       <a href="/downloads/">Downloads</a>
       {% if user.is_authenticated %}
-        <a href="/my-orders/">My Orders</a>
+        <a href="/my-orders/">{% trans "My Orders" %}</a>
         <a href="/affiliate/dashboard/">Affiliate Program</a>
         <a href="/cart/" title="Cart"><i class="fas fa-shopping-cart"></i></a>
         <a href="/wallet/" title="Wallet">
@@ -283,6 +332,16 @@ nav#main-nav::-webkit-scrollbar-thumb {
       {% else %}
         <a href="/auth/login/" title="Login"><i class="fas fa-sign-in-alt"></i></a>
       {% endif %}
+
+      <div class="language-dropdown">
+      <button class="dropbtn">
+        <img src="{% static 'flags/' %}de.png" alt="de" class="flag-icon" id="current-flag">
+      </button>
+      <div class="dropdown-content">
+        <a href="/de/shop/" onclick="switchLanguage('de')"><img src="{% static 'flags/de.png' %}" class="flag-icon"> Deutsch</a>
+        <a href="/en/shop/" onclick="switchLanguage('en')"><img src="{% static 'flags/en.png' %}" class="flag-icon"> English</a>
+      </div>
+    </div>
     </nav>
   </header>
 
@@ -294,15 +353,15 @@ nav#main-nav::-webkit-scrollbar-thumb {
   <div>&copy; 2025 Joel Digitals. All rights reserved.</div>
   
   <div class="footer-links">
-    <a href="/imprint/">Imprint</a> |
-    <a href="/privacy/">Privacy Policy</a> |
-    <a href="/terms/">Terms of Service</a> |
-    <a href="/">Home</a>
+    <a href="/imprint/">{% trans "Imprint" %}</a> |
+    <a href="/privacy/">{% trans "Privacy Policy" %}</a> |
+    <a href="/terms/">{% trans "Terms of Service" %}</a> |
+    <a href="/">{% trans "Home" %}</a>
   </div>
 
   <div class="socials">
-    <!--<a href="https://facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-    <a href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>-->
+    <a href="https://facebook.com/joeldigitalsofficial" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+    <!--<a href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>-->
     <a href="https://instagram.com/joel_digitals_official" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
     <!--<a href="https://linkedin.com" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>-->
     <a href="https://www.youtube.com/@JoelDigitals" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
