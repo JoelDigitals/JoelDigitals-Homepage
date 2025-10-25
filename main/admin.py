@@ -1,5 +1,34 @@
 from django.contrib import admin
 from .models import TeamMember, OpeningHour, SpecialOpeningHour
+from django.contrib import admin
+from .models import FAQ
+from django.utils.html import format_html
+
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ("question_de", "question_en", "is_published", "order", "created_at")
+    list_filter = ("is_published",)
+    search_fields = (
+        "question_de", "question_en",
+        "short_answer_de", "short_answer_en",
+        "answer_de", "answer_en",
+    )
+    prepopulated_fields = {"slug": ("question_en",)}
+    ordering = ("order",)
+
+    fieldsets = (
+        ("Deutsch", {
+            "fields": ("question_de", "short_answer_de", "answer_de", "detail_content_de")
+        }),
+        ("English", {
+            "fields": ("question_en", "short_answer_en", "answer_en", "detail_content_en")
+        }),
+        ("Allgemein", {
+            "fields": ("slug", "is_published", "order", "created_at", "updated_at")
+        }),
+    )
+
+    readonly_fields = ("created_at", "updated_at")
 
 # Register your models here.
 

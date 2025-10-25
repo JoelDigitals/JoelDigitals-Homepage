@@ -1232,3 +1232,12 @@ msgstr "Quantity"
 
 msgid "My Orders"
 msgstr "My Orders"
+
+msgid "Frequently Asked Questions"
+msgstr "Frequently Asked Questions"
+
+msgid "View all FAQs"
+msgstr "View all FAQs"
+
+msgid "Page"
+msgstr "Page"

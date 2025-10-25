@@ -1,0 +1,103 @@
+{% extends "base_home.html" %}
+{% load i18n %}
+
+{% block title %}{{ faq.question }}{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    background-color: #1c1c1e;
+  }
+
+  .faq-detail-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 4rem 1rem;
+  }
+
+  a.back-link {
+    color: #aaa;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  a.back-link:hover {
+    color: #4f46e5;
+    text-decoration: underline;
+  }
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .faq-main, .faq-details {
+    background-color: #2a2a2e;
+    border-radius: 1rem;
+    padding: 2.5rem;
+    border: 1px solid #444;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+  }
+
+  .faq-main:hover, .faq-details:hover {
+    background-color: #333336;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+  }
+
+  .faq-main p, .faq-details p {
+    color: #ccc;
+    line-height: 1.8;
+    font-size: 1.05rem;
+  }
+
+  .faq-details h2 {
+    color: #ffffff;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .faq-details p, .faq-details li {
+    color: #ccc;
+  }
+
+  .faq-details a {
+    color: #4f46e5;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .faq-details a:hover {
+    color: #7c3aed;
+    text-decoration: underline;
+  }
+</style>
+<div class="faq-detail-container">
+  <a href="{% url 'list' %}" class="back-link">← {% trans "Back to list" %}</a>
+
+  <h1>{{ faq.question }}</h1>
+
+  <!-- Kurzantwort / Hauptantwort -->
+  <section class="faq-main mt-6 prose prose-invert max-w-none">
+    {% if faq.short_answer %}
+      <p>{{ faq.short_answer|linebreaksbr }}</p>
+    {% else %}
+      {{ faq.answer|safe }}
+    {% endif %}
+  </section>
+  <br>
+  <!-- Detailinhalt -->
+  {% if faq.detail_content %}
+  <section class="faq-details mt-10 prose prose-invert max-w-none">
+    <h2>{% trans "More Details" %}</h2>
+    {{ faq.detail_content|safe }}
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

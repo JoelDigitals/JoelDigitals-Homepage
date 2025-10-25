@@ -184,6 +184,26 @@ h1,h2,h3{color:#fff;}
     </div>
   </section>
 
+  <!-- FAQ Section -->
+<section class="hours-section" data-aos="fade-up">
+  <h2>❓ {% trans "Frequently Asked Questions" %}</h2>
+  <div style="max-width:800px;margin:2rem auto;text-align:left;">
+    {% for faq in faqs %}
+      <div style="margin-bottom:1.2rem;border-bottom:1px solid #444;padding-bottom:0.8rem;">
+        <h3 style="color:#fff;font-size:1.1rem;margin-bottom:0.5rem;">{{ faq.question }}</h3>
+        <p style="color:#ccc;margin-bottom:0.5rem;">{{ faq.short_answer|truncatewords:20 }}</p>
+        <a href="{% url 'detail' faq.slug %}" class="cta-btn" style="font-size:0.9rem;">{% trans "Read more" %}</a>
+      </div>
+    {% empty %}
+      <p>{% trans "No FAQs available at the moment." %}</p>
+    {% endfor %}
+  </div>
+  <div style="text-align:center;margin-top:1rem;">
+    <a href="{% url 'list' %}" class="cta-btn">{% trans "View all FAQs" %}</a>
+  </div>
+</section>
+
+
   <!-- Blog -->
   {% if latest_blog %}
   <section data-aos="fade-up">

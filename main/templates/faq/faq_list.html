@@ -1,0 +1,166 @@
+{% extends "base_home.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "FAQ" %}{% endblock %}
+
+
+{% block content %}
+<style>
+
+  .faq-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 4rem 1rem;
+  }
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  /* Suchformular */
+  form input[type="text"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #444;
+    background-color: #2a2a2e;
+    color: #fff;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+
+  form input[type="text"]:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
+  }
+
+  form button {
+    cursor: pointer;
+  }
+
+  /* FAQ-Karten */
+  .faq-card {
+    background-color: #2a2a2e;
+    border-radius: 1rem;
+    padding: 2rem;
+    border: 1px solid #444;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+
+  .faq-card:hover {
+    background-color: #333336;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+  }
+
+  .faq-card h2 a {
+    color: #ffffff;
+    transition: color 0.3s ease;
+  }
+
+  .faq-card h2 a:hover {
+    color: #4f46e5;
+  }
+
+  .faq-card p {
+    color: #ccc;
+    line-height: 1.8;
+    margin-top: 0.5rem;
+  }
+
+  .faq-card .read-more {
+    margin-top: 1.5rem;
+    display: inline-block;
+    color: #4f46e5;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .faq-card .read-more:hover {
+    color: #7c3aed;
+    text-decoration: underline;
+  }
+
+  /* Pagination */
+  .faq-pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+    color: #aaa;
+    font-weight: 500;
+  }
+
+  .faq-pagination a {
+    color: #4f46e5;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .faq-pagination a:hover {
+    color: #7c3aed;
+    text-decoration: underline;
+  }
+
+  .faq-pagination span {
+    color: #aaa;
+  }
+</style>
+
+<div class="faq-container">
+  <h1>{% trans "Frequently Asked Questions" %}</h1>
+
+  <!-- Suchformular -->
+  <form method="get" class="mb-12 flex flex-col md:flex-row gap-4">
+    {{ form.q }}
+    <button type="submit"
+            class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold
+                   hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md">
+      {% trans "Search" %}
+    </button>
+  </form>
+
+  <!-- FAQ-Liste -->
+  <div class="space-y-8">
+    {% for faq in faqs %}
+      <article class="faq-card">
+        <h2 class="text-2xl font-semibold mb-2">
+          <a href="{{ faq.get_absolute_url }}">{{ faq.question }}</a>
+        </h2>
+
+        {% if faq.short_answer %}
+          <p>{{ faq.short_answer|linebreaksbr }}</p>
+        {% else %}
+          <p>{{ faq.answer|striptags|truncatechars:200 }}</p>
+        {% endif %}
+
+        <a href="{{ faq.get_absolute_url }}" class="read-more">{% trans "Read more" %} →</a>
+      </article>
+    {% empty %}
+      <p class="text-center text-gray-400">{% trans "No FAQs found." %}</p>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  <div class="faq-pagination">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">← {% trans "Previous" %}</a>
+    {% else %}
+      <span></span>
+    {% endif %}
+
+    <span>{% trans "Page" %} {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{% trans "Next" %} →</a>
+    {% else %}
+      <span></span>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
