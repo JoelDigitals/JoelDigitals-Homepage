@@ -78,6 +78,13 @@ def blog_detail(request, pk):
     post.title = post.title_en if lang == "en" else post.title_de
     post.content = post.content_en if lang == "en" else post.content_de
 
+    # Sprachabhängige Titel und Teaser für verwandte Beiträge
+    for related in related_posts:
+        related.title = related.title_en if lang == "en" else related.title_de
+        related.teaser_text = (
+            (related.content_en if lang == "en" else related.content_de)[:180] + "..."
+        )
+
     return render(request, "blog/blog_detail.html", {
         "post": post,
         "comments": comments,

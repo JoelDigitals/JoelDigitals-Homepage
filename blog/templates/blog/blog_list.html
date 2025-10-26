@@ -176,7 +176,7 @@
         <div class="blog-card-content">
             <div>
                 <h3>{{ post.title }}</h3>
-                <p class="teaser">{{ post.teaser_text|striptags }}</p>
+                <p class="teaser">{{ post.teaser_text|striptags|safe }}</p>
             </div>
             <div>
                 <p class="blog-meta">

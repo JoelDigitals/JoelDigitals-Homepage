@@ -202,6 +202,7 @@
                         {% endif %}
                         <div class="blog-card-content">
                             <h4>{{ next_post.title }}</h4>
+                            <p>{{ next_post.teaser_text|safe }}</p>
                             <a href="{% url 'blog_detail' next_post.pk %}" class="btn">{% trans "Read" %}</a>
                         </div>
                     </div>
