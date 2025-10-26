@@ -8,50 +8,110 @@
 <style>
     body {
         margin: 0;
-        font-family: Arial, sans-serif;
-        color: #000;
+        font-family: 'Inter', Arial, sans-serif;
+        color: #111;
         font-size: 18px;
+        line-height: 1.7;
     }
 
     main {
-        padding: 40px 20px;
-        max-width: 1000px;
+        padding: 60px 20px;
+        max-width: 1100px;
         margin: auto;
     }
 
     .container {
-        background-color: white;
-        padding: 30px;
+        background-color: #fff;
+        padding: 40px 35px;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    h1, h2, h3 {
+        color: #003399;
+        margin-top: 30px;
+        font-weight: 700;
+    }
+
+    h1 {
+        text-align: center;
+        font-size: 2.2em;
+        margin-bottom: 30px;
+    }
+
+    .highlight {
+        color: #0073ff;
+        font-weight: bold;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    ul li::before {
+        content: "✓ ";
+        color: #0073ff;
+        font-weight: bold;
+    }
+
+    .values {
+        background-color: #f7f9ff;
         border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        padding: 20px 30px;
+        margin: 30px 0;
     }
 
-    h1, h2 {
-        color: #0044cc;
+    .team {
+        margin-top: 40px;
     }
 
-    @media (max-width: 1000px) {
+    @media (max-width: 800px) {
         main {
-            padding: 20px;
-        }
-    }
-
-    @media (max-width: 600px) {
-        .logo-img {
-            width: 200px;
-            height: auto;
+            padding: 30px 15px;
         }
     }
 </style>
 
 <main>
     <div class="container">
-        <h2>{% trans "About Joel Digitals" %}</h2>
-        <p>{% trans "Joel Digitals is a Germany-based digital technology company specializing in custom IT solutions for businesses of all sizes. Since our inception, we've been dedicated to delivering quality, reliability, and cutting-edge expertise." %}</p>
-        <p>{% trans "Our multidisciplinary team includes skilled developers, creative designers, and experienced project managers who work together to turn your ideas into real-world digital products. We support you throughout every stage — from concept and development to ongoing support and growth." %}</p>
-        <p>{% trans "What sets us apart is our ability to transform complex technical challenges into practical, user-friendly solutions. We take pride in understanding your goals and translating them into robust systems that are built to last." %}</p>
-        <p>{% trans "At Joel Digitals, we don’t just provide services — we build partnerships. Our mission is to be a trusted companion in your digital journey, offering clear communication, transparency, and consistently high standards." %}</p>
-        <p>{% trans "Let us help you unlock your digital potential and drive long-term success through innovation and strategy." %}</p>
+        <h1>{% trans "About Joel Digitals" %}</h1>
+
+        <p>{% trans "Joel Digitals is a forward-thinking digital agency based in Germany, specializing in tailor-made IT and web solutions for businesses of all sizes. We blend creativity, technology, and strategy to help brands build their digital future." %}</p>
+
+        <h2>{% trans "Our Vision" %}</h2>
+        <p>{% trans "To empower companies to grow through innovative and intelligent digital systems — built with precision, scalability, and design excellence." %}</p>
+
+        <h2>{% trans "Our Mission" %}</h2>
+        <p>{% trans "We develop customized platforms, applications, and automation tools that make technology accessible, efficient, and truly valuable. Our goal is to simplify the digital landscape and provide measurable results for our clients." %}</p>
+
+        <div class="values">
+            <h3>{% trans "Our Core Values" %}</h3>
+            <ul>
+                <li>{% trans "Innovation – We stay ahead of trends and deliver cutting-edge solutions." %}</li>
+                <li>{% trans "Transparency – Clear communication and full project visibility are central to our work." %}</li>
+                <li>{% trans "Reliability – Clients can count on us for consistent quality and dependable results." %}</li>
+                <li>{% trans "Partnership – We build long-term collaborations based on trust and shared success." %}</li>
+                <li>{% trans "Sustainability – Our systems are designed for long-term performance and maintainability." %}</li>
+            </ul>
+        </div>
+
+        <h2>{% trans "Our Expertise" %}</h2>
+        <p>{% trans "From custom web applications and cloud systems to automation and AI integration, we combine deep technical knowledge with user-centered design. Our expertise covers a broad range of technologies including Django, Twilio, Tailwind, React, and modern deployment infrastructures like Render and Docker." %}</p>
+
+        <h2>{% trans "Our Team" %}</h2>
+        <p>{% trans "Joel Digitals is made up of passionate developers, creative designers, and strategic thinkers — led by professionals who believe in technology as a tool for human progress. Each project is handled with dedication, precision, and the shared goal of exceeding expectations." %}</p>
+
+        <div class="team">
+            <h3>{% trans "Collaboration & Management" %}</h3>
+            <p>{% trans "Under the JDS Management system, our internal organization focuses on structured processes, transparent communication, and continuous improvement — ensuring that every client receives the highest level of service and support." %}</p>
+        </div>
+
+        <h2>{% trans "Our Promise" %}</h2>
+        <p>{% trans "At Joel Digitals, we don’t just build projects — we create digital ecosystems that grow with your business. Our promise: innovation, clarity, and long-term partnership." %}</p>
+
+        <p><strong>{% trans "Ready to shape the future together?" %}</strong><br>
+        {% trans "Let’s connect and create something extraordinary." %}</p>
     </div>
 </main>
 {% endblock %}

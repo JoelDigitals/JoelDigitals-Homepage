@@ -6,98 +6,137 @@
 {% block content %}
 <style>
   body {
-    background-color: #1c1c1e;
+    background-color: #111114;
   }
 
   .faq-detail-container {
-    max-width: 900px;
+    max-width: 950px;
     margin: 0 auto;
-    padding: 4rem 1rem;
+    padding: 5rem 1.5rem;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
   }
 
   a.back-link {
-    color: #aaa;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #9ca3af;
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    font-size: 1rem;
   }
 
   a.back-link:hover {
-    color: #4f46e5;
+    color: #818cf8;
     text-decoration: underline;
   }
 
   h1 {
     font-size: 3rem;
     font-weight: 800;
-    color: #ffffff;
-    margin-top: 1rem;
-    margin-bottom: 2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 2.5rem;
+    background: linear-gradient(to right, #6366f1, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
   }
 
+  /* Karten-Stil */
   .faq-main, .faq-details {
-    background-color: #2a2a2e;
+    background-color: #1e1e22;
     border-radius: 1rem;
     padding: 2.5rem;
-    border: 1px solid #444;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    transition: all 0.3s ease;
+    border: 1px solid #333;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.35);
+    transition: all 0.35s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .faq-main::before, .faq-details::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    left: -40%;
+    width: 180%;
+    height: 180%;
+    background: radial-gradient(circle at top left, rgba(99,102,241,0.07), transparent 70%);
+    transform: rotate(25deg);
   }
 
   .faq-main:hover, .faq-details:hover {
-    background-color: #333336;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+    border-color: #4f46e5;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35);
   }
 
-  .faq-main p, .faq-details p {
-    color: #ccc;
+  .faq-main p, .faq-details p, .faq-details li {
+    color: #d1d1d1;
     line-height: 1.8;
     font-size: 1.05rem;
   }
 
   .faq-details h2 {
-    color: #ffffff;
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
-
-  .faq-details p, .faq-details li {
-    color: #ccc;
+    color: #fff;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    background: linear-gradient(to right, #818cf8, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .faq-details a {
-    color: #4f46e5;
+    color: #818cf8;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
   }
 
   .faq-details a:hover {
-    color: #7c3aed;
+    color: #a78bfa;
     text-decoration: underline;
   }
+
+  /* Leichte Animation beim Laden */
+  .faq-detail-container {
+    animation: fadeInUp 0.6s ease-out both;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(25px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 </style>
+
 <div class="faq-detail-container">
   <a href="{% url 'list' %}" class="back-link">← {% trans "Back to list" %}</a>
 
   <h1>{{ faq.question }}</h1>
 
-  <!-- Kurzantwort / Hauptantwort -->
-  <section class="faq-main mt-6 prose prose-invert max-w-none">
+  <!-- Hauptinhalt -->
+  <section class="faq-main">
     {% if faq.short_answer %}
-      <p>{{ faq.short_answer|linebreaksbr }}</p>
+      <p>{{ faq.answer|safe }}</p>
     {% else %}
       {{ faq.answer|safe }}
     {% endif %}
   </section>
   <br>
-  <!-- Detailinhalt -->
   {% if faq.detail_content %}
-  <section class="faq-details mt-10 prose prose-invert max-w-none">
-    <h2>{% trans "More Details" %}</h2>
-    {{ faq.detail_content|safe }}
-  </section>
+    <section class="faq-details mt-10">
+      <h2>{% trans "More Details" %}</h2>
+      {{ faq.detail_content|safe }}
+    </section>
   {% endif %}
 </div>
 {% endblock %}
