@@ -682,12 +682,48 @@ def remove_from_cart(request, item_id):
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+import threading
 from django.contrib import messages
 from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from .paypal import create_paypal_order, capture_paypal_order
 from .models import Cart, Order, OrderItem, DiscountCode, AffiliateCode
+
+# --- Hilfsfunktion: E-Mails im Hintergrund ---
+def send_order_emails_async(order, request):
+    thread = threading.Thread(target=send_order_emails, args=(order, request))
+    thread.start()
+
+
+def send_order_emails(order, request):
+    """Versendet Bestellbestätigung an Kunde und Admin."""
+    from django.template.loader import render_to_string
+
+    # Kunde
+    subject_customer = 'Bestellbestätigung – Joel Digitals'
+    from_email = settings.DEFAULT_FROM_EMAIL
+    to_email = [order.email]
+
+    context = {'order': order, 'now': timezone.now()}
+    html_content = render_to_string('emails/order_customer_info.html', context)
+    text_content = render_to_string('emails/order_customer_info.txt', context)
+
+    msg = EmailMultiAlternatives(subject_customer, text_content, from_email, to_email)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
+    # Admin
+    subject_admin = f'Neue Bestellung #{order.id} von {order.first_name} {order.last_name}'
+    to_admin = ['buy.joel-digitals@gmx.de']
+    admin_context = {'order': order, 'order_url': request.build_absolute_uri(reverse('order_admin'))}
+    admin_html = render_to_string('emails/order_admin_notification.html', admin_context)
+    admin_text = render_to_string('emails/order_admin_notification.txt', admin_context)
+
+    admin_msg = EmailMultiAlternatives(subject_admin, admin_text, from_email, to_admin)
+    admin_msg.attach_alternative(admin_html, "text/html")
+    admin_msg.send()
+
 
 @login_required
 def checkout(request):
@@ -748,7 +784,7 @@ def checkout(request):
             if not wallet or not wallet.has_funds(final_total):
                 messages.error(request, 'Nicht genügend Guthaben im Wallet.')
                 return redirect('checkout')
-            
+
         if payment_method == 'lastschrift':
             if not account_holder or not iban:
                 messages.error(request, 'Bitte Kontoinhaber und IBAN für Lastschrift angeben.')
@@ -792,9 +828,9 @@ def checkout(request):
             discount_code_obj.times_used += 1
             discount_code_obj.save()
 
-        # Mails versenden
+        # E-Mails **asynchron** versenden
         try:
-            send_order_emails(order, request)
+            send_order_emails_async(order, request)
         except Exception as e:
             messages.error(request, f"Fehler beim Mailversand: {e}")
 
@@ -813,9 +849,10 @@ def checkout(request):
 
         # Banküberweisung
         if payment_method == 'überweisung':
+            from django.core.mail import send_mail
             send_mail(
                 subject='Zahlungsinformationen – Joel Digitals',
-                message=f'Bitte überweisen Sie {final_total:.2f} € auf unser Konto DE35 2022 0800 0056 4323 94. Verwendungszweck: Bestelllung #{order.id}.',
+                message=f'Bitte überweisen Sie {final_total:.2f} € auf unser Konto DE35 2022 0800 0056 4323 94. Verwendungszweck: Bestellung #{order.id}.',
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[email],
                 fail_silently=False
@@ -871,29 +908,6 @@ def checkout(request):
     }
     return render(request, 'apps/checkout.html', context)
 
-
-def send_order_emails(order, request):
-    subject_customer = 'Bestellbestätigung – Joel Digitals'
-    from_email = settings.DEFAULT_FROM_EMAIL
-    to_email = [order.email]
-
-    context = {'order': order, 'now': timezone.now()}
-    html_content = render_to_string('emails/order_customer_info.html', context)
-    text_content = render_to_string('emails/order_customer_info.txt', context)
-
-    msg = EmailMultiAlternatives(subject_customer, text_content, from_email, to_email)
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-
-    subject_admin = f'Neue Bestellung #{order.id} von {order.first_name} {order.last_name}'
-    to_admin = ['buy.joel-digitals@gmx.de']
-    admin_context = {'order': order, 'order_url': request.build_absolute_uri(reverse('order_admin'))}
-    admin_html = render_to_string('emails/order_admin_notification.html', admin_context)
-    admin_text = render_to_string('emails/order_admin_notification.txt', admin_context)
-
-    admin_msg = EmailMultiAlternatives(subject_admin, admin_text, from_email, to_admin)
-    admin_msg.attach_alternative(admin_html, "text/html")
-    admin_msg.send()
 
 @login_required
 def paypal_execute(request):
