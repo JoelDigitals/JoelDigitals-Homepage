@@ -150,7 +150,7 @@
 <main>
     <div class="post-container">
         <h2>{{ post.title }}</h2>
-        <p><em>{% trans "Published on" %} {{ post.created_at|date:"d.m.Y H:i" }}</em></p>
+        <p><em>{% trans "Published on" %} {{ post.published_at|date:"d.m.Y H:i" }}</em></p>
         <p><strong>👁️ {% trans "Views" %}:</strong> {{ post.views }}</p>
 
         {% if post.teaser_image %}

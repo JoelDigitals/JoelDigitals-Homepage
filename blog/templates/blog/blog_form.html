@@ -16,34 +16,19 @@
     font-size: 18px;
     color: #000;
 }
-
-h2 {
-    text-align: center;
-    margin-top: 0;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-label {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
+h2 { text-align: center; margin-top: 0; }
+form { display: flex; flex-direction: column; gap: 20px; }
+label { font-weight: bold; margin-bottom: 5px; }
 input[type="text"],
 input[type="file"],
-select,
-textarea {
+input[type="datetime-local"],
+select, textarea {
     width: 100%;
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
-
 .btn {
     display: inline-block;
     background-color: #0044cc;
@@ -55,25 +40,14 @@ textarea {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-
-.btn:hover {
-    background-color: #0033aa;
-}
-
-.btn-secondary {
-    background-color: #aaa;
-}
-
-.btn-secondary:hover {
-    background-color: #888;
-}
-
+.btn:hover { background-color: #0033aa; }
+.btn-secondary { background-color: #aaa; }
+.btn-secondary:hover { background-color: #888; }
 .lang-section {
     border: 1px solid #ccc;
     padding: 15px;
     border-radius: 8px;
 }
-
 .lang-section h3 {
     margin-top: 0;
     text-align: center;
@@ -99,6 +73,10 @@ textarea {
             {{ form.title_en.label_tag }} {{ form.title_en }}
             {{ form.content_en.label_tag }} {{ form.content_en }}
         </div>
+
+        <!-- Veröffentlichungsdatum -->
+        {{ form.published_at.label_tag }} 
+        {{ form.published_at }}
 
         {{ form.teaser_image.label_tag }} {{ form.teaser_image }}
         {{ form.is_published.label_tag }} {{ form.is_published }}

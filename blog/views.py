@@ -26,17 +26,33 @@ def is_blog_editor(user):
     return user.is_authenticated and user.groups.filter(name='Marketing').exists()
 
 
+from django.utils import timezone
+
 def blog_list(request):
-    lang = request.LANGUAGE_CODE  # automatisch ermittelt, z. B. 'de' oder 'en'
-    categories_with_posts = BlogCategory.objects.filter(posts__is_published=True).distinct()
+    lang = request.LANGUAGE_CODE
+    now = timezone.now()
+
+    # Zeige nur Posts, die veröffentlicht sind und deren Datum erreicht wurde
+    categories_with_posts = BlogCategory.objects.filter(
+        posts__is_published=True,
+        posts__published_at__lte=now
+    ).distinct()
+
     category_filters = request.GET.getlist("category")
 
     if category_filters:
-        posts = BlogPost.objects.filter(is_published=True, categories__id__in=category_filters).distinct().order_by("-created_at")
+        posts = BlogPost.objects.filter(
+            is_published=True,
+            published_at__lte=now,
+            categories__id__in=category_filters
+        ).distinct().order_by("-published_at", "-created_at")
     else:
-        posts = BlogPost.objects.filter(is_published=True).order_by("-created_at")
+        posts = BlogPost.objects.filter(
+            is_published=True,
+            published_at__lte=now
+        ).order_by("-published_at", "-created_at")
 
-    # Titel je nach Sprache
+    # Sprachabhängiger Titel & Teaser
     for post in posts:
         post.title = post.title_en if lang == "en" else post.title_de
         post.teaser_text = (post.content_en if lang == "en" else post.content_de)[:250]
@@ -104,16 +120,23 @@ def admin_blog(request):
         'user_groups': user_groups
     })
 
-@user_passes_test(is_blog_editor)
+@user_passes_test(lambda u: u.is_staff or u.groups.filter(name="BlogEditor").exists())
 def blog_create(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
+
     if request.method == 'POST':
         form = BlogPostForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            blog_post = form.save(commit=False)
+            if blog_post.is_published and not blog_post.published_at:
+                # Falls noch kein Datum gesetzt wurde, automatisch jetzt
+                blog_post.published_at = timezone.now()
+            blog_post.save()
+            form.save_m2m()
             return redirect('admin_blog')
     else:
         form = BlogPostForm()
+
     return render(request, 'blog/blog_form.html', {
         'form': form,
         'action': 'Erstellen',

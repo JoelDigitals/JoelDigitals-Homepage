@@ -18,6 +18,7 @@ class BlogPost(models.Model):
     content_en = RichTextField(verbose_name="Inhalt (EN)")
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+    published_at = models.DateTimeField(null=True, blank=True)
     is_published = models.BooleanField(default=True)
     categories = models.ManyToManyField(BlogCategory, related_name='posts', blank=True)
     views = models.PositiveIntegerField(default=0)

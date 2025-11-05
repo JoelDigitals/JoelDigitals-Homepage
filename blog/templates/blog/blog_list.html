@@ -180,7 +180,7 @@
             </div>
             <div>
                 <p class="blog-meta">
-                    <em>{% trans "Published on" %} {{ post.created_at|date:"d.m.Y" }}</em>
+                    <em>{% trans "Published on" %} {{ post.published_at|date:"d.m.Y" }}</em>
                     {% if post.views %}
                         • {{ post.views }} {% trans "views" %}
                     {% endif %}
