@@ -679,10 +679,13 @@ def remove_from_cart(request, item_id):
     cart_item.delete()
     return redirect('cart_view')
 # views.py (oder wo du den Checkout hast)
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 import threading
+import traceback
+from django.core.mail import get_connection
 from django.contrib import messages
 from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
@@ -696,33 +699,64 @@ def send_order_emails_async(order, request):
     thread.start()
 
 
+# --- Verbesserte E-Mail-Sendung mit parallelem Versand und Fehler-Logging ---
 def send_order_emails(order, request):
-    """Versendet Bestellbestätigung an Kunde und Admin."""
-    from django.template.loader import render_to_string
+    """
+    Sendet Bestellbestätigung an Kunde und Admin.
+    Läuft im Hintergrund und erzeugt eigene Mailverbindung.
+    """
+    try:
+        connection = get_connection()  # Neue SMTP-Verbindung pro Thread
+        from_email = settings.DEFAULT_FROM_EMAIL
 
-    # Kunde
-    subject_customer = 'Bestellbestätigung – Joel Digitals'
-    from_email = settings.DEFAULT_FROM_EMAIL
-    to_email = [order.email]
+        # === Kunde ===
+        subject_customer = "Bestellbestätigung – Joel Digitals"
+        to_email = [order.email]
+        context = {'order': order, 'now': timezone.now()}
+        html_content = render_to_string('emails/order_customer_info.html', context)
+        text_content = render_to_string('emails/order_customer_info.txt', context)
 
-    context = {'order': order, 'now': timezone.now()}
-    html_content = render_to_string('emails/order_customer_info.html', context)
-    text_content = render_to_string('emails/order_customer_info.txt', context)
+        msg_customer = EmailMultiAlternatives(
+            subject_customer,
+            text_content,
+            from_email,
+            to_email,
+            connection=connection
+        )
+        msg_customer.attach_alternative(html_content, "text/html")
 
-    msg = EmailMultiAlternatives(subject_customer, text_content, from_email, to_email)
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
+        # === Admin ===
+        subject_admin = f"Neue Bestellung #{order.id} von {order.first_name} {order.last_name}"
+        to_admin = ["buy.joel-digitals@gmx.de"]
+        admin_context = {
+            'order': order,
+            'order_url': request.build_absolute_uri(reverse('order_admin')),
+            'now': timezone.now()
+        }
+        admin_html = render_to_string('emails/order_admin_notification.html', admin_context)
+        admin_text = render_to_string('emails/order_admin_notification.txt', admin_context)
 
-    # Admin
-    subject_admin = f'Neue Bestellung #{order.id} von {order.first_name} {order.last_name}'
-    to_admin = ['buy.joel-digitals@gmx.de']
-    admin_context = {'order': order, 'order_url': request.build_absolute_uri(reverse('order_admin'))}
-    admin_html = render_to_string('emails/order_admin_notification.html', admin_context)
-    admin_text = render_to_string('emails/order_admin_notification.txt', admin_context)
+        msg_admin = EmailMultiAlternatives(
+            subject_admin,
+            admin_text,
+            from_email,
+            to_admin,
+            connection=connection
+        )
+        msg_admin.attach_alternative(admin_html, "text/html")
 
-    admin_msg = EmailMultiAlternatives(subject_admin, admin_text, from_email, to_admin)
-    admin_msg.attach_alternative(admin_html, "text/html")
-    admin_msg.send()
+        # === Beide Mails in einem Durchgang senden ===
+        connection.open()
+        msg_customer.send()
+        msg_admin.send()
+        connection.close()
+
+        print(f"[✓] E-Mails erfolgreich für Bestellung #{order.id} gesendet")
+
+    except Exception as e:
+        print(f"[✗] Fehler beim Senden der E-Mails für Bestellung #{order.id}: {e}")
+        print(traceback.format_exc())
+
 
 
 @login_required
