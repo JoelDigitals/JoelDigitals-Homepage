@@ -169,15 +169,13 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'mail.gmx.net'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'joel-digitals@gmx.de'
-EMAIL_HOST_PASSWORD = 'Jo240207!'
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'joel-digitals@gmx.de'
-COMPANY_EMAIL = 'joel-digitals@gmx.de'
-
+# SENDGRID as mail backend
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
+DEFAULT_FROM_EMAIL = "info.joel-digitals@gmx.de"
+COMPANY_EMAIL = "info.joel-digitals@gmx.de"
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+SENDGRID_ECHO_TO_STDOUT = False
 
 
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
