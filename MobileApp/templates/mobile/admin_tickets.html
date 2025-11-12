@@ -1,341 +1,172 @@
+{% extends "base_mobile.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Joel Digitals - Admin Support Tickets</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-        html, body {
-            margin: 0; padding: 0; height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
-            color: #222;
-            font-size: 18px;
-            display: flex;
-            flex-direction: column;
-        }
 
-        header {
-            background: linear-gradient(90deg, #0044cc, #0033aa);
-            color: white;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            flex-wrap: wrap;
-        }
+{% block title %}Admin Support Tickets – Joel Digitals{% endblock %}
 
-        header strong {
-            font-size: 1.4rem;
-        }
+{% block content %}
+<style>
+    .tickets-container {
+        background-color: #fff;
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
 
-        nav.desktop-nav {
-            display: flex;
-            gap: 20px;
-        }
+    h2 {
+        margin-top: 0;
+        color: #0044cc;
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 30px;
+        text-align: center;
+    }
 
-        nav.desktop-nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-        }
+    .btn {
+        display: inline-block;
+        background-color: #0044cc;
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 10px 5px 20px 0;
+        transition: background-color 0.2s ease;
+    }
 
-        nav.desktop-nav a:hover {
-            text-decoration: underline;
-        }
+    .btn:hover {
+        background-color: #1d00d9;
+    }
 
-        /* Hamburger Styles */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            cursor: pointer;
-        }
+    .ticket {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
 
-        .hamburger div {
-            width: 25px;
-            height: 3px;
-            background: white;
-        }
+    .status-open { color: red; font-weight: bold; }
+    .status-resolved { color: green; font-weight: bold; }
 
-        /* Mobile Navigation */
-        nav.mobile-nav {
-            display: none;
-            flex-direction: column;
-            background: #0033aa;
-            padding: 10px 0;
-        }
+    .priority-low { border-left: 8px solid #7EC8E3; }
+    .priority-medium { border-left: 8px solid #f0ad4e; }
+    .priority-high { border-left: 8px solid #d9534f; }
 
-        nav.mobile-nav a {
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-        }
+    .ticket form textarea,
+    .ticket form select,
+    .ticket form input[type="submit"] {
+        width: 100%;
+        margin-top: 10px;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
 
-        nav.mobile-nav a:hover {
-            background: #002288;
-        }
+    hr {
+        margin: 20px 0;
+        border: none;
+        border-top: 1px solid #ccc;
+    }
 
-        main {
-            flex: 1 0 auto;
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: auto;
-            width: 100%;
-            box-sizing: border-box;
+    h4 {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        color: #0044cc;
+    }
+
+    @media (max-width: 600px) {
+        .tickets-container {
+            padding: 30px 20px;
         }
 
         h2 {
-            margin-bottom: 30px;
+            font-size: 1.8rem;
         }
+    }
+</style>
 
-        .btn {
-            display: inline-block;
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 16px;
-            margin: 5px 5px 10px 0;
-            transition: background-color 0.2s ease-in-out;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background-color: #002a99;
-        }
-
-        .ticket {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-left: 8px solid #ccc;
-        }
-
-        .priority-low    { border-left-color: #7EC8E3; }
-        .priority-medium { border-left-color: #f0ad4e; }
-        .priority-high   { border-left-color: #d9534f; }
-
-        .status-open {
-            color: #d9534f;
-            font-weight: bold;
-        }
-
-        .status-resolved {
-            color: #5cb85c;
-            font-weight: bold;
-        }
-
-        .ticket form {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .ticket form label {
-            font-weight: 500;
-        }
-
-        .ticket form select,
-        .ticket form textarea,
-        .ticket form input[type="submit"] {
-            font-size: 16px;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .ticket form textarea {
-            resize: vertical;
-        }
-
-        .ticket form input[type="submit"] {
-            background-color: #0044cc;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        .ticket form input[type="submit"]:hover {
-            background-color: #002a99;
-        }
-
-        footer {
-            background-color: #0044cc;
-            color: #ccc;
-            padding: 30px 20px;
-            text-align: center;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        footer a {
-            color: #ccc;
-            text-decoration: none;
-            margin: 0 10px;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 768px) {
-            nav.desktop-nav {
-                display: none;
-            }
-            .hamburger {
-                display: flex;
-            }
-            nav.mobile-nav.show {
-                display: flex;
-            }
-            header {
-                flex-wrap: nowrap;
-                justify-content: space-between;
-            }
-            main {
-                padding: 20px 15px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            nav.mobile-nav a {
-                padding-left: 15px;
-            }
-        }
-    </style>
-</head>
-<body>
-<header>
-    <strong>Joel Digitals</strong>
-    <nav class="desktop-nav">
-        <a href="/mobile/">Home</a>
-        {% if user.is_authenticated %}
-            {% if "Selling" in user_groups %}<a href="/mobile/admin-sales/">Admin: Sales</a>{% endif %}
-            {% if "Support" in user_groups %}<a href="/mobile/admin-tickets/">Admin: Tickets</a>{% endif %}
-            <a href="/mobile/logout/">Logout</a>
-        {% else %}
-            <a href="/mobile/login/">Login</a>
-        {% endif %}
-    </nav>
-    <div class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu" role="button" tabindex="0">
-        <div></div>
-        <div></div>
-        <div></div>
-    </div>
-</header>
-
-<nav class="mobile-nav" id="mobileMenu">
-    <a href="/mobile/">Home</a>
-    {% if user.is_authenticated %}
-        {% if "Selling" in user_groups %}<a href="/mobile/admin-sales/">Admin: Sales</a>{% endif %}
-        {% if "Support" in user_groups %}<a href="/mobile/admin-tickets/">Admin: Tickets</a>{% endif %}
-        <a href="/mobile/logout/">Logout</a>
-    {% else %}
-        <a href="/mobile/login/">Login</a>
-    {% endif %}
-</nav>
-
-<main>
+<div class="tickets-container">
     <h2>🛠️ Admin Area: Support Tickets</h2>
 
     {% if tickets %}
-        <a href="{% url 'archive_ticket_app' %}" class="btn">📁 View Archived Tickets</a>
+        <a href="{% url 'archive_ticket_app' %}" class="btn">View Archived Tickets</a>
 
         {% for ticket in tickets %}
             {% if user.is_superuser or "SupportAdmin" in user_groups or ticket.assigned_to == user %}
-                <div class="ticket priority-{{ ticket.priority }}">
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
+            <div class="ticket priority-{{ ticket.priority }}">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
 
-                        <strong>{{ ticket.subject }}</strong> –
-                        <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
-                            {% if ticket.is_resolved %}Resolved{% else %}Open{% endif %}
-                        </span>
+                    <strong>{{ ticket.subject }}</strong> –
+                    <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
+                        {% if ticket.is_resolved %}Resolved{% else %}Open{% endif %}
+                    </span>
 
-                        <p>
-                            <strong>Assigned to:</strong> {{ ticket.assigned_to }}<br />
-                            <strong>Priority:</strong> {{ ticket.priority|title }}<br />
-                            <strong>Ticket Number:</strong> {{ ticket.ticket_number }}<br />
-                            <strong>App:</strong> {{ ticket.app_name }}<br />
-                            <strong>Platform:</strong> {{ ticket.platform }}<br />
-                            <strong>From:</strong> {{ ticket.email }}<br />
-                            <strong>Created:</strong> {{ ticket.created_at|date:"d.m.Y H:i" }}
-                        </p>
+                    <p>
+                        <strong>Assigned to:</strong> {{ ticket.assigned_to }}<br>
+                        <strong>Priority:</strong> {{ ticket.get_priority_display }}<br>
+                        <strong>Ticket Number:</strong> {{ ticket.ticket_number }}<br>
+                        <strong>App:</strong> {{ ticket.app_name }}<br>
+                        <strong>Platform:</strong> {{ ticket.platform }}
+                    </p>
 
-                        <p>{{ ticket.description|linebreaks }}</p>
+                    <p><strong>From:</strong> {{ ticket.email }}<br>
+                    <strong>Created:</strong> {{ ticket.created_at|date:"d.m.Y H:i" }}</p>
 
-                        {% if user.is_superuser or "SupportAdmin" in user_groups %}
-                            <label>Status:</label>
-                            <button type="submit" name="action" value="toggle" class="btn">
-                                {% if ticket.is_resolved %}Mark as Open{% else %}Mark as Resolved{% endif %}
-                            </button>
-                        {% else %}
-                            <p><strong>Status:</strong>
-                                <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
-                                    {% if ticket.is_resolved %}Resolved{% else %}Open{% endif %}
-                                </span>
-                            </p>
-                        {% endif %}
+                    <p>{{ ticket.description|linebreaks }}</p>
 
-                        <hr />
-                        <h4>Internal Notes</h4>
-                        {% for note in ticket.notes.all %}
-                            <p><small>{{ note.created_at|date:"d.m.Y H:i" }} by {{ note.author }}:</small><br />
-                            {{ note.text|linebreaks }}</p>
-                            <hr />
-                        {% empty %}
-                            <p><em>No notes yet.</em></p>
-                        {% endfor %}
+                    {% if user.is_superuser or "SupportAdmin" in user_groups %}
+                        <button type="submit" name="action" value="toggle" class="btn">
+                            {% if ticket.is_resolved %}Mark as Open{% else %}Mark as Resolved{% endif %}
+                        </button>
+                    {% endif %}
 
-                        {% if user.is_superuser or "SupportAdmin" in user_groups %}
-                            <label for="note-text-{{ ticket.id }}">Add Note:</label>
-                            <textarea id="note-text-{{ ticket.id }}" name="note_text" rows="3" placeholder="Write internal note..."></textarea>
-                            <button type="submit" name="action" value="add_note" class="btn">Add Note</button>
-                            <button href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">Zum Ticket-Chat</button>
-                        {% endif %}
-                    </form>
-                </div>
+                    <hr>
+                    <h4>Internal Notes</h4>
+                    {% for note in ticket.notes.all %}
+                        <p><strong>{{ note.author.get_full_name|default:note.author.username }}:</strong>
+                            {{ note.created_at|date:"d.m.Y H:i" }}<br>
+                            {{ note.note|linebreaks }}</p>
+                    {% empty %}
+                        <p><em>No notes yet.</em></p>
+                    {% endfor %}
+
+                    <label for="note">Add Note:</label>
+                    <textarea name="note" rows="3" placeholder="Internal note (visible only to Support)"></textarea>
+
+                    {% if user.is_superuser or "SupportAdmin" in user_groups %}
+                        <label>Assigned to:</label>
+                        <select name="assigned_to">
+                            {% for u in support_users %}
+                                <option value="{{ u.id }}" {% if ticket.assigned_to == u %}selected{% endif %}>
+                                    {{ u.get_full_name }} ({{ u.username }})
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <label>Priority:</label>
+                        <select name="priority">
+                            <option value="low" {% if ticket.priority == 'low' %}selected{% endif %}>Low</option>
+                            <option value="medium" {% if ticket.priority == 'medium' %}selected{% endif %}>Medium</option>
+                            <option value="high" {% if ticket.priority == 'high' %}selected{% endif %}>High</option>
+                        </select>
+                    {% endif %}
+
+                    <input type="submit" name="action" value="update" class="btn">
+                    <a href="{% url 'ticket_detail_app' ticket.ticket_number %}" class="btn">View Chat</a>
+                </form>
+            </div>
             {% endif %}
         {% endfor %}
     {% else %}
-        <p>No open tickets.</p>
+        <p>No tickets found.</p>
+        <a href="{% url 'archive_ticket_app' %}" class="btn">View Archived Tickets</a>
     {% endif %}
-</main>
-
-<footer>
-    © 2023 Joel Digitals
-    <a href="/mobile/contact/">Contact</a> | 
-    <a href="/mobile/wiki/">Wiki</a>
-</footer>
-
-<script>
-    function toggleMenu() {
-        const menu = document.getElementById('mobileMenu');
-        menu.classList.toggle('show');
-    }
-
-    // Optional: close mobile menu on link click (for better UX)
-    document.querySelectorAll('nav.mobile-nav a').forEach(link => {
-        link.addEventListener('click', () => {
-            document.getElementById('mobileMenu').classList.remove('show');
-        });
-    });
-</script>
-</body>
-</html>
+</div>
+{% endblock %}

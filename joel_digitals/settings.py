@@ -177,6 +177,13 @@ COMPANY_EMAIL = "info.joel-digitals@gmx.de"
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 SENDGRID_ECHO_TO_STDOUT = False
 
+# SENDGRID as mail backend
+#EMAIL_BACKEND = "django.core.mail.backends.base.BaseEmailBackend"
+# Brevo API Key
+#BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
+# Absender-Einstellungen
+#DEFAULT_FROM_EMAIL = "info.joel-digitals@gmx.de"
+#COMPANY_EMAIL = "info.joel-digitals@gmx.de"
 
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

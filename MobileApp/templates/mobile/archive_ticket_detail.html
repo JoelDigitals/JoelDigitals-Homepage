@@ -1,210 +1,92 @@
+{% extends "base_mobile.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Ticket {{ ticket.ticket_number }} – Archiv</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #bfb9b9;
-            color: #000;
-            font-size: 18px;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+
+{% block title %}Ticket {{ ticket.ticket_number }} – Archiv{% endblock %}
+
+{% block content %}
+<style>
+    .ticket-detail-container {
+        background-color: #fff;
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    h2 {
+        margin-top: 0;
+        color: #0044cc;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 30px;
+    }
+
+    p {
+        margin: 10px 0;
+        line-height: 1.5;
+    }
+
+    .btn {
+        display: inline-block;
+        background-color: #0044cc;
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-top: 20px;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn:hover {
+        background-color: #1d00d9;
+    }
+
+    .note {
+        background: #f0f0f0;
+        border-left: 4px solid #0044cc;
+        margin: 15px 0;
+        padding: 10px 15px;
+        border-radius: 4px;
+    }
+
+    .note-meta {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 5px;
+    }
+
+    footer {
+        margin-top: 50px;
+        text-align: center;
+        color: #aaa;
+        font-size: 14px;
+    }
+
+    footer a {
+        color: #999;
+        text-decoration: none;
+        margin: 0 8px;
+    }
+
+    @media (max-width: 600px) {
+        .ticket-detail-container {
+            padding: 30px 20px;
         }
-        header {
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            flex-shrink: 0;
-        }
-        header strong {
-            font-size: 1.3rem;
-        }
-        nav.desktop-nav {
-            display: flex;
-            gap: 20px;
-        }
-        nav.desktop-nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        nav.desktop-nav a:hover {
-            text-decoration: underline;
-        }
-        /* Hamburger Styles */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            cursor: pointer;
-        }
-        .hamburger div {
-            width: 25px;
-            height: 3px;
-            background: white;
-        }
-        /* Mobile Navigation */
-        nav.mobile-nav {
-            display: none;
-            flex-direction: column;
-            background: #0033aa;
-            padding: 10px 0;
-        }
-        nav.mobile-nav a {
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-        }
-        nav.mobile-nav a:hover {
-            background: #002288;
-        }
-        main {
-            flex: 1 0 auto;
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            box-sizing: border-box;
-            width: 100%;
-        }
+
         h2 {
-            margin-bottom: 25px;
+            font-size: 1.6rem;
         }
-        p {
-            margin: 10px 0;
-            line-height: 1.5;
-        }
-        a.button {
-            display: inline-block;
-            background-color: #0044cc;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
-        }
-        a.button:hover {
-            background-color: #1d00d9;
-        }
-        footer {
-            flex-shrink: 0;
-            background-color: #0044cc;
-            padding: 20px;
-            text-align: center;
-            color: #ccc;
-            border-top: 1px solid #ccc;
-            margin-top: 50px;
-        }
-        footer a {
-            color: #ccc;
-            text-decoration: none;
-            margin: 0 8px;
-            font-size: 14px;
-        }
-        footer a:hover {
-            text-decoration: underline;
-        }
-        .note {
-            background: #f0f0f0;
-            border-left: 4px solid #0044cc;
-            margin: 15px 0;
-            padding: 10px 15px;
-            border-radius: 4px;
-        }
-        .note-meta {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 5px;
-        }
-        @media (max-width: 768px) {
-            nav.desktop-nav {
-                display: none;
-            }
-            .hamburger {
-                display: flex;
-            }
-            nav.mobile-nav.show {
-                display: flex;
-            }
-            header {
-                justify-content: space-between;
-                flex-wrap: nowrap;
-            }
-            main {
-                padding: 20px 15px;
-            }
-        }
-        @media (max-width: 600px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            nav.mobile-nav a {
-                padding-left: 15px;
-            }
-        }
-    </style>
-</head>
-<body>
-<header>
-    <strong>Joel Digitals – Admin</strong>
-    <nav class="desktop-nav">
-        <a href="/mobile/">Home</a>
-        {% if user.is_authenticated %}
-            {% if "Selling" in user_groups %}
-                <a href="/mobile/admin-sales/">Admin: Sales</a>
-            {% endif %}
-            {% if "Support" in user_groups %}
-                <a href="/mobile/admin-tickets/">Admin: Tickets</a>
-            {% endif %}
-            <a href="/mobile/logout/">Logout</a>
-        {% else %}
-            <a href="/mobile/login/">Login</a>
-        {% endif %}
-    </nav>
-    <div class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu" role="button" tabindex="0">
-        <div></div>
-        <div></div>
-        <div></div>
-    </div>
-</header>
+    }
+</style>
 
-<nav class="mobile-nav" id="mobileMenu">
-    <a href="/mobile/">Home</a>
-    {% if user.is_authenticated %}
-        {% if "Selling" in user_groups %}
-            <a href="/mobile/admin-sales/">Admin: Sales</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/mobile/admin-tickets/">Admin: Tickets</a>
-        {% endif %}
-        <a href="/mobile/logout/">Logout</a>
-    {% else %}
-        <a href="/mobile/login/">Login</a>
-    {% endif %}
-</nav>
-
-<main>
+<div class="ticket-detail-container">
     <h2>🎫 Ticket-Details – {{ ticket.ticket_number }}</h2>
     <p><strong>Benutzer:</strong> {{ ticket.email }}</p>
     <p><strong>Betreff:</strong> {{ ticket.subject }}</p>
-    <p><strong>Status:</strong>
+    <p><strong>Status:</strong> 
         {% if ticket.is_resolved %}
             ✅ Erledigt
         {% else %}
@@ -214,7 +96,7 @@
     <p><strong>Erstellt am:</strong> {{ ticket.created_at|date:"d.m.Y H:i" }}</p>
     <p><strong>Bearbeitet von:</strong> {{ ticket.assigned_to }}</p>
     <p><strong>Erledigt am:</strong> {{ ticket.resolved_at|default:"–" }}</p>
-    <p><strong>Nachricht:</strong><br />{{ ticket.description|linebreaks }}</p>
+    <p><strong>Nachricht:</strong><br>{{ ticket.description|linebreaks }}</p>
 
     <h3>Notizen</h3>
     {% if ticket.notes.all %}
@@ -229,31 +111,10 @@
             </div>
         {% endfor %}
     {% else %}
-        <p>Keine Notizen vorhanden.</p>
+        <p><em>Keine Notizen vorhanden.</em></p>
     {% endif %}
 
-    <a href="{% url 'ticket_detail_app' ticket.ticket_number %}" class="button">🗨️ Zum Chat</a>
-</main>
+    <a href="{% url 'ticket_detail_app' ticket.ticket_number %}" class="btn">🗨️ Zum Chat</a>
+</div>
 
-<footer>
-    <a>&copy; 2025 Joel Digitals. All rights reserved.</a>
-    <p>
-        <a href="/imprint/">Imprint</a> |
-        <a href="/privacy/">Privacy Policy</a> |
-        <a href="/terms/">Terms of Service</a>
-    </p>
-</footer>
-
-<script>
-    function toggleMenu() {
-        const menu = document.getElementById('mobileMenu');
-        menu.classList.toggle('show');
-    }
-    document.querySelectorAll('nav.mobile-nav a').forEach(link => {
-        link.addEventListener('click', () => {
-            document.getElementById('mobileMenu').classList.remove('show');
-        });
-    });
-</script>
-</body>
-</html>
+{% endblock %}

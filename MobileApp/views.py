@@ -4,10 +4,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import send_mail
-from contact.forms import ContactForm, SalesWishForm, SupportTicketForm, TicketMessageForm
+from contact.forms import ContactForm, SalesWishForm, SupportTicketForm, TicketMessageForm, AppointmentForm
 from django.contrib import messages
 from django.http import HttpResponse
-from contact.models import SalesWish, SupportTicket, TicketMessage, SalesChatMessage, SalesEntry, TicketNote
+from contact.models import SalesWish, SupportTicket, TicketMessage, SalesChatMessage, SalesEntry, TicketNote, Appointment
 from django.contrib.admin.views.decorators import staff_member_required, user_passes_test
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -371,3 +371,127 @@ def ticket_detail_view_app(request, ticket_number):
         'ticket': ticket,
         'user_groups': [g.name for g in request.user.groups.all()],
     })
+
+def appointment_create_app(request):
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST)
+        if form.is_valid():
+            appointment = form.save()
+
+            # Mail an uns (intern)
+            admin_subject = f"Neue Terminbuchung von {appointment.first_name} {appointment.last_name}"
+            admin_message = (
+                f"Neue Terminbuchung:\n\n"
+                f"Name: {appointment.first_name} {appointment.last_name}\n"
+                f"E-Mail: {appointment.email}\n"
+                f"Telefon: {appointment.phone}\n"
+                f"Terminart: {appointment.appointment_type}\n"
+                f"Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n"
+            )
+
+            send_mail(
+                subject=admin_subject,
+                message=admin_message,
+                from_email='joel-digitals@gmx.de',
+                recipient_list=['Info.joel-digitals@gmx.de'],
+            )
+
+            # Mail an Kunden (Bestätigung)
+            client_subject = "Ihre Terminbuchung bei Joel Digitals"
+            client_message = (
+                f"Hallo {appointment.first_name},\n\n"
+                "vielen Dank für Ihre Terminbuchung bei Joel Digitals. Wir haben Ihre Anfrage erhalten und werden sie bald prüfen.\n\n"
+                f"Details Ihres Termins:\n"
+                f"- Terminart: {appointment.appointment_type}\n"
+                f"- Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n\n"
+                "Sie erhalten eine weitere E-Mail, sobald wir den Termin bestätigen oder ablehnen.\n\n"
+                "Mit freundlichen Grüßen\n"
+                "Ihr Joel Digitals Team"
+            )
+
+            send_mail(
+                subject=client_subject,
+                message=client_message,
+                from_email='joel-digitals@gmx.de',
+                recipient_list=[appointment.email],
+            )
+
+            return redirect('appointment_success')
+    else:
+        form = AppointmentForm()
+
+    return render(request, 'mobile/appointment_form.html', {'form': form})
+
+
+@login_required
+def appointment_admin_view_app(request):
+    pending = Appointment.objects.filter(status='pending').order_by('appointment_datetime')
+    accepted = Appointment.objects.filter(status='accepted').order_by('appointment_datetime')
+    rejected = Appointment.objects.filter(status='rejected').order_by('appointment_datetime')
+    return render(request, 'mobile/termin_admin.html', {
+        'pending': pending,
+        'accepted': accepted,
+        'rejected': rejected,
+    })
+
+
+@login_required
+def update_appointment_status_app(request, pk, status):
+    appointment = get_object_or_404(Appointment, pk=pk)
+    appointment.status = status
+    appointment.save()
+
+    # Automatische E-Mail
+    if status == 'accepted':
+        subject = "Termin bestätigt – Joel Digitals"
+        message = (
+            f"Hallo {appointment.first_name},\n\n"
+            f"Ihr Termin am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')} wurde bestätigt.\n\n"
+            "Wir freuen uns auf das Gespräch und stehen Ihnen bei Fragen jederzeit zur Verfügung.\n\n"
+            "Bitte beachten Sie, dass Sie den Termin bis zu 24 Stunden vorher absagen können.\n\n"
+            f"Details Ihres Termins:\n"
+            f"- Terminart: {appointment.appointment_type}\n"
+            f"- Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n\n"
+
+            "Bitte halten Sie sich den Termin frei und seien Sie pünktlich.\n\n" \
+            f"Bitte rufen sie und am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')} an unter der Nummer: +4915253480270 an\n\n"
+            "Mit freundlichen Grüßen\n"
+            "Bis bald!\nIhr Joel Digitals Team"
+        )
+    elif status == 'rejected':
+        subject = "Termin abgelehnt – Joel Digitals"
+        message = (
+            f"Hallo {appointment.first_name},\n\n"
+            f"Ihr Termin am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')} wurde leider abgelehnt.\n\n"
+            "Bitte buchen Sie ggf. einen neuen Termin.\n\n"
+            "Wir entschuldigen uns für die Unannehmlichkeiten und hoffen, dass wir bald einen passenden Termin finden.\n\n"
+            "Bitte buchen Sie ggf. einen neuen Termin über unsere Website oder nehmen sie über unser Kontaktformular/Ticketsystem Kontakt mit uns auf.\n\n"
+            
+            "Hier sind wir erreichbar:\n"
+            "https://joel-digitals.de/contact/\n\n"
+            "Telefon: +4915253480270\n\n"
+            "E-Mail: info.joel-digitals@gmx.de\n\n"
+
+            "Details Ihres Termins:\n"
+            f"- Terminart: {appointment.appointment_type}\n"
+            f"- Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n\n"
+            "Bitte zögern Sie nicht, uns bei Fragen zu kontaktieren.\n\n"
+            "Wir danken Ihnen für Ihr Verständnis und Ihre Geduld.\n\n"
+
+            "Mit freundlichen Grüßen\n"
+            "Ihr Joel Digitals Team"
+        )
+    else:
+        return redirect('appointment_admin_app')  # keine Mail bei pending
+
+    send_mail(
+        subject=subject,
+        message=message,
+        from_email='joel-digitals@gmx.de',
+        recipient_list=[appointment.email],
+    )
+
+    return redirect('appointment_admin')
+
+def appointment_success_app(request):
+    return render(request, 'mobile/appointment_success.html')

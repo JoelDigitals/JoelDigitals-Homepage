@@ -1,322 +1,176 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8" />
-    <title>Joel Digitals – Startseite</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-        :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --accent: #4f9dff;
-            --accent-hover: #1f78ff;
-            --text-color: #e0e0e0;
-            --muted: #999;
-            --admin: #ff9800;
-            --groups: #9c27b0;
-        }
+{% extends "base_mobile.html" %}
+{% load static i18n %}
 
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+{% block title %}{% trans "Startseite – Joel Digitals" %}{% endblock %}
 
-        header {
-            background-color: #1a1a1a;
-            color: white;
-            padding: 15px 25px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.7);
-        }
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
+<style>
+:root {
+    --bg-dark: #121212;
+    --card-bg: #1e1e1e;
+    --text-light: #fff;
+    --accent: #00bcd4;
+    --accent-hover: #26c6da;
+    --admin: #ff9800;
+    --divider: #2a2a2a;
+}
 
-        header strong {
-            font-size: 1.5rem;
-        }
+body { color: var(--text-light); }
 
-        nav.desktop-nav {
-            display: flex;
-            gap: 20px;
-        }
+.main-content { padding: 1.2rem; max-width: 900px; margin: 0 auto; }
 
-        nav.desktop-nav a,
-        nav.desktop-nav form button {
-            color: var(--accent);
-            text-decoration: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-        }
+.section-header {
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--divider);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.3rem;
+    color: var(--accent);
+}
+.section-header.admin { color: var(--admin); }
+.section-header span { font-size: 1.6rem; }
 
-        nav.desktop-nav a:hover,
-        nav.desktop-nav form button:hover {
-            color: var(--accent-hover);
-            text-decoration: underline;
-        }
+.welcome-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    margin-top: 1rem;
+}
 
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            cursor: pointer;
-        }
+.welcome-box {
+    background-color: var(--card-bg);
+    border-radius: 14px;
+    padding: 1.2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    border-left: 5px solid var(--accent);
+    transition: all 0.25s ease;
+}
+.welcome-box.admin { border-left-color: var(--admin); }
+.welcome-box:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.6); }
 
-        .hamburger div {
-            width: 25px;
-            height: 3px;
-            background: white;
-            border-radius: 2px;
-        }
+.welcome-box h2 {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+}
 
-        nav.mobile-nav {
-            display: none;
-            flex-direction: column;
-            background: #1a1a1a;
-            padding: 10px 0;
-        }
+.welcome-box ul { margin:0; padding-left:1rem; }
+.welcome-box li { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem; }
 
-        nav.mobile-nav a,
-        nav.mobile-nav form button {
-            color: var(--accent);
-            padding: 12px 20px;
-            text-decoration: none;
-            background: none;
-            border: none;
-            text-align: left;
-            cursor: pointer;
-            width: 100%;
-            font-size: 1em;
-            font-weight: bold;
-        }
+.welcome-box a { color: var(--accent); text-decoration: none; }
+.welcome-box a:hover { color: var(--accent-hover); text-decoration: underline; }
 
-        nav.mobile-nav a:hover,
-        nav.mobile-nav form button:hover {
-            background: #111;
-        }
+footer {
+    text-align:center;
+    padding:1rem;
+    color:#aaa;
+    font-size:0.9rem;
+    margin-top:2rem;
+    border-top:1px solid #222;
+}
+</style>
+{% endblock %}
 
-        main {
-            flex: 1 0 auto;
-            max-width: 960px;
-            margin: 40px auto;
-            padding: 0 20px;
-            box-sizing: border-box;
-            width: 100%;
-        }
+{% block content %}
+<div class="main-content">
 
-        h1 {
-            margin-bottom: 25px;
-            color: white;
-        }
-
-        .info-box {
-            background: var(--card-bg);
-            border-left: 5px solid var(--accent);
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-        }
-
-        .admin {
-            border-left-color: var(--admin);
-        }
-
-        .groups {
-            border-left-color: var(--groups);
-        }
-
-        ul {
-            margin-left: 1rem;
-        }
-
-        a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        a:hover {
-            text-decoration: underline;
-            color: var(--accent-hover);
-        }
-
-        footer {
-            background-color: #1a1a1a;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            color: var(--muted);
-            border-top: 1px solid #333;
-        }
-
-        footer a {
-            color: var(--muted);
-            text-decoration: none;
-            margin: 0 8px;
-        }
-
-        footer a:hover {
-            color: var(--accent);
-        }
-
-        @media (max-width: 768px) {
-            nav.desktop-nav {
-                display: none;
-            }
-            .hamburger {
-                display: flex;
-            }
-            nav.mobile-nav.show {
-                display: flex;
-            }
-            header {
-                flex-wrap: nowrap;
-            }
-        }
-
-        @media (max-width: 600px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            nav.mobile-nav a,
-            nav.mobile-nav form button {
-                padding-left: 15px;
-            }
-            main {
-                margin: 20px auto;
-            }
-        }
-    </style>
-</head>
-<body>
-
-<header>
-    <strong>Joel Digitals – Admin</strong>
-    <nav class="desktop-nav">
-        {% if user.is_authenticated %}
-            {% if "Selling" in user_groups %}
-                <a href="/mobile/admin-sales/">Admin: Sales</a>
-            {% endif %}
-            {% if "Support" in user_groups %}
-                <a href="/mobile/admin-tickets/">Admin: Tickets</a>
-            {% endif %}
-            <form method="post" action="{% url 'logout_app' %}">
-                {% csrf_token %}
-                <button type="submit" title="Logout">🚪 Logout ({{ user.username }})</button>
-            </form>
-        {% else %}
-            <a href="{% url 'login_app' %}">🔐 Login</a>
-        {% endif %}
-    </nav>
-    <div class="hamburger" onclick="toggleMenu()" aria-label="Navigation öffnen" role="button" tabindex="0">
-        <div></div>
-        <div></div>
-        <div></div>
+    <!-- Begrüßung -->
+    <div class="page-header" style="text-align:center; margin-bottom:1.5rem;">
+        <h2 style="display:flex;align-items:center;justify-content:center;gap:0.4rem;color:var(--accent);">
+            <span class="material-symbols-rounded">waving_hand</span>
+            {% trans "Willkommen bei Joel Digitals" %}
+        </h2>
+        <p style="color:#aaa;">{% trans "Hier findest du alle wichtigen Bereiche im Überblick." %}</p>
     </div>
-</header>
-
-<nav class="mobile-nav" id="mobileMenu">
-    {% if user.is_authenticated %}
-        {% if "Selling" in user_groups %}
-            <a href="/mobile/admin-sales/">Admin: Sales</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/mobile/admin-tickets/">Admin: Tickets</a>
-        {% endif %}
-        <form method="post" action="{% url 'logout_app' %}">
-            {% csrf_token %}
-            <button type="submit" title="Logout">🚪 Logout ({{ user.username }})</button>
-        </form>
-    {% else %}
-        <a href="{% url 'login_app' %}">🔐 Login</a>
-    {% endif %}
-</nav>
-
-<main>
-    <h1>Willkommen auf der Startseite!</h1>
 
     {% if user.is_authenticated %}
-        <div class="info-box admin">
-            <p><strong>Status:</strong><br>
-                {% if is_superuser %}
-                    🔑 Du bist ein <strong>Superuser</strong>.
-                {% else %}
-                    👤 Du bist ein normaler Benutzer.
-                {% endif %}
-            </p>
+    <!-- 🌐 Allgemeine Bereiche -->
+    <div class="section-header">
+        <span class="material-symbols-rounded">apps</span>
+        {% trans "Allgemeine Bereiche" %}
+    </div>
+    <div class="welcome-grid">
+        <div class="welcome-box">
+            <h2><span class="material-symbols-rounded">shopping_cart</span> {% trans "Verkauf" %}</h2>
+            <p>{% trans "Zugang zum Verkaufsbereich für Angebote und Kundenkommunikation." %}</p>
+            <a href="{% url 'sales_app' %}">{% trans "Zum Verkaufsbereich" %}</a>
         </div>
 
-        <div class="info-box groups">
-            <p><strong>Gruppenrechte:</strong></p>
-            <ul>
-                {% if user_groups %}
-                    {% for group in user_groups %}
-                        <li>✅ Mitglied in: <strong>{{ group }}</strong></li>
-                    {% endfor %}
-                {% else %}
-                    <li>❌ Keine Gruppenrechte</li>
-                {% endif %}
-            </ul>
+        <div class="welcome-box">
+            <h2><span class="material-symbols-rounded">confirmation_number</span> {% trans "Tickets" %}</h2>
+            <p>{% trans "Hier kannst du Support-Tickets einsehen oder erstellen." %}</p>
+            <a href="{% url 'support_tickets_app' %}">{% trans "Zu den Tickets" %}</a>
         </div>
 
-        <div class="info-box">
-            <p><strong>Verfügbare Bereiche:</strong></p>
-            <ul>
-                <li><a href="{% url 'sales_app' %}">🛒 Verkaufs-Kontakt</a></li>
-                <li><a href="{% url 'support_tickets_app' %}">🎫 Tickets</a></li>
-                {% if in_support_sales %}
-                    <li><a href="{% url 'admin_sales_app' %}">🛒 Verkaufs Admin</a></li>
-                {% endif %}
-                {% if in_support_tickets %}
-                    <li><a href="{% url 'admin_tickets_app' %}">🎫 Tickets Admin</a></li>
-                {% endif %}
-                {% if is_superuser %}
-                    <li><a href="/admin/">🔧 Adminseite</a></li>
-                {% endif %}
-            </ul>
+        <div class="welcome-box">
+            <h2><span class="material-symbols-rounded">event</span> {% trans "Termine" %}</h2>
+            <p>{% trans "Hier kannst du deine bevorstehenden Termine einsehen." %}</p>
+            <a href="{% url 'appointments_app' %}">{% trans "Zu deinen Terminen" %}</a>
         </div>
-    {% else %}
-        <div class="info-box">
-            <p>Du bist nicht eingeloggt. <a href="{% url 'login_app' %}">Hier einloggen</a>.</p>
+    </div>
+
+    <!-- 🛠 Admin- und Spezialbereiche -->
+    {% if is_superuser or in_support_sales or in_support_tickets %}
+    <div class="section-header admin">
+        <span class="material-symbols-rounded">admin_panel_settings</span>
+        {% trans "Admin- und Spezialbereiche" %}
+    </div>
+    <div class="welcome-grid">
+        {% if is_superuser %}
+        <div class="welcome-box admin">
+            <h2><span class="material-symbols-rounded">key</span> {% trans "Superuser-Bereich" %}</h2>
+            <p>{% trans "Voller Zugriff auf alle Systemfunktionen und Einstellungen." %}</p>
+            <a href="/admin/">{% trans "Webiste Admin öffnen" %}</a><br>
+            <a href="https://jds-management.de/admin/">{% trans "JDS Management Admin öffnen" %}</a><br>
+            <a href="https://jds-appstore.de/admin/">{% trans "JDS AppStore Admin öffnen" %}</a><br>
+            <a href="https://auftragnetz.de/admin/">{% trans "AuftragNetz Admin öffnen" %}</a><br>
         </div>
+        {% endif %}
+
+        {% if in_support_sales %}
+        <div class="welcome-box admin">
+            <h2><span class="material-symbols-rounded">store</span> {% trans "Verkauf (Admin)" %}</h2>
+            <p>{% trans "Verwaltung der Verkaufsanfragen und Teamaktivitäten." %}</p>
+            <a href="{% url 'admin_sales_app' %}">{% trans "Verkaufs-Admin öffnen" %}</a>
+        </div>
+        {% endif %}
+
+        {% if in_support_tickets %}
+        <div class="welcome-box admin">
+            <h2><span class="material-symbols-rounded">support_agent</span> {% trans "Tickets (Admin)" %}</h2>
+            <p>{% trans "Übersicht und Bearbeitung aller eingehenden Support-Tickets." %}</p>
+            <a href="{% url 'admin_tickets_app' %}">{% trans "Tickets-Admin öffnen" %}</a>
+        </div>
+        {% endif %}
+
+        {% if is_superuser or in_support_sales or in_support_tickets %}
+        <div class="welcome-box admin">
+            <h2><span class="material-symbols-rounded">event_available</span> {% trans "Termine (Admin)" %}</h2>
+            <p>{% trans "Verwalte alle Termine und Zugriffe für Teammitglieder." %}</p>
+            <a href="{% url 'admin_appointments_app' %}">{% trans "Termine-Admin öffnen" %}</a>
+        </div>
+        {% endif %}
+    </div>
     {% endif %}
-</main>
 
-<footer>
-    <a>&copy; 2025 Joel Digitals. Alle Rechte vorbehalten.</a>
-    <p>
-        <a href="/imprint/">Impressum</a> |
-        <a href="/privacy/">Datenschutz</a> |
-        <a href="/terms/">AGB</a>
-    </p>
-</footer>
+    {% else %}
+    <!-- Nicht eingeloggt -->
+    <div class="welcome-box" style="margin-top:2rem;">
+        <h2><span class="material-symbols-rounded">lock</span> {% trans "Nicht eingeloggt" %}</h2>
+        <p>{% trans "Du bist nicht eingeloggt." %} <a href="{% url 'login_app' %}">{% trans "Hier einloggen" %}</a></p>
+    </div>
+    {% endif %}
 
+</div>
+{% endblock %}
+
+{% block extra_js %}
 <script>
-    function toggleMenu() {
-        const menu = document.getElementById('mobileMenu');
-        menu.classList.toggle('show');
-    }
-    document.querySelectorAll('nav.mobile-nav a, nav.mobile-nav button').forEach(el => {
-        el.addEventListener('click', () => {
-            document.getElementById('mobileMenu').classList.remove('show');
-        });
-    });
+console.log("Startseite geladen mit getrennten Benutzer-, Adminbereichen und Terminen.");
 </script>
-
-</body>
-</html>
+{% endblock %}

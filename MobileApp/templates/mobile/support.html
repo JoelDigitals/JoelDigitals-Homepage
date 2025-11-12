@@ -1,284 +1,140 @@
+{% extends "base_mobile.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>Joel Digitals – Support</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --accent: #4f9dff;
-            --accent-hover: #1f78ff;
-            --text-color: #e0e0e0;
-            --muted: #999;
-        }
 
-        * { box-sizing: border-box; }
+{% block title %}Support & Tickets – Joel Digitals{% endblock %}
 
-        html, body {
-            margin: 0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
-            font-size: 18px;
-            line-height: 1.5;
-        }
+{% block content %}
+<style>
+    body, .support-container {
+        font-family: Arial, sans-serif;
+        color: #000;
+    }
 
-        /* Header & Navigation */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #1a1a1a;
-            padding: 18px 24px;
-            box-shadow: 0 2px 6px rgba(0,0,0,.4);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+    .support-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        background-color: #fff;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+    }
 
-        .brand {
-            font-weight: 700;
-            font-size: 1.4rem;
-            color: #fff;
-            letter-spacing: .5px;
-        }
+    h2 {
+        color: #0044cc;
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+    }
 
-        nav.desktop-nav {
-            display: flex;
-            gap: 20px;
-        }
-        nav.desktop-nav a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color .2s;
-        }
-        nav.desktop-nav a:hover { color: var(--accent-hover); }
+    form {
+        margin-bottom: 40px;
+    }
 
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            cursor: pointer;
-        }
-        .hamburger div {
-            width: 24px;
-            height: 3px;
-            background: #fff;
-            border-radius: 2px;
-        }
+    form label {
+        display: block;
+        margin-top: 10px;
+        font-weight: 600;
+    }
 
-        nav.mobile-nav {
-            display: none;
-            flex-direction: column;
-            background: #1a1a1a;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,.3);
-        }
-        nav.mobile-nav a {
-            padding: 14px 24px;
-            color: var(--accent);
-            font-weight: 600;
-            text-decoration: none;
-            border-top: 1px solid #333;
-        }
-        nav.mobile-nav.show { display: flex; }
+    input[type="text"], input[type="email"], textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
 
-        /* Main */
-        main {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
+    button.btn, input[type="submit"] {
+        background-color: #0044cc;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+    }
 
+    button.btn:hover, input[type="submit"]:hover {
+        background-color: #0033a0;
+    }
+
+    section {
+        margin-bottom: 40px;
+    }
+
+    .ticket {
+        background-color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .status-open {
+        color: red;
+        font-weight: 700;
+    }
+
+    .status-resolved {
+        color: green;
+        font-weight: 700;
+    }
+
+    small {
+        display: block;
+        margin-top: 5px;
+        color: #555;
+    }
+
+    a.btn {
+        display: inline-block;
+        margin-top: 10px;
+        text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+        .support-container {
+            padding: 30px 20px;
+        }
         h2 {
-            font-size: 2rem;
-            margin-bottom: 30px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 1.8rem;
         }
+    }
+</style>
 
-        /* Form */
-        form {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 8px;
-            margin-bottom: 40px;
-            box-shadow: 0 2px 8px rgba(0,0,0,.35);
-        }
-
-        label {
-            display: block;
-            margin-top: 16px;
-            font-weight: 600;
-            color: var(--text-color);
-        }
-
-        input, textarea {
-            width: 100%;
-            margin-top: 6px;
-            padding: 10px 12px;
-            border: 1px solid #444;
-            border-radius: 6px;
-            background: #222;
-            color: var(--text-color);
-            font-size: 16px;
-            transition: border-color .2s;
-        }
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 12px 24px;
-            margin-top: 20px;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background .2s;
-        }
-        .btn:hover { background: var(--accent-hover); }
-
-        /* Ticket list */
-        .ticket {
-            background: var(--card-bg);
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,.25);
-        }
-        .ticket strong {
-            font-size: 1.15rem;
-            color: #fff;
-        }
-        .status-open, .status-resolved {
-            font-size: .9rem;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-left: 8px;
-        }
-        .status-open   { background: #e74c3c; color: #fff; }
-        .status-resolved { background: #27ae60; color: #fff; }
-
-        small {
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        /* Footer */
-        footer {
-            background: #1a1a1a;
-            padding: 24px;
-            margin-top: 60px;
-            text-align: center;
-            color: var(--muted);
-            font-size: 14px;
-            border-top: 1px solid #333;
-        }
-        footer a {
-            color: var(--muted);
-            margin: 0 8px;
-            text-decoration: none;
-            transition: color .2s;
-        }
-        footer a:hover { color: var(--accent); }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            nav.desktop-nav { display: none; }
-            .hamburger { display: flex; }
-        }
-    </style>
-</head>
-<body>
-
-<header>
-    <div class="brand">Joel Digitals</div>
-
-    <!-- Mobile Hamburger -->
-    <div class="hamburger" onclick="toggleNav()">
-        <div></div><div></div><div></div>
-    </div>
-
-    <!-- Desktop Nav -->
-    <nav class="desktop-nav">
-        <a href="/mobile/">Home</a>
-        {% if user.is_authenticated %}
-            {% if "Selling" in user_groups %}
-                <a href="/mobile/admin-sales/">Admin: Sales</a>
-            {% endif %}
-            {% if "Support" in user_groups %}
-                <a href="/mobile/admin-tickets/">Admin: Tickets</a>
-            {% endif %}
-            <a href="/mobile/logout/">Logout</a>
-        {% else %}
-            <a href="/mobile/login/">Login</a>
-        {% endif %}
-    </nav>
-
-    <!-- Mobile Nav -->
-    <nav class="mobile-nav" id="mobileNav">
-        <a href="/mobile/">Home</a>
-        {% if user.is_authenticated %}
-            {% if "Selling" in user_groups %}
-                <a href="/mobile/admin-sales/">Admin: Sales</a>
-            {% endif %}
-            {% if "Support" in user_groups %}
-                <a href="/mobile/admin-tickets/">Admin: Tickets</a>
-            {% endif %}
-            <a href="/mobile/logout/">Logout</a>
-        {% else %}
-            <a href="/mobile/login/">Login</a>
-        {% endif %}
-    </nav>
-</header>
-
-<main>
+<div class="support-container">
     <h2>🛠️ Support & Ticketsystem</h2>
 
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button class="btn" type="submit">Ticket absenden</button>
+        <input type="submit" value="Ticket absenden">
     </form>
 
     <section>
         <h3>📋 Deine Tickets</h3>
         {% if tickets %}
             {% for ticket in tickets %}
-                <div class="ticket">
-                    <strong>{{ ticket.subject }}</strong>
+                <div class="ticket"> 
+                    <strong>{{ ticket.subject }}</strong> – 
                     <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
                         {% if ticket.is_resolved %}Gelöst{% else %}Offen{% endif %}
                     </span>
-
-                    <p style="margin: 8px 0 12px;">{{ ticket.description|linebreaks }}</p>
-
-                    <small>
-                        Ticket-ID: {{ ticket.ticket_number }}<br>
-                        Erstellt: {{ ticket.created_at|date:"d.m.Y H:i" }}<br>
-                        App: {{ ticket.app_name }} | Plattform: {{ ticket.platform }}
-                        {% if ticket.is_resolved %}<br>Gelöst: {{ ticket.resolved_at|date:"d.m.Y H:i" }}{% endif %}
-                    </small>
-
+                    <p>{{ ticket.description|linebreaks }}</p>
+                    <small>Ticket-ID: {{ ticket.ticket_number }} | Erstellt am {{ ticket.created_at|date:"d.m.Y H:i" }}</small>
+                    <small>App: {{ ticket.app_name }} | Plattform: {{ ticket.platform }}</small>
+                    {% if ticket.is_resolved %}
+                        <small>Gelöst am {{ ticket.resolved_at|date:"d.m.Y H:i" }}</small>
+                    {% endif %}
                     {% if not ticket.is_archived %}
-                        <br><br>
                         <a href="{% url 'ticket_detail_app' ticket.ticket_number %}" class="btn">Zum Ticket-Chat</a>
                     {% endif %}
                 </div>
@@ -287,21 +143,5 @@
             <p>Du hast noch keine Support-Tickets eingereicht.</p>
         {% endif %}
     </section>
-</main>
-
-<footer>
-    <p>&copy; 2025 Joel Digitals. All rights reserved.</p>
-    <p>
-        <a href="/imprint/">Impressum</a> |
-        <a href="/privacy/">Datenschutz</a> |
-        <a href="/terms/">AGB</a>
-    </p>
-</footer>
-
-<script>
-    function toggleNav() {
-        document.getElementById('mobileNav').classList.toggle('show');
-    }
-</script>
-</body>
-</html>
+</div>
+{% endblock %}

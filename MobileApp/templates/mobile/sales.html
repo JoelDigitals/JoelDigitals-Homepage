@@ -1,389 +1,207 @@
+{% extends "base_mobile.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8" />
-    <title>Joel Digitals – Sales & Wishlist</title>
-    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-        :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --accent: #4f9dff;
-            --accent-hover: #1f78ff;
-            --text-color: #e0e0e0;
-            --muted: #999;
+
+{% block title %}Sales / Wishlist – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+    .sales-container {
+        background-color: #fff;
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    h2 {
+        margin-top: 0;
+        color: #0044cc;
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    form label {
+        display: block;
+        margin-top: 15px;
+        font-weight: 600;
+        color: #0044cc;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea {
+        width: 100%;
+        padding: 8px 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-family: inherit;
+        box-sizing: border-box;
+        resize: vertical;
+    }
+
+    textarea {
+        min-height: 80px;
+    }
+
+    button.btn {
+        margin-top: 20px;
+        background-color: #0044cc;
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button.btn:hover,
+    button.btn:focus {
+        background-color: #003399;
+        outline: none;
+    }
+
+    #wish-form-container {
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        padding: 15px 20px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    .wish-field {
+        margin-bottom: 15px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+    }
+
+    .wish-field:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    #wish-fields label {
+        margin-top: 10px;
+    }
+
+    h3 {
+        color: #0044cc;
+        margin-top: 0;
+    }
+
+    .entry {
+        margin-bottom: 30px;
+        padding: 15px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    }
+
+    .entry strong {
+        color: #0044cc;
+    }
+
+    .entry ul {
+        margin-top: 8px;
+        padding-left: 20px;
+    }
+
+    .entry a.btn {
+        display: inline-block;
+        margin-top: 10px;
+        background-color: #0066ff;
+        padding: 8px 14px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        text-decoration: none;
+        color: white;
+        transition: background-color 0.3s ease;
+    }
+
+    .entry a.btn:hover,
+    .entry a.btn:focus {
+        background-color: #0044cc;
+        outline: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+        .sales-container {
+            padding: 30px 20px;
         }
 
-        html, body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-size: 18px;
+        h2 {
+            font-size: 1.8rem;
         }
+    }
+</style>
 
-        header {
-            background-color: #1a1a1a;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.7);
-        }
+<div class="sales-container">
+    <h2>Sales / Wishlist</h2>
 
-        header strong {
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        nav.desktop-nav {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        nav.desktop-nav a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        nav.desktop-nav a:hover {
-            color: var(--accent-hover);
-            text-decoration: underline;
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            cursor: pointer;
-        }
-
-        .hamburger div {
-            width: 25px;
-            height: 3px;
-            background: white;
-            border-radius: 2px;
-        }
-
-        nav.mobile-nav {
-            display: none;
-            flex-direction: column;
-            background: #1a1a1a;
-            padding: 10px 0;
-        }
-
-        nav.mobile-nav a {
-            color: var(--accent);
-            padding: 12px 20px;
-            text-decoration: none;
-            background: none;
-            border: none;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        nav.mobile-nav.show {
-            display: flex;
-        }
-
-        main {
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: auto;
-        }
-
-        form label {
-            display: block;
-            margin-top: 10px;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 4px;
-            border: 1px solid #555;
-            background: #222;
-            color: var(--text-color);
-        }
-
-        .btn {
-            background-color: var(--accent);
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            margin-top: 15px;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .wish-field {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: var(--card-bg);
-            border-radius: 6px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
-        }
-
-        table, th, td {
-            border: 1px solid #444;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-
-        .entry-box {
-            margin-bottom: 30px;
-            padding: 15px;
-            background: var(--card-bg);
-            border-radius: 8px;
-        }
-
-        footer {
-            background-color: #1a1a1a;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 50px;
-            color: var(--muted);
-            border-top: 1px solid #333;
-        }
-
-        footer a {
-            color: var(--muted);
-            text-decoration: none;
-            margin: 0 8px;
-        }
-
-        footer a:hover {
-            color: var(--accent);
-        }
-
-        #cookie-banner {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #333;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            z-index: 1000;
-        }
-
-        #cookie-banner button {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            margin-left: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        #cookie-banner button:hover {
-            background-color: var(--accent-hover);
-        }
-
-        #language-switch {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: white;
-            padding: 5px;
-            border-radius: 5px;
-            font-size: 14px;
-            z-index: 1001;
-        }
-
-        #language-switch select {
-            font-size: 14px;
-            padding: 2px 6px;
-        }
-
-        @media (max-width: 768px) {
-            nav.desktop-nav {
-                display: none;
-            }
-            .hamburger {
-                display: flex;
-            }
-        }
-
-        @media (max-width: 600px) {
-            main {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-
-<!-- Header -->
-<header>
-    <strong>Joel Digitals – Sales & Wishlist</strong>
-    <nav class="desktop-nav">
-        <a href="/mobile/">🏠 Home</a>
-        {% if user.is_authenticated %}
-            {% if "Selling" in user_groups %}
-                <a href="/mobile/admin-sales/">Admin: Sales</a>
-            {% endif %}
-            {% if "Support" in user_groups %}
-                <a href="/mobile/admin-tickets/">Admin: Tickets</a>
-            {% endif %}
-            <a href="/mobile/logout/">🚪 Logout</a>
-        {% else %}
-            <a href="/mobile/login/">🔐 Login</a>
-        {% endif %}
-    </nav>
-    <div class="hamburger" onclick="toggleMenu()">
-        <div></div><div></div><div></div>
-    </div>
-</header>
-
-<nav class="mobile-nav" id="mobileMenu">
-    <a href="/mobile/">🏠 Home</a>
-    {% if user.is_authenticated %}
-        {% if "Selling" in user_groups %}
-            <a href="/mobile/admin-sales/">Admin: Sales</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/mobile/admin-tickets/">Admin: Tickets</a>
-        {% endif %}
-        <a href="/mobile/logout/">🚪 Logout</a>
-    {% else %}
-        <a href="/mobile/login/">🔐 Login</a>
-    {% endif %}
-</nav>
-
-<!-- Main Content -->
-<main>
-    <h2>📥 Wunschliste / Sales</h2>
-
-    <form action="{% url 'sales_app' %}" method="POST" id="wish-form">
+    <form action="{% url 'sales_app' %}" method="POST" id="wish-form">           
         {% csrf_token %}
-        <label for="name">Dein Name:</label>
+        <label for="name">Your Name:</label>
         <input type="text" name="name" id="name" required>
 
-        <label for="email">Deine E-Mail:</label>
+        <label for="email">Your Email:</label>
         <input type="email" name="email" id="email" required>
 
-        <label for="subject">Betreff:</label>
+        <label for="subject">Subject:</label>
         <input type="text" name="subject" id="subject" required>
 
-        <label for="message">Nachricht:</label>
+        <label for="message">Message:</label>
         <textarea name="message" id="message" rows="4"></textarea>
 
-        <button type="button" class="btn" id="open-wish-form">➕ Wunsch hinzufügen</button>
+        <button type="button" class="btn" id="open-wish-form">Add Wish</button>
 
         <div id="wish-form-container" style="display: none;">
-            <h3>🎯 Wünsche</h3>
+            <h3>Add Wishes</h3>
             <div id="wish-fields">
                 <div class="wish-field">
-                    <label for="wish-title-0">Titel:</label>
+                    <label for="wish-title-0">Wish Title:</label>
                     <input type="text" name="wishes[0][title]" id="wish-title-0" required>
-                    <label for="wish-description-0">Beschreibung:</label>
+
+                    <label for="wish-description-0">Description:</label>
                     <textarea name="wishes[0][description]" id="wish-description-0" required></textarea>
                 </div>
             </div>
-            <button type="button" class="btn" id="add-wish">➕ Weiteren Wunsch</button>
+            <button type="button" class="btn" id="add-wish">Add Another Wish</button>
         </div>
 
-        <button type="submit" class="btn">📨 Absenden</button>
+        <button type="submit" class="btn">Submit Form</button>
     </form>
 
-    <h3>📝 Deine bisherigen Einträge</h3>
+    <h3 style="margin-top: 40px; text-align: center;">All submitted entries</h3>
     {% for entry in entries %}
-        <div class="entry-box">
+        <div class="entry">
             <strong>Name:</strong> {{ entry.name }}<br>
             <strong>Email:</strong> {{ entry.email }}<br>
-            <strong>Betreff:</strong> {{ entry.subject }}<br>
-            <strong>Nachricht:</strong> {{ entry.message }}<br>
-            <strong>Gesendet am:</strong> {{ entry.created_at|date:"d.m.Y H:i" }}<br>
-            <strong>Wünsche:</strong>
+            <strong>Subject:</strong> {{ entry.subject }}<br>
+            <strong>Message:</strong> {{ entry.message }}<br>
+            <strong>Submitted at:</strong> {{ entry.created_at }}<br>
+            <strong>Wishes:</strong>
             <ul>
                 {% for wish in entry.wishes.all %}
                     <li><strong>{{ wish.title }}:</strong> {{ wish.description }}</li>
                 {% endfor %}
             </ul>
-            <a href="{% url 'sales_chat_app' entry.id %}" class="btn">💬 Chat öffnen</a>
+            <a href="{% url 'sales_chat_app' entry.id %}" class="btn">Chat</a>
         </div>
     {% empty %}
-        <p>❌ Noch keine Einträge vorhanden.</p>
+        <p style="text-align: center;">You haven't submitted any wishes yet.</p>
     {% endfor %}
-</main>
-
-<!-- Footer -->
-<footer>
-    <div>&copy; 2025 Joel Digitals. Alle Rechte vorbehalten.</div>
-    <p>
-        <a href="/imprint/">Impressum</a> |
-        <a href="/privacy/">Datenschutz</a>
-    </p>
-</footer>
-
-<!-- Cookie-Banner -->
-<div id="cookie-banner">
-    <span id="cookie-text">Wir verwenden Cookies, um Ihre Erfahrung zu verbessern.</span>
-    <button onclick="acceptCookies()">Akzeptieren</button>
 </div>
 
-<!-- JS -->
 <script>
-    function toggleMenu() {
-        const menu = document.getElementById('mobileMenu');
-        menu.classList.toggle('show');
-    }
-
-    const cookieBanner = document.getElementById("cookie-banner");
-    const cookieText = document.getElementById("cookie-text");
-    const languageSelect = document.getElementById("language-select");
-
-    function acceptCookies() {
-        localStorage.setItem("cookiesAccepted", "true");
-        cookieBanner.style.display = "none";
-    }
-
-    function checkCookieConsent() {
-        if (localStorage.getItem("cookiesAccepted") === "true") {
-            cookieBanner.style.display = "none";
-        }
-    }
-
-    function updateLanguageText(lang) {
-        const texts = {
-            de: "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern.",
-            en: "We use cookies to improve your experience.",
-            fr: "Nous utilisons des cookies pour améliorer votre expérience."
-        };
-        cookieText.textContent = texts[lang] || texts["de"];
-    }
-
-    languageSelect.addEventListener("change", (e) => {
-        const lang = e.target.value;
-        updateLanguageText(lang);
-    });
-
-    document.addEventListener("DOMContentLoaded", () => {
-        checkCookieConsent();
-        updateLanguageText("de");
-    });
-
     document.getElementById('open-wish-form').onclick = function() {
         const formContainer = document.getElementById('wish-form-container');
         formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
@@ -396,14 +214,13 @@
         newWishField.className = 'wish-field';
 
         newWishField.innerHTML = `
-            <label for="wish-title-${wishCount}">Titel:</label>
+            <label for="wish-title-${wishCount}">Wish Title:</label>
             <input type="text" name="wishes[${wishCount}][title]" id="wish-title-${wishCount}" required>
-            <label for="wish-description-${wishCount}">Beschreibung:</label>
+
+            <label for="wish-description-${wishCount}">Description:</label>
             <textarea name="wishes[${wishCount}][description]" id="wish-description-${wishCount}" required></textarea>
         `;
         wishFields.appendChild(newWishField);
     };
 </script>
-
-</body>
-</html>
+{% endblock %}

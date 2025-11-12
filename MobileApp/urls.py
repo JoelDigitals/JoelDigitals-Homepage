@@ -19,4 +19,6 @@ urlpatterns = [
     path('admin-sales/<int:entry_id>/edit/<int:wish_id>/', views.edit_wish_app, name='edit_wish_app'),
     path('admin-sales/<int:entry_id>/delete/<int:wish_id>/', views.delete_wish_app, name='delete_wish_app'),
     path('admin-sales/<int:entry_id>/export/<int:wish_id>/', views.export_single_wish_app, name='export_single_wish_app'),
+    path('appointments/', views.appointment_create_app, name='appointments_app'),
+    path('admin-appointments/', views.appointment_admin_view_app, name='admin_appointments_app'),
 ]

@@ -1,0 +1,207 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}Joel Digitals Support{% endblock %}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet">
+
+<style>
+:root {
+    --bg: #0d0d0d;
+    --surface: #181818;
+    --accent: #00bcd4;
+    --accent-hover: #26c6da;
+    --text: #f5f5f5;
+    --muted: #9ca3af;
+    --radius: 14px;
+    --admin: #ff9800;
+}
+
+* { box-sizing: border-box; margin:0; padding:0; }
+
+html, body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden; /* fix horizontales Scrollen */
+}
+
+a { color: var(--accent); text-decoration: none; transition: color 0.2s ease; }
+a:hover { color: var(--accent-hover); }
+
+/* Header / Navigation */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(24,24,24,0.95);
+    backdrop-filter: blur(10px);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #222;
+}
+
+.brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.2rem; }
+.brand img { height:30px; width:30px; border-radius:8px; }
+
+/* Mobile Menü Button */
+.menu-toggle { display:flex; flex-direction:column; gap:4px; background:none; border:none; cursor:pointer; z-index:200; }
+.menu-toggle div { width:25px; height:3px; background: var(--text); border-radius:2px; transition: all 0.3s ease; }
+
+/* Mobile Navigation */
+nav {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    height: 100vh;
+    width: 75%;
+    max-width: 300px;
+    background: var(--surface);
+    box-shadow: -3px 0 12px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    padding: 80px 20px;
+    gap: 15px;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+}
+
+nav.show { right:0; }
+
+/* Links */
+nav a, nav form button {
+    color: var(--text);
+    font-size:1rem;
+    font-weight:600;
+    border:none;
+    background:none;
+    text-align:left;
+    padding:12px 10px;
+    border-radius: var(--radius);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+    transition: background 0.2s, color 0.2s;
+    width:100%;
+}
+
+nav a:hover, nav form button:hover { background: rgba(255,255,255,0.05); color: var(--accent-hover); }
+
+/* Desktop Navigation */
+.desktop-nav { display:none; gap:25px; align-items:center; }
+.desktop-nav a, .desktop-nav form button { background:none; border:none; color:var(--text); font-weight:600; font-size:0.95rem; cursor:pointer; transition: color 0.2s; }
+.desktop-nav a:hover, .desktop-nav form button:hover { color: var(--accent-hover); }
+
+/* Main */
+main { flex:1; width:100%; max-width:960px; margin:0 auto; padding:20px; animation: fadeIn 0.4s ease; overflow-x:hidden; }
+
+/* Footer */
+footer { background: var(--surface); text-align:center; padding:15px; font-size:0.85rem; color:var(--muted); border-top:1px solid #222; width:100%; }
+footer a { color: var(--muted); margin:0 6px; }
+footer a:hover { color: var(--accent); }
+
+/* Animation */
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+/* Responsive */
+@media(min-width:768px) {
+    .menu-toggle { display:none; }
+    nav { display:none; }
+    .desktop-nav { display:flex; }
+}
+</style>
+
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="{% static 'favicon.png' %}" alt="Logo">
+        <span>Joel Digitals</span>
+    </div>
+
+    <!-- Desktop -->
+    <div class="desktop-nav">
+        {% if user.is_authenticated %}
+            {% if "Support" in user_groups %}
+                <a href="/mobile/admin-tickets/"><span class="material-symbols-rounded">confirmation_number</span> {% trans "Tickets" %}</a>
+            {% endif %}
+            {% if "Selling" in user_groups %}
+                <a href="/mobile/admin-sales/"><span class="material-symbols-rounded">storefront</span> {% trans "Sales" %}</a>
+            {% endif %}
+            <a href="/mobile/admin-dashboard/"><span class="material-symbols-rounded">dashboard</span> {% trans "Dashboard" %}</a>
+            <form method="post" action="{% url 'logout_app' %}">
+                {% csrf_token %}
+                <button type="submit"><span class="material-symbols-rounded">logout</span> {% trans "Logout" %}</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login_app' %}"><span class="material-symbols-rounded">login</span> {% trans "Login" %}</a>
+        {% endif %}
+    </div>
+
+    <!-- Mobile Button -->
+    <button class="menu-toggle" onclick="toggleMenu()" aria-label="Menü öffnen">
+        <div></div><div></div><div></div>
+    </button>
+
+    <!-- Mobile Menu -->
+    <nav id="mobileNav">
+        <a href="/mobile/"><span class="material-symbols-rounded">home</span> {% trans "Home" %}</a>
+        {% if user.is_authenticated %}
+            {% if "Support" in user_groups %}
+                <a href="/mobile/admin-tickets/"><span class="material-symbols-rounded">confirmation_number</span> {% trans "Admin: Tickets" %}</a>
+            {% endif %}
+            {% if "Selling" in user_groups %}
+                <a href="/mobile/admin-sales/"><span class="material-symbols-rounded">storefront</span> {% trans "Admin: Sales" %}</a>
+            {% endif %}
+            <a href="/mobile/admin-tickets/"><span class="material-symbols-rounded">confirmation_number</span> {% trans "Tickets" %}</a>
+            <a href="/mobile/admin-tickets/"><span class="material-symbols-rounded">storefront</span> {% trans "Sales" %}</a>
+            <form method="post" action="{% url 'logout_app' %}">
+                {% csrf_token %}
+                <button type="submit"><span class="material-symbols-rounded">logout</span> {% trans "Logout" %}</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login_app' %}"><span class="material-symbols-rounded">login</span> {% trans "Login" %}</a>
+        {% endif %}
+    </nav>
+</header>
+
+<main>
+{% block content %}{% endblock %}
+</main>
+
+<footer>
+    &copy; 2025 Joel Digitals · 
+    <a href="/imprint/">{% trans "Impressum" %}</a> ·
+    <a href="/privacy/">{% trans "Datenschutz" %}</a> ·
+    <a href="/terms/">{% trans "AGB" %}</a>
+</footer>
+
+<script>
+function toggleMenu() {
+    const nav = document.getElementById('mobileNav');
+    const body = document.body;
+    nav.classList.toggle('show');
+    body.style.overflow = nav.classList.contains('show') ? 'hidden' : 'auto';
+}
+document.querySelectorAll('nav a, nav button').forEach(el=>{
+    el.addEventListener('click', ()=> {
+        document.getElementById('mobileNav').classList.remove('show');
+        document.body.style.overflow = 'auto';
+    });
+});
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>
