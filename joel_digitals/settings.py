@@ -172,8 +172,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # SENDGRID as mail backend
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
-DEFAULT_FROM_EMAIL = "info.joel-digitals@gmx.de"
-COMPANY_EMAIL = "info.joel-digitals@gmx.de"
+DEFAULT_FROM_EMAIL = "info@joel-digitals.com"
+COMPANY_EMAIL = "info@joel-digitals.com"
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 SENDGRID_ECHO_TO_STDOUT = False
 
@@ -182,8 +182,8 @@ SENDGRID_ECHO_TO_STDOUT = False
 # Brevo API Key
 #BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
 # Absender-Einstellungen
-#DEFAULT_FROM_EMAIL = "info.joel-digitals@gmx.de"
-#COMPANY_EMAIL = "info.joel-digitals@gmx.de"
+#DEFAULT_FROM_EMAIL = "info@joel-digitals.com"
+#COMPANY_EMAIL = "info@joel-digitals.com"
 
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

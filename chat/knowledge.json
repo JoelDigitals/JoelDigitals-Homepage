@@ -80,7 +80,7 @@
         "benachrichtigungen": "E-Mail-Erinnerungen für Deadlines, Aufgaben und Meetings",
         "mobile_app": "iOS & Android App zur mobilen Verwaltung unterwegs"
       },
-      "preis": "Kostenlos testen für 14 Tage, anschließend einmalg bezahlen. Alle Peise im Shop: https://joel-digitals.de/de/shop/?group=1",
+      "preis": "Kostenlos testen für 14 Tage, anschließend einmalg bezahlen ab 74,99€. Alle Peise im Shop: https://joel-digitals.de/de/shop/?group=1",
       "docs": "https://joel-digitals.de/our-apps/JDS-Management/",
       "register": "https://jds-management.de/register",
       "testversion": "Kostenlos testen mit dem Registrierungs Code: Test_14. https://jds-management.de/register"
@@ -97,7 +97,7 @@
         "statistiken": "Übersicht über vergangene Aufträge, Auslastung und Budget",
         "leadlist": "Liste mit Suchen nach deinen Produkten"
       },
-      "preis": "Kostenlos mit eingeschränkten Funktionen. Medium-Version: 199,99€/Jahr, Company-Version: 399,99€/Jahr",
+      "preis": "Kostenlos mit eingeschränkten Funktionen. Medium-Version: 99,99€/Jahr, Company-Version: 249,99€/Jahr",
       "docs": "https://joel-digitals.de/our-apps/auftragnetz/"
     },
     "jds_appstore": {
@@ -119,7 +119,7 @@
         "Social Media Branding",
         "Print-Materialien (Visitenkarten, Flyer, Broschüren)"
       ],
-      "preis": "je nach Umfang",
+      "preis": "je nach Umfang ab 44,99€ (nur eine kleine Skizze und Reinzeichung) größerer Umfang 40€ pro Stunde",
       "kontakt": "https://joel-digitals.de/our-apps/logo/"
     },
     "support": {
@@ -165,6 +165,49 @@
         "SEO-Optimierung"
       ],
       "preis": "80€/Stunde oder Pauschalpreise je nach Projekt"
+    },
+    "Black Friday": {
+      "name": "Black Friday Angebote",
+      "beschreibung": "Jedes Jahr am Black Friday (letzter Freitag im November) bieten wir spezielle Rabatte auf unsere Produkte und Dienstleistungen an.",
+      "angebote": [
+        "Rabatte auf Software-Lizenzen",
+        "Sonderpreise für Webentwicklungspakete",
+        "Exklusive Angebote für Neukunden"
+      ],
+      "website": "https://joel-digitals.de/shop/?q=&min=&max=&discount=1&sort=name"
+    },
+    "Black Week": {
+      "name": "Black Week Angebote",
+      "beschreibung": "Jedes Jahr in der Woche vor dem Black Friday bieten wir spezielle Rabatte auf unsere Produkte und Dienstleistungen an.",
+      "angebote": [
+        "Rabatte auf Software-Lizenzen",
+        "Sonderpreise für Webentwicklungspakete",
+        "Exklusive Angebote für Neukunden"
+      ],
+      "website": "https://joel-digitals.de/shop/?q=&min=&max=&discount=1&sort=name"
+    },
+    "Black Week 2025": {
+      "name": "Black Week 2025 Angebote",
+      "beschreibung": "Vom 24.11.2025 bis zum 01.12.2025 bieten wir spezielle Rabatte auf unsere Produkte und Dienstleistungen an.",
+      "angebote": [
+        "AuftragNetz Firma 75% Rabatt",
+        "AuftragNetz Medum 55% Rabatt",
+        "JDS Management bis zu 50% Rabatt",
+        "Logo Design 10% Rabatt",
+        "und viele mehr!",
+        "Zusätzlich gibt es 5% Extra Rabatt am Black Friday (28.11.2025) auf den gesamten Einkauf mit dem Code: BLACK25"
+      ],
+      "website": "https://joel-digitals.de/shop/?q=&min=&max=&discount=1&sort=name"
+    },
+    "Cyber Monday": {
+      "name": "Cyber Monday Angebote",
+      "beschreibung": "Jedes Jahr am Cyber Monday (Montag nach dem Black Friday) bieten wir spezielle Rabatte auf unsere Produkte und Dienstleistungen an.",
+      "angebote": [
+        "Rabatte auf Software-Lizenzen",
+        "Sonderpreise für Webentwicklungspakete",
+        "Exklusive Angebote für Neukunden"
+      ],
+      "website": "https://joel-digitals.de/shop/?q=&min=&max=&discount=1&sort=name"
     }
   },
   "en": {

@@ -393,7 +393,7 @@ def appointment_create_app(request):
                 subject=admin_subject,
                 message=admin_message,
                 from_email='joel-digitals@gmx.de',
-                recipient_list=['Info.joel-digitals@gmx.de'],
+                recipient_list=['info@joel-digitals.com'],
             )
 
             # Mail an Kunden (Bestätigung)
@@ -470,7 +470,7 @@ def update_appointment_status_app(request, pk, status):
             "Hier sind wir erreichbar:\n"
             "https://joel-digitals.de/contact/\n\n"
             "Telefon: +4915253480270\n\n"
-            "E-Mail: info.joel-digitals@gmx.de\n\n"
+            "E-Mail: info@joel-digitals.com\n\n"
 
             "Details Ihres Termins:\n"
             f"- Terminart: {appointment.appointment_type}\n"

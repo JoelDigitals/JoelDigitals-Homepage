@@ -34,8 +34,8 @@ def appointment_create(request):
             send_mail(
                 subject=admin_subject,
                 message=admin_message,
-                from_email='joel-digitals@gmx.de',
-                recipient_list=['Info.joel-digitals@gmx.de'],
+                from_email='-support@joel-digitals.com',
+                recipient_list=['info@joel-digitals.com'],
             )
 
             # Mail an Kunden (Bestätigung)
@@ -54,7 +54,7 @@ def appointment_create(request):
             send_mail(
                 subject=client_subject,
                 message=client_message,
-                from_email='joel-digitals@gmx.de',
+                from_email='support@joel-digitals.com',
                 recipient_list=[appointment.email],
             )
 
@@ -112,7 +112,7 @@ def update_appointment_status(request, pk, status):
             "Hier sind wir erreichbar:\n"
             "https://joel-digitals.de/contact/\n\n"
             "Telefon: +4915253480270\n\n"
-            "E-Mail: info.joel-digitals@gmx.de\n\n"
+            "E-Mail: info@joel-digitals.com\n\n"
 
             "Details Ihres Termins:\n"
             f"- Terminart: {appointment.appointment_type}\n"
@@ -129,7 +129,7 @@ def update_appointment_status(request, pk, status):
     send_mail(
         subject=subject,
         message=message,
-        from_email='joel-digitals@gmx.de',
+        from_email='support@joel-digitals.com',
         recipient_list=[appointment.email],
     )
 
@@ -161,8 +161,8 @@ def contact_view(request):
         send_mail(
             subject=f"Kontaktanfrage von {name}, Email: {form.cleaned_data['email']}",
             message=message,
-            from_email='joel-digitals@gmx.de',
-            recipient_list=['Info.joel-digitals@gmx.de'],
+            from_email='support@joel-digitals.com',
+            recipient_list=['info@joel-digitals.com'],
         )
 
         messages.success(request, "Deine Nachricht wurde erfolgreich gesendet.")
