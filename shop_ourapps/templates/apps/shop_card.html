@@ -3,12 +3,28 @@
      data-desc="{{ app.display_description|default_if_none:''|lower }}"
      data-price="{{ app.discounted_price|floatformat:2 }}"
      data-discount="{{ app.discount_percent|default:0 }}">
-  {% if app.image %}<img src="{{ app.image.url }}" alt="{{ app.display_name }}">{% endif %}
+
+  {% if app.discount_is_active and app.active_sale_name %}
+    <div class="sale-banner-overlay">
+        {% if app.sale_badge %}
+            <img src="{{ app.sale_badge.image.url }}" alt="{{ app.active_sale_name }}">
+        {% else %}
+            <span class="sale-banner-text">{{ app.active_sale_name }}</span>
+        {% endif %}
+    </div>
+  {% endif %}
+
+  {% if app.image %}
+    <div class="image-wrapper">
+        <img src="{{ app.image.url }}" alt="{{ app.display_name }}">
+    </div>
+  {% endif %}
+
   <h2>{{ app.display_name }}</h2>
   <p>{{ app.display_description|truncatechars:80 }}</p>
   <p>Version: {{ app.version }}</p>
 
-  {% if app.discount_percent > 0 %}
+  {% if app.discount_is_active %}
     <span class="badge-sale">🔖 {{ app.discount_percent }}% OFF</span>
     <div class="price-block">
       <span class="price-old">€{{ app.price }}</span>
@@ -23,3 +39,52 @@
     {% if app.link %}<a class="btn-shop" href="{{ app.link }}" target="_blank">Wiki</a>{% endif %}
   </div>
 </div>
+
+<style>
+.shop-card {
+    position: relative; /* absolut positionierte Banner beziehen sich auf die Card */
+}
+
+.image-wrapper {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+}
+
+.image-wrapper img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.shop-card:hover .image-wrapper img {
+    transform: scale(1.05);
+}
+
+/* Banner oben links in der Ecke */
+.sale-banner-overlay {
+    position: absolute;
+    top: -35px;
+    left: 8px;  /* links oben */
+    padding: 2px 6px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.85rem;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    z-index: 10;
+    background: none;
+}
+
+.sale-banner-overlay img {
+    max-width: 120px;
+    object-fit: contain;
+}
+
+.sale-banner-text {
+    background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+</style>

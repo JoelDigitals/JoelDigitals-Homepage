@@ -97,6 +97,13 @@ class WalletCode(models.Model):
             return True
         return False
 
+class SaleBadge(models.Model):
+    name = models.CharField(max_length=255)
+    image = models.ImageField(upload_to="sale_badges/")
+
+    def __str__(self):
+        return self.name
+
 class App(models.Model):
     name = models.CharField(max_length=255)
     name_english = models.CharField(max_length=255, blank=True, null=True)
@@ -122,17 +129,59 @@ class App(models.Model):
     link = models.URLField(blank=True, null=True)
     group = models.ForeignKey(AppGroup, null=True, blank=True, on_delete=models.SET_NULL)
 
+    is_black_week = models.BooleanField(default=False)
+    is_cyber_monday = models.BooleanField(default=False)
+    is_christmas_sale = models.BooleanField(default=False)
+
+    sale_badge = models.ForeignKey(SaleBadge, null=True, blank=True, on_delete=models.SET_NULL)
+
+    # Rabatt nur innerhalb eines Zeitraums gültig
+    discount_start = models.DateTimeField(blank=True, null=True)
+    discount_end = models.DateTimeField(blank=True, null=True)
     discount_percent = models.PositiveIntegerField(default=0)
 
     @property
+    def discount_is_active(self):
+        """Prüft, ob Rabatt aktuell gültig ist."""
+        from django.utils import timezone
+
+        now = timezone.now()
+
+        if self.discount_percent <= 0:
+            return False
+
+        if self.discount_start and now < self.discount_start:
+            return False
+
+        if self.discount_end and now > self.discount_end:
+            return False
+
+        return True
+
+    @property
     def discounted_price(self):
-        if self.price and self.discount_percent > 0:
+        """Berechnet den Preis, nur wenn Rabatt aktiv ist."""
+        from decimal import Decimal
+
+        if self.price and self.discount_is_active:
             discount_multiplier = Decimal(1) - (Decimal(self.discount_percent) / Decimal(100))
             return self.price * discount_multiplier
+
         return self.price
 
+    @property
+    def active_sale_name(self):
+        """Gibt den Namen des aktiven Sales zurück."""
+        if self.is_black_week:
+            return "Black Week Deal"
+        if self.is_cyber_monday:
+            return "Cyber Monday Deal"
+        if self.is_christmas_sale:
+            return "Christmas Sale"
+        return None
+
     def __str__(self):
-        return self.name
+        return self.name 
 
 
 class AffiliateLink(models.Model):

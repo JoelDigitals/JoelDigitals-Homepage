@@ -76,32 +76,52 @@
         <p>{{ app.display_description }}</p>
     </div>
 
-    {% if app.discount_percent > 0 %}
-  <div style="margin-left: 80px; margin-top: 20px;">
-    <span style="
-      display: inline-block;
-      background-color: #fff0f0;
-      color: #c82333;
-      padding: 6px 12px;
-      border-radius: 5px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      margin-bottom: 6px;
-    ">
-      🔖 {{ app.discount_percent }}% {% trans "Discount" %}
-    </span>
+    {% if app.discount_is_active %}
+        {% if app.active_sale_name %}
+            <div style="margin-top: 12px;">
+                {% if app.sale_badge %}
+                    <img src="{{ app.sale_badge.image.url }}" alt="{{ app.active_sale_name }}" style="max-width:300px; width:100%; object-fit:contain;">
+                {% else %}
+                    <span style="
+                        background:#d10000;
+                        padding: 12px 20px;
+                        color:white;
+                        font-weight:700;
+                        border-radius:10px;
+                        font-size:1.1rem;
+                    ">
+                        {{ app.active_sale_name }}
+                    </span>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        <div style="margin-left: 80px; margin-top: 20px;">
+          <span style="
+            display: inline-block;
+            background-color: #fff0f0;
+            color: #c82333;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            margin-bottom: 6px;
+          ">
+            🔖 {{ app.discount_percent }}% {% trans "Discount" %}
+          </span>
+      
+          <p style="margin: 4px 0 0;">
+            <span style="text-decoration: line-through; color: #999; font-size: 0.95rem;">{{ app.price }}€</span><br>
+            <strong style="color: #198754; font-size: 1.2rem;">€{{ app.discounted_price|floatformat:2 }}</strong>
+          </p>
+        </div>
+    {% else %}
+      <p style="margin-left: 80px; margin-top: 20px;">
+        {% trans "Price" %}: <strong>{{ app.price }}€</strong>
+      </p>
+    {% endif %}
 
-    <p style="margin: 4px 0 0;">
-      <span style="text-decoration: line-through; color: #999; font-size: 0.95rem;">{{ app.price }}€</span><br>
-      <strong style="color: #198754; font-size: 1.2rem;">€{{ app.discounted_price|floatformat:2 }}</strong>
-    </p>
-  </div>
-{% else %}
-  <p style="margin-left: 80px; margin-top: 20px;">
-    {% trans "Price" %}: <strong>{{ app.price }}€</strong>
-  </p>
-{% endif %}
 
 
 

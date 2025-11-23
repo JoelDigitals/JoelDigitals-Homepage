@@ -1336,3 +1336,9 @@ msgstr "Let’s connect and create something extraordinary."
 
 msgid "More Details"
 msgstr "More Details"
+
+msgid "This Imprint is valid for all our Apps and Social Media Accounts."
+msgstr "This Imprint is valid for all our Apps and Social Media Accounts."
+
+msgid "This Privacy Policy applies to all our apps and social media accounts."
+msgstr "This Privacy Policy applies to all our apps and social media accounts."

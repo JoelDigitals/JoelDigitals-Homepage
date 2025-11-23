@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Purchase, AffiliateLink, Affiliate, App, Cart, CartItem, AffiliatePartner, Order, OrderItem, AffiliateCode, DiscountCode, Wallet, WalletCode, AppGroup, AffiliateCode, Voucher, VoucherOrder
+from .models import Purchase, AffiliateLink, Affiliate, App, Cart, CartItem, AffiliatePartner, Order, OrderItem, AffiliateCode, DiscountCode, Wallet, WalletCode, AppGroup, AffiliateCode, Voucher, VoucherOrder, SaleBadge
 
 class PurchaseAdmin(admin.ModelAdmin):
     list_display = ['user', 'app', 'affiliate', 'date', 'full_name', 'email']
@@ -23,6 +23,7 @@ admin.site.register(AffiliateCode)
 admin.site.register(DiscountCode)
 admin.site.register(WalletCode)
 admin.site.register(Wallet)
+admin.site.register(SaleBadge)
 admin.site.register(AppGroup)
 admin.site.register(Voucher)
 admin.site.register(VoucherOrder)
