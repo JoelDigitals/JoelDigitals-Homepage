@@ -154,36 +154,148 @@ h1,h2,h3{color:#fff;}
   </section>
 
   <!-- Shop -->
-  <section data-aos="fade-up">
-    <h2 style="text-align:center; margin-top:2rem;">🔥 {% trans "Our Shop" %}</h2>
-    <div class="services-grid">
-      {% for product in products %}
-      <div class="card" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:100 }}">
-        <img src="{{ product.image.url }}" alt="{{ product.name }}">
-        <div class="card-body">
-          <h3>{{ product.name }}</h3>
-          <p>{{ product.short_description|truncatewords:18 }}</p>
-          {% if product.discount_percent > 0 %}
-          <div class="price">
-            <span style="text-decoration: line-through; color:#888;">{{ product.price }} €</span>
-            <span style="color:#3a86ff; font-weight:bold; margin-left:0.5rem;">{{ product.discounted_price|floatformat:2 }} €</span>
-            <span style="background:#ff3e3e; color:#fff; font-size:0.8rem; padding:2px 6px; border-radius:6px; margin-left:5px;">
-              -{{ product.discount_percent }}%
-            </span>
-          </div>
-          {% else %}
-          <div class="price"><strong>{{ product.price }} €</strong></div>
-          {% endif %}
-          <a href="{% url 'app_detail' slug=product.slug %}" class="cta-btn">{% trans "Buy Now" %}</a>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    <div style="text-align:center; margin-top:1rem;">
-      <a href="/shop/" class="cta-btn">{% trans "View Shop" %}</a>
-    </div>
-  </section>
+  <section class="shop-section" data-aos="fade-up">
+  <!-- Section Title -->
+  <h2 class="section-title" style="text-align:center; margin-top:2rem;">
+    🔥 {% trans "Our Shop" %}
+  </h2>
 
+  <!-- Products Grid -->
+  <div class="products-grid">
+    {% for product in products %}
+    <div class="product-card" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:100 }}">
+      
+      <!-- Product Image -->
+      <div class="product-image">
+        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+      </div>
+      
+      <!-- Product Details -->
+      <div class="product-details">
+        <h3 class="product-name">{{ product.name }}</h3>
+        <p class="product-description">{{ product.short_description|truncatewords:18 }}</p>
+
+        {% if product.discount_is_active %}
+          <!-- Discount Badge -->
+          <span class="badge-sale">🔖 {{ product.discount_percent }}% OFF</span>
+
+          <!-- Price with Discount -->
+          <div class="price-block">
+            <span class="price-old">€{{ product.price }}</span>
+            <span class="price-new">€{{ product.discounted_price|floatformat:2 }}</span>
+          </div>
+        {% else %}
+          <!-- Regular Price -->
+          <div class="price-block">
+            Preis: <strong>€{{ product.price }}</strong>
+          </div>
+        {% endif %}
+
+        <!-- Buy Button -->
+        <a href="{% url 'app_detail' slug=product.slug %}" class="cta-btn">
+          {% trans "Buy Now" %}
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- View Shop Button -->
+  <div class="shop-btn-wrapper" style="text-align:center; margin-top:1rem;">
+    <a href="/shop/" class="cta-btn">{% trans "View Shop" %}</a>
+  </div>
+</section>
+<style>
+.shop-section {
+  padding: 3rem 1rem;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.product-card {
+  background-color: #333333ff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.product-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.product-details {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.product-name {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.product-description {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.price-block {
+  margin: 0.5rem 0;
+}
+
+.price-old {
+  text-decoration: line-through;
+  color: #888;
+  margin-right: 0.5rem;
+}
+
+.price-new {
+  font-weight: bold;
+  color: #e53935;
+}
+
+.badge-sale {
+  display: inline-block;
+  background-color: #ffe0b2;
+  color: #e65100;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.cta-btn {
+  display: inline-block;
+  padding: 0.6rem 1.4rem;
+  background-color: #1e88e5;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.cta-btn:hover {
+  background-color: #1565c0;
+}
+</style>
   <!-- FAQ Section -->
 <section class="hours-section" data-aos="fade-up">
   <h2>❓ {% trans "Frequently Asked Questions" %}</h2>
@@ -251,5 +363,53 @@ h1,h2,h3{color:#fff;}
   </section>
 
 </div>
+<style>
+  .shop-card {
+    position: relative; /* absolut positionierte Banner beziehen sich auf die Card */
+}
+
+.image-wrapper {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+}
+
+.image-wrapper img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.shop-card:hover .image-wrapper img {
+    transform: scale(1.05);
+}
+
+/* Banner oben links in der Ecke */
+.sale-banner-overlay {
+    position: absolute;
+    top: -35px;
+    left: 8px;  /* links oben */
+    padding: 2px 6px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.85rem;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    z-index: 10;
+    background: none;
+}
+
+.sale-banner-overlay img {
+    max-width: 120px;
+    object-fit: contain;
+}
+
+.sale-banner-text {
+    background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+</style>
 </main>
 {% endblock %}

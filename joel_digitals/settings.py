@@ -170,8 +170,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # SENDGRID as mail backend
-EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
-SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
+EMAIL_BACKEND = "django_mailjet.backends.MailjetBackend"
+
+MAILJET_API_KEY = "c3f43729e477c3cd3a4cfdd51ef6a2ba"
+MAILJET_API_SECRET = "c06b2f2787d4a1ee5bf3c9821c8745c4"
+
 DEFAULT_FROM_EMAIL = "info@joel-digitals.com"
 COMPANY_EMAIL = "info@joel-digitals.com"
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
