@@ -9,7 +9,7 @@ django.setup()
 
 def create_superuser():
     username = 'JoelDigitals'  # Benutzername
-    email = 'joel-digitals@gmx.de'  # E-Mail-Adresse
+    email = 'no-reply@joel-digitals.com'  # E-Mail-Adresse
     password = 'Jo240207!'  # Passwort
 
     # Überprüfen, ob der Superuser bereits existiert

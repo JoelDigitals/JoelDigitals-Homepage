@@ -137,7 +137,7 @@ def generate_voucher_pdf(voucher, recipient_name, recipient_email, message, amou
     shop_lines = [
         "Joel Digitals",
         "www.joel-digitals.de",
-        "joel-digitals@gmx.de",
+        "no-reply@joel-digitals.com",
         "",
         "Wichtiger Hinweis:",
         "Dieser Gutschein ist nur einmal gültig.",
@@ -408,7 +408,7 @@ def purchase_app(request, slug):
                 subject=f"Purchase Confirmation: {app.name}",
                 message=f"Dear {data['full_name']},\n\nThank you for purchasing {app.name}.",
                 recipient_list=[data['email']],
-                from_email="joel-digitals@gmx.de"
+                from_email="no-reply@joel-digitals.com"
             )
 
             # E-Mail an Team
@@ -416,7 +416,7 @@ def purchase_app(request, slug):
                 subject=f"New Purchase: {app.name}",
                 message=f"New order from {data['full_name']} ({data['email']}) for {app.name}\n\nAddress:\n{data['address']}, {data['zip_code']} {data['city']}, {data['country']}",
                 recipient_list=["buy.joel-digitals@gmx.de"],
-                from_email="joel-digitals@gmx.de"
+                from_email="no-reply@joel-digitals.com"
             )
 
             return redirect("shop")
@@ -511,7 +511,7 @@ def affiliate_eligibility(request):
                 subject,
                 message,
                 settings.DEFAULT_FROM_EMAIL,
-                ['joel-digitals@gmx.de'],  # <- Anpassen
+                ['no-reply@joel-digitals.com'],  # <- Anpassen
                 fail_silently=False
             )
 

@@ -31,7 +31,7 @@ class AppointmentAdmin(admin.ModelAdmin):
                     f"Ihr Termin am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')} "
                     f"wurde von Joel Digitals bestätigt.\n\nBis bald!\nIhr Joel Digitals Team"
                 ),
-                from_email='joel-digitals@gmx.de',
+                from_email='no-reply@joel-digitals.com',
                 recipient_list=[appointment.email],
             )
 
@@ -48,6 +48,6 @@ class AppointmentAdmin(admin.ModelAdmin):
                     f"Bitte vereinbaren Sie einen neuen Termin oder kontaktieren Sie uns direkt.\n\n"
                     "Ihr Joel Digitals Team"
                 ),
-                from_email='joel-digitals@gmx.de',
+                from_email='no-reply@joel-digitals.com',
                 recipient_list=[appointment.email],
             )

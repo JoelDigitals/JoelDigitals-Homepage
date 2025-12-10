@@ -392,7 +392,7 @@ def appointment_create_app(request):
             send_mail(
                 subject=admin_subject,
                 message=admin_message,
-                from_email='joel-digitals@gmx.de',
+                from_email='no-reply@joel-digitals.com',
                 recipient_list=['info@joel-digitals.com'],
             )
 
@@ -412,7 +412,7 @@ def appointment_create_app(request):
             send_mail(
                 subject=client_subject,
                 message=client_message,
-                from_email='joel-digitals@gmx.de',
+                from_email='no-reply@joel-digitals.com',
                 recipient_list=[appointment.email],
             )
 
@@ -487,7 +487,7 @@ def update_appointment_status_app(request, pk, status):
     send_mail(
         subject=subject,
         message=message,
-        from_email='joel-digitals@gmx.de',
+        from_email='no-reply@joel-digitals.com',
         recipient_list=[appointment.email],
     )
 
