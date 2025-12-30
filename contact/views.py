@@ -221,7 +221,7 @@ Status: {appointment.get_status_display()}
                     fail_silently=False,
                 )
                 
-                return redirect("appointment_success_app")
+                return redirect("appointment_success")
     else:
         form = AppointmentForm()
     
