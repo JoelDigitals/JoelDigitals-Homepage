@@ -1,12 +1,14 @@
 from django.contrib import admin
 from django.core.mail import send_mail
-from .models import SalesWish, SupportTicket, TicketMessage, SalesEntry, SalesChatMessage, Appointment, AppointmentType
+from .models import SalesWish, SupportTicket, TicketMessage, SalesEntry, SalesChatMessage, Appointment, AppointmentType, SpecialTimeSlot, TimeSlot
 
 admin.site.register(SalesWish)
 admin.site.register(SupportTicket)
 admin.site.register(TicketMessage)
 admin.site.register(SalesEntry)
 admin.site.register(SalesChatMessage)
+admin.site.register(SpecialTimeSlot)
+admin.site.register(TimeSlot)
 
 @admin.register(AppointmentType)
 class AppointmentTypeAdmin(admin.ModelAdmin):

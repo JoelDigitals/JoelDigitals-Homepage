@@ -13,11 +13,17 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 from django.utils.timezone import now
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.utils import timezone
 from contact.views import is_Sales_Editor, is_Support_Ticket_Admin, is_Support_Editor
+from contact.utils import get_available_times, is_slot_available
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
+from django.urls import reverse
+
 
 def login_view_app(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
@@ -56,7 +62,8 @@ def home_view_app(request):
 
 @login_required
 def sales_app(request):
-    user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
+    user_groups = [group.name for group in request.user.groups.all()]
+
     if request.method == 'POST':
         name = request.POST.get('name')
         email = request.POST.get('email')
@@ -81,41 +88,87 @@ def sales_app(request):
             else:
                 break
 
+        # 📧 HTML-Mail beim Erstellen
+        html_content = render_to_string(
+            "emails/sales_entry_created.html",
+            {"entry": entry}
+        )
+
+        email_msg = EmailMultiAlternatives(
+            subject=f"Neue Sales-Anfrage: {entry.subject}",
+            body="Neue Sales-Anfrage",
+            from_email=settings.COMPANY_EMAIL_NO_REPLY,
+            to=["info@joel-digitals.com"]
+        )
+        email_msg.attach_alternative(html_content, "text/html")
+        email_msg.send()
+
         messages.success(request, "Wünsche wurden gespeichert.")
-        return redirect('sales_app')
+        return redirect('sales')
 
     entries = SalesEntry.objects.filter(user=request.user)\
         .prefetch_related('wishes', 'chat_messages')\
         .order_by('-created_at')
 
-    return render(request, 'mobile/sales.html', {'entries': entries, 'user_groups': user_groups})
+    return render(request, 'mobile/sales.html', {
+        'entries': entries,
+        'user_groups': user_groups
+    })
 
 @login_required
 def sales_chat_app(request, entry_id):
-    user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
+    user_groups = [group.name for group in request.user.groups.all()]
     entry = get_object_or_404(SalesEntry, id=entry_id)
 
-    # Zugriff nur für Ersteller oder Admin
     if request.user != entry.user and not request.user.is_staff:
-        raise PermissionDenied("Du hast keinen Zugriff auf diesen Chat.")
+        raise PermissionDenied()
 
-    # Neue Nachricht senden
     if request.method == "POST":
         message_text = request.POST.get("message")
+
         if message_text:
             SalesChatMessage.objects.create(
                 entry=entry,
                 user=request.user,
                 message=message_text
             )
-            return redirect('sales_chat_app', entry_id=entry.id)
 
-    # Alle Nachrichten für diesen Eintrag
-    messages = SalesChatMessage.objects.filter(entry=entry).order_by('created_at')
+            # 🔁 Empfänger bestimmen
+            if request.user == entry.user:
+                recipient = "info@joel-digitals.com"
+            else:
+                recipient = entry.email
+
+            chat_url = request.build_absolute_uri(
+                reverse("sales_chat", args=[entry.id])
+            )
+
+            html_content = render_to_string(
+                "emails/sales_chat_message.html",
+                {
+                    "entry": entry,
+                    "message": message_text,
+                    "sender": request.user.get_full_name() or request.user.username,
+                    "chat_url": chat_url
+                }
+            )
+
+            email_msg = EmailMultiAlternatives(
+                subject=f"Neue Nachricht: {entry.subject}",
+                body="Neue Chat-Nachricht",
+                from_email=settings.COMPANY_EMAIL_NO_REPLY,
+                to=[recipient]
+            )
+            email_msg.attach_alternative(html_content, "text/html")
+            email_msg.send()
+
+            return redirect('sales_chat', entry_id=entry.id)
+
+    messages_qs = SalesChatMessage.objects.filter(entry=entry).order_by('created_at')
 
     return render(request, 'mobile/sales_chat.html', {
         'entry': entry,
-        'messages': messages,
+        'messages': messages_qs,
         'user_groups': user_groups
     })
 
@@ -373,54 +426,49 @@ def ticket_detail_view_app(request, ticket_number):
     })
 
 def appointment_create_app(request):
+    selected_date = None
+    available_slots = None
+
     if request.method == 'POST':
         form = AppointmentForm(request.POST)
-        if form.is_valid():
-            appointment = form.save()
 
-            # Mail an uns (intern)
-            admin_subject = f"Neue Terminbuchung von {appointment.first_name} {appointment.last_name}"
-            admin_message = (
-                f"Neue Terminbuchung:\n\n"
-                f"Name: {appointment.first_name} {appointment.last_name}\n"
-                f"E-Mail: {appointment.email}\n"
-                f"Telefon: {appointment.phone}\n"
-                f"Terminart: {appointment.appointment_type}\n"
-                f"Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n"
-            )
+        if "check_slots" in request.POST:
+            selected_date = datetime.strptime(request.POST.get("date"), "%Y-%m-%d").date()
+            available_slots = get_available_times(selected_date)
+        else:
+            if form.is_valid():
+                appointment = form.save(commit=False)
 
-            send_mail(
-                subject=admin_subject,
-                message=admin_message,
-                from_email='no-reply@joel-digitals.com',
-                recipient_list=['info@joel-digitals.com'],
-            )
+                if not is_slot_available(appointment.appointment_datetime,
+                                         appointment.appointment_type.duration_minutes):
+                    form.add_error("appointment_datetime", "Dieser Slot ist bereits voll!")
+                    return render(request, "mobile/appointment_form.html", {
+                        "form": form,
+                        "available_slots": None
+                    })
 
-            # Mail an Kunden (Bestätigung)
-            client_subject = "Ihre Terminbuchung bei Joel Digitals"
-            client_message = (
-                f"Hallo {appointment.first_name},\n\n"
-                "vielen Dank für Ihre Terminbuchung bei Joel Digitals. Wir haben Ihre Anfrage erhalten und werden sie bald prüfen.\n\n"
-                f"Details Ihres Termins:\n"
-                f"- Terminart: {appointment.appointment_type}\n"
-                f"- Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n\n"
-                "Sie erhalten eine weitere E-Mail, sobald wir den Termin bestätigen oder ablehnen.\n\n"
-                "Mit freundlichen Grüßen\n"
-                "Ihr Joel Digitals Team"
-            )
+                appointment.save()
 
-            send_mail(
-                subject=client_subject,
-                message=client_message,
-                from_email='no-reply@joel-digitals.com',
-                recipient_list=[appointment.email],
-            )
+                send_mail(
+                    subject="Neue Terminbuchung",
+                    message="Ein neuer Termin wurde angelegt.",
+                    from_email="no-reply@joel-digitals.com",
+                    recipient_list=["info@joel-digitals.com"]
+                )
 
-            return redirect('appointment_success')
+                return redirect("appointment_success_app")
     else:
         form = AppointmentForm()
 
-    return render(request, 'mobile/appointment_form.html', {'form': form})
+    return render(request, "mobile/appointment_form.html", {
+        "form": form,
+        "available_slots": available_slots,
+        "selected_date": selected_date
+    })
+
+
+def appointment_success_app(request):
+    return render(request, "mobile/appointment_success.html")
 
 
 @login_required
@@ -493,5 +541,3 @@ def update_appointment_status_app(request, pk, status):
 
     return redirect('appointment_admin')
 
-def appointment_success_app(request):
-    return render(request, 'mobile/appointment_success.html')

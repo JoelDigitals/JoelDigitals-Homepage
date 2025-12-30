@@ -1,79 +1,813 @@
 {% extends "base_home.html" %}
 {% load static %}
 
-{% block title %}Terminvereinbarung – Joel Digitals{% endblock %}
-
 {% block content %}
 <style>
-    /* (Dein bereits mitgeliefertes Styling wird 1:1 übernommen) */
-    .contactform-container {
-        background-color: #fff;
-        max-width: 600px;
-        margin: 40px auto;
-        padding: 40px 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-    }
+.form-box {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    margin: 20px auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 600px;
+    color: #2563eb;
+}
 
-    h2 {
-        margin-top: 0;
-        color: #0044cc;
-        font-weight: 700;
-        font-size: 2rem;
-        margin-bottom: 25px;
-        text-align: center;
-    }
+.form-box h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #2563eb;
+}
 
-    form {
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-    }
+.form-group {
+    margin-bottom: 16px;
+}
 
-    form p {
-        margin: 0;
-        font-size: 1rem;
-        line-height: 1.4;
-    }
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
 
-    button.btn {
-        padding: 12px 20px;
-        background-color: #0044cc;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        box-shadow: 0 2px 6px rgba(0, 68, 204, 0.4);
-    }
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #2563eb;
+}
 
-    button.btn:hover,
-    button.btn:focus {
-        background-color: #0033a0;
-        box-shadow: 0 4px 12px rgba(0, 51, 160, 0.6);
-    }
+input, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+}
 
-    @media (max-width: 480px) {
-        .contactform-container {
-            padding: 30px 20px;
-        }
+input:focus, select:focus {
+    outline: none;
+    border-color: #2563eb;
+}
 
-        h2 {
-            font-size: 1.6rem;
-        }
+button.btn {
+    margin-top: 10px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+button.btn:hover {
+    background: #1d4ed8;
+}
+
+button.btn:disabled {
+    background: #d1d5db;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
+button.btn-submit {
+    background: #10b981;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+button.btn-submit:hover {
+    background: #059669;
+}
+
+.selected-display {
+    margin-top: 10px;
+    padding: 12px;
+    background: #dbeafe;
+    border-left: 4px solid #2563eb;
+    border-radius: 6px;
+    display: none;
+    font-size: 14px;
+}
+
+.selected-display.show {
+    display: block;
+}
+
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 999;
+}
+
+#overlay.show {
+    display: block;
+}
+
+#datePopup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    color: #2563eb;
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 1000;
+    max-width: 900px;
+    width: 90%;
+    max-height: 85vh;
+    overflow: hidden;
+}
+
+#datePopup.show {
+    display: block;
+}
+
+.popup-header {
+    padding: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.popup-header h2 {
+    font-size: 22px;
+    color: #2563eb;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: #2563eb;
+}
+
+.popup-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-height: calc(85vh - 80px);
+    overflow-y: auto;
+}
+
+.calendar-section, .slots-section {
+    padding: 20px;
+}
+
+.calendar-section {
+    border-right: 1px solid #e5e7eb;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.calendar-header button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #2563eb;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.calendar-header button:hover {
+    background: #f3f4f6;
+}
+
+.calendar-header h3 {
+    font-size: 18px;
+    color: #2563eb;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.calendar-day.available {
+    background: #2563eb;
+    color: #fff;
+}
+
+.calendar-day.available:hover {
+    background: #1d4ed8;
+}
+
+.calendar-day.selected {
+    background: #10b981;
+    color: #fff;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}
+
+.calendar-day.unavailable {
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.calendar-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    font-size: 12px;
+}
+
+.loading-calendar {
+    text-align: center;
+    padding: 40px 20px;
+    display: none;
+}
+
+.loading-calendar.show {
+    display: block;
+}
+
+.calendar-content {
+    display: none;
+}
+
+.calendar-content.show {
+    display: block;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-box {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.legend-box.available {
+    background: #2563eb;
+}
+
+.legend-box.unavailable {
+    background: #f3f4f6;
+}
+
+.slots-section h3 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: #2563eb;
+}
+
+.slots-placeholder {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+}
+
+.slots-placeholder.hide {
+    display: none;
+}
+
+.loading-slots {
+    text-align: center;
+    padding: 60px 20px;
+    display: none;
+}
+
+.loading-slots.show {
+    display: block;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.slots-container {
+    display: none;
+}
+
+.slots-container.show {
+    display: block;
+}
+
+.selected-date-info {
+    padding: 12px;
+    background: #dbeafe;
+    border-left: 4px solid #2563eb;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.selected-date-info p:first-child {
+    color: #6b7280;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.selected-date-info p:last-child {
+    font-weight: 600;
+    color: #2563eb;
+}
+
+.slots-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.slot {
+    padding: 10px 16px;
+    background: #fff;
+    color: #2563eb;
+    border: 2px solid #2563eb;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.slot:hover {
+    background: #2563eb;
+    color: #fff;
+}
+
+.slot.disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+    cursor: not-allowed;
+}
+
+.slot.disabled:hover {
+    background: #f3f4f6;
+    color: #9ca3af;
+}
+
+.no-slots {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+    display: none;
+}
+
+.no-slots.show {
+    display: block;
+}
+
+.error-text {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
     }
+    
+    .popup-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .calendar-section {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .slots-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 </style>
 
-<div class="contactform-container">
-    <h2>Termin vereinbaren</h2>
-    <form method="post" novalidate>
+<div class="form-box">
+    <h1>Termin vereinbaren</h1>
+    
+    <form method="post" id="appointmentForm">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn" type="submit">Senden</button>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>Vorname:</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                    <p class="error-text">{{ form.first_name.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label>Nachname:</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <p class="error-text">{{ form.last_name.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>E-Mail:</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <p class="error-text">{{ form.email.errors.0 }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>Telefon:</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+                <p class="error-text">{{ form.phone.errors.0 }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>Terminart:</label>
+            {{ form.appointment_type }}
+            {% if form.appointment_type.errors %}
+                <p class="error-text">{{ form.appointment_type.errors.0 }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>Datum & Uhrzeit wählen:</label>
+            <button type="button" id="openDatePopup" class="btn">Datum & Zeit wählen</button>
+            
+            <input type="hidden" name="appointment_datetime" id="appointment_datetime">
+            
+            <div id="selectedDisplay" class="selected-display"></div>
+            
+            {% if form.appointment_datetime.errors %}
+                <p class="error-text">{{ form.appointment_datetime.errors.0 }}</p>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn btn-submit" id="submitBtn" disabled>Jetzt buchen</button>
     </form>
 </div>
+
+<div id="overlay"></div>
+
+<div id="datePopup">
+    <div class="popup-header">
+        <h2>Verfügbare Termine</h2>
+        <button type="button" class="close-btn" id="closePopup">&times;</button>
+    </div>
+    
+    <div class="popup-content">
+        <!-- Kalender Sektion -->
+        <div class="calendar-section">
+            <div class="loading-calendar" id="loadingCalendar">
+                <div class="spinner"></div>
+                <p>Lade verfügbare Termine...</p>
+            </div>
+            
+            <div class="calendar-content" id="calendarContent">
+                <div class="calendar-header">
+                    <button type="button" id="prevMonth">‹</button>
+                    <h3 id="currentMonth"></h3>
+                    <button type="button" id="nextMonth">›</button>
+                </div>
+                
+                <div class="calendar-weekdays">
+                    <div>Mo</div>
+                    <div>Di</div>
+                    <div>Mi</div>
+                    <div>Do</div>
+                    <div>Fr</div>
+                    <div>Sa</div>
+                    <div>So</div>
+                </div>
+                
+                <div class="calendar-days" id="calendarDays"></div>
+                
+                <div class="calendar-legend">
+                    <div class="legend-item">
+                        <div class="legend-box available"></div>
+                        <span>Verfügbar</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box unavailable"></div>
+                        <span>Nicht verfügbar</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slots Sektion -->
+        <div class="slots-section">
+            <h3>Verfügbare Zeiten</h3>
+            
+            <div class="slots-placeholder" id="slotsPlaceholder">
+                <p>Bitte wählen Sie zuerst ein Datum</p>
+            </div>
+            
+            <div class="loading-slots" id="loadingSlots">
+                <div class="spinner"></div>
+                <p>Lade verfügbare Zeiten...</p>
+            </div>
+            
+            <div class="slots-container" id="slotsContainer">
+                <div class="selected-date-info">
+                    <p>Gewähltes Datum:</p>
+                    <p id="selectedDateDisplay"></p>
+                </div>
+                <div class="slots-grid" id="slotsList"></div>
+            </div>
+            
+            <div class="no-slots" id="noSlots">
+                <p>Keine verfügbaren Termine an diesem Tag</p>
+                <p style="font-size: 12px; margin-top: 8px;">Bitte wählen Sie ein anderes Datum</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const popup = document.getElementById('datePopup');
+    const overlay = document.getElementById('overlay');
+    const openBtn = document.getElementById('openDatePopup');
+    const closeBtn = document.getElementById('closePopup');
+    const appointmentType = document.getElementById('id_appointment_type');
+    const calendarDays = document.getElementById('calendarDays');
+    const currentMonthEl = document.getElementById('currentMonth');
+    const prevMonthBtn = document.getElementById('prevMonth');
+    const nextMonthBtn = document.getElementById('nextMonth');
+    const slotsPlaceholder = document.getElementById('slotsPlaceholder');
+    const loadingSlots = document.getElementById('loadingSlots');
+    const slotsContainer = document.getElementById('slotsContainer');
+    const slotsList = document.getElementById('slotsList');
+    const noSlots = document.getElementById('noSlots');
+    const selectedDateDisplay = document.getElementById('selectedDateDisplay');
+    const datetimeInput = document.getElementById('appointment_datetime');
+    const selectedDisplay = document.getElementById('selectedDisplay');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingCalendar = document.getElementById('loadingCalendar');
+    const calendarContent = document.getElementById('calendarContent');
+    
+    let currentDate = new Date();
+    let selectedDate = null;
+    let availableDates = [];
+    
+    function openPopup() {
+        if (!appointmentType.value) {
+            alert('Bitte wählen Sie zuerst eine Terminart aus.');
+            return;
+        }
+        overlay.classList.add('show');
+        popup.classList.add('show');
+        loadAvailableDates();
+    }
+    
+    function closePopup() {
+        overlay.classList.remove('show');
+        popup.classList.remove('show');
+    }
+    
+    openBtn.addEventListener('click', openPopup);
+    closeBtn.addEventListener('click', closePopup);
+    overlay.addEventListener('click', closePopup);
+    
+    function loadAvailableDates() {
+        // Zeige Ladescreen
+        loadingCalendar.classList.add('show');
+        calendarContent.classList.remove('show');
+        
+        fetch('{% url "api_available_dates" %}')
+            .then(response => response.json())
+            .then(data => {
+                availableDates = data.dates;
+                loadingCalendar.classList.remove('show');
+                calendarContent.classList.add('show');
+                renderCalendar();
+            })
+            .catch(error => {
+                console.error('Fehler beim Laden der Daten:', error);
+                loadingCalendar.classList.remove('show');
+                alert('Fehler beim Laden der verfügbaren Termine.');
+            });
+    }
+    
+    function renderCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        currentMonthEl.textContent = new Date(year, month).toLocaleDateString('de-DE', {
+            month: 'long',
+            year: 'numeric'
+        });
+        
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        let startOffset = firstDay.getDay() - 1;
+        if (startOffset < 0) startOffset = 6;
+        
+        calendarDays.innerHTML = '';
+        
+        // Leere Tage am Anfang
+        for (let i = 0; i < startOffset; i++) {
+            const emptyDay = document.createElement('div');
+            calendarDays.appendChild(emptyDay);
+        }
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Tage des Monats
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+            const date = new Date(year, month, day);
+            const dateStr = date.toISOString().split('T')[0];
+            const isAvailable = availableDates.includes(dateStr);
+            const isPast = date < today;
+            const isSelected = selectedDate === dateStr;
+            
+            const dayBtn = document.createElement('button');
+            dayBtn.type = 'button';
+            dayBtn.textContent = day;
+            dayBtn.className = 'calendar-day';
+            
+            if (isPast || !isAvailable) {
+                dayBtn.classList.add('unavailable');
+                dayBtn.disabled = true;
+            } else if (isSelected) {
+                dayBtn.classList.add('selected');
+            } else {
+                dayBtn.classList.add('available');
+                dayBtn.addEventListener('click', function() {
+                    selectDate(dateStr);
+                });
+            }
+            
+            calendarDays.appendChild(dayBtn);
+        }
+    }
+    
+    function selectDate(dateStr) {
+        selectedDate = dateStr;
+        renderCalendar();
+        loadSlots(dateStr);
+    }
+    
+    function loadSlots(dateStr) {
+        const typeId = appointmentType.value;
+        
+        // Alle Bereiche verstecken
+        slotsPlaceholder.classList.add('hide');
+        slotsContainer.classList.remove('show');
+        noSlots.classList.remove('show');
+        loadingSlots.classList.add('show');
+        
+        fetch(`{% url "api_slots" %}?date=${dateStr}&type=${typeId}`)
+            .then(response => response.json())
+            .then(data => {
+                loadingSlots.classList.remove('show');
+                
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                if (data.slots.length === 0) {
+                    noSlots.classList.add('show');
+                    return;
+                }
+                
+                const d = new Date(dateStr + 'T00:00:00');
+                selectedDateDisplay.textContent = d.toLocaleDateString('de-DE', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                slotsContainer.classList.add('show');
+                slotsList.innerHTML = '';
+                
+                data.slots.forEach(slot => {
+                    const slotBtn = document.createElement('button');
+                    slotBtn.type = 'button';
+                    slotBtn.textContent = slot.time;
+                    slotBtn.className = 'slot';
+                    
+                    if (slot.full) {
+                        slotBtn.classList.add('disabled');
+                        slotBtn.disabled = true;
+                    } else {
+                        slotBtn.addEventListener('click', function() {
+                            selectSlot(slot.datetime, slot.time, dateStr);
+                        });
+                    }
+                    
+                    slotsList.appendChild(slotBtn);
+                });
+            })
+            .catch(error => {
+                loadingSlots.classList.remove('show');
+                noSlots.classList.add('show');
+                console.error('Fehler beim Laden der Slots:', error);
+            });
+    }
+    
+    function selectSlot(datetime, time, dateStr) {
+        // Parse datetime korrekt (kommt im ISO-Format vom Server)
+        const dt = new Date(datetime);
+        
+        // Formatiere für Django (YYYY-MM-DD HH:MM:SS)
+        const year = dt.getFullYear();
+        const month = String(dt.getMonth() + 1).padStart(2, '0');
+        const day = String(dt.getDate()).padStart(2, '0');
+        const hours = String(dt.getHours()).padStart(2, '0');
+        const minutes = String(dt.getMinutes()).padStart(2, '0');
+        const djangoFormat = `${year}-${month}-${day} ${hours}:${minutes}:00`;
+        
+        datetimeInput.value = djangoFormat;
+        
+        // Zeige das gewählte Datum an (lokal)
+        const d = new Date(dateStr + 'T00:00:00');
+        const dateFormatted = d.toLocaleDateString('de-DE', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        selectedDisplay.innerHTML = `<strong>Gewählt:</strong> ${dateFormatted} um ${time} Uhr`;
+        selectedDisplay.classList.add('show');
+        submitBtn.disabled = false;
+        
+        closePopup();
+    }
+    
+    prevMonthBtn.addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+    
+    nextMonthBtn.addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+});
+</script>
 {% endblock %}

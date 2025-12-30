@@ -3,66 +3,235 @@ from django.core.mail import send_mail
 from .forms import ContactForm, SalesWishForm, SupportTicketForm, TicketMessageForm, AppointmentForm
 from django.contrib import messages
 from django.http import HttpResponse
-from .models import SalesWish, SupportTicket, TicketMessage, SalesChatMessage, SalesEntry, TicketNote, Appointment
+from .models import SalesWish, SupportTicket, TicketMessage, SalesChatMessage, SalesEntry, TicketNote, Appointment, AppointmentType, TimeSlot, SpecialTimeSlot
 from django.contrib.admin.views.decorators import staff_member_required, user_passes_test
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 from django.utils.timezone import now
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.utils import timezone
+from contact.utils import get_available_times, is_slot_available
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
+from django.urls import reverse
+from django.utils.timezone import make_aware
+from django.http import JsonResponse
+
+
+def generate_time_slots(start_dt, end_dt, slot_interval_minutes=10):
+    """
+    Generiert Zeitslots im definierten Intervall (z.B. alle 10 Minuten).
+    Diese sind die STARTZEITEN für mögliche Termine.
+    """
+    slots = []
+    current = start_dt
+    
+    while current < end_dt:
+        slots.append(current)
+        current += timedelta(minutes=slot_interval_minutes)
+    
+    return slots
+
+def is_slot_available(slot_start, duration_minutes, max_parallel=2):
+    """
+    Prüft, ob zu einem bestimmten Startzeitpunkt noch Kapazität frei ist.
+    Ein Termin blockiert die Zeit von slot_start bis slot_start + duration_minutes.
+    
+    Berücksichtigt Überschneidungen mit bestehenden Terminen unterschiedlicher Dauer.
+    """
+    slot_start_aware = make_aware(slot_start) if slot_start.tzinfo is None else slot_start
+    slot_end = slot_start_aware + timedelta(minutes=duration_minutes)
+    
+    # Zähle alle Termine, die sich mit diesem Zeitfenster überschneiden
+    # Ein bestehender Termin überschneidet sich, wenn:
+    # - er vor unserem Ende beginnt UND
+    # - er nach unserem Start endet (unter Berücksichtigung seiner eigenen Dauer)
+    
+    overlapping_appointments = Appointment.objects.filter(
+        appointment_datetime__lt=slot_end,  # Beginnt vor unserem Ende
+        status__in=['pending', 'accepted']  # Nur aktive Termine
+    ).exclude(
+        status='rejected'
+    )
+    
+    # Prüfe für jeden Termin, ob er wirklich überschneidet
+    overlapping_count = 0
+    for appt in overlapping_appointments:
+        appt_end = appt.appointment_datetime + timedelta(minutes=appt.appointment_type.duration_minutes)
+        # Wenn der Termin nach unserem Start endet, gibt es eine Überschneidung
+        if appt_end > slot_start_aware:
+            overlapping_count += 1
+    
+    return overlapping_count < max_parallel
+
+def get_available_times(selected_date, appointment_type, max_parallel=2):
+    """
+    Gibt alle verfügbaren Zeitslots für ein bestimmtes Datum zurück.
+    Slots starten alle 5 Minuten, jeder Termin blockiert die Dauer seines Termintyps.
+    
+    Args:
+        selected_date: Das Datum für das Slots gesucht werden
+        appointment_type: Der AppointmentType mit duration_minutes Attribut
+        max_parallel: Maximale Anzahl paralleler Termine (Standard: 2)
+    """
+    duration_minutes = appointment_type.duration_minutes
+    slot_interval = 10  # Startzeiten alle 5 Minuten
+    
+    all_possible_slots = []
+    
+    # 1. Reguläre TimeSlots für den Wochentag
+    regular_slots = TimeSlot.objects.filter(weekday=selected_date.weekday())
+    for ts in regular_slots:
+        start_dt = datetime.combine(selected_date, ts.start_time)
+        end_dt = datetime.combine(selected_date, ts.end_time)
+        
+        # Stelle sicher, dass der letzte mögliche Termin noch vollständig in die Zeitspanne passt
+        # Reduziere end_dt um die Termindauer
+        effective_end = end_dt - timedelta(minutes=duration_minutes)
+        
+        if effective_end > start_dt:
+            all_possible_slots += generate_time_slots(start_dt, effective_end + timedelta(minutes=slot_interval), slot_interval)
+    
+    # 2. Spezielle TimeSlots für dieses Datum
+    special_slots = SpecialTimeSlot.objects.filter(date=selected_date)
+    for sts in special_slots:
+        start_dt = datetime.combine(selected_date, sts.start_time)
+        end_dt = datetime.combine(selected_date, sts.end_time)
+        
+        # Auch hier: letzter Termin muss vollständig passen
+        effective_end = end_dt - timedelta(minutes=duration_minutes)
+        
+        if effective_end > start_dt:
+            all_possible_slots += generate_time_slots(start_dt, effective_end + timedelta(minutes=slot_interval), slot_interval)
+    
+    # 3. Duplikate entfernen und sortieren
+    all_possible_slots = sorted(set(all_possible_slots))
+    
+    # 4. Verfügbarkeit prüfen
+    available_slots = []
+    current_time = now()
+    
+    for slot_dt in all_possible_slots:
+        slot_aware = make_aware(slot_dt) if slot_dt.tzinfo is None else slot_dt
+        
+        # Überspringe vergangene Zeitslots
+        if slot_aware <= current_time:
+            continue
+        
+        # Prüfe Verfügbarkeit mit der korrekten Dauer
+        is_available = is_slot_available(slot_dt, duration_minutes, max_parallel)
+        
+        available_slots.append({
+            "datetime": slot_aware,
+            "time": slot_aware.strftime("%H:%M"),
+            "full": not is_available
+        })
+    
+    return available_slots
+
+def get_available_dates(request):
+    """API-Endpoint: Liefert verfügbare Daten für die nächsten 60 Tage"""
+    dates = []
+    today = datetime.today().date()
+    
+    for i in range(0, 60):
+        d = today + timedelta(days=i)
+        # Optional: Prüfe, ob an diesem Tag überhaupt Slots existieren
+        has_regular = TimeSlot.objects.filter(weekday=d.weekday()).exists()
+        has_special = SpecialTimeSlot.objects.filter(date=d).exists()
+        
+        if has_regular or has_special:
+            dates.append(d.strftime("%Y-%m-%d"))
+    
+    return JsonResponse({"dates": dates})
+
+def get_slots(request):
+    """API-Endpoint: Liefert verfügbare Zeitslots für ein bestimmtes Datum"""
+    date_str = request.GET.get("date")
+    type_id = request.GET.get("type")
+    
+    if not date_str or not type_id:
+        return JsonResponse({"slots": [], "error": "Datum und Termintyp erforderlich"})
+    
+    try:
+        selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        appointment_type = AppointmentType.objects.get(id=type_id)
+    except (ValueError, AppointmentType.DoesNotExist):
+        return JsonResponse({"slots": [], "error": "Ungültiges Datum oder Termintyp"})
+    
+    slots = get_available_times(selected_date, appointment_type)
+    
+    # JSON-Ausgabe vorbereiten
+    slots_list = [
+        {
+            "datetime": s["datetime"].isoformat(),
+            "time": s["time"],
+            "full": s["full"]
+        }
+        for s in slots
+    ]
+    
+    return JsonResponse({"slots": slots_list})
 
 def appointment_create(request):
+    """Hauptview für die Terminbuchung"""
     if request.method == 'POST':
         form = AppointmentForm(request.POST)
+        
         if form.is_valid():
-            appointment = form.save()
+            appointment = form.save(commit=False)
+            appointment_type = appointment.appointment_type
+            
+            # Finale Verfügbarkeitsprüfung
+            slot_start = appointment.appointment_datetime
+            
+            if not is_slot_available(
+                slot_start, 
+                appointment_type.duration_minutes, 
+                max_parallel=2
+            ):
+                form.add_error(
+                    "appointment_datetime", 
+                    "Dieser Zeitslot ist leider bereits ausgebucht. Bitte wählen Sie einen anderen."
+                )
+            else:
+                appointment.save()
+                
+                # E-Mail-Benachrichtigung
+                send_mail(
+                    subject=f"Neue Terminbuchung: {appointment_type.name}",
+                    message=f"""
+Neuer Termin wurde gebucht:
 
-            # Mail an uns (intern)
-            admin_subject = f"Neue Terminbuchung von {appointment.first_name} {appointment.last_name}"
-            admin_message = (
-                f"Neue Terminbuchung:\n\n"
-                f"Name: {appointment.first_name} {appointment.last_name}\n"
-                f"E-Mail: {appointment.email}\n"
-                f"Telefon: {appointment.phone}\n"
-                f"Terminart: {appointment.appointment_type}\n"
-                f"Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n"
-            )
+Name: {appointment.first_name} {appointment.last_name}
+E-Mail: {appointment.email}
+Telefon: {appointment.phone}
+Terminart: {appointment_type.name}
+Datum/Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}
+Dauer: {appointment_type.duration_minutes} Minuten
 
-            send_mail(
-                subject=admin_subject,
-                message=admin_message,
-                from_email='-support@joel-digitals.com',
-                recipient_list=['info@joel-digitals.com'],
-            )
-
-            # Mail an Kunden (Bestätigung)
-            client_subject = "Ihre Terminbuchung bei Joel Digitals"
-            client_message = (
-                f"Hallo {appointment.first_name},\n\n"
-                "vielen Dank für Ihre Terminbuchung bei Joel Digitals. Wir haben Ihre Anfrage erhalten und werden sie bald prüfen.\n\n"
-                f"Details Ihres Termins:\n"
-                f"- Terminart: {appointment.appointment_type}\n"
-                f"- Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n\n"
-                "Sie erhalten eine weitere E-Mail, sobald wir den Termin bestätigen oder ablehnen.\n\n"
-                "Mit freundlichen Grüßen\n"
-                "Ihr Joel Digitals Team"
-            )
-
-            send_mail(
-                subject=client_subject,
-                message=client_message,
-                from_email='support@joel-digitals.com',
-                recipient_list=[appointment.email],
-            )
-
-            return redirect('appointment_success')
+Status: {appointment.get_status_display()}
+                    """,
+                    from_email="no-reply@joel-digitals.com",
+                    recipient_list=["info@joel-digitals.com"],
+                    fail_silently=False,
+                )
+                
+                return redirect("appointment_success_app")
     else:
         form = AppointmentForm()
+    
+    return render(request, "contact/appointment_form.html", {
+        "form": form,
+    })
 
-    return render(request, 'contact/appointment_form.html', {'form': form})
+def appointment_success(request):
+    """Erfolgsseite nach Terminbuchung"""
+    return render(request, "contact/appointment_success.html")
 
 
 @login_required
@@ -172,7 +341,8 @@ def contact_view(request):
 
 @login_required
 def sales(request):
-    user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
+    user_groups = [group.name for group in request.user.groups.all()]
+
     if request.method == 'POST':
         name = request.POST.get('name')
         email = request.POST.get('email')
@@ -197,6 +367,21 @@ def sales(request):
             else:
                 break
 
+        # 📧 HTML-Mail beim Erstellen
+        html_content = render_to_string(
+            "emails/sales_entry_created.html",
+            {"entry": entry}
+        )
+
+        email_msg = EmailMultiAlternatives(
+            subject=f"Neue Sales-Anfrage: {entry.subject}",
+            body="Neue Sales-Anfrage",
+            from_email=settings.COMPANY_EMAIL_NO_REPLY,
+            to=["info@joel-digitals.com"]
+        )
+        email_msg.attach_alternative(html_content, "text/html")
+        email_msg.send()
+
         messages.success(request, "Wünsche wurden gespeichert.")
         return redirect('sales')
 
@@ -204,34 +389,65 @@ def sales(request):
         .prefetch_related('wishes', 'chat_messages')\
         .order_by('-created_at')
 
-    return render(request, 'contact/sales.html', {'entries': entries, 'user_groups': user_groups})
+    return render(request, 'contact/sales.html', {
+        'entries': entries,
+        'user_groups': user_groups
+    })
 
 @login_required
 def sales_chat(request, entry_id):
-    user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
+    user_groups = [group.name for group in request.user.groups.all()]
     entry = get_object_or_404(SalesEntry, id=entry_id)
 
-    # Zugriff nur für Ersteller oder Admin
     if request.user != entry.user and not request.user.is_staff:
-        raise PermissionDenied("Du hast keinen Zugriff auf diesen Chat.")
+        raise PermissionDenied()
 
-    # Neue Nachricht senden
     if request.method == "POST":
         message_text = request.POST.get("message")
+
         if message_text:
             SalesChatMessage.objects.create(
                 entry=entry,
                 user=request.user,
                 message=message_text
             )
+
+            # 🔁 Empfänger bestimmen
+            if request.user == entry.user:
+                recipient = "info@joel-digitals.com"
+            else:
+                recipient = entry.email
+
+            chat_url = request.build_absolute_uri(
+                reverse("sales_chat", args=[entry.id])
+            )
+
+            html_content = render_to_string(
+                "emails/sales_chat_message.html",
+                {
+                    "entry": entry,
+                    "message": message_text,
+                    "sender": request.user.get_full_name() or request.user.username,
+                    "chat_url": chat_url
+                }
+            )
+
+            email_msg = EmailMultiAlternatives(
+                subject=f"Neue Nachricht: {entry.subject}",
+                body="Neue Chat-Nachricht",
+                from_email=settings.COMPANY_EMAIL_NO_REPLY,
+                to=[recipient]
+            )
+            email_msg.attach_alternative(html_content, "text/html")
+            email_msg.send()
+
             return redirect('sales_chat', entry_id=entry.id)
 
-    # Alle Nachrichten für diesen Eintrag
-    messages = SalesChatMessage.objects.filter(entry=entry).order_by('created_at')
+    messages_qs = SalesChatMessage.objects.filter(entry=entry).order_by('created_at')
 
     return render(request, 'contact/sales_chat.html', {
         'entry': entry,
-        'messages': messages,
+        'messages': messages_qs,
         'user_groups': user_groups
     })
 

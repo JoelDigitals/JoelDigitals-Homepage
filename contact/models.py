@@ -118,9 +118,33 @@ class SalesChatMessage(models.Model):
 
 class AppointmentType(models.Model):
     name = models.CharField(max_length=100)
+    duration_minutes = models.PositiveIntegerField(default=20)  # z.B. 20 / 45 Minuten
 
     def __str__(self):
         return self.name
+
+
+class TimeSlot(models.Model):
+    """Reguläre wiederkehrende Buchungszeiten"""
+    weekday = models.IntegerField(  # 0=Montag, 6=Sonntag
+        choices=[(i, ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"][i]) for i in range(7)]
+    )
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    def __str__(self):
+        return f"{self.get_weekday_display()} {self.start_time}–{self.end_time}"
+
+
+class SpecialTimeSlot(models.Model):
+    """Einzelne Sondertermine"""
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    def __str__(self):
+        return f"{self.date} {self.start_time}–{self.end_time}"
+
 
 class Appointment(models.Model):
     STATUS_CHOICES = [
@@ -133,11 +157,16 @@ class Appointment(models.Model):
     last_name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
-    appointment_type = models.ForeignKey('AppointmentType', on_delete=models.SET_NULL, null=True)
-    appointment_datetime = models.DateTimeField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
+    appointment_type = models.ForeignKey(AppointmentType, on_delete=models.SET_NULL, null=True)
+    appointment_datetime = models.DateTimeField()
+
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def end_datetime(self):
+        return self.appointment_datetime + timedelta(minutes=self.appointment_type.duration_minutes)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} – {self.appointment_datetime.strftime('%d.%m.%Y %H:%M')}"
