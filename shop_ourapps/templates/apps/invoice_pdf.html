@@ -13,7 +13,7 @@
         {% endif %} – {{ invoice.invoice_number }}
     </title>
     <style>
-        /* Style unverändert */
+        /* Style unverändert */ 
         :root{--green:#2e7d32;--light-green:#e8f5e9;}
         @page{size:A4;margin:20mm;}
         body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;line-height:1.4;color:#333;margin:0;position:relative;}
@@ -109,8 +109,8 @@
                     <td>{{ item.app.product_number }}</td>
                     <td>{{ item.quantity }}</td>
                     <td>{{ item.app.price|floatformat:2 }} €</td>
-                    <td>{{ item.app.discount_percent }}%</td>
-                    <td>{{ item.app.discounted_price|floatformat:2 }} €</td>
+                    <td>{{ item.discount_percent }}%</td>
+                    <td>{{ item.discounted_price|floatformat:2 }} €</td>
                     <td>{{ item.price|floatformat:2 }} €</td>
                 </tr>
                 {% empty %}
