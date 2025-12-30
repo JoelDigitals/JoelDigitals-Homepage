@@ -138,7 +138,7 @@ def get_available_dates(request):
     dates = []
     today = datetime.today().date()
     
-    for i in range(0, 60):
+    for i in range(2, 100):
         d = today + timedelta(days=i)
         # Optional: Prüfe, ob an diesem Tag überhaupt Slots existieren
         has_regular = TimeSlot.objects.filter(weekday=d.weekday()).exists()
@@ -482,6 +482,25 @@ def support_tickets(request):
             sender=request.user,
             message=ticket.description
         )
+        send_mail(
+            subject=f"Neues Support-Ticket: {ticket.subject}",
+            message=f"Ein neues Support-Ticket wurde erstellt.\n\nTicket-Nummer: {ticket.ticket_number}\nBetreff: {ticket.subject}\n\nBitte im Admin-Bereich prüfen.",
+            from_email=settings.COMPANY_EMAIL_NO_REPLY,
+            recipient_list=[settings.SUPPORT_EMAIL]
+        )
+        send_mail(
+            subject=f"Dein Support-Ticket wurde erstellt: {ticket.subject}",
+            message=f"Hallo {request.user.get_full_name() or request.user.username},\n\n"
+                    f"dein Support-Ticket wurde erfolgreich erstellt.\n\n"
+                    f"Ticket-Nummer: {ticket.ticket_number}\n"
+                    f"Betreff: {ticket.subject}\n\n"
+                    "Unser Support-Team wird sich so schnell wie möglich bei dir melden.\n\n"
+                    "Vielen Dank für deine Geduld!\n\n"
+                    "Mit freundlichen Grüßen\n"
+                    "Dein Joel Digitals Team",
+            from_email=settings.COMPANY_EMAIL_NO_REPLY,
+            recipient_list=[ticket.email]
+        )
         messages.success(request, "Ticket erfolgreich erstellt.")
         return redirect('support_tickets')
 
@@ -490,13 +509,12 @@ def support_tickets(request):
 
 @login_required
 def ticket_detail(request, ticket_number):
-    user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
+    user_groups = [group.name for group in request.user.groups.all()]
     ticket = get_object_or_404(SupportTicket, ticket_number=ticket_number)
 
-    # Nur Zugriff, wenn eigener User oder Admin
+    # 🔐 Zugriff prüfen
     if ticket.user != request.user and not request.user.is_staff:
-        messages.error(request, "Du hast keinen Zugriff auf dieses Ticket.")
-        return redirect('support_tickets')
+        raise PermissionDenied()
 
     if request.method == 'POST':
         form = TicketMessageForm(request.POST)
@@ -506,9 +524,41 @@ def ticket_detail(request, ticket_number):
             message.sender = request.user
             message.save()
 
-            # Ticket ggf. reaktivieren
+            # 🔁 Ticket ggf. reaktivieren
             ticket.reactivate_if_new_message(request.user)
+
+            # 🔁 Empfänger bestimmen
+            if request.user == ticket.user:
+                recipient = settings.SUPPORT_EMAIL  # z. B. info@joel-digitals.com
+            else:
+                recipient = ticket.user.email
+
+            ticket_url = request.build_absolute_uri(
+                reverse("ticket_detail", args=[ticket.ticket_number])
+            )
+
+            html_content = render_to_string(
+                "emails/ticket_message.html",
+                {
+                    "ticket": ticket,
+                    "message": message.message,
+                    "sender": request.user.get_full_name() or request.user.username,
+                    "ticket_url": ticket_url
+                }
+            )
+
+            email = EmailMultiAlternatives(
+                subject=f"Neue Nachricht zu Ticket #{ticket.ticket_number}",
+                body="Neue Ticket-Nachricht",
+                from_email=settings.COMPANY_EMAIL_NO_REPLY,
+                to=[recipient]
+            )
+            email.attach_alternative(html_content, "text/html")
+            email.send()
+
+            messages.success(request, "Nachricht gesendet.")
             return redirect('ticket_detail', ticket_number=ticket.ticket_number)
+
     else:
         form = TicketMessageForm()
 

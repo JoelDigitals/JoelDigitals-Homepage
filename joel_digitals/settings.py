@@ -177,6 +177,7 @@ MAILJET_API_SECRET = "c06b2f2787d4a1ee5bf3c9821c8745c4"
 
 DEFAULT_FROM_EMAIL = "info@joel-digitals.com"
 COMPANY_EMAIL_NO_REPLY = "no-reply@joel-digitals.com"
+SUPPORT_EMAIL = "support@joel-digitals.com"
 COMPANY_EMAIL = "info@joel-digitals.com"
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 SENDGRID_ECHO_TO_STDOUT = False

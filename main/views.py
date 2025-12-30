@@ -14,7 +14,9 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib import messages
 from django.utils.translation import get_language
+from django.utils import timezone
 
+now = timezone.now()
 
 def faq_list(request):
     """
@@ -75,7 +77,7 @@ def home(request):
     lang = request.LANGUAGE_CODE  # ← aktuelle Sprache ("de" oder "en")
 
     # Neuste Blogartikel
-    latest_blog = BlogPost.objects.filter(is_published=True).order_by('-created_at')[:2]
+    latest_blog = BlogPost.objects.filter(is_published=True, published_at__lte=now).order_by("-published_at", "-created_at")[:2]
     for post in latest_blog:
         post.title = post.title_en if lang == "en" else post.title_de
         post.teaser_text = (post.content_en if lang == "en" else post.content_de)[:200]

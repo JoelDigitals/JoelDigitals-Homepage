@@ -208,6 +208,86 @@
         "Exklusive Angebote für Neukunden"
       ],
       "website": "https://joel-digitals.de/shop/?q=&min=&max=&discount=1&sort=name"
+    },
+    "Weihnachtsangebote": {
+      "name": "Weihnachtsangebote",
+      "beschreibung": "In der Weihnachtszeit bieten wir spezielle Rabatte auf unsere Produkte und Dienstleistungen an.",
+      "angebote": [
+        "Rabatte auf Software-Lizenzen",
+        "Sonderpreise für Webentwicklungspakete",
+        "Exklusive Angebote für Neukunden"
+      ],
+      "website": "https://joel-digitals.de/shop/?q=&min=&max=&discount=1&sort=name"
+    },
+    "Verkauf": {
+      "name": "Verkaufschat",
+      "beschreibung": "Unser Verkaufschat hilft dir, das richtige Produkt oder die richtige Dienstleistung für deine Bedürfnisse zu finden. Stelle Fragen und erhalte Empfehlungen.",
+      "features": [
+        "Produktberatung",
+        "Empfehlungen basierend auf deinen Anforderungen",
+        "Direkter Kontakt zu unserem Verkaufsteam"
+      ],
+      "link": "https://joel-digitals.de/contact/sales/"
+    },
+    "Termine": {
+      "name": "Terminvereinbarung",
+      "beschreibung": "Vereinbare einen Termin mit unserem Team für eine Beratung, ein Meeting oder eine Projektbesprechung.",
+      "features": [
+        "Echtzeit-Verfügbarkeit",
+        "Automatische Bestätigung per E-Mail"
+      ],
+      "link": "https://joel-digitals.de/contact/appointment/"
+    },
+    "Ticket": {
+      "name": "Support Ticket",
+      "beschreibung": "Erstelle ein Support-Ticket, um Hilfe bei technischen Problemen, Fragen zu unseren Produkten oder anderen Anliegen zu erhalten.",
+      "features": [
+        "Schnelle Reaktionszeiten",
+        "Verfolgung des Ticket-Status",
+        "Direkter Kontakt zu unserem Support-Team"
+      ],
+      "link": "https://joel-digitals.de/contact/support/"
+    },
+    "Feedback": {
+      "name": "Feedback",
+      "beschreibung": "Teile uns dein Feedback zu unseren Produkten, Dienstleistungen oder deiner Erfahrung mit Joel Digitals mit.",
+      "features": [
+        "Anonyme oder namentliche Rückmeldungen",
+        "Verbesserungsvorschläge willkommen"
+      ],
+      "link": "mailto:info@joel-digitals.de"
+    },
+    "Karriere": {
+      "name": "Karriere bei Joel Digitals",
+      "beschreibung": "Entdecke Karrieremöglichkeiten bei Joel Digitals. Wir suchen talentierte und motivierte Personen, die unser Team verstärken möchten.",
+      "features": [
+        "Offene Stellenangebote",
+        "Praktika und Werkstudentenstellen",
+        "Bewerbungsprozess"
+      ],
+      "link": "https://jds-management.de/jobs/1/"
+    },
+    "Blog": {
+      "name": "Joel Digitals Blog",
+      "beschreibung": "Bleibe auf dem Laufenden mit den neuesten Nachrichten, Tipps und Trends aus der digitalen Welt in unserem Blog.",
+      "features": [
+        "Regelmäßige Artikel zu Webentwicklung, Design, Marketing und mehr",
+        "Gastbeiträge von Experten",
+        "Kommentare und Diskussionen"
+      ],
+      "link": "https://joel-digitals.de/blog/"
+    },
+    "Dienstleistungen": {
+      "name": "Dienstleistungen von Joel Digitals",
+      "beschreibung": "Entdecke die vielfältigen Dienstleistungen, die Joel Digitals anbietet, um dein Unternehmen digital voranzubringen.",
+      "services": [
+        "Webentwicklung",
+        "Mobile App-Entwicklung",
+        "Digitales Marketing",
+        "Grafikdesign",
+        "IT-Beratung"
+      ],
+      "link": "https://joel-digitals.de/services/"
     }
   },
   "en": {

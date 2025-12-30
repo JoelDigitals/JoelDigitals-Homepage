@@ -203,6 +203,25 @@ def support_tickets_app(request):
             sender=request.user,
             message=ticket.description
         )
+        send_mail(
+            subject=f"Neues Support-Ticket: {ticket.subject}",
+            message=f"Ein neues Support-Ticket wurde erstellt.\n\nTicket-Nummer: {ticket.ticket_number}\nBetreff: {ticket.subject}\n\nBitte im Admin-Bereich prüfen.",
+            from_email=settings.COMPANY_EMAIL_NO_REPLY,
+            recipient_list=[settings.SUPPORT_EMAIL]
+        )
+        send_mail(
+            subject=f"Dein Support-Ticket wurde erstellt: {ticket.subject}",
+            message=f"Hallo {request.user.get_full_name() or request.user.username},\n\n"
+                    f"dein Support-Ticket wurde erfolgreich erstellt.\n\n"
+                    f"Ticket-Nummer: {ticket.ticket_number}\n"
+                    f"Betreff: {ticket.subject}\n\n"
+                    "Unser Support-Team wird sich so schnell wie möglich bei dir melden.\n\n"
+                    "Vielen Dank für deine Geduld!\n\n"
+                    "Mit freundlichen Grüßen\n"
+                    "Dein Joel Digitals Team",
+            from_email=settings.COMPANY_EMAIL_NO_REPLY,
+            recipient_list=[ticket.email]
+        )
         messages.success(request, "Ticket erfolgreich erstellt.")
         return redirect('support_tickets_app')
 
@@ -211,13 +230,12 @@ def support_tickets_app(request):
 
 @login_required
 def ticket_detail_app(request, ticket_number):
-    user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
+    user_groups = [group.name for group in request.user.groups.all()]
     ticket = get_object_or_404(SupportTicket, ticket_number=ticket_number)
 
-    # Nur Zugriff, wenn eigener User oder Admin
+    # 🔐 Zugriff prüfen
     if ticket.user != request.user and not request.user.is_staff:
-        messages.error(request, "Du hast keinen Zugriff auf dieses Ticket.")
-        return redirect('support_tickets_app')
+        raise PermissionDenied()
 
     if request.method == 'POST':
         form = TicketMessageForm(request.POST)
@@ -227,15 +245,47 @@ def ticket_detail_app(request, ticket_number):
             message.sender = request.user
             message.save()
 
-            # Ticket ggf. reaktivieren
+            # 🔁 Ticket ggf. reaktivieren
             ticket.reactivate_if_new_message(request.user)
-            return redirect('ticket_detail_app', ticket_number=ticket.ticket_number)
+
+            # 🔁 Empfänger bestimmen
+            if request.user == ticket.user:
+                recipient = settings.SUPPORT_EMAIL  # z. B. info@joel-digitals.com
+            else:
+                recipient = ticket.user.email
+
+            ticket_url = request.build_absolute_uri(
+                reverse("ticket_detail", args=[ticket.ticket_number])
+            )
+
+            html_content = render_to_string(
+                "emails/ticket_message.html",
+                {
+                    "ticket": ticket,
+                    "message": message.message,
+                    "sender": request.user.get_full_name() or request.user.username,
+                    "ticket_url": ticket_url
+                }
+            )
+
+            email = EmailMultiAlternatives(
+                subject=f"Neue Nachricht zu Ticket #{ticket.ticket_number}",
+                body="Neue Ticket-Nachricht",
+                from_email=settings.COMPANY_EMAIL_NO_REPLY,
+                to=[recipient]
+            )
+            email.attach_alternative(html_content, "text/html")
+            email.send()
+
+            messages.success(request, "Nachricht gesendet.")
+            return redirect('ticket_detail', ticket_number=ticket.ticket_number)
+
     else:
         form = TicketMessageForm()
 
     messages_list = ticket.messages.order_by('created_at')
 
-    return render(request, 'mobile/ticket_detail.html', {
+    return render(request, 'contact/ticket_detail.html', {
         'ticket': ticket,
         'messages': messages_list,
         'form': form,
@@ -426,44 +476,55 @@ def ticket_detail_view_app(request, ticket_number):
     })
 
 def appointment_create_app(request):
-    selected_date = None
-    available_slots = None
-
+    """Hauptview für die Terminbuchung"""
     if request.method == 'POST':
         form = AppointmentForm(request.POST)
-
-        if "check_slots" in request.POST:
-            selected_date = datetime.strptime(request.POST.get("date"), "%Y-%m-%d").date()
-            available_slots = get_available_times(selected_date)
-        else:
-            if form.is_valid():
-                appointment = form.save(commit=False)
-
-                if not is_slot_available(appointment.appointment_datetime,
-                                         appointment.appointment_type.duration_minutes):
-                    form.add_error("appointment_datetime", "Dieser Slot ist bereits voll!")
-                    return render(request, "mobile/appointment_form.html", {
-                        "form": form,
-                        "available_slots": None
-                    })
-
-                appointment.save()
-
-                send_mail(
-                    subject="Neue Terminbuchung",
-                    message="Ein neuer Termin wurde angelegt.",
-                    from_email="no-reply@joel-digitals.com",
-                    recipient_list=["info@joel-digitals.com"]
+        
+        if form.is_valid():
+            appointment = form.save(commit=False)
+            appointment_type = appointment.appointment_type
+            
+            # Finale Verfügbarkeitsprüfung
+            slot_start = appointment.appointment_datetime
+            
+            if not is_slot_available(
+                slot_start, 
+                appointment_type.duration_minutes, 
+                max_parallel=2
+            ):
+                form.add_error(
+                    "appointment_datetime", 
+                    "Dieser Zeitslot ist leider bereits ausgebucht. Bitte wählen Sie einen anderen."
                 )
+            else:
+                appointment.save()
+                
+                # E-Mail-Benachrichtigung
+                send_mail(
+                    subject=f"Neue Terminbuchung: {appointment_type.name}",
+                    message=f"""
+Neuer Termin wurde gebucht:
 
+Name: {appointment.first_name} {appointment.last_name}
+E-Mail: {appointment.email}
+Telefon: {appointment.phone}
+Terminart: {appointment_type.name}
+Datum/Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}
+Dauer: {appointment_type.duration_minutes} Minuten
+
+Status: {appointment.get_status_display()}
+                    """,
+                    from_email="no-reply@joel-digitals.com",
+                    recipient_list=["info@joel-digitals.com"],
+                    fail_silently=False,
+                )
+                
                 return redirect("appointment_success_app")
     else:
         form = AppointmentForm()
 
     return render(request, "mobile/appointment_form.html", {
-        "form": form,
-        "available_slots": available_slots,
-        "selected_date": selected_date
+        "form": form
     })
 
 

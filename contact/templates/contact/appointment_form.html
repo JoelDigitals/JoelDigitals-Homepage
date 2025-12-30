@@ -633,7 +633,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadingCalendar.classList.add('show');
         calendarContent.classList.remove('show');
         
-        fetch('{% url "api_available_dates" %}')
+        fetch('{% url "get_available_dates" %}')
             .then(response => response.json())
             .then(data => {
                 availableDates = data.dates;
@@ -677,7 +677,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Tage des Monats
         for (let day = 1; day <= lastDay.getDate(); day++) {
             const date = new Date(year, month, day);
-            const dateStr = date.toISOString().split('T')[0];
+            // Formatiere Datum manuell um Timezone-Probleme zu vermeiden
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const isAvailable = availableDates.includes(dateStr);
             const isPast = date < today;
             const isSelected = selectedDate === dateStr;
@@ -718,7 +719,7 @@ document.addEventListener('DOMContentLoaded', function() {
         noSlots.classList.remove('show');
         loadingSlots.classList.add('show');
         
-        fetch(`{% url "api_slots" %}?date=${dateStr}&type=${typeId}`)
+        fetch(`{% url "get_slots" %}?date=${dateStr}&type=${typeId}`)
             .then(response => response.json())
             .then(data => {
                 loadingSlots.classList.remove('show');
@@ -733,7 +734,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 
-                const d = new Date(dateStr + 'T00:00:00');
+                // Parse Datum OHNE Timezone-Konvertierung
+                const [year, month, day] = dateStr.split('-');
+                const d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                
                 selectedDateDisplay.textContent = d.toLocaleDateString('de-DE', {
                     weekday: 'long',
                     year: 'numeric',
@@ -774,17 +778,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const dt = new Date(datetime);
         
         // Formatiere für Django (YYYY-MM-DD HH:MM:SS)
-        const year = dt.getFullYear();
-        const month = String(dt.getMonth() + 1).padStart(2, '0');
-        const day = String(dt.getDate()).padStart(2, '0');
-        const hours = String(dt.getHours()).padStart(2, '0');
-        const minutes = String(dt.getMinutes()).padStart(2, '0');
+        const year = dt.getUTCFullYear();
+        const month = String(dt.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(dt.getUTCDate()).padStart(2, '0');
+        const hours = String(dt.getUTCHours()).padStart(2, '0');
+        const minutes = String(dt.getUTCMinutes()).padStart(2, '0');
         const djangoFormat = `${year}-${month}-${day} ${hours}:${minutes}:00`;
         
         datetimeInput.value = djangoFormat;
         
-        // Zeige das gewählte Datum an (lokal)
-        const d = new Date(dateStr + 'T00:00:00');
+        // Parse Datum OHNE Timezone-Konvertierung für Anzeige
+        const [yearStr, monthStr, dayStr] = dateStr.split('-');
+        const d = new Date(parseInt(yearStr), parseInt(monthStr) - 1, parseInt(dayStr));
         const dateFormatted = d.toLocaleDateString('de-DE', {
             weekday: 'short',
             year: 'numeric',
