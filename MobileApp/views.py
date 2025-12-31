@@ -563,7 +563,10 @@ def update_appointment_status_app(request, pk, status):
             f"- Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n\n"
 
             "Bitte halten Sie sich den Termin frei und seien Sie pünktlich.\n\n" \
-            f"Bitte rufen sie und am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')} an unter der Nummer: +4915253480270 an\n\n"
+            f"Sie werden im Nahgang eine Mail mit einer Meeting Einladung an {appointment.email} senden.\n\n"
+            "Falls sie keine Einladung erhalten haben, werden sie zu Terminbeginn von der Nummer +4915253480270 angerufen.\n\n"
+            "Falls Sie den Termin nicht wahrnehmen können, bitten wir Sie, uns rechtzeitig zu informieren.\n\n"
+            "Bei Fragen stehen wir Ihnen gerne zur Verfügung.\n\n"
             "Mit freundlichen Grüßen\n"
             "Bis bald!\nIhr Joel Digitals Team"
         )
