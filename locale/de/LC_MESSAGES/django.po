@@ -1342,3 +1342,96 @@ msgstr "Dieses Impressum gilt für alle unsere Apps und Social-Media-Konten."
 
 msgid "This Privacy Policy applies to all our apps and social media accounts."
 msgstr "Diese Datenschutzerklärung gilt für alle unsere Apps und Social-Media-Konten."
+
+msgid "Allgemeine Geschäftsbedingungen (AGB)"
+msgstr "Allgemeine Geschäftsbedingungen (AGB)"
+
+msgid "Joel Digitals betreibt einen Online-Shop für digitale Produkte, Lizenzschlüssel, Design-Leistungen und Programmierung. Mit dem Zugriff auf diese Website oder dem Kauf von Produkten akzeptieren Sie die nachfolgenden Bedingungen."
+msgstr "Joel Digitals betreibt einen Online-Shop für digitale Produkte, Lizenzschlüssel, Design-Leistungen und Programmierung. Mit dem Zugriff auf diese Website oder dem Kauf von Produkten akzeptieren Sie die nachfolgenden Bedingungen."
+
+msgid "1. Geltungsbereich"
+msgstr "1. Geltungsbereich"
+
+msgid "Diese AGB gelten für alle Kunden, sowohl Privatpersonen als auch Unternehmen, die Produkte oder Dienstleistungen von Joel Digitals erwerben."
+msgstr "Diese AGB gelten für alle Kunden, sowohl Privatpersonen als auch Unternehmen, die Produkte oder Dienstleistungen von Joel Digitals erwerben."
+
+msgid "2. Vertragsschluss"
+msgstr "2. Vertragsschluss"
+
+msgid "Ein Vertrag kommt zustande mit dem Kauf durch Abschluss des Bestellprozesses im Shop, durch Bestätigung per E-Mail oder durch schriftliche Vereinbarung (z. B. bei individuellen Leistungen)."
+msgstr "Ein Vertrag kommt zustande mit dem Kauf durch Abschluss des Bestellprozesses im Shop, durch Bestätigung per E-Mail oder durch schriftliche Vereinbarung (z. B. bei individuellen Leistungen)."
+
+msgid "3. Leistungen und Produkte"
+msgstr "3. Leistungen und Produkte"
+
+msgid "Joel Digitals bietet Folgendes an:"
+msgstr "Joel Digitals bietet Folgendes an:"
+
+msgid "Digitale Produkte und Lizenzschlüssel"
+msgstr "Digitale Produkte und Lizenzschlüssel"
+
+msgid "E-Books über Drittanbieter (z. B. Amazon)"
+msgstr "E-Books über Drittanbieter (z. B. Amazon)"
+
+msgid "Design-Leistungen (auf Anfrage)"
+msgstr "Design-Leistungen (auf Anfrage)"
+
+msgid "Programmier-Leistungen wie Apps, Webseiten, Google Sites (auf Anfrage)"
+msgstr "Programmier-Leistungen wie Apps, Webseiten, Google Sites (auf Anfrage)"
+
+msgid "4. Nutzungsrechte und Lizenzen"
+msgstr "4. Nutzungsrechte und Lizenzen"
+
+msgid "Mit dem Kauf eines digitalen Produkts oder Lizenzschlüssels erhält der Kunde ein einfaches, nicht exklusives Nutzungsrecht. Eine Weitergabe oder Vervielfältigung an Dritte ist ohne ausdrückliche Genehmigung untersagt."
+msgstr "Mit dem Kauf eines digitalen Produkts oder Lizenzschlüssels erhält der Kunde ein einfaches, nicht exklusives Nutzungsrecht. Eine Weitergabe oder Vervielfältigung an Dritte ist ohne ausdrückliche Genehmigung untersagt."
+
+msgid "5. Lieferung und Bereitstellung"
+msgstr "5. Lieferung und Bereitstellung"
+
+msgid "Digitale Produkte und Lizenzschlüssel werden per E-Mail oder über das Kundenkonto bereitgestellt. Für E-Books über Drittanbieter gelten deren Lieferbedingungen."
+msgstr "Digitale Produkte und Lizenzschlüssel werden per E-Mail oder über das Kundenkonto bereitgestellt. Für E-Books über Drittanbieter gelten deren Lieferbedingungen."
+
+msgid "6. Preise und Zahlung"
+msgstr "6. Preise und Zahlung"
+
+msgid "Preise verstehen sich in Euro (€). Akzeptierte Zahlungsmethoden sind PayPal, Überweisung, Stripe (inkl. Apple Pay, Google Pay) und weitere zukünftig angekündigte Methoden."
+msgstr "Preise verstehen sich in Euro (€). Akzeptierte Zahlungsmethoden sind PayPal, Überweisung, Stripe (inkl. Apple Pay, Google Pay) und weitere zukünftig angekündigte Methoden."
+
+msgid "7. Anpassungs- und Supportfrist"
+msgstr "7. Anpassungs- und Supportfrist"
+
+msgid "Für programmierte Produkte besteht eine 7-tägige Anpassungsfrist bei berechtigten funktionalen Problemen nach Lieferung. Grundlegende Neuprogrammierungen sind davon ausgeschlossen."
+msgstr "Für programmierte Produkte besteht eine 7-tägige Anpassungsfrist bei berechtigten funktionalen Problemen nach Lieferung. Grundlegende Neuprogrammierungen sind davon ausgeschlossen."
+
+msgid "8. Widerrufsrecht"
+msgstr "8. Widerrufsrecht"
+
+msgid "Verbraucher haben ein gesetzliches Widerrufsrecht von 14 Tagen. Dieses erlischt jedoch, sobald der Kunde ausdrücklich zustimmt, dass die digitale Lieferung vor Ablauf der Frist beginnt und der Kunde mit der Bereitstellung einverstanden ist."
+msgstr "Verbraucher haben ein gesetzliches Widerrufsrecht von 14 Tagen. Dieses erlischt jedoch, sobald der Kunde ausdrücklich zustimmt, dass die digitale Lieferung vor Ablauf der Frist beginnt und der Kunde mit der Bereitstellung einverstanden ist."
+
+msgid "9. Rückgabe und Erstattungen"
+msgstr "9. Rückgabe und Erstattungen"
+
+msgid "Nach Aktivierung oder Lieferung digitaler Produkte ist eine Rückgabe ausgeschlossen. Design-Leistungen und andere Services sind ebenfalls vom Rückgaberecht ausgeschlossen."
+msgstr "Nach Aktivierung oder Lieferung digitaler Produkte ist eine Rückgabe ausgeschlossen. Design-Leistungen und andere Services sind ebenfalls vom Rückgaberecht ausgeschlossen."
+
+msgid "10. Haftung und Gewährleistung"
+msgstr "10. Haftung und Gewährleistung"
+
+msgid "Joel Digitals haftet nur für Vorsatz und grobe Fahrlässigkeit im gesetzlich zulässigen Rahmen. Für indirekte Schäden, entgangene Gewinne oder Datenverluste wird keine Haftung übernommen."
+msgstr "Joel Digitals haftet nur für Vorsatz und grobe Fahrlässigkeit im gesetzlich zulässigen Rahmen. Für indirekte Schäden, entgangene Gewinne oder Datenverluste wird keine Haftung übernommen."
+
+msgid "11. Anwendbares Recht und Gerichtsstand"
+msgstr "11. Anwendbares Recht und Gerichtsstand"
+
+msgid "Es gilt deutsches Recht unter Ausschluss des UN-Kaufrechts. Gerichtsstand ist Saarland, Deutschland."
+msgstr "Es gilt deutsches Recht unter Ausschluss des UN-Kaufrechts. Gerichtsstand ist Saarland, Deutschland."
+
+msgid "12. Kontakt"
+msgstr "12. Kontakt"
+
+msgid "Bei Fragen oder Problemen kontaktieren Sie uns unter:"
+msgstr "Bei Fragen oder Problemen kontaktieren Sie uns unter:"
+
+msgid "support@joel-digitals.com"
+msgstr "support@joel-digitals.com"

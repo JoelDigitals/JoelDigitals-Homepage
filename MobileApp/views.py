@@ -563,7 +563,7 @@ def update_appointment_status_app(request, pk, status):
             f"- Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n\n"
 
             "Bitte halten Sie sich den Termin frei und seien Sie pünktlich.\n\n" \
-            f"Sie werden im Nahgang eine Mail mit einer Meeting Einladung an {appointment.email} senden.\n\n"
+            f"Sie werden im Nachgang eine Mail mit einer Meeting Einladung an {appointment.email} senden.\n\n"
             "Falls sie keine Einladung erhalten haben, werden sie zu Terminbeginn von der Nummer +4915253480270 angerufen.\n\n"
             "Falls Sie den Termin nicht wahrnehmen können, bitten wir Sie, uns rechtzeitig zu informieren.\n\n"
             "Bei Fragen stehen wir Ihnen gerne zur Verfügung.\n\n"
@@ -575,7 +575,7 @@ def update_appointment_status_app(request, pk, status):
         message = (
             f"Hallo {appointment.first_name},\n\n"
             f"Ihr Termin am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')} wurde leider abgelehnt.\n\n"
-            "Bitte buchen Sie ggf. einen neuen Termin.\n\n"
+            
             "Wir entschuldigen uns für die Unannehmlichkeiten und hoffen, dass wir bald einen passenden Termin finden.\n\n"
             "Bitte buchen Sie ggf. einen neuen Termin über unsere Website oder nehmen sie über unser Kontaktformular/Ticketsystem Kontakt mit uns auf.\n\n"
             

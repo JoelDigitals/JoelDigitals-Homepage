@@ -1342,3 +1342,96 @@ msgstr "This Imprint is valid for all our Apps and Social Media Accounts."
 
 msgid "This Privacy Policy applies to all our apps and social media accounts."
 msgstr "This Privacy Policy applies to all our apps and social media accounts."
+
+msgid "Allgemeine Geschäftsbedingungen (AGB)"
+msgstr "Terms and Conditions"
+
+msgid "Joel Digitals betreibt einen Online-Shop für digitale Produkte, Lizenzschlüssel, Design-Leistungen und Programmierung. Mit dem Zugriff auf diese Website oder dem Kauf von Produkten akzeptieren Sie die nachfolgenden Bedingungen."
+msgstr "Joel Digitals operates an online shop for digital products, license keys, design services and programming. By accessing this website or purchasing products, you agree to the following terms."
+
+msgid "1. Geltungsbereich"
+msgstr "1. Scope"
+
+msgid "Diese AGB gelten für alle Kunden, sowohl Privatpersonen als auch Unternehmen, die Produkte oder Dienstleistungen von Joel Digitals erwerben."
+msgstr "These terms apply to all customers, both consumers and businesses, purchasing from Joel Digitals."
+
+msgid "2. Vertragsschluss"
+msgstr "2. Conclusion of Contract"
+
+msgid "Ein Vertrag kommt zustande mit dem Kauf durch Abschluss des Bestellprozesses im Shop, durch Bestätigung per E-Mail oder durch schriftliche Vereinbarung (z. B. bei individuellen Leistungen)."
+msgstr "A contract is concluded when the purchase process is completed in the shop, confirmed by email, or agreed in writing (e.g., for custom services)."
+
+msgid "3. Leistungen und Produkte"
+msgstr "3. Services and Products"
+
+msgid "Joel Digitals bietet Folgendes an:"
+msgstr "Joel Digitals offers the following:"
+
+msgid "Digitale Produkte und Lizenzschlüssel"
+msgstr "Digital products and license keys"
+
+msgid "E-Books über Drittanbieter (z. B. Amazon)"
+msgstr "E-books via third-party platforms (e.g., Amazon)"
+
+msgid "Design-Leistungen (auf Anfrage)"
+msgstr "Design services (on request)"
+
+msgid "Programmier-Leistungen wie Apps, Webseiten, Google Sites (auf Anfrage)"
+msgstr "Custom software and web development (on request)"
+
+msgid "4. Nutzungsrechte und Lizenzen"
+msgstr "4. Usage Rights and Licenses"
+
+msgid "Mit dem Kauf eines digitalen Produkts oder Lizenzschlüssels erhält der Kunde ein einfaches, nicht exklusives Nutzungsrecht. Eine Weitergabe oder Vervielfältigung an Dritte ist ohne ausdrückliche Genehmigung untersagt."
+msgstr "By purchasing a digital product or license key, the customer is granted a simple, non-exclusive right of use. Transfer or copying to third parties is prohibited without explicit permission."
+
+msgid "5. Lieferung und Bereitstellung"
+msgstr "5. Delivery and Provision"
+
+msgid "Digitale Produkte und Lizenzschlüssel werden per E-Mail oder über das Kundenkonto bereitgestellt. Für E-Books über Drittanbieter gelten deren Lieferbedingungen."
+msgstr "Digital products and license keys are delivered via email or customer account. For e-books sold through third parties, their delivery terms apply."
+
+msgid "6. Preise und Zahlung"
+msgstr "6. Prices and Payment"
+
+msgid "Preise verstehen sich in Euro (€). Akzeptierte Zahlungsmethoden sind PayPal, Überweisung, Stripe (inkl. Apple Pay, Google Pay) und weitere zukünftig angekündigte Methoden."
+msgstr "All prices are in Euros (€). Accepted payment methods include PayPal, bank transfer, Stripe (including Apple Pay, Google Pay), and other future methods."
+
+msgid "7. Anpassungs- und Supportfrist"
+msgstr "7. Adjustment and Support Period"
+
+msgid "Für programmierte Produkte besteht eine 7-tägige Anpassungsfrist bei berechtigten funktionalen Problemen nach Lieferung. Grundlegende Neuprogrammierungen sind davon ausgeschlossen."
+msgstr "For custom-developed products, there is a 7-day correction period for valid functional issues after delivery. Major reprogramming is excluded."
+
+msgid "8. Widerrufsrecht"
+msgstr "8. Right of Withdrawal"
+
+msgid "Verbraucher haben ein gesetzliches Widerrufsrecht von 14 Tagen. Dieses erlischt jedoch, sobald der Kunde ausdrücklich zustimmt, dass die digitale Lieferung vor Ablauf der Frist beginnt und der Kunde mit der Bereitstellung einverstanden ist."
+msgstr "Consumers have a 14-day statutory right of withdrawal. This ceases when the consumer agrees that the digital delivery starts before the end of this period."
+
+msgid "9. Rückgabe und Erstattungen"
+msgstr "9. Returns and Refunds"
+
+msgid "Nach Aktivierung oder Lieferung digitaler Produkte ist eine Rückgabe ausgeschlossen. Design-Leistungen und andere Services sind ebenfalls vom Rückgaberecht ausgeschlossen."
+msgstr "After activation or delivery of digital products, returns are excluded. Design and other services are also non-returnable."
+
+msgid "10. Haftung und Gewährleistung"
+msgstr "10. Liability and Warranty"
+
+msgid "Joel Digitals haftet nur für Vorsatz und grobe Fahrlässigkeit im gesetzlich zulässigen Rahmen. Für indirekte Schäden, entgangene Gewinne oder Datenverluste wird keine Haftung übernommen."
+msgstr "Joel Digitals is only liable for intent and gross negligence as permitted by law. No liability for indirect damages, lost profits, or data loss."
+
+msgid "11. Anwendbares Recht und Gerichtsstand"
+msgstr "11. Governing Law and Jurisdiction"
+
+msgid "Es gilt deutsches Recht unter Ausschluss des UN-Kaufrechts. Gerichtsstand ist Saarland, Deutschland."
+msgstr "German law applies, excluding the UN Sales Convention. Jurisdiction is Saarland, Germany."
+
+msgid "12. Kontakt"
+msgstr "12. Contact"
+
+msgid "Bei Fragen oder Problemen kontaktieren Sie uns unter:"
+msgstr "For inquiries or issues, contact us at:"
+
+msgid "support@joel-digitals.com"
+msgstr "support@joel-digitals.com"
