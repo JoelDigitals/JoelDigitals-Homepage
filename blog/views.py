@@ -114,7 +114,19 @@ def blog_detail(request, pk):
 @user_passes_test(is_blog_editor)
 def admin_blog(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
-    posts = BlogPost.objects.all().order_by('-created_at')
+    
+    # Nur die nötigsten Felder laden
+    posts = BlogPost.objects.all().only(
+        'id', 'title_de', 'title_en', 'created_at', 
+        'is_published', 'teaser_image', 'views'
+    ).prefetch_related('categories').order_by('-created_at')
+    
+    lang = request.LANGUAGE_CODE
+    for post in posts:
+        post.title = post.title_en if lang == "en" else post.title_de
+        # Teaser OHNE den vollen Content zu laden
+        post.teaser_text = ""  # Erstmal leer lassen zum Testen
+    
     return render(request, 'blog/admin_blog.html', {
         'posts': posts,
         'user_groups': user_groups

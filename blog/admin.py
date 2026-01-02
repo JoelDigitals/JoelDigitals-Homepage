@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BlogPost, BlogCategory
+from .models import BlogPost, BlogCategory, Comment
 
 @admin.register(BlogPost)
 class BlogPostAdmin(admin.ModelAdmin):
@@ -12,3 +12,9 @@ class BlogPostAdmin(admin.ModelAdmin):
 @admin.register(BlogCategory)
 class BlogCategoryAdmin(admin.ModelAdmin):
     list_display = ('name',)
+    
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('post', 'user', 'created_at')
+    list_filter = ('created_at',)
