@@ -66,6 +66,8 @@ h1,h2,h3{color:#fff;}
   border-radius:16px;
   box-shadow:0 8px 24px rgba(0,0,0,0.4);
   transition: transform .3s;
+  height: auto;
+  object-fit: cover;
 }
 .alt-section img:hover { transform: scale(1.05); }
 .alt-section .text { flex:1 1 50%; min-width:280px; }
@@ -90,7 +92,12 @@ h1,h2,h3{color:#fff;}
   flex-direction:column;
 }
 .card:hover { transform: translateY(-6px) scale(1.02); box-shadow:0 14px 36px rgba(0,0,0,0.5);}
-.card img { width:100%; aspect-ratio:16/10; object-fit:cover; transition: transform .3s; }
+.card img { 
+  width:100%; 
+  height: 200px;
+  object-fit:cover; 
+  transition: transform .3s;
+}
 .card img:hover { transform: scale(1.05); }
 .card-body { padding:1.2rem; flex:1; display:flex; flex-direction:column; color:#ddd; }
 .card-body h3 { font-size:1.2rem; margin-bottom:0.6rem; color:#fff; }
@@ -122,9 +129,16 @@ h1,h2,h3{color:#fff;}
   transform: translateY(-5px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
+.product-image {
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+  background: #2b2b2b;
+}
 .product-image img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   display: block;
 }
 .product-details {
@@ -210,6 +224,43 @@ h1,h2,h3{color:#fff;}
 }
 .hours-section p, .contact-section p { color:#ccc; max-width:600px; margin:1rem auto 0; font-size:1rem; }
 
+/* Rating Section */
+.rating-stars {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 1rem auto;
+  flex-wrap: wrap;
+}
+
+.rating-star {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.rating-star-filled {
+  color: #fbbf24;
+}
+
+.rating-star-empty {
+  color: #4b5563;
+}
+
+.rating-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  color: #fff;
+}
+
+.rating-count {
+  font-size: 0.95rem;
+  color: #9ca3af;
+  margin: 0.25rem 0 1.5rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .hero h1 { font-size:1.8rem; }
@@ -218,6 +269,33 @@ h1,h2,h3{color:#fff;}
   .alt-section img, .alt-section .text { flex:1 1 90%; max-width:90%; }
   .cta-btn { padding:0.6rem 1.2rem; font-size:0.9rem; }
   .white-wrapper { padding:1rem; }
+  
+  .rating-star {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .rating-text {
+    font-size: 1.25rem;
+  }
+  
+  .product-image {
+    height: 200px;
+  }
+  
+  .card img {
+    height: 180px;
+  }
+}
+
+/* Safari/iOS specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .product-image img,
+  .card img,
+  .alt-section img {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
 }
 </style>
 
@@ -318,39 +396,40 @@ h1,h2,h3{color:#fff;}
     </div>
   </section>
 
-<!-- ⭐ Durchschnittsbewertung -->
-<section class="hours-section" data-aos="fade-up">
-  <h2 class="text-center font-bold text-3xl">⭐ {% trans "Customer Rating" %}</h2>
+  <!-- ⭐ Durchschnittsbewertung -->
+  <section class="hours-section" data-aos="fade-up">
+    <h2 style="font-weight:700; font-size:2rem; margin-bottom:1rem;">⭐ {% trans "Rating" %}</h2>
 
-  <div class="text-center mt-4">
-    <div class="flex justify-center mb-2">
-      {% for i in "12345" %}
-        {% if forloop.counter <= rating.stars|default:0 %}
-          <svg class="w-6 h-6 text-yellow-400 inline-block" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M9.049 2.927l1.902 3.854 4.256.619-3.079 3.001.726 4.233-3.805-2.001-3.805 2.001.726-4.233L2.89 7.4l4.256-.619L9.05 2.927z"/>
-          </svg>
-        {% else %}
-          <svg class="w-6 h-6 text-gray-600 inline-block" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M9.049 2.927l1.902 3.854 4.256.619-3.079 3.001.726 4.233-3.805-2.001-3.805 2.001.726-4.233L2.89 7.4l4.256-.619L9.05 2.927z"/>
-          </svg>
-        {% endif %}
-      {% endfor %}
+    <div style="text-align:center;">
+      <!-- Sterne nebeneinander -->
+      <div class="rating-stars">
+        {% for i in "12345" %}
+          {% if forloop.counter <= rating.stars|default:0 %}
+            <svg class="rating-star rating-star-filled" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927l1.902 3.854 4.256.619-3.079 3.001.726 4.233-3.805-2.001-3.805 2.001.726-4.233L2.89 7.4l4.256-.619L9.05 2.927z"/>
+            </svg>
+          {% else %}
+            <svg class="rating-star rating-star-empty" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927l1.902 3.854 4.256.619-3.079 3.001.726 4.233-3.805-2.001-3.805 2.001.726-4.233L2.89 7.4l4.256-.619L9.05 2.927z"/>
+            </svg>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Rating Text -->
+      <p class="rating-text">
+        {{ rating.average|default:"0.0" }} / 5
+      </p>
+      <p class="rating-count">
+        {% blocktrans with count=rating.count|default:"0" %}based on {{ count }} reviews{% endblocktrans %}
+      </p>
+
+      <!-- Button -->
+      <a href="{% url 'reviews' %}" class="cta-btn">
+        {% trans "Customer Testimonials and Reviews" %}
+      </a>
     </div>
-
-    <p class="text-lg font-semibold mt-2">
-      {{ rating.average|default:"0.0" }} / 5
-    </p>
-    <p class="text-sm text-gray-400">
-      {% blocktrans with count=rating.count|default:"0" %}based on {{ count }} reviews{% endblocktrans %}
-    </p>
-  </div>
-
-  <div class="text-center mt-4">
-    <a href="{% url 'reviews' %}" class="cta-btn">
-      {% trans "Customer Testimonials and Reviews" %}
-    </a>
-  </div>
-</section>
+  </section>
 
   <!-- Blog -->
   {% if latest_blog %}

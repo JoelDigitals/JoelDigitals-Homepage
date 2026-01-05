@@ -1468,3 +1468,21 @@ msgstr "Submit a Review"
 
 msgid "Absenden"
 msgstr "Submit"
+
+msgid "Rating"
+msgstr "Rating"
+
+msgid "Thank you for your review!"
+msgstr "Thank you for your review!"
+
+msgid "Your review has been submitted successfully and will be published shortly after approval."
+msgstr "Your review has been submitted successfully and will be published shortly after approval."
+
+msgid "Rate us on Google as well"
+msgstr "Rate us on Google as well"
+
+msgid "Leave a Google review"
+msgstr "Leave a Google review"
+
+msgid "Back to homepage"
+msgstr "Back to homepage"

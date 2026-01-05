@@ -1,0 +1,43 @@
+{% extends "base_home.html" %}
+{% load i18n %}
+
+{% block content %}
+<section class="min-h-[70vh] flex items-center justify-center px-4">
+  <div class="max-w-xl w-full text-center bg-gray-900 rounded-2xl p-8 shadow-xl">
+
+    <!-- Icon -->
+    <div class="text-5xl mb-4">🎉</div>
+
+    <!-- Titel -->
+    <h1 class="text-2xl sm:text-3xl font-bold mb-4">
+      {% trans "Thank you for your review!" %}
+    </h1>
+
+    <!-- Text -->
+    <p class="text-gray-300 mb-6 leading-relaxed">
+      {% trans "Your review has been submitted successfully and will be published shortly after approval." %}
+    </p>
+
+    <!-- Google CTA -->
+    <div class="bg-gray-800 rounded-xl p-5 mb-6">
+      <p class="font-semibold mb-3">
+        ⭐ {% trans "Rate us on Google as well" %}
+      </p>
+
+      <a href="https://g.page/r/CS8zMNPtOaaIEAE/review"
+         target="_blank"
+         rel="noopener"
+         class="inline-block w-full sm:w-auto px-6 py-3 rounded-lg bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-semibold hover:opacity-90 transition">
+        {% trans "Leave a Google review" %}
+      </a>
+    </div>
+
+    <!-- Zurück -->
+    <a href="{% url 'home' %}"
+       class="text-sm text-gray-400 hover:text-white transition">
+      ← {% trans "Back to homepage" %}
+    </a>
+
+  </div>
+</section>
+{% endblock %}

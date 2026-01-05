@@ -1468,3 +1468,21 @@ msgstr "Bewertung abgeben"
 
 msgid "Absenden"
 msgstr "Absenden"
+
+msgid "Rating"
+msgstr "Bewertung"
+
+msgid "Thank you for your review!"
+msgstr "Vielen Dank für deine Bewertung!"
+
+msgid "Your review has been submitted successfully and will be published shortly after approval."
+msgstr "Deine Bewertung wurde erfolgreich übermittelt und wird in Kürze nach Freigabe veröffentlicht."
+
+msgid "Rate us on Google as well"
+msgstr "Bewerte uns auch gerne auf Google"
+
+msgid "Leave a Google review"
+msgstr "Google Bewertung abgeben"
+
+msgid "Back to homepage"
+msgstr "Zurück zur Startseite"
