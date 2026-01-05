@@ -72,9 +72,11 @@ def terms_view(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     return render(request, 'legal/terms.html', {'user_groups': user_groups})
 
+from reviews.utils import get_average_rating
+
 def home(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
-    lang = request.LANGUAGE_CODE  # ← aktuelle Sprache ("de" oder "en")
+    lang = request.LANGUAGE_CODE  # aktuelle Sprache ("de" oder "en")
 
     # Neuste Blogartikel
     latest_blog = BlogPost.objects.filter(is_published=True, published_at__lte=now).order_by("-published_at")[:2]
@@ -89,7 +91,6 @@ def home(request):
         product.name = product.name if lang == 'de' else product.name_english
 
     # FAQs – max. 5, Sprache abhängig
-        # FAQs – max. 5, Sprache abhängig
     faqs = FAQ.objects.all()[:5]
     localized_faqs = []
     for f in faqs:
@@ -100,13 +101,18 @@ def home(request):
             "short_answer": f.short_answer_en if lang == "en" else f.short_answer_de,
         })
 
+    # ⭐ Durchschnittsbewertung hinzufügen
+    rating = get_average_rating()
+
     return render(request, 'main/home.html', {
         'user_groups': user_groups,
         'latest_blog': latest_blog,
         'products': random_products,
-        'faqs': faqs,
+        'faqs': localized_faqs,
+        'rating': rating,  # ⭐ hier!
         'lang': lang,
     })
+
 
 #register 
 def register_view(request):

@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'download',
     'MobileApp',
     'chat',
+    "reviews",
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"

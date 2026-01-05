@@ -1435,3 +1435,36 @@ msgstr "For inquiries or issues, contact us at:"
 
 msgid "support@joel-digitals.com"
 msgstr "support@joel-digitals.com"
+
+msgid "Customer Rating"
+msgstr "Customer Rating"
+
+msgid "based on %(count)s reviews"
+msgstr "based on %(count)s reviews"
+
+msgid "Customer Testimonials and Reviews"
+msgstr "Customer Testimonials and Reviews"
+
+msgid "Kundenbewertungen"
+msgstr "Customer Reviews"
+
+msgid "Jetzt bewerten"
+msgstr "Review Now"
+
+msgid "Website Bewertungen"
+msgstr "Website Reviews"
+
+msgid "Google Bewertungen"
+msgstr "Google Reviews"
+
+msgid "Testimonials"
+msgstr "Testimonials"
+
+msgid "Noch keine Bewertungen vorhanden."
+msgstr "No reviews available yet."
+
+msgid "Bewertung abgeben"
+msgstr "Submit a Review"
+
+msgid "Absenden"
+msgstr "Submit"
