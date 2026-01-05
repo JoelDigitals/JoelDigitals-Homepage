@@ -51,13 +51,55 @@ body {
 
 .average-rating .stars {
     display: flex;
-    gap: 0.25rem;
+    gap: 0.35rem;
+    align-items: center;
 }
 
 .average-rating .rating-text {
     font-size: 1.5rem;
     font-weight: 700;
     color: #fff;
+}
+
+/* Star Container for Half Stars */
+.star-container {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+}
+
+.star-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    color: #4b5563;
+}
+
+.star-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    color: #fbbf24;
+    overflow: hidden;
+    clip-path: inset(0 50% 0 0);
+}
+
+/* Größere Sterne für bessere Sichtbarkeit */
+.average-rating .star,
+.average-rating .star-container {
+    width: 24px;
+    height: 24px;
+}
+
+.average-rating .star-bg,
+.average-rating .star-fill {
+    width: 24px;
+    height: 24px;
 }
 
 /* Reviews Grid */
@@ -117,10 +159,12 @@ body {
 .star {
     width: 20px;
     height: 20px;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
 }
 
 .star-filled {
     color: #fbbf24;
+    filter: drop-shadow(0 0 3px rgba(251, 191, 36, 0.5));
 }
 
 .star-empty {
@@ -328,17 +372,36 @@ html {
     {% if average_rating %}
     <div class="average-rating">
       <div class="stars">
+        <!-- Volle Sterne -->
+        {% with full_stars=average_rating|floatformat:0|add:"0" %}
+        {% with half_check=average_rating|stringformat:"f"|slice:"-1" %}
+        
         {% for i in "12345" %}
-          {% if forloop.counter <= average_rating %}
+          {% if forloop.counter <= full_stars %}
+            <!-- Voller Stern -->
             <svg class="star star-filled" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927l1.902 3.854 4.256.619-3.079 3.001.726 4.233-3.805-2.001-3.805 2.001.726-4.233L2.89 7.4l4.256-.619L9.05 2.927z"/>
             </svg>
+          {% elif forloop.counter == full_stars|add:"1" and average_rating|stringformat:"f" != average_rating|floatformat:0|stringformat:"f" %}
+            <!-- Halber Stern -->
+            <div class="star-container">
+              <svg class="star-bg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927l1.902 3.854 4.256.619-3.079 3.001.726 4.233-3.805-2.001-3.805 2.001.726-4.233L2.89 7.4l4.256-.619L9.05 2.927z"/>
+              </svg>
+              <svg class="star-fill" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927l1.902 3.854 4.256.619-3.079 3.001.726 4.233-3.805-2.001-3.805 2.001.726-4.233L2.89 7.4l4.256-.619L9.05 2.927z"/>
+              </svg>
+            </div>
           {% else %}
+            <!-- Leerer Stern -->
             <svg class="star star-empty" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927l1.902 3.854 4.256.619-3.079 3.001.726 4.233-3.805-2.001-3.805 2.001.726-4.233L2.89 7.4l4.256-.619L9.05 2.927z"/>
             </svg>
           {% endif %}
         {% endfor %}
+        
+        {% endwith %}
+        {% endwith %}
       </div>
       <span class="rating-text">{{ average_rating|floatformat:1 }} / 5</span>
     </div>
@@ -430,15 +493,12 @@ html {
     {% for t in testimonials %}
     <div class="review-card">
       <div class="review-header">
-        <span class="reviewer-name">{{ t.name }}</span>
-        {% if t.company %}
-        <span style="color: #888; font-size: 0.875rem;">{{ t.company }}</span>
+        <span class="reviewer-name">{{ t.customer_name }}</span>
+        {% if t.position %}
+        <span style="color: #888; font-size: 0.875rem;">{{ t.position }}</span>
         {% endif %}
       </div>
-      <p class="review-text">{{ t.text|linebreaks }}</p>
-      {% if t.position %}
-      <p class="review-source">{{ t.position }}</p>
-      {% endif %}
+      <p class="review-text">{{ t.text }}</p>
     </div>
     {% endfor %}
   </div>

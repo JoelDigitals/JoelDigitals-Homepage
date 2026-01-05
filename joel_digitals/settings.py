@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     'MobileApp',
     'chat',
     "reviews",
+    'landingpages',
+    'django.contrib.sites',
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
