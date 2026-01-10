@@ -1,3 +1,6 @@
+{% load static %}
+
+{% load static i18n %}
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -5,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Joel Digitals - Ihre digitale Zukunft beginnt hier</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
         
@@ -70,6 +74,35 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
+<!-- Grundlegende SEO-Tags -->
+<meta name="description" content="Joel Digitals – {{ page.seo_description }}">
+<meta name="keywords" content="{{ page.subheadline_de }} | {{ page.subheadline_en }}">
+<meta name="author" content="Joel Digitals">
+
+<!-- Open Graph (Social Media) -->
+<meta property="og:title" content="Joel Digitals – {{ page.seo_title }}">
+<meta property="og:description" content="{{ page.seo_description }}">
+<meta property="og:image" content="https://www.joel-digitals.de{% static 'images/office.png' %}">
+<meta property="og:url" content="https://www.joel-digitals.de/">
+<meta property="og:type" content="website">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Joel Digitals – {{ page.seo_title }}">
+<meta name="twitter:description" content="{{ page.seo_description }}">
+<meta name="twitter:image" content="https://www.joel-digitals.de{% static 'images/office.png' %}">
+
+<!-- Google Site Verification -->
+<meta name="google-site-verification" content="nYCDtmq2NV0GFiHeLJOBxrS7aoBIl6PYI_kk6RjH85k">
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17401744435"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'AW-17401744435');
+</script>
 </head>
 <body class="antialiased">
     <!-- Hero Section -->
@@ -257,7 +290,16 @@
         <div class="max-w-7xl mx-auto text-center">
             <p class="text-lg font-semibold text-white mb-2">Joel Digitals</p>
             <p class="text-sm">© 2025-2026 Alle Rechte vorbehalten</p>
+            <div class="footer-links">
+              <a href="/imprint/">{% trans "Imprint" %}</a> |
+              <a href="/privacy/">{% trans "Privacy Policy" %}</a> |
+              <a href="/terms/">{% trans "Terms of Service" %}</a> |
+              <a href="/">{% trans "Home" %}</a>
+            </div>
         </div>
     </footer>
+
+    <!-- Cookie Banner -->
+{% include 'cookie_banner.html' %}
 </body>
 </html>
