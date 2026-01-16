@@ -848,6 +848,28 @@ def checkout(request):
             bank_name=bank_name
         )
 
+        from django.db.models import F
+        from decimal import Decimal
+        
+        if affiliate_code_obj:
+            partner_user = affiliate_code_obj.partner.user
+        
+            commission_amount = (
+                Decimal(final_total) * Decimal(affiliate_code_obj.partner.commission_percent) / Decimal(100)
+            )
+        
+            wallet, created = Wallet.objects.get_or_create(
+                user=partner_user,
+                defaults={
+                    'balance': Decimal('0.00'),
+                    'pending_earnings': Decimal('0.00')
+                }
+            )
+        
+            Wallet.objects.filter(id=wallet.id).update(
+                pending_earnings=F('pending_earnings') + commission_amount
+            )
+        
         for item in items:
             OrderItem.objects.create(
                 order=order,

@@ -77,7 +77,7 @@ class Wallet(models.Model):
         self.save()
 
     def __str__(self):
-        return f"{self.user.email} – Balance: {self.balance} €, Pending: {self.pending_earnings} €"
+        return f"{self.user} – Balance: {self.balance} €, Pending: {self.pending_earnings} €"
     
 class WalletCode(models.Model):
     code = models.CharField(max_length=50, unique=True)
