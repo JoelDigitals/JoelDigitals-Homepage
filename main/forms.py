@@ -25,3 +25,46 @@ class AskQuestionForm(forms.ModelForm):
             "answer_de": forms.Textarea(attrs={"rows": 5}),
             "answer_en": forms.Textarea(attrs={"rows": 5}),
         }
+
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
+
+class RegisterForm(UserCreationForm):
+
+    accept_agb = forms.BooleanField(
+        required=True,
+        label=_("I agree to the Terms and Conditions")
+    )
+
+    accept_privacy = forms.BooleanField(
+        required=True,
+        label=_("I agree to the Privacy Policy")
+    )
+
+    accept_contact = forms.BooleanField(
+        required=True,
+        label=_(
+            "I agree to be contacted using my provided data (e.g. email) "
+            "for information about price changes or service updates"
+        )
+    )
+
+    accept_marketing = forms.BooleanField(
+        required=False,
+        label=_("I would like to receive marketing emails (optional)")
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "email",
+            "password1",
+            "password2",
+        )
+
+    email = forms.EmailField(
+        required=True,
+        label=_("Email address")
+    )

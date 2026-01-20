@@ -1486,3 +1486,39 @@ msgstr "Google Bewertung abgeben"
 
 msgid "Back to homepage"
 msgstr "Zurück zur Startseite"
+
+msgid "Register"
+msgstr "Registrieren"
+
+msgid "Legal agreements"
+msgstr "Rechtliche Hinweise"
+
+msgid "Optional"
+msgstr "Optional"
+
+msgid "Already registered?"
+msgstr "Schon registriert?"
+
+msgid "Login here"
+msgstr "Zum Login"
+
+msgid "I agree to the"
+msgstr "Ich stimme den"
+
+msgid "Terms and Conditions"
+msgstr "Allgemeinen Geschäftsbedingungen (AGB)"
+
+msgid "Privacy Policy"
+msgstr "Datenschutzbestimmungen"
+
+msgid "I agree to be contacted using my provided data (e.g. email) for information about price changes or service updates"
+msgstr "Ich stimme der Kontaktaufnahme über meine Daten (z. B. E-Mail) zu, um über Preisänderungen oder Aktualisierungen informiert zu werden"
+
+msgid "I would like to receive marketing emails (optional)"
+msgstr "Ich möchte Marketing-E-Mails erhalten (optional)"
+
+msgid "Email address"
+msgstr "E-Mail-Adresse"
+
+msgid "Registration successful. You can now log in."
+msgstr "Registrierung erfolgreich. Du kannst dich jetzt einloggen."

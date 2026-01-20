@@ -1486,3 +1486,39 @@ msgstr "Leave a Google review"
 
 msgid "Back to homepage"
 msgstr "Back to homepage"
+
+msgid "Register"
+msgstr "Register"
+
+msgid "Legal agreements"
+msgstr "Legal agreements"
+
+msgid "Optional"
+msgstr "Optional"
+
+msgid "Already registered?"
+msgstr "Already registered?"
+
+msgid "Login here"
+msgstr "Login here"
+
+msgid "I agree to the"
+msgstr "I agree to the"
+
+msgid "Terms and Conditions"
+msgstr "Terms and Conditions"
+
+msgid "Privacy Policy"
+msgstr "Privacy Policy"
+
+msgid "I agree to be contacted using my provided data (e.g. email) for information about price changes or service updates"
+msgstr "I agree to be contacted using my provided data (e.g. email) for information about price changes or service updates"
+
+msgid "I would like to receive marketing emails (optional)"
+msgstr "I would like to receive marketing emails (optional)"
+
+msgid "Email address"
+msgstr "Email address"
+
+msgid "Registration successful. You can now log in."
+msgstr "Registration successful. You can now log in."

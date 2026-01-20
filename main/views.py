@@ -113,17 +113,22 @@ def home(request):
         'lang': lang,
     })
 
+from django.utils.translation import gettext_lazy as _
+from .forms import RegisterForm
 
-#register 
 def register_view(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Registrierung erfolgreich! Du kannst dich jetzt einloggen.')
+            messages.success(
+                request,
+                _("Registration successful. You can now log in.")
+            )
             return redirect('login')
     else:
-        form = UserCreationForm()
+        form = RegisterForm()
+
     return render(request, 'main/register.html', {'form': form})
 
 def login_view(request):
