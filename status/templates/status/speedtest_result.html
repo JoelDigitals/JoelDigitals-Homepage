@@ -1,207 +1,1043 @@
 {% extends "base_home.html" %}
 {% load i18n %}
-{% block title %}{% trans "Speedtest Ergebnis" %} – Joel Digitals{% endblock %}
+{% block title %}{% trans "Analyse-Ergebnis" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-  main {
-    max-width: 100vw;
-    overflow-x: hidden;
+  :root {
+    --bg-primary: #0a0a0a;
+    --bg-card: #111111;
+    --bg-elevated: #1a1a1a;
+    --border-subtle: #2a2a2a;
+    --border-hover: #3a3a3a;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --text-muted: #666666;
+    
+    /* Score Colors */
+    --score-excellent: #10b981;
+    --score-good: #3b82f6;
+    --score-warning: #f59e0b;
+    --score-poor: #ef4444;
+    
+    /* Shadows */
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 40px rgba(102, 126, 234, 0.15);
   }
 
-  .rating-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: bold;
-    color: white;
-    font-size: 0.95rem;
-  }
-  .rating-good { background-color: #16a34a; }
-  .rating-ok { background-color: #eab308; }
-  .rating-bad { background-color: #dc2626; }
-
-  .status-card {
-    border-left: 6px solid #3b82f6;
-    background: #424242ff;
-    border-radius: 10px;
-    padding: 14px 18px;
-    margin-bottom: 14px;
-    transition: 0.3s;
-  }
-  .status-card:hover {
-    background: #424242ff;
+  .results-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    min-height: 100vh;
+    background: var(--bg-primary);
   }
 
-  .explanation-box {
-    background: #424242ff;
-    border-left: 5px solid #6366f1;
-    padding: 10px 14px;
-    border-radius: 10px;
-    margin-top: 10px;
+  /* Glass Card Component */
+  .glass-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-md);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .cta-box {
-    background: rgba(225, 37, 37, 1);
-    border-left: 5px solid #c80000ff;
-    padding: 16px;
-    border-radius: 12px;
+  .glass-panel:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+  }
+
+  /* Hero Score Section */
+  .score-hero {
     text-align: center;
-    margin-top: 18px;
+    margin-bottom: 3rem;
   }
 
-  .cta-btn {
-    display: inline-block;
-    background: #2563eb;
-    color: white;
-    font-weight: bold;
-    padding: 10px 18px;
-    border-radius: 10px;
-    margin: 10px 6px 0;
-    text-decoration: none;
-    transition: 0.3s;
+  .score-circle-container {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    margin: 0 auto 2rem;
   }
-  .cta-btn:hover { background: #1d4ed8; }
+
+  .score-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      var(--score-color) 0%,
+      var(--score-color) calc(var(--score) * 1%),
+      var(--border-subtle) calc(var(--score) * 1%),
+      var(--border-subtle) 100%
+    );
+    box-shadow: 
+      0 0 60px rgba(var(--score-rgb), 0.3),
+      inset 0 0 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .score-circle::before {
+    content: '';
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--bg-elevated), var(--bg-primary));
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05);
+  }
+
+  .score-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .score-number {
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--score-color);
+    text-shadow: 0 0 30px rgba(var(--score-rgb), 0.5);
+  }
+
+  .score-label {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+  }
+
+  .score-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    background: rgba(var(--score-rgb), 0.1);
+    border: 1px solid rgba(var(--score-rgb), 0.3);
+    color: var(--score-color);
+    box-shadow: 0 0 20px rgba(var(--score-rgb), 0.2);
+  }
+
+  /* Category Cards Grid */
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .category-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 1.75rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .category-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--card-gradient);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+  }
+
+  .category-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .category-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .category-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  .category-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .category-score {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Progress Bar */
+  .progress-container {
+    margin-bottom: 1.25rem;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 10px;
+    background: var(--border-subtle);
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .progress-excellent { background: linear-gradient(90deg, var(--score-excellent), #059669); }
+  .progress-good { background: linear-gradient(90deg, var(--score-good), #2563eb); }
+  .progress-warning { background: linear-gradient(90deg, var(--score-warning), #d97706); }
+  .progress-poor { background: linear-gradient(90deg, var(--score-poor), #dc2626); }
+
+  /* Metrics List */
+  .metrics-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .metric-item:last-child {
+    border-bottom: none;
+  }
+
+  .metric-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .metric-value {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+  }
+
+  .status-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.75rem;
+  }
+
+  .status-success { background: rgba(16, 185, 129, 0.2); color: var(--score-excellent); }
+  .status-error { background: rgba(239, 68, 68, 0.2); color: var(--score-poor); }
+
+  /* Alerts & Lists */
+  .alerts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .alert-panel {
+    border-radius: 20px;
+    padding: 1.75rem;
+    border: 1px solid;
+  }
+
+  .alert-recommendations {
+    background: rgba(16, 185, 129, 0.05);
+    border-color: rgba(16, 185, 129, 0.2);
+  }
+
+  .alert-warnings {
+    background: rgba(245, 158, 11, 0.05);
+    border-color: rgba(245, 158, 11, 0.2);
+  }
+
+  .alert-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .alert-recommendations .alert-header { color: var(--score-excellent); }
+  .alert-warnings .alert-header { color: var(--score-warning); }
+
+  .alert-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .alert-item {
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    border-left: 3px solid;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    transition: all 0.3s ease;
+  }
+
+  .alert-recommendations .alert-item {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: var(--score-excellent);
+    color: #d1fae5;
+  }
+
+  .alert-warnings .alert-item {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: var(--score-warning);
+    color: #fef3c7;
+  }
+
+  .alert-item:hover {
+    transform: translateX(4px);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  /* CTA Sections */
+  .cta-email {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 24px;
+    padding: 3rem;
+    text-align: center;
+    color: white;
+    margin-bottom: 2rem;
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-email::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 30s linear infinite;
+  }
+
+  .cta-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+  }
+
+  .cta-subtitle {
+    font-size: 1.125rem;
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+  }
+
+  .email-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 640px) {
+    .email-form {
+      flex-direction: row;
+    }
+  }
+
+  .email-input {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+
+  .email-input:focus {
+    outline: none;
+    border-color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.25);
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.1);
+  }
+
+  .email-input::placeholder {
+    color: rgba(255,255,255,0.7);
+  }
+
+  .btn-primary {
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .btn-white {
+    background: white;
+    color: #667eea;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+
+  .btn-white:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  }
+
+  .btn-dark {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .btn-dark:hover {
+    background: var(--border-subtle);
+    transform: translateY(-2px);
+  }
+
+  .btn-gradient {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+  }
+
+  .btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(245, 87, 108, 0.6);
+  }
+
+  /* CTA Poor Score */
+  .cta-optimize {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 24px;
+    padding: 3rem;
+    text-align: center;
+    color: white;
+    margin-bottom: 2rem;
+    box-shadow: 0 20px 40px rgba(245, 87, 108, 0.3);
+  }
+
+  .cta-optimize .cta-title {
+    font-size: 2.25rem;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+
+  /* Error State */
+  .error-state {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .error-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+  }
+
+  /* Action Bar */
+  .action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  /* Header Info */
+  .page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .url-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: 50px;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .meta-info {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  /* Utility */
+  .text-excellent { color: var(--score-excellent); }
+  .text-good { color: var(--score-good); }
+  .text-warning { color: var(--score-warning); }
+  .text-poor { color: var(--score-poor); }
+
+  @media (max-width: 768px) {
+    .results-container {
+      padding: 1rem;
+    }
+    
+    .glass-panel {
+      padding: 1.5rem;
+    }
+    
+    .categories-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .alerts-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .score-circle-container {
+      width: 200px;
+      height: 200px;
+    }
+    
+    .score-number {
+      font-size: 3rem;
+    }
+    
+    .page-title {
+      font-size: 1.75rem;
+    }
+  }
 </style>
 
-<main class="py-10 px-4">
-  <div class="max-w-3xl mx-auto bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg">
-    <h1 class="text-3xl font-bold text-blue-600 mb-2 text-center">
-      {% trans "Website-Speedtest Ergebnis" %}
-    </h1>
-    <p class="text-center text-gray-600 dark:text-gray-400 mb-6">
-      {% trans "Hier erhältst du eine leicht verständliche Auswertung deiner Website-Geschwindigkeit – inklusive Tipps, was verbessert werden kann." %}
-    </p>
+<div class="results-container">
+  
+  {% if messages %}
+    <div class="mb-6">
+      {% for message in messages %}
+        <div class="glass-panel border-l-4 border-{{ message.tags }}-500 text-{{ message.tags }}-200">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-    {% if result.error %}
-      <div class="bg-red-100 text-red-800 p-4 rounded-lg mb-6 text-center">
-        <strong>{% trans "Fehler:" %}</strong> {{ result.error }}
+  {% if result.error %}
+    <!-- Error State -->
+    <div class="glass-panel error-state">
+      <div class="error-icon">❌</div>
+      <h1 class="text-3xl font-bold text-red-500 mb-4">{% trans "Fehler bei der Analyse" %}</h1>
+      <p class="text-lg text-gray-400 mb-6">{{ result.error }}</p>
+      <a href="{% url 'speedtest_form' %}" class="btn-primary btn-gradient">
+        {% trans "Neue Analyse starten" %}
+      </a>
+    </div>
+  {% else %}
+    
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">{% trans "Website-Analyse Ergebnis" %}</h1>
+      <div class="url-display">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+        </svg>
+        <span>{{ result.url }}</span>
       </div>
-    {% else %}
+      <p class="meta-info">{% trans "Getestet am" %}: {{ result.test_date }}</p>
+    </div>
 
-      <!-- Grunddaten -->
-      <div class="status-card">
-        <h3 class="font-semibold text-blue-700">{% trans "Geprüfte URL" %}</h3>
-        <p class="text-blue-600 font-medium break-all">{{ result.url }}</p>
+    <!-- Overall Score -->
+    <div class="glass-panel score-hero">
+      <div class="score-circle-container">
+        <div class="score-circle" 
+             style="--score: {{ result.overall_score }};
+                    --score-color: {% if result.overall_score >= 80 %}var(--score-excellent){% elif result.overall_score >= 60 %}var(--score-good){% elif result.overall_score >= 40 %}var(--score-warning){% else %}var(--score-poor){% endif %};
+                    --score-rgb: {% if result.overall_score >= 80 %}16, 185, 129{% elif result.overall_score >= 60 %}59, 130, 246{% elif result.overall_score >= 40 %}245, 158, 11{% else %}239, 68, 68{% endif %};">
+          <div class="score-content">
+            <div class="score-number">{{ result.overall_score }}</div>
+            <div class="score-label">/ 100</div>
+          </div>
+        </div>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-4">
-        <div class="status-card">
-          <h3 class="font-semibold text-blue-700">{% trans "Status" %}</h3>
-          {% if result.status == 'Online' %}
-            <span class="rating-badge rating-good">✅ {% trans "Online" %}</span>
-            <p class="text-sm text-gray-500 mt-2">{% trans "Die Website antwortet korrekt und ist erreichbar." %}</p>
-          {% else %}
-            <span class="rating-badge rating-bad">⚠️ {{ result.status }}</span>
-            <p class="text-sm text-gray-500 mt-2">{% trans "Die Website konnte nicht erreicht werden." %}</p>
-          {% endif %}
-        </div>
+      <div class="score-status {% if result.overall_score >= 80 %}text-excellent{% elif result.overall_score >= 60 %}text-good{% elif result.overall_score >= 40 %}text-warning{% else %}text-poor{% endif %}">
+        {% if result.overall_score >= 80 %}🎉 {% trans "Exzellent!" %}
+        {% elif result.overall_score >= 60 %}👍 {% trans "Gut" %}
+        {% elif result.overall_score >= 40 %}⚠️ {% trans "Verbesserungsbedarf" %}
+        {% else %}❌ {% trans "Dringend optimieren!" %}{% endif %}
+      </div>
 
-        <div class="status-card">
-          <h3 class="font-semibold text-blue-700">{% trans "Antwortzeit" %}</h3>
-          {% if result.response_time %}
-            {% if result.response_time <= 800 %}
-              <span class="rating-badge rating-good">{{ result.response_time }} ms</span>
-              <p class="text-sm text-gray-500 mt-2">{% trans "Sehr schnell – ideal für eine gute Nutzererfahrung." %}</p>
-            {% elif result.response_time <= 1500 %}
-              <span class="rating-badge rating-ok">{{ result.response_time }} ms</span>
-              <p class="text-sm text-gray-500 mt-2">{% trans "Akzeptabel – mit Optimierungen kann sie verbessert werden." %}</p>
-            {% else %}
-              <span class="rating-badge rating-bad">{{ result.response_time }} ms</span>
-              <p class="text-sm text-gray-500 mt-2">{% trans "Langsam – mögliche Ursachen sind große Bilder oder viele externe Skripte." %}</p>
-            {% endif %}
-          {% else %}
-            <span class="rating-badge rating-bad">{% trans "Keine Antwort" %}</span>
-          {% endif %}
-        </div>
-
-        <div class="status-card">
-          <h3 class="font-semibold text-blue-700">{% trans "HTTP-Code" %}</h3>
-          <span class="font-semibold">{{ result.http_code }}</span>
-          <p class="text-sm text-gray-500 mt-2">{% trans "200 bedeutet: Alles in Ordnung. Andere Werte deuten auf technische Fehler hin." %}</p>
-        </div>
-
-        {% if result.ssl_valid is not None %}
-        <div class="status-card">
-          <h3 class="font-semibold text-blue-700">{% trans "SSL-Verschlüsselung" %}</h3>
-          {% if result.ssl_valid %}
-            <span class="rating-badge rating-good">🔒 {% trans "Gültig" %}</span>
-            <p class="text-sm text-gray-500 mt-2">{% trans "Die Verbindung ist sicher – gut für Vertrauen und SEO." %}</p>
-          {% else %}
-            <span class="rating-badge rating-bad">❌ {% trans "Ungültig" %}</span>
-            <p class="text-sm text-gray-500 mt-2">{% trans "Unsicher – es sollte ein SSL-Zertifikat installiert werden." %}</p>
-          {% endif %}
-        </div>
+      <p class="text-gray-400 text-lg mt-4 max-w-2xl mx-auto">
+        {% if result.overall_score >= 80 %}
+          {% trans "Ihre Website ist hervorragend optimiert und erfüllt alle wichtigen Kriterien für Performance, SEO und Sicherheit." %}
+        {% elif result.overall_score >= 60 %}
+          {% trans "Gute Basis, aber es gibt noch Optimierungspotential in einzelnen Bereichen. Details siehe unten." %}
+        {% elif result.overall_score >= 40 %}
+          {% trans "Mehrere Bereiche benötigen Aufmerksamkeit. Die wichtigsten Verbesserungen sind unten aufgeführt." %}
+        {% else %}
+          {% trans "Ihre Website benötigt dringende Optimierung für bessere Performance, Sicherheit und Nutzererfahrung." %}
         {% endif %}
-      </div>
+      </p>
+    </div>
 
-      <!-- Bewertung -->
-      <div class="mt-8 bg-gray-100 dark:bg-gray-800 p-6 rounded-xl">
-        <h2 class="text-xl font-semibold mb-4 text-blue-700">{% trans "Gesamtbewertung" %}</h2>
-
-        <div class="w-full bg-gray-300 rounded-full h-5 mb-3">
-          <div class="{% if result.score >= 80 %}bg-green-500{% elif result.score >= 50 %}bg-yellow-400{% else %}bg-red-500{% endif %} h-5 rounded-full"
-               style="width: {{ result.score }}%;"></div>
+    <!-- Category Scores -->
+    <div class="categories-grid">
+      
+      <!-- Performance -->
+      <article class="category-card" style="--card-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+        <div class="category-header">
+          <div class="category-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">⚡</div>
+          <h3 class="category-title">{% trans "Performance" %}</h3>
+        </div>
+        
+        <div class="category-score {% if result.performance.score >= 70 %}text-excellent{% elif result.performance.score >= 50 %}text-warning{% else %}text-poor{% endif %}">
+          {{ result.performance.score }}<span class="text-lg text-gray-500">/100</span>
+        </div>
+        
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill {% if result.performance.score >= 70 %}progress-excellent{% elif result.performance.score >= 50 %}progress-warning{% else %}progress-poor{% endif %}" 
+                 style="width: {{ result.performance.score }}%"></div>
+          </div>
         </div>
 
-        <p class="mb-3 progress-label text-lg">
-          {% trans "Bewertung:" %}
-          <span class="{% if result.score >= 80 %}text-green-600{% elif result.score >= 50 %}text-yellow-500{% else %}text-red-600{% endif %}">
-            {{ result.score }} / 100
-          </span>
-        </p>
+        <div class="metrics-list">
+          <div class="metric-item">
+            <span class="metric-label">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              {% trans "Ladezeit" %}
+            </span>
+            <span class="metric-value">{{ result.performance.response_time }}ms</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+              {% trans "Seitengröße" %}
+            </span>
+            <span class="metric-value">{{ result.performance.page_size|filesizeformat }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              {% trans "Komprimierung" %}
+            </span>
+            <span class="metric-value">
+              <span class="status-icon {% if result.performance.compression %}status-success">✓{% else %}status-error">✗{% endif %}</span>
+              {% if result.performance.compression %}{% trans "Aktiv" %}{% else %}{% trans "Inaktiv" %}{% endif %}
+            </span>
+          </div>
+        </div>
+      </article>
 
-        <p class="text-sm text-gray-600 dark:text-gray-400">
-          {% trans "Ein Wert über 80 gilt als ausgezeichnet. Unter 50 sollte dringend optimiert werden." %}
-        </p>
+      <!-- SEO -->
+      <article class="category-card" style="--card-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+        <div class="category-header">
+          <div class="category-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">🎯</div>
+          <h3 class="category-title">{% trans "SEO" %}</h3>
+        </div>
+        
+        <div class="category-score {% if result.seo.score >= 70 %}text-excellent{% elif result.seo.score >= 50 %}text-warning{% else %}text-poor{% endif %}">
+          {{ result.seo.score }}<span class="text-lg text-gray-500">/100</span>
+        </div>
+        
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill {% if result.seo.score >= 70 %}progress-excellent{% elif result.seo.score >= 50 %}progress-warning{% else %}progress-poor{% endif %}" 
+                 style="width: {{ result.seo.score }}%"></div>
+          </div>
+        </div>
 
-        <div class="mt-4">
-          {% for exp in result.explanations %}
-            <div class="explanation-box">
-              <p class="text-gray-800 dark:text-gray-200">{{ exp }}</p>
-            </div>
+        <div class="metrics-list">
+          <div class="metric-item">
+            <span class="metric-label">{% trans "Title-Tag" %}</span>
+            <span class="metric-value">
+              <span class="status-icon {% if result.seo.title %}status-success">✓{% else %}status-error">✗{% endif %}</span>
+            </span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">{% trans "Meta-Description" %}</span>
+            <span class="metric-value">
+              <span class="status-icon {% if result.seo.meta_description %}status-success">✓{% else %}status-error">✗{% endif %}</span>
+            </span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">{% trans "H1-Tags" %}</span>
+            <span class="metric-value">{{ result.seo.h1_tags|length }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">{% trans "Sitemap" %}</span>
+            <span class="metric-value">
+              <span class="status-icon {% if result.seo.sitemap_xml %}status-success">✓{% else %}status-error">✗{% endif %}</span>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Security -->
+      <article class="category-card" style="--card-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+        <div class="category-header">
+          <div class="category-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">🔒</div>
+          <h3 class="category-title">{% trans "Sicherheit" %}</h3>
+        </div>
+        
+        <div class="category-score {% if result.security.score >= 70 %}text-excellent{% elif result.security.score >= 50 %}text-warning{% else %}text-poor{% endif %}">
+          {{ result.security.score }}<span class="text-lg text-gray-500">/100</span>
+        </div>
+        
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill {% if result.security.score >= 70 %}progress-excellent{% elif result.security.score >= 50 %}progress-warning{% else %}progress-poor{% endif %}" 
+                 style="width: {{ result.security.score }}%"></div>
+          </div>
+        </div>
+
+        <div class="metrics-list">
+          <div class="metric-item">
+            <span class="metric-label">{% trans "SSL gültig" %}</span>
+            <span class="metric-value">
+              <span class="status-icon {% if result.security.ssl_valid %}status-success">✓{% else %}status-error">✗{% endif %}</span>
+              {% if result.security.ssl_valid %}{% trans "Ja" %}{% else %}{% trans "Nein" %}{% endif %}
+            </span>
+          </div>
+          {% if result.security.ssl_expires %}
+          <div class="metric-item">
+            <span class="metric-label">{% trans "SSL läuft ab" %}</span>
+            <span class="metric-value text-xs">{{ result.security.ssl_expires }}</span>
+          </div>
+          {% endif %}
+          <div class="metric-item">
+            <span class="metric-label">{% trans "Security-Header" %}</span>
+            <span class="metric-value">{{ result.security.security_headers|length }}</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Mobile -->
+      <article class="category-card" style="--card-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+        <div class="category-header">
+          <div class="category-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">📱</div>
+          <h3 class="category-title">{% trans "Mobile" %}</h3>
+        </div>
+        
+        <div class="category-score {% if result.mobile.score >= 70 %}text-excellent{% elif result.mobile.score >= 50 %}text-warning{% else %}text-poor{% endif %}">
+          {{ result.mobile.score }}<span class="text-lg text-gray-500">/100</span>
+        </div>
+        
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill {% if result.mobile.score >= 70 %}progress-excellent{% elif result.mobile.score >= 50 %}progress-warning{% else %}progress-poor{% endif %}" 
+                 style="width: {{ result.mobile.score }}%"></div>
+          </div>
+        </div>
+
+        <div class="metrics-list">
+          <div class="metric-item">
+            <span class="metric-label">{% trans "Viewport-Tag" %}</span>
+            <span class="metric-value">
+              <span class="status-icon {% if result.mobile.viewport_meta %}status-success">✓{% else %}status-error">✗{% endif %}</span>
+            </span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">{% trans "Mobile-Optimiert" %}</span>
+            <span class="metric-value">
+              <span class="status-icon {% if result.mobile.mobile_friendly %}status-success">✓{% else %}status-error">✗{% endif %}</span>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Server -->
+      <article class="category-card" style="--card-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+        <div class="category-header">
+          <div class="category-icon" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">🖥️</div>
+          <h3 class="category-title">{% trans "Server" %}</h3>
+        </div>
+        
+        <div class="category-score {% if result.server.score >= 70 %}text-excellent{% elif result.server.score >= 50 %}text-warning{% else %}text-poor{% endif %}">
+          {{ result.server.score }}<span class="text-lg text-gray-500">/100</span>
+        </div>
+        
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill {% if result.server.score >= 70 %}progress-excellent{% elif result.server.score >= 50 %}progress-warning{% else %}progress-poor{% endif %}" 
+                 style="width: {{ result.server.score }}%"></div>
+          </div>
+        </div>
+
+        <div class="metrics-list">
+          <div class="metric-item">
+            <span class="metric-label">{% trans "HTTP-Code" %}</span>
+            <span class="metric-value">{{ result.server.http_code }}</span>
+          </div>
+          {% if result.server.ip_address %}
+          <div class="metric-item">
+            <span class="metric-label">{% trans "IP-Adresse" %}</span>
+            <span class="metric-value text-xs font-mono">{{ result.server.ip_address }}</span>
+          </div>
+          {% endif %}
+          <div class="metric-item">
+            <span class="metric-label">{% trans "CDN erkannt" %}</span>
+            <span class="metric-value">
+              <span class="status-icon {% if result.server.cdn_detected %}status-success">✓{% else %}status-error">✗{% endif %}</span>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Accessibility -->
+      <article class="category-card" style="--card-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+        <div class="category-header">
+          <div class="category-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">♿</div>
+          <h3 class="category-title">{% trans "Barrierefreiheit" %}</h3>
+        </div>
+        
+        <div class="category-score {% if result.accessibility.score >= 70 %}text-excellent{% elif result.accessibility.score >= 50 %}text-warning{% else %}text-poor{% endif %}">
+          {{ result.accessibility.score }}<span class="text-lg text-gray-500">/100</span>
+        </div>
+        
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill {% if result.accessibility.score >= 70 %}progress-excellent{% elif result.accessibility.score >= 50 %}progress-warning{% else %}progress-poor{% endif %}" 
+                 style="width: {{ result.accessibility.score }}%"></div>
+          </div>
+        </div>
+
+        <div class="metrics-list">
+          <div class="metric-item">
+            <span class="metric-label">{% trans "Sprachangabe" %}</span>
+            <span class="metric-value">
+              <span class="status-icon {% if result.accessibility.lang_attribute %}status-success">✓{% else %}status-error">✗{% endif %}</span>
+            </span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">{% trans "Alt-Texte" %}</span>
+            <span class="metric-value">{{ result.accessibility.alt_texts }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">{% trans "ARIA-Labels" %}</span>
+            <span class="metric-value">{{ result.accessibility.aria_labels }}</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Recommendations & Warnings -->
+    <div class="alerts-grid">
+      {% if result.recommendations %}
+      <div class="alert-panel alert-recommendations">
+        <div class="alert-header">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {% trans "Empfehlungen" %}
+        </div>
+        <div class="alert-list">
+          {% for rec in result.recommendations %}
+            <div class="alert-item">{{ rec }}</div>
           {% endfor %}
         </div>
-
-        {% if result.score < 50 %}
-        <div class="cta-box">
-          <h3 class="text-lg font-bold text-red-700 mb-2">{% trans "Deine Website ist optimierungsbedürftig!" %}</h3>
-          <p class="text-gray-700 mb-3">{% trans "Wir helfen dir, die Geschwindigkeit, Sicherheit und Nutzerfreundlichkeit deiner Website zu verbessern." %}</p>
-          <a href="{% url 'sales' %}" class="cta-btn">{% trans "Anfrage stellen" %}</a>
-          <a href="{% url 'appointment_create' %}" class="cta-btn bg-green-600 hover:bg-green-700">{% trans "Gespräch buchen" %}</a>
-        </div>
-        {% endif %}
       </div>
-
-      <!-- Header -->
-      {% if result.headers %}
-        <h2 class="text-xl font-semibold mt-8 mb-3 text-blue-700">{% trans "Technische Details (HTTP Header)" %}</h2>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">{% trans "Diese Daten zeigen, wie dein Server Anfragen beantwortet. Sie sind vor allem für Entwickler relevant." %}</p>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse border border-gray-300 dark:border-gray-700 text-sm">
-            <thead>
-              <tr class="bg-gray-200 dark:bg-gray-800">
-                <th class="border border-gray-300 dark:border-gray-700 px-3 py-2">{% trans "Name" %}</th>
-                <th class="border border-gray-300 dark:border-gray-700 px-3 py-2">{% trans "Wert" %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for k,v in result.headers.items %}
-                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                  <td class="border px-3 py-2 font-medium">{{ k }}</td>
-                  <td class="border px-3 py-2 text-sm break-all">{{ v }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
       {% endif %}
+
+      {% if result.warnings %}
+      <div class="alert-panel alert-warnings">
+        <div class="alert-header">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          {% trans "Warnungen" %}
+        </div>
+        <div class="alert-list">
+          {% for warn in result.warnings %}
+            <div class="alert-item">{{ warn }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Email CTA -->
+    <div class="cta-email">
+      <div class="cta-content">
+        <div class="text-5xl mb-4">📧</div>
+        <h2 class="cta-title">{% trans "Ergebnisse per E-Mail erhalten" %}</h2>
+        <p class="cta-subtitle">{% trans "Lass dir die komplette Analyse zusenden und teile sie mit deinem Team!" %}</p>
+        
+        <form method="post" class="email-form">
+          {% csrf_token %}
+          <input type="hidden" name="url" value="{{ result.url }}">
+          <input type="email" name="email" placeholder="deine@email.de" class="email-input" required>
+          <button type="submit" class="btn-primary btn-white">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+            </svg>
+            {% trans "Ergebnisse senden" %}
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Optimization CTA (if score < 70) -->
+    {% if result.overall_score < 70 %}
+    <div class="cta-optimize">
+      <div class="text-5xl mb-4">🚀</div>
+      <h2 class="cta-title">{% trans "Lass uns deine Website optimieren!" %}</h2>
+      <p class="cta-subtitle">{% trans "Unsere Experten helfen dir, Performance, SEO und Sicherheit deutlich zu verbessern." %}</p>
+      
+      <div class="btn-group">
+        <a href="{% url 'appointment_create' %}" class="btn-primary btn-white">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          {% trans "Kostenloses Gespräch buchen" %}
+        </a>
+        <a href="{% url 'sales' %}" class="btn-primary" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.3);">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+          </svg>
+          {% trans "Anfrage stellen" %}
+        </a>
+      </div>
+      
+      <p class="mt-6 text-sm opacity-75">{% trans "100% kostenlos & unverbindlich" %}</p>
+    </div>
     {% endif %}
 
-    <div class="mt-8 text-center">
-      <a href="{% url 'speedtest_form' %}"
-         class="text-blue-600 hover:underline font-semibold text-lg">{% trans "Neue URL prüfen" %}</a>
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <a href="{% url 'speedtest_form' %}" class="btn-primary btn-gradient">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        {% trans "Neue Analyse starten" %}
+      </a>
+      <button onclick="window.print()" class="btn-primary btn-dark">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+        </svg>
+        {% trans "Ergebnisse drucken" %}
+      </button>
     </div>
-  </div>
-</main>
+
+  {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Animate progress bars
+  const progressBars = document.querySelectorAll('.progress-fill');
+  progressBars.forEach(bar => {
+    const targetWidth = bar.style.width;
+    bar.style.width = '0';
+    setTimeout(() => {
+      bar.style.width = targetWidth;
+    }, 300);
+  });
+
+  // Animate score circle
+  const scoreCircle = document.querySelector('.score-circle');
+  if (scoreCircle) {
+    scoreCircle.style.opacity = '0';
+    scoreCircle.style.transform = 'scale(0.8)';
+    setTimeout(() => {
+      scoreCircle.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+      scoreCircle.style.opacity = '1';
+      scoreCircle.style.transform = 'scale(1)';
+    }, 100);
+  }
+});
+</script>
 {% endblock %}

@@ -66,6 +66,9 @@ INSTALLED_APPS = [
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
+GA_PROPERTY_ID = "508800547"  # z.B. "123456789"
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/pfad/zu/service-account.json'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

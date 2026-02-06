@@ -103,17 +103,41 @@ def detailed_speedtest(url):
     return result
 
 
+from django.shortcuts import render
+from django.utils.translation import gettext as _
+from django.contrib import messages
+from .utils import comprehensive_website_test, send_test_results_email
+
+
 def speedtest_form(request):
+    """Display the website test form"""
     return render(request, "status/speedtest_form.html")
 
 
 def speedtest_result(request):
+    """Process website test and display results"""
     url = request.GET.get("url", "").strip()
+    
     if not url:
-        return render(request, "status/speedtest_result.html", {"error": _("Bitte gib eine URL ein.")})
-
-    result = detailed_speedtest(url)
-    return render(request, "status/speedtest_result.html", {"result": result})
+        return render(request, "status/speedtest_form.html", {
+            "error": _("Bitte gib eine gültige URL ein.")
+        })
+    
+    # Run comprehensive test
+    result = comprehensive_website_test(url)
+    
+    # Handle email sending if requested
+    if request.method == "POST":
+        email = request.POST.get("email", "").strip()
+        if email:
+            if send_test_results_email(email, result):
+                messages.success(request, _("Ergebnisse wurden erfolgreich per E-Mail versendet!"))
+            else:
+                messages.error(request, _("Fehler beim E-Mail-Versand. Bitte versuche es später erneut."))
+    
+    return render(request, "status/speedtest_result.html", {
+        "result": result
+    })
 
 def check_server_status(url):
     try:

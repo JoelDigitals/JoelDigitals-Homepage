@@ -75,9 +75,11 @@ select, textarea {
         </div>
 
         <!-- Veröffentlichungsdatum -->
-        {{ form.published_at.label_tag }} 
-        {{ form.published_at }}
-
+        <!-- Veröffentlichungsdatum -->
+        <div>
+            {{ form.published_at.label_tag }} 
+            {{ form.published_at }}
+        </div>
         {{ form.teaser_image.label_tag }} {{ form.teaser_image }}
         {{ form.is_published.label_tag }} {{ form.is_published }}
         {{ form.categories.label_tag }} {{ form.categories }}

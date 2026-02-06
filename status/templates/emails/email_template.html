@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website-Analyse Ergebnisse</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <!-- Main Container -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+                    
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 40px 50px; text-align: center; border-radius: 16px 16px 0 0;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                🚀 Website-Analyse
+                            </h1>
+                            <p style="margin: 10px 0 0; color: rgba(255,255,255,0.95); font-size: 16px;">
+                                Ihre Ergebnisse sind da!
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- URL Info -->
+                    <tr>
+                        <td style="padding: 30px 40px 20px;">
+                            <div style="background: #f9fafb; border-left: 4px solid #667eea; padding: 16px 20px; border-radius: 8px;">
+                                <p style="margin: 0; font-size: 13px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    Getestete Website
+                                </p>
+                                <p style="margin: 8px 0 0; font-size: 16px; color: #1f2937; font-weight: 600; word-break: break-all;">
+                                    {{ url }}
+                                </p>
+                                <p style="margin: 4px 0 0; font-size: 12px; color: #9ca3af;">
+                                    Getestet am: {{ test_date }}
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Overall Score -->
+                    <tr>
+                        <td style="padding: 20px 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding: 30px 0;">
+                                        <!-- Score Circle -->
+                                        <div style="width: 160px; height: 160px; border-radius: 50%; background: {{ score_gradient }}; display: inline-flex; align-items: center; justify-content: center; position: relative; margin: 0 auto;">
+                                            <div style="width: 140px; height: 140px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                                                <div style="font-size: 48px; font-weight: 700; color: {{ score_color }}; line-height: 1;">
+                                                    {{ overall_score }}
+                                                </div>
+                                                <div style="font-size: 14px; color: #6b7280; margin-top: 4px;">
+                                                    von 100
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <h2 style="margin: 20px 0 10px; color: {{ score_color }}; font-size: 24px; font-weight: 700;">
+                                            {{ score_label }}
+                                        </h2>
+                                        <p style="margin: 0; color: #6b7280; font-size: 14px;">
+                                            {{ score_description }}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Category Scores -->
+                    <tr>
+                        <td style="padding: 20px 40px;">
+                            <h3 style="margin: 0 0 20px; color: #1f2937; font-size: 20px; font-weight: 700;">
+                                📊 Kategorie-Scores
+                            </h3>
+                            
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <!-- Performance -->
+                                <tr>
+                                    <td style="padding: 12px 0;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="width: 40px;">
+                                                    <div style="width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                                                        ⚡
+                                                    </div>
+                                                </td>
+                                                <td style="padding-left: 12px;">
+                                                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Performance</div>
+                                                    <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                                                        <div style="background: {{ performance_color }}; height: 100%; width: {{ performance_score }}%; border-radius: 4px;"></div>
+                                                    </div>
+                                                </td>
+                                                <td style="width: 60px; text-align: right; font-weight: 700; color: {{ performance_color }};">
+                                                    {{ performance_score }}/100
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                
+                                <!-- SEO -->
+                                <tr>
+                                    <td style="padding: 12px 0;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="width: 40px;">
+                                                    <div style="width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                                                        🎯
+                                                    </div>
+                                                </td>
+                                                <td style="padding-left: 12px;">
+                                                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">SEO</div>
+                                                    <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                                                        <div style="background: {{ seo_color }}; height: 100%; width: {{ seo_score }}%; border-radius: 4px;"></div>
+                                                    </div>
+                                                </td>
+                                                <td style="width: 60px; text-align: right; font-weight: 700; color: {{ seo_color }};">
+                                                    {{ seo_score }}/100
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Security -->
+                                <tr>
+                                    <td style="padding: 12px 0;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="width: 40px;">
+                                                    <div style="width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                                                        🔒
+                                                    </div>
+                                                </td>
+                                                <td style="padding-left: 12px;">
+                                                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Sicherheit</div>
+                                                    <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                                                        <div style="background: {{ security_color }}; height: 100%; width: {{ security_score }}%; border-radius: 4px;"></div>
+                                                    </div>
+                                                </td>
+                                                <td style="width: 60px; text-align: right; font-weight: 700; color: {{ security_color }};">
+                                                    {{ security_score }}/100
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Mobile -->
+                                <tr>
+                                    <td style="padding: 12px 0;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="width: 40px;">
+                                                    <div style="width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                                                        📱
+                                                    </div>
+                                                </td>
+                                                <td style="padding-left: 12px;">
+                                                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Mobile</div>
+                                                    <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                                                        <div style="background: {{ mobile_color }}; height: 100%; width: {{ mobile_score }}%; border-radius: 4px;"></div>
+                                                    </div>
+                                                </td>
+                                                <td style="width: 60px; text-align: right; font-weight: 700; color: {{ mobile_color }};">
+                                                    {{ mobile_score }}/100
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Key Metrics -->
+                    <tr>
+                        <td style="padding: 20px 40px;">
+                            <h3 style="margin: 0 0 16px; color: #1f2937; font-size: 20px; font-weight: 700;">
+                                📈 Wichtige Metriken
+                            </h3>
+                            
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td style="width: 50%; padding: 8px 8px 8px 0;">
+                                        <div style="background: #f9fafb; padding: 12px; border-radius: 8px;">
+                                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Ladezeit</div>
+                                            <div style="font-size: 18px; font-weight: 700; color: #1f2937;">{{ response_time }}ms</div>
+                                        </div>
+                                    </td>
+                                    <td style="width: 50%; padding: 8px 0 8px 8px;">
+                                        <div style="background: #f9fafb; padding: 12px; border-radius: 8px;">
+                                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Seitengröße</div>
+                                            <div style="font-size: 18px; font-weight: 700; color: #1f2937;">{{ page_size }}</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 50%; padding: 8px 8px 8px 0;">
+                                        <div style="background: #f9fafb; padding: 12px; border-radius: 8px;">
+                                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">SSL-Status</div>
+                                            <div style="font-size: 18px; font-weight: 700; color: {{ ssl_color }};">{{ ssl_status }}</div>
+                                        </div>
+                                    </td>
+                                    <td style="width: 50%; padding: 8px 0 8px 8px;">
+                                        <div style="background: #f9fafb; padding: 12px; border-radius: 8px;">
+                                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Mobile-Ready</div>
+                                            <div style="font-size: 18px; font-weight: 700; color: {{ mobile_ready_color }};">{{ mobile_ready }}</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Recommendations -->
+                    {% if recommendations %}
+                    <tr>
+                        <td style="padding: 20px 40px;">
+                            <h3 style="margin: 0 0 16px; color: #1f2937; font-size: 20px; font-weight: 700;">
+                                ✓ Top Empfehlungen
+                            </h3>
+                            
+                            {% for rec in recommendations %}
+                            <div style="background: #f0fdf4; border-left: 3px solid #10b981; padding: 12px 16px; border-radius: 6px; margin-bottom: 8px;">
+                                <p style="margin: 0; color: #065f46; font-size: 14px; line-height: 1.6;">
+                                    {{ rec }}
+                                </p>
+                            </div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    
+                    <!-- Warnings -->
+                    {% if warnings %}
+                    <tr>
+                        <td style="padding: 20px 40px;">
+                            <h3 style="margin: 0 0 16px; color: #1f2937; font-size: 20px; font-weight: 700;">
+                                ⚠ Wichtige Hinweise
+                            </h3>
+                            
+                            {% for warn in warnings %}
+                            <div style="background: #fef3c7; border-left: 3px solid #f59e0b; padding: 12px 16px; border-radius: 6px; margin-bottom: 8px;">
+                                <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 1.6;">
+                                    {{ warn }}
+                                </p>
+                            </div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    
+                    <!-- CTA Button -->
+                    <tr>
+                        <td style="padding: 30px 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td align="center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 12px;">
+                                        <h3 style="margin: 0 0 12px; color: #ffffff; font-size: 22px; font-weight: 700;">
+                                            🚀 Lass uns deine Website optimieren!
+                                        </h3>
+                                        <p style="margin: 0 0 24px; color: rgba(255,255,255,0.9); font-size: 15px;">
+                                            Unsere Experten helfen dir, Performance und SEO zu verbessern.
+                                        </p>
+                                        <a href="{{ site_url }}" style="display: inline-block; background: #ffffff; color: #667eea; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                                            Kostenloses Gespräch buchen
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 30px 40px; background: #f9fafb; border-radius: 0 0 16px 16px; text-align: center;">
+                            <p style="margin: 0 0 10px; color: #6b7280; font-size: 13px;">
+                                Detaillierte Ergebnisse unter:
+                            </p>
+                            <a href="{{ site_url }}/speedtest/" style="color: #667eea; text-decoration: none; font-weight: 600; font-size: 14px;">
+                                {{ site_url }}/speedtest/
+                            </a>
+                            <p style="margin: 20px 0 0; color: #9ca3af; font-size: 12px;">
+                                © 2025-2026 Joel Digitals. Alle Rechte vorbehalten.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

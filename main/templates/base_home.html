@@ -359,16 +359,8 @@
     <a href="/shop/">{% trans "Shop" %}</a>
 
     {% if user.is_authenticated %}
-        {% if "Marketing" in user_groups %}
-            <a href="/blog/admin-blog/">{% trans "Admin: Blog" %}</a>
-        {% endif %}
-        {% if "Selling" in user_groups %}
-            <a href="/contact/admin-sales/">{% trans "Admin: Sales" %}</a>
-            <a href="/admin-sales/orders/">{% trans "Admin: Orders" %}</a>
-            <a href="/contact/appointment/admin/">{% trans "Admin: Termin" %}</a>
-        {% endif %}
-        {% if "Support" in user_groups %}
-            <a href="/contact/admin-tickets/">{% trans "Admin: Tickets" %}</a>
+        {% if "Admin" in user_groups %}
+            <a href="/dashboard/admin/">{% trans "Admin-Dashboard" %}</a>
         {% endif %}
         <a href="/auth/logout/">{% trans "Logout" %}</a>
     {% else %}
