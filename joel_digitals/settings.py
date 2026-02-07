@@ -21,7 +21,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -36,6 +35,11 @@ ALLOWED_HOSTS = ['joel-digitals.de', 'www.joel-digitals.de', 'joel-digitals.onre
     'localhost',
     ]
 
+OAUTH2_PROVIDER = {
+    "SCOPES": {
+        "read": "Read access",
+    }
+}
 
 
 # Application definition
