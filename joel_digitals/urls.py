@@ -38,6 +38,7 @@ urlpatterns += i18n_patterns(
     path("reviews/", include("reviews.urls")),
     # project urls.py
     path('', include('landingpages.urls')),
+    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     
 )
 

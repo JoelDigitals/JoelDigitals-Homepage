@@ -14,4 +14,5 @@ urlpatterns = [
     path('opening-hours/', views.opening_hours, name='opening_hours'),
     path("faq/", views.faq_list, name="list"),
     path("faq/<slug:slug>/", views.faq_detail, name="detail"),
+    path('api/user/', views.user_info),
 ]

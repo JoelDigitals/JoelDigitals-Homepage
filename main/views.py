@@ -650,3 +650,18 @@ def opening_hours(request):
         "phone_number": "+49 1525 3480270",
     }
     return render(request, "main/opening_hours.html", context)
+
+
+from django.http import JsonResponse
+from oauth2_provider.decorators import protected_resource
+
+@protected_resource()
+def user_info(request):
+    user = request.user
+    return JsonResponse({
+        'id': user.id,
+        'email': user.email,
+        'username': user.username,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+    })

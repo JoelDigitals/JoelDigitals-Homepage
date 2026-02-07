@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "reviews",
     'landingpages',
     'django.contrib.sites',
+    'oauth2_provider',
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
@@ -205,3 +206,8 @@ PAYPAL_ENVIRONMENT = "live"  # später "live" setzen
 
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "")
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'oauth2_provider.backends.OAuth2Backend',
+)
