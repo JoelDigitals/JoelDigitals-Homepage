@@ -1,0 +1,213 @@
+<!-- sso_authorize.html -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App autorisieren</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 480px;
+            width: 100%;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .user-info {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .user-info .user-email {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .user-info .logout-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .app-info {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #667eea;
+        }
+        .app-info h2 {
+            font-size: 18px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        .app-info p {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .permissions {
+            margin-bottom: 30px;
+        }
+        .permissions h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .permission-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        .permission-item .icon {
+            font-size: 20px;
+            margin-right: 12px;
+            color: #667eea;
+        }
+        .permission-item .text {
+            flex: 1;
+        }
+        .permission-item .text strong {
+            display: block;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        .permission-item .text small {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-authorize {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-authorize:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #666;
+        }
+        .btn-cancel:hover {
+            background: #d0d0d0;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .security-note {
+            margin-top: 20px;
+            padding: 12px;
+            background: #fff9e6;
+            border-radius: 6px;
+            border-left: 3px solid #ffc107;
+        }
+        .security-note p {
+            color: #856404;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 App autorisieren</h1>
+        </div>
+        
+        <div class="user-info">
+            <span class="user-email">{{ user.email }}</span>
+            <a href="/logout/?next={{ request.path }}" class="logout-link">Abmelden</a>
+        </div>
+        
+        <div class="app-info">
+            <h2>{{ client.name }}</h2>
+            <p>Diese App möchte auf dein Joel Digitals Konto zugreifen.</p>
+        </div>
+        
+        <div class="permissions">
+            <h3>Zugriff auf folgende Daten:</h3>
+            {% for scope in scopes %}
+            <div class="permission-item">
+                <span class="icon">✓</span>
+                <div class="text">
+                    <strong>{{ scope.display_name }}</strong>
+                    <small>{{ scope.description }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <form id="authorize-form" method="POST" action="/auth/sso/authorize/">
+            {% csrf_token %}
+            <input type="hidden" name="client_id" value="{{ client_id }}">
+            <input type="hidden" name="redirect_uri" value="{{ redirect_uri }}">
+            <input type="hidden" name="state" value="{{ state }}">
+            <input type="hidden" name="scope" value="{{ scope_string }}">
+            
+            <div class="actions">
+                <button type="button" class="btn btn-cancel" onclick="window.location.href='{{ redirect_uri }}?error=access_denied&state={{ state }}'">
+                    Abbrechen
+                </button>
+                <button type="submit" class="btn btn-authorize">
+                    Autorisieren
+                </button>
+            </div>
+        </form>
+        
+        <div class="security-note">
+            <p>💡 <strong>Hinweis:</strong> Du kannst diese Berechtigung jederzeit in deinen Account-Einstellungen widerrufen.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('authorize-form').addEventListener('submit', function(e) {
+            const btn = this.querySelector('.btn-authorize');
+            btn.disabled = true;
+            btn.textContent = 'Autorisiere...';
+        });
+    </script>
+</body>
+</html>
