@@ -123,3 +123,48 @@ class SpecialOpeningHour(models.Model):
         if self.closed:
             return f"{self.date} (Closed)"
         return f"{self.date}: {self.open_time.strftime('%H:%M')} – {self.close_time.strftime('%H:%M')}"
+
+import secrets
+from django.db import models
+from django.contrib.auth.models import User
+
+
+class SSOClient(models.Model):
+    """Registrierte SSO Client-Apps"""
+    name = models.CharField(max_length=100)
+    client_id = models.CharField(max_length=50, unique=True)
+    client_secret = models.CharField(max_length=100)
+    callback_url = models.URLField(max_length=500)  # ← Nur EINE URL, kein JSON!
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.name
+    
+    @classmethod
+    def create_client(cls, name, callback_url):
+        """Erstellt einen neuen SSO Client"""
+        return cls.objects.create(
+            name=name,
+            client_id=secrets.token_urlsafe(16),
+            client_secret=secrets.token_urlsafe(32),
+            callback_url=callback_url,
+        )
+    
+    def is_callback_allowed(self, callback_url):
+        """Prüft ob die Callback-URL erlaubt ist"""
+        return callback_url == self.callback_url
+
+
+class SSOSession(models.Model):
+    """Temporäre SSO Sessions"""
+    token = models.CharField(max_length=100, unique=True, db_index=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    client = models.ForeignKey(SSOClient, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    used = models.BooleanField(default=False)
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['token', 'used']),
+        ]

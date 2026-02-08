@@ -15,4 +15,9 @@ urlpatterns = [
     path("faq/", views.faq_list, name="list"),
     path("faq/<slug:slug>/", views.faq_detail, name="detail"),
     path('api/user/', views.user_info),
+
+    # SSO-URLs entfernt - sind jetzt in joel_digitals/urls.py
+    # path('auth/sso/connect/', views.sso_connect, name='sso_connect'),
+    # path('auth/sso/connect/login/', views.sso_connect_login, name='sso_connect_login'),
+    # path('api/sso/validate/', views.validate_sso_token, name='sso_validate'),
 ]

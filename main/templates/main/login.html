@@ -1,62 +1,168 @@
 {% extends "base_home.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}Login – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    .container {
+    .auth-container {
         background-color: white;
-        padding: 30px;
+        padding: 40px;
         border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        max-width: 1000px;
-        margin: 40px auto;
-        font-size: 18px;
-        color: #000;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin: 60px auto;
     }
 
-    h2 {
+    .auth-container h2 {
         margin-top: 0;
+        margin-bottom: 30px;
+        color: #333;
+        text-align: center;
+        font-size: 28px;
     }
 
-    a.mail-link {
-        color: #0044cc;
-        text-decoration: none;
+    .form-group {
+        margin-bottom: 20px;
     }
 
-    a.mail-link:hover {
-        text-decoration: underline;
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+        font-size: 14px;
     }
 
-    .contact-button {
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #0044cc;
+    }
+
+    .btn-submit {
+        width: 100%;
         background-color: #0044cc;
         color: white;
-        padding: 10px 20px;
+        padding: 14px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 18px;
-        margin-top: 20px;
+        font-size: 16px;
+        font-weight: 600;
+        margin-top: 10px;
+        transition: background-color 0.3s;
     }
 
-    .contact-button:hover {
+    .btn-submit:hover {
         background-color: #0033a0;
     }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 20px;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .auth-footer a {
+        color: #0044cc;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 5px 0 0 0;
+    }
+
+    .errorlist li {
+        color: #dc3545;
+        font-size: 13px;
+    }
+
+    .messages {
+        max-width: 500px;
+        margin: 20px auto;
+    }
+
+    .alert {
+        padding: 12px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
 </style>
+
 <main>
-    <div class="container">
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="auth-container">
         <h2>Login</h2>
-        <form method="post">
+        
+        <form method="post" novalidate>
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn">Einloggen</button>
+            
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% if field.name == 'username' %}
+                    <input type="text" name="{{ field.name }}" class="form-control" id="{{ field.id_for_label }}" placeholder="Username" required>
+                {% elif field.name == 'password' %}
+                    <input type="password" name="{{ field.name }}" class="form-control" id="{{ field.id_for_label }}" placeholder="Passwort" required>
+                {% else %}
+                    {{ field }}
+                {% endif %}
+                {% if field.errors %}
+                    <ul class="errorlist">
+                        {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-submit">Einloggen</button>
         </form>
-        <p>Noch keinen Account?
-            <a href="/auth/register/">Jetzt registrieren</a>
-        </p>
+
+        <div class="auth-footer">
+            Noch keinen Account?
+            <a href="{% url 'register' %}">Jetzt registrieren</a>
+        </div>
     </div>
 </main>
 {% endblock %}

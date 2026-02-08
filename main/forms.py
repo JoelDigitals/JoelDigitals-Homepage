@@ -31,6 +31,14 @@ from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
 class RegisterForm(UserCreationForm):
+    email = forms.EmailField(
+        required=True,
+        label=_("Email address"),
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('your@email.com')
+        })
+    )
 
     accept_agb = forms.BooleanField(
         required=True,
@@ -57,14 +65,21 @@ class RegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = (
-            "username",
-            "email",
-            "password1",
-            "password2",
-        )
+        fields = ("username", "email", "password1", "password2")
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('Username')
+            }),
+        }
 
-    email = forms.EmailField(
-        required=True,
-        label=_("Email address")
-    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': _('Password')
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': _('Confirm password')
+        })

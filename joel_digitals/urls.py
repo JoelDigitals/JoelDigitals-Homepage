@@ -7,7 +7,8 @@ from django.conf.urls.static import static
 from django.urls import path, include
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib.sitemaps.views import sitemap
-from main.sitemaps import StaticViewSitemap  # gleich erstellen!
+from main.sitemaps import StaticViewSitemap
+from main import views as main_views  # ← WICHTIG: Import hinzufügen
 
 # --- Sitemap Definition ---
 sitemaps = {
@@ -20,6 +21,12 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     # Optional: Sprachumschaltung soll auch ohne Sprache funktionieren
     path("i18n/", include("django.conf.urls.i18n")),
+    
+    # ==================== SSO URLs (OHNE i18n) ====================
+    path('auth/sso/connect/', main_views.sso_connect, name='sso_connect'),
+    path('auth/sso/connect/login/', main_views.sso_connect_login, name='sso_connect_login'),
+    path('api/sso/validate/', main_views.validate_sso_token, name='sso_validate'),
+    # ============================================================
 ]
 
 # --- Sprachabhängige URLs (z. B. /de/ oder /en/) ---
@@ -29,17 +36,15 @@ urlpatterns += i18n_patterns(
     path('', include('main.urls')),
     path('blog/', include('blog.urls')),
     path('contact/', include('contact.urls')),
-    path('', include('shop_ourapps.urls')),  # dein Shop
+    path('', include('shop_ourapps.urls')),
     path('wiki/', include('wiki.urls')),
     path('status/', include('status.urls')),
     path('downloads/', include('download.urls')),
     path('mobile/', include('MobileApp.urls')),
-    path('chat/', include('chat.urls')),  # Pfad bleibt /de/chat/api/
+    path('chat/', include('chat.urls')),
     path("reviews/", include("reviews.urls")),
-    # project urls.py
     path('', include('landingpages.urls')),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    
 )
 
 # --- Medien-Dateien ---

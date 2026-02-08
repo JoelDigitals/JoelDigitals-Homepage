@@ -547,14 +547,41 @@ def home(request):
         'lang': lang,
     })
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
+from django.core.mail import send_mail
+from django.conf import settings
 from .forms import RegisterForm
+
 
 def register_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            
+            # Newsletter-Anmeldung an euch senden
+            if form.cleaned_data.get('accept_marketing'):
+                try:
+                    send_mail(
+                        subject=f'Neue Newsletter-Anmeldung: {user.username}',
+                        message=f'''
+Neue Newsletter-Anmeldung:
+
+Username: {user.username}
+Email: {user.email}
+Datum: {user.date_joined.strftime("%d.%m.%Y %H:%M")}
+
+Der Benutzer hat sich für Marketing-E-Mails angemeldet.
+                        ''',
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=["j-nicolay@joel-digitals.com"],  # Eure E-Mail-Adresse
+                        fail_silently=False,
+                    )
+                except Exception as e:
+                    print(f"Newsletter-Benachrichtigung konnte nicht gesendet werden: {e}")
+            
             messages.success(
                 request,
                 _("Registration successful. You can now log in.")
@@ -665,3 +692,339 @@ def user_info(request):
         'first_name': user.first_name,
         'last_name': user.last_name,
     })
+
+import secrets
+import logging
+from django.http import JsonResponse
+from django.contrib.auth import authenticate, login as django_login
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.utils import timezone
+from datetime import timedelta
+from .models import SSOClient, SSOSession
+
+logger = logging.getLogger(__name__)
+
+def sso_connect(request):
+    """Zeigt Login-Seite ODER leitet direkt weiter"""
+    client_id = request.GET.get('client_id')
+    redirect_uri = request.GET.get('redirect_uri')
+    state = request.GET.get('state', '')
+    
+    # Validiere Client
+    try:
+        client = SSOClient.objects.get(client_id=client_id, is_active=True)
+        
+        # ✅ Prüfe die EINE Callback-URL
+        if not client.is_callback_allowed(redirect_uri):
+            return render(request, 'sso_error.html', {
+                'error': f'Invalid redirect_uri',
+                'expected': client.callback_url,  # ← Singular!
+                'received': redirect_uri,
+            })
+            
+    except SSOClient.DoesNotExist:
+        return render(request, 'sso_error.html', {
+            'error': 'Invalid client_id'
+        })
+    
+    # User ist bereits eingeloggt → direkt Token generieren
+    if request.user.is_authenticated:
+        token = _generate_sso_token(request.user, client)
+        callback_url = f"{redirect_uri}?token={token}&state={state}"
+        return redirect(callback_url)
+    
+    # User nicht eingeloggt → Login-Seite zeigen
+    return render(request, 'sso_connect.html', {
+        'client': client,
+        'client_id': client_id,
+        'redirect_uri': redirect_uri,
+        'state': state,
+    })
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def sso_connect_login(request):
+    """Login speziell für SSO-Connect (gibt Daten zurück)"""
+    print("=" * 80)
+    print(f"SSO CONNECT LOGIN - START")
+    print("=" * 80)
+    
+    try:
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        client_id = request.POST.get('client_id')
+        redirect_uri = request.POST.get('redirect_uri')
+        state = request.POST.get('state', '')
+        
+        print(f"📥 Empfangene Daten:")
+        print(f"   - Email: {email}")
+        print(f"   - Password: {'*' * len(password) if password else 'None'}")
+        print(f"   - Client ID: {client_id}")
+        print(f"   - Redirect URI: {redirect_uri}")
+        print(f"   - State: {state}")
+        
+        logger.info(f"SSO Connect Login Versuch: email={email}, client_id={client_id}")
+        
+        # Validierung
+        if not email or not password:
+            print("❌ FEHLER: Email oder Passwort fehlt")
+            return JsonResponse({'error': 'Email und Passwort erforderlich'}, status=400)
+        
+        if not client_id or not redirect_uri:
+            print("❌ FEHLER: Client ID oder Redirect URI fehlt")
+            return JsonResponse({'error': 'Client ID und Redirect URI erforderlich'}, status=400)
+        
+        print("✅ Validierung erfolgreich")
+        
+        # Client validieren
+        print(f"\n🔍 Suche Client mit ID: {client_id}")
+        try:
+            client = SSOClient.objects.get(client_id=client_id, is_active=True)
+            print(f"✅ Client gefunden:")
+            print(f"   - Name: {client.name}")
+            print(f"   - ID: {client.client_id}")
+            print(f"   - Aktiv: {client.is_active}")
+            logger.info(f"Client gefunden: {client.name}")
+        except SSOClient.DoesNotExist:
+            print(f"❌ FEHLER: Client nicht gefunden: {client_id}")
+            logger.error(f"Client nicht gefunden: {client_id}")
+            return JsonResponse({'error': 'Invalid client'}, status=400)
+        
+        # User authentifizieren
+        from django.contrib.auth.models import User
+        
+        print(f"\n🔍 Suche User mit Email: {email}")
+        try:
+            user_obj = User.objects.get(email=email)
+            print(f"✅ User gefunden:")
+            print(f"   - Username: {user_obj.username}")
+            print(f"   - Email: {user_obj.email}")
+            print(f"   - Aktiv: {user_obj.is_active}")
+            logger.info(f"User gefunden: {user_obj.username}")
+            
+            # Authentifizieren
+            print(f"\n🔐 Authentifiziere User...")
+            user = authenticate(request, username=user_obj.username, password=password)
+            
+            if not user:
+                print(f"❌ FEHLER: Authentifizierung fehlgeschlagen für: {email}")
+                logger.warning(f"Authentifizierung fehlgeschlagen für: {email}")
+                return JsonResponse({'error': 'Ungültige Email oder Passwort'}, status=401)
+            
+            print(f"✅ Authentifizierung erfolgreich für: {user.email}")
+            logger.info(f"Authentifizierung erfolgreich: {user.email}")
+            
+        except User.DoesNotExist:
+            print(f"❌ FEHLER: User nicht gefunden: {email}")
+            logger.warning(f"User nicht gefunden: {email}")
+            return JsonResponse({'error': 'Ungültige Email oder Passwort'}, status=401)
+        
+        # User einloggen (OPTIONAL für SSO - eventuell nicht nötig)
+        print(f"\n🔓 Logge User ein...")
+        django_login(request, user)
+        print(f"✅ User eingeloggt: {user.email}")
+        logger.info(f"User eingeloggt: {user.email}")
+        
+        # Token generieren
+        print(f"\n🎫 Generiere Token...")
+        token = _generate_sso_token(user, client)
+        print(f"✅ Token generiert: {token[:20]}...{token[-10:]}")
+        logger.info(f"Token generiert: {token[:20]}...")
+        
+        # Redirect URL
+        callback_url = f"{redirect_uri}?token={token}&state={state}"
+        print(f"\n🔗 Callback URL erstellt:")
+        print(f"   {callback_url[:100]}...")
+        
+        print("\n" + "=" * 80)
+        print("✅ SSO CONNECT LOGIN - ERFOLGREICH")
+        print("=" * 80 + "\n")
+        
+        # WICHTIG: Direkt JsonResponse zurückgeben, kein Redirect!
+        from django.http import JsonResponse
+        response = JsonResponse({
+            'success': True,
+            'redirect_url': callback_url
+        }, status=200)
+        
+        # Verhindere weitere Django-Redirects
+        response['Content-Type'] = 'application/json'
+        
+        return response
+        
+    except Exception as e:
+        print("\n" + "=" * 80)
+        print("❌ SSO CONNECT LOGIN - FEHLER")
+        print("=" * 80)
+        print(f"Exception Type: {type(e).__name__}")
+        print(f"Exception Message: {str(e)}")
+        import traceback
+        print(f"Traceback:\n{traceback.format_exc()}")
+        print("=" * 80 + "\n")
+        
+        logger.error(f"SSO Connect Login Error: {str(e)}", exc_info=True)
+        return JsonResponse({
+            'error': 'Ein unerwarteter Fehler ist aufgetreten',
+            'detail': str(e)
+        }, status=500)
+
+
+# ==================== TOKEN VALIDATION API ====================
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def validate_sso_token(request):
+    """API: Validiert Token und gibt User-Daten zurück"""
+    print("=" * 80)
+    print("TOKEN VALIDATION - START")
+    print("=" * 80)
+    
+    try:
+        token = request.POST.get('token')
+        client_id = request.POST.get('client_id')
+        client_secret = request.POST.get('client_secret')
+        
+        print(f"📥 Empfangene Daten:")
+        print(f"   - Token: {token[:20] if token else 'None'}...{token[-10:] if token else ''}")
+        print(f"   - Client ID: {client_id}")
+        print(f"   - Client Secret: {'*' * len(client_secret) if client_secret else 'None'}")
+        
+        logger.info(f"Token Validation Versuch: client_id={client_id}, token={token[:20] if token else 'None'}...")
+        
+        # Parameter prüfen
+        if not all([token, client_id, client_secret]):
+            missing = []
+            if not token: missing.append('token')
+            if not client_id: missing.append('client_id')
+            if not client_secret: missing.append('client_secret')
+            
+            print(f"❌ FEHLER: Fehlende Parameter: {', '.join(missing)}")
+            logger.warning(f"Fehlende Parameter: {', '.join(missing)}")
+            return JsonResponse({
+                'error': 'Missing parameters',
+                'missing': missing
+            }, status=400)
+        
+        print("✅ Alle Parameter vorhanden")
+        
+        # Client validieren
+        print(f"\n🔍 Validiere Client Credentials...")
+        try:
+            client = SSOClient.objects.get(
+                client_id=client_id,
+                client_secret=client_secret,
+                is_active=True
+            )
+            print(f"✅ Client validiert:")
+            print(f"   - Name: {client.name}")
+            print(f"   - Client ID: {client.client_id}")
+            logger.info(f"Client validiert: {client.name}")
+        except SSOClient.DoesNotExist:
+            print(f"❌ FEHLER: Client credentials ungültig: {client_id}")
+            logger.error(f"Client credentials ungültig: {client_id}")
+            return JsonResponse({'error': 'Invalid client credentials'}, status=401)
+        
+        # Token validieren
+        print(f"\n🔍 Suche Session mit Token...")
+        try:
+            session = SSOSession.objects.get(
+                token=token,
+                client=client,
+                used=False
+            )
+            print(f"✅ Session gefunden:")
+            print(f"   - User: {session.user.email}")
+            print(f"   - Client: {session.client.name}")
+            print(f"   - Erstellt: {session.created_at}")
+            print(f"   - Verwendet: {session.used}")
+            logger.info(f"Session gefunden: user={session.user.email}")
+            
+            # Token-Ablauf prüfen (5 Minuten)
+            time_diff = timezone.now() - session.created_at
+            print(f"\n⏱️  Token-Alter: {time_diff.total_seconds():.2f} Sekunden")
+            
+            if session.created_at < timezone.now() - timedelta(minutes=5):
+                print(f"❌ FEHLER: Token abgelaufen (älter als 5 Minuten)")
+                logger.warning(f"Token abgelaufen: {token[:20]}...")
+                session.delete()
+                print("🗑️  Abgelaufene Session gelöscht")
+                return JsonResponse({'error': 'Token expired'}, status=401)
+            
+            print("✅ Token ist noch gültig")
+            
+            # Token als verwendet markieren
+            print(f"\n✏️  Markiere Token als verwendet...")
+            session.used = True
+            session.save()
+            print("✅ Token als verwendet markiert")
+            
+            logger.info(f"Token erfolgreich validiert für: {session.user.email}")
+            
+            # User-Daten zurückgeben
+            user_data = {
+                'email': session.user.email,
+                'username': session.user.username,
+                'first_name': session.user.first_name,
+                'last_name': session.user.last_name,
+            }
+            
+            print(f"\n📤 Zurückgegebene User-Daten:")
+            for key, value in user_data.items():
+                print(f"   - {key}: {value}")
+            
+            print("\n" + "=" * 80)
+            print("✅ TOKEN VALIDATION - ERFOLGREICH")
+            print("=" * 80 + "\n")
+            
+            return JsonResponse(user_data)
+            
+        except SSOSession.DoesNotExist:
+            print(f"❌ FEHLER: Token nicht gefunden oder bereits verwendet")
+            logger.error(f"Token nicht gefunden oder bereits verwendet: {token[:20]}...")
+            return JsonResponse({'error': 'Invalid or already used token'}, status=401)
+        
+    except Exception as e:
+        print("\n" + "=" * 80)
+        print("❌ TOKEN VALIDATION - FEHLER")
+        print("=" * 80)
+        print(f"Exception Type: {type(e).__name__}")
+        print(f"Exception Message: {str(e)}")
+        import traceback
+        print(f"Traceback:\n{traceback.format_exc()}")
+        print("=" * 80 + "\n")
+        
+        logger.error(f"Token Validation Error: {str(e)}", exc_info=True)
+        return JsonResponse({
+            'error': 'Ein unerwarteter Fehler ist aufgetreten',
+            'detail': str(e)
+        }, status=500)
+
+
+# ==================== HELPER ====================
+
+def _generate_sso_token(user, client):
+    """Generiert einmaligen SSO-Token"""
+    print(f"\n   🎫 _generate_sso_token() aufgerufen")
+    print(f"      - User: {user.email}")
+    print(f"      - Client: {client.name}")
+    
+    try:
+        token = secrets.token_urlsafe(48)
+        print(f"      - Token erstellt: {token[:20]}...{token[-10:]}")
+        
+        session = SSOSession.objects.create(
+            token=token,
+            user=user,
+            client=client,
+        )
+        print(f"      - Session ID: {session.id}")
+        print(f"      - Erstellt: {session.created_at}")
+        
+        logger.info(f"SSO Session erstellt: user={user.email}, client={client.name}")
+        return token
+        
+    except Exception as e:
+        print(f"      ❌ FEHLER beim Token generieren: {str(e)}")
+        logger.error(f"Token Generation Error: {str(e)}", exc_info=True)
+        raise

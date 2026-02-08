@@ -215,3 +215,13 @@ AUTHENTICATION_BACKENDS = (
     'oauth2_provider.backends.OAuth2Backend',
     'django.contrib.auth.backends.ModelBackend',
 )
+
+# Shared Secret für SSO
+SSO_SHARED_SECRET = "Iay01SJILCeOtgo99wjdEf3b6kBULkYMD6e5mfiqZHGIdAUUs9uOvOcgF9utVRVp7oVL9bIDH9MdYLWMIuUk3ECmhFd7hXtfRiPDL0Eu2DffIjrIYD1bJkZgzzbBv9C5E9Fosg6aBu1mEliHcG39wYTbbdRk7YzyEEW7uvjRdDkWSeAtXuKHkm"
+
+# Cache aktivieren (falls noch nicht)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}

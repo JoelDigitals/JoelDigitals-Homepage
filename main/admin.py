@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TeamMember, OpeningHour, SpecialOpeningHour
+from .models import TeamMember, OpeningHour, SpecialOpeningHour, SSOClient, SSOSession
 from django.contrib import admin
 from .models import FAQ
 from django.utils.html import format_html
@@ -45,3 +45,6 @@ class OpeningHourAdmin(admin.ModelAdmin):
 class SpecialOpeningHourAdmin(admin.ModelAdmin):
     list_display = ("date", "open_time", "close_time", "closed", "note")
     ordering = ("date",)
+
+admin.site.register(SSOClient)
+admin.site.register(SSOSession)
