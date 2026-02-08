@@ -18,14 +18,15 @@ sitemaps = {
 # --- Basis-URL-Muster (nicht sprachabhängig) ---
 urlpatterns = [
     # Sitemap soll außerhalb von /de/ oder /en/ liegen
+    
+    path('auth/sso/connect/', main_views.sso_connect, name='sso_connect'),
+    path('auth/sso/connect/login/', main_views.sso_connect_login, name='sso_connect_login'),
+    path('api/sso/validate/', main_views.validate_sso_token, name='sso_validate'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     # Optional: Sprachumschaltung soll auch ohne Sprache funktionieren
     path("i18n/", include("django.conf.urls.i18n")),
     
-    # ==================== SSO URLs (OHNE i18n) ====================
-    path('auth/sso/connect/', main_views.sso_connect, name='sso_connect'),
-    path('auth/sso/connect/login/', main_views.sso_connect_login, name='sso_connect_login'),
-    path('api/sso/validate/', main_views.validate_sso_token, name='sso_validate'),
+    # ==================== SSO URLs (OHNE i18n) ===================
     # ============================================================
 ]
 
