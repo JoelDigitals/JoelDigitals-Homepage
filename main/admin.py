@@ -1,7 +1,6 @@
 from django.contrib import admin
-from .models import TeamMember, OpeningHour, SpecialOpeningHour, SSOClient, SSOSession
+from .models import TeamMember, OpeningHour, SpecialOpeningHour, SSOClient, SSOSession, FAQ, SSOAuthorization, SSOScope
 from django.contrib import admin
-from .models import FAQ
 from django.utils.html import format_html
 
 @admin.register(FAQ)
@@ -48,3 +47,5 @@ class SpecialOpeningHourAdmin(admin.ModelAdmin):
 
 admin.site.register(SSOClient)
 admin.site.register(SSOSession)
+admin.site.register(SSOAuthorization)
+admin.site.register(SSOScope)
