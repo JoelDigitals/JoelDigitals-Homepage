@@ -22,10 +22,10 @@ urlpatterns = [
     path('auth/sso/connect/', main_views.sso_connect, name='sso_connect'),
     path('auth/sso/connect/login/', main_views.sso_connect_login, name='sso_connect_login'),
     path('api/sso/validate/', main_views.validate_sso_token, name='sso_validate'),
-    path('sso/login/', main_views.sso_login_page, name='sso_login_page'),
+    path('auth/sso/login/', main_views.sso_login_page, name='sso_login_page'),
     path('auth/sso/authorize-page/', main_views.sso_authorize_page, name='sso_authorize_page'),
-    path('sso/authorize/', main_views.sso_authorize, name='sso_authorize'),
-    path('sso/validate/', main_views.validate_sso_token, name='validate_sso_token'),
+    path('auth/sso/authorize/', main_views.sso_authorize, name='sso_authorize'),
+    path('auth/sso/validate/', main_views.validate_sso_token, name='validate_sso_token'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     # Optional: Sprachumschaltung soll auch ohne Sprache funktionieren
     path("i18n/", include("django.conf.urls.i18n")),

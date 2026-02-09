@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TeamMember, OpeningHour, SpecialOpeningHour, SSOClient, SSOSession, FAQ, SSOAuthorization, SSOScope
+from .models import TeamMember, OpeningHour, SpecialOpeningHour, SSOClient_Authorization, SSOClient, SSOSession, FAQ, SSOAuthorization, SSOScope
 from django.contrib import admin
 from django.utils.html import format_html
 
@@ -49,3 +49,4 @@ admin.site.register(SSOClient)
 admin.site.register(SSOSession)
 admin.site.register(SSOAuthorization)
 admin.site.register(SSOScope)
+admin.site.register(SSOClient_Authorization)

@@ -1,23 +1,41 @@
 {% load static %}
-{% load static i18n %}
+{% load i18n %}
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}Joel Digitals Shop{% endblock %}</title>
+  <title>{% block title %}Joel Digitals{% endblock %}</title>
+  <meta name="google-site-verification" content="sP-l43HiT_JOY1vkAJ3NcugHJcr00jutssyop5eirvw" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-D4085BFCPR"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-D4085BFCPR');
+  </script>
+  
+  <script>function loadScript(a){var b=document.getElementsByTagName("head")[0],c=document.createElement("script");c.type="text/javascript",c.src="https://tracker.metricool.com/resources/be.js",c.onreadystatechange=a,c.onload=a,b.appendChild(c)}loadScript(function(){beTracker.t({hash:"8bab1ebed57afcda8eda967e654c64de"})});</script>
+  
   <style>
     :root {
       --primary: #0044cc;
+      --primary-hover: #0033a0;
       --bg: #121212;
       --surface: #1e1e1e;
       --text: #eee;
       --border: #333;
+      --profile-bg: #2a2a2a;
     }
+    
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
+    
     body {
       display: flex;
       flex-direction: column;
@@ -26,10 +44,11 @@
       color: var(--text);
       min-height: 100vh;
     }
+    
     header {
       position: relative;
-      z-index: 10002; /* höher als nav */
-      background: #181818; /* oder rgba(24,24,24,0.95) für leichte Transparenz */
+      z-index: 10002;
+      background: #181818;
       padding: 1rem 2rem;
       display: flex;
       align-items: center;
@@ -37,34 +56,187 @@
       box-shadow: 0 2px 6px rgba(0,0,0,.6);
     }
 
-    /* Hamburger/X & Logo immer über Slide-Bar */
     .menu-toggle, .logo-img {
       position: relative;
       z-index: 10003;
     }
+
     .logo-img {
       width: 200px;
       height: auto;
       object-fit: contain;
     }
+    
     nav {
       display: flex;
       align-items: center;
       gap: 1rem;
     }
+    
     nav a {
       color: var(--text);
       text-decoration: none;
       font-weight: 600;
       transition: color .3s;
+      position: relative;
     }
-    nav a:hover { color: var(--primary); }
+    
+    nav a:hover { 
+      color: var(--primary); 
+    }
+
+    /* Profile Dropdown */
+    .profile-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .profile-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--profile-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .profile-btn:hover {
+      background: var(--surface);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .profile-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #0066ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .profile-chevron {
+      font-size: 0.7rem;
+      transition: transform 0.3s ease;
+    }
+
+    .profile-dropdown.active .profile-chevron {
+      transform: rotate(180deg);
+    }
+
+    .profile-menu {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      right: 0;
+      background: var(--profile-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      min-width: 220px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 10004;
+      overflow: hidden;
+    }
+
+    .profile-dropdown.active .profile-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .profile-menu-header {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .profile-menu-name {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+      color: var(--text);
+    }
+
+    .profile-menu-email {
+      font-size: 0.85rem;
+      color: #999;
+    }
+
+    .profile-menu-items {
+      padding: 0.5rem 0;
+    }
+
+    .profile-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .profile-menu-item:hover {
+      background: var(--surface);
+      color: var(--primary);
+    }
+
+    .profile-menu-item i {
+      width: 18px;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    .profile-menu-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0.5rem 0;
+    }
+
+    .profile-menu-item.logout {
+      color: #ff4444;
+    }
+
+    .profile-menu-item.logout:hover {
+      background: rgba(255, 68, 68, 0.1);
+      color: #ff6666;
+    }
+
+    /* Wallet Badge in Profile Menu */
+    .wallet-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: #1a1a1a;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-left: auto;
+    }
 
     main {
       flex: 1;
       padding: 2rem;
       max-width: 1200px;
       margin: auto;
+      width: 100%;
     }
     
     footer {
@@ -79,31 +251,37 @@
       gap: 0.8rem;
       align-items: center;
     }
+    
     footer .footer-links {
       display: flex;
       flex-wrap: wrap;
       gap: 0.8rem;
       justify-content: center;
     }
+    
     footer .footer-links a {
       color: #ccc;
       text-decoration: none;
       transition: color .3s;
     }
+    
     footer .footer-links a:hover {
       color: var(--primary);
       text-decoration: underline;
     }
+    
     footer .socials {
       display: flex;
       gap: 1rem;
       justify-content: center;
       font-size: 1.3rem;
     }
+    
     footer .socials a {
       color: #ccc;
       transition: color .3s, transform .3s;
     }
+    
     footer .socials a:hover {
       color: var(--primary);
       transform: scale(1.15);
@@ -121,18 +299,22 @@
       font-size: 0.9rem;
       color: var(--text);
     }
+    
     #cookie-banner a {
       color: var(--primary);
       text-decoration: underline;
     }
+    
     #cookie-banner label {
       display: block;
       margin: 0.3rem 0;
       cursor: pointer;
     }
+    
     #cookie-banner input[type=checkbox] {
       margin-right: 0.5rem;
     }
+    
     #cookie-banner button {
       background-color: var(--primary);
       color: white;
@@ -144,9 +326,11 @@
       font-weight: 600;
       transition: background-color 0.3s ease;
     }
+    
     #cookie-banner button:hover {
-      background-color: #0033a0;
+      background-color: var(--primary-hover);
     }
+    
     #cookie-banner select {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -158,79 +342,15 @@
     }
 
     .menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 1.8rem;
-  color: var(--text);
-  cursor: pointer;
-}
-
-@media (max-width: 768px) {
-  .menu-toggle {
-    display: block;
-  }
-
-  nav#main-nav {
-    position: fixed;
-    top: 0; left: 0;
-    width: 70%;
-    height: 100vh;
-    transform: translateX(-100%);
-    background: rgba(30, 30, 30, 0.85); /* halbtransparent */
-    flex-direction: column;
-    padding: 2rem 1rem;
-    gap: 1rem;
-    transition: transform 0.3s ease;
-    z-index: 10001; /* unter Header */
-    display: flex;
-    overflow-y: auto; /* scrollbar falls Inhalt zu lang */
-  }
-
-  nav#main-nav.open {
-    transform: translateX(0);
-  }
-
-  nav#main-nav a {
-    font-size: 1.2rem;
-  }
-
-  /* Damit Content unter Header sichtbar bleibt */
-  nav#main-nav::before {
-    content: '';
-    display: block;
-    height: 70px; /* Höhe des Headers */
-    flex-shrink: 0;
-  }
-}
-
-/* Optional: scrollbar schön */
-nav#main-nav::-webkit-scrollbar {
-  width: 6px;
-}
-nav#main-nav::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
-  border-radius: 3px;
-}
-
-    @media (max-width: 600px) {
-      header, footer {
-        flex-direction: column;
-        align-items: center;
-      }
-      nav {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.5rem;
-      }
-      main {
-        padding: 1rem;
-      }
-      #cookie-banner {
-        padding: 1rem;
-        font-size: 0.8rem;
-      }
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: var(--text);
+      cursor: pointer;
     }
+
+    /* Language Dropdown */
     .language-dropdown {
       position: relative;
       display: inline-block;
@@ -247,6 +367,11 @@ nav#main-nav::-webkit-scrollbar-thumb {
       width: 24px;
       height: auto;
       vertical-align: middle;
+      transition: transform 0.3s ease;
+    }
+
+    .dropbtn:hover .flag-icon {
+      transform: scale(1.1);
     }
 
     .dropdown-content {
@@ -279,75 +404,335 @@ nav#main-nav::-webkit-scrollbar-thumb {
     .language-dropdown:hover .dropdown-content {
       display: block;
     }
+
+    /* Mobile Navigation */
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+      
+      nav#main-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 70%;
+        height: 100vh;
+        transform: translateX(-100%);
+        background: rgba(30, 30, 30, 0.98);
+        backdrop-filter: blur(10px);
+        flex-direction: column;
+        padding: 2rem 1rem;
+        padding-top: calc(1rem + 70px);
+        gap: 1rem;
+        transition: transform 0.3s ease;
+        z-index: 10001;
+        display: flex;
+        overflow-y: auto;
+      }
+    
+      nav#main-nav.open {
+        transform: translateX(0);
+      }
+    
+      nav#main-nav a {
+        font-size: 1.1rem;
+      }
+
+      .profile-dropdown {
+        width: 100%;
+      }
+
+      .profile-btn {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .profile-menu {
+        position: static;
+        width: 100%;
+        margin-top: 0.5rem;
+        box-shadow: none;
+        border: none;
+        background: var(--surface);
+      }
+    }
+    
+    nav#main-nav::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    nav#main-nav::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+    }
+
+    @media (max-width: 600px) {
+      header, footer {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      main {
+        padding: 1rem;
+      }
+      
+      #cookie-banner {
+        padding: 1rem;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Home Link nur im Hamburger-Menü sichtbar */
+    nav#main-nav .mobile-home { 
+      display: none; 
+    }
+
+    @media (max-width: 768px) {
+      nav#main-nav .mobile-home { 
+        display: block; 
+        font-weight: bold; 
+      }
+    }
   </style>
 
-<!-- Grundlegende SEO-Tags -->
-<meta name="description" content="Joel Digitals – Ihr Partner für digitale Lösungen, Webentwicklung, Marketing & IT-Services.">
-<meta name="keywords" content="Webentwicklung, Anwendungen, Auftäge finden, Produkt Design, Management, AuftragNetz, Markendesign, JDS Appstore, Django leicht gemacht, Support, KI ChatBots, CRM, Kunden Managemnt, E-Rechnung, DATEV, Digitalisierung, IT-Services, Joel Digitals, Marketing, Online-Shop, Marketing, Logo design, Websites, Rundum Service, Germany, Saaland, Lebach, Joel Digitals, JDS Management, Joel Digitas Shop">
-<meta name="author" content="Joel Digitals">
+  <!-- Grundlegende SEO-Tags -->
+  <meta name="description" content="Joel Digitals – Ihr Partner für digitale Lösungen, Webentwicklung, Marketing & IT-Services.">
+  <meta name="keywords" content="Webentwicklung, Anwendungen, Aufträge finden, Produkt Design, Management, AuftragNetz, Markendesign, JDS Appstore, Django leicht gemacht, Support, KI ChatBots, CRM, Kunden Management, E-Rechnung, DATEV, Digitalisierung, IT-Services, Joel Digitals, Marketing, Online-Shop, Logo design, Websites, Rundum Service, Germany, Saarland, Lebach">
+  <meta name="author" content="Joel Digitals">
 
-<!-- Open Graph für Social Media -->
-<meta property="og:title" content="Joel Digitals – Digitale Lösungen für Ihr Business">
-<meta property="og:description" content="Professionelle Webentwicklung, Marketing & IT-Dienstleistungen.">
-<meta property="og:image" content="{% static 'images/office.png' %}">
-<meta property="og:url" content="https://www.joel-digitals.de/"> 
-<meta property="og:type" content="website">
+  <!-- Open Graph für Social Media -->
+  <meta property="og:title" content="Joel Digitals – Digitale Lösungen für Ihr Business">
+  <meta property="og:description" content="Professionelle Webentwicklung, Marketing & IT-Dienstleistungen.">
+  <meta property="og:image" content="{% static 'images/office.png' %}">
+  <meta property="og:url" content="https://www.joel-digitals.de/"> 
+  <meta property="og:type" content="website">
 
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Joel Digitals – Digitale Lösungen für Ihr Business">
-<meta name="twitter:description" content="Professionelle Webentwicklung, Marketing & IT-Dienstleistungen.">
-<meta name="twitter:image" content="{% static 'images/office.png' %}">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Joel Digitals – Digitale Lösungen für Ihr Business">
+  <meta name="twitter:description" content="Professionelle Webentwicklung, Marketing & IT-Dienstleistungen.">
+  <meta name="twitter:image" content="{% static 'images/office.png' %}">
 
+  <!-- Google Ads Conversion -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17401744435"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-17401744435');
+  </script>
+  <script>
+    gtag('event', 'conversion', {
+      'send_to': 'AW-17401744435/3TMiCJ6x4PoaELOY5ulA',
+      'value': 1.0,
+      'currency': 'EUR'
+    });
+  </script>
+  <script>
+    gtag('event', 'conversion', {'send_to': 'AW-17401744435/_pVCCL2CpvwaELOY5ulA'});
+  </script>
+  <meta name="google-site-verification" content="nYCDtmq2NV0GFiHeLJOBxrS7aoBIl6PYI_kk6RjH85k" />
 
-<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17401744435"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-17401744435'); </script> 
-<!-- Event snippet for Seitenaufruf conversion page --> <script> gtag('event', 'conversion', { 'send_to': 'AW-17401744435/3TMiCJ6x4PoaELOY5ulA', 'value': 1.0, 'currency': 'EUR' }); </script> 
-<!-- Event snippet for Route berechnen conversion page --> <script> gtag('event', 'conversion', {'send_to': 'AW-17401744435/_pVCCL2CpvwaELOY5ulA'}); </script> 
-<meta name="google-site-verification" content="nYCDtmq2NV0GFiHeLJOBxrS7aoBIl6PYI_kk6RjH85k" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Joel Digitals",
+    "description": "Joel Digitals Bewertungen",
+    "price": 80,
+    "currency": "EUR",
+    "availability": "InStock",
+    "aggregateRating": {
+      "ratingValue": 4.6,
+      "reviewCount": 112,
+      "bestRating": 4.8,
+      "worstRating": 3.5
+    }
+  }
+  </script>
+
+  {% block extra_head %}{% endblock %}
 </head>
 
-{% block extra_head %}{% endblock %}
-</head>
+<body>
+<!-- Header -->
 <header>
   <div style="display: flex; align-items: center; gap: 1rem;">
     <button class="menu-toggle" onclick="toggleMenu()">
-      <i class="fas fa-bars"></i>
+      <i class="fas fa-bars" id="menu-icon"></i>
     </button>
     <a href="/">
       <img src="{% static 'logo.png' %}" alt="Joel Digitals Logo" class="logo-img">
     </a>
   </div>
+  
   <nav id="main-nav">
-      <a href="/shop/">Shop</a>
-      <a href="/contact/">{% trans "Contact" %}</a>
-      <a href="/downloads/">Downloads</a>
-      {% if user.is_authenticated %}
-        <a href="/my-orders/">{% trans "My Orders" %}</a>
-        <a href="/affiliate/dashboard/">Affiliate Program</a>
-        <a href="/cart/" title="Cart"><i class="fas fa-shopping-cart"></i></a>
-        <a href="/wallet/" title="Wallet">
-          <i class="fas fa-wallet"></i> {{ wallet_balance|floatformat:2 }} €
-        </a>
-        <a href="/auth/logout/" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
-      {% else %}
-        <a href="/auth/login/" title="Login"><i class="fas fa-sign-in-alt"></i></a>
-      {% endif %}
+    <!-- Home-Link nur im Hamburger-Menü -->
+    <a href="/" class="mobile-home">{% trans "Home" %}</a>
 
-      <div class="language-dropdown">
+    <!-- Haupt-Navigation -->
+    <a href="/wiki/">{% trans "Wiki" %}</a>
+    <a href="/status/">{% trans "Status" %}</a>
+    <a href="/services/">{% trans "Services" %}</a>
+    <a href="/about/">{% trans "About Us" %}</a>
+    <a href="/contact/">{% trans "Contact" %}</a>
+    <a href="/blog/">{% trans "Blog" %}</a>
+    <a href="/our-apps/">{% trans "Our Apps" %}</a>
+    <a href="/shop/">{% trans "Shop" %}</a>
+
+    {% if user.is_authenticated %}
+      <!-- Warenkorb Icon -->
+      <a href="/cart/" title="{% trans 'Cart' %}">
+        <i class="fas fa-shopping-cart"></i>
+      </a>
+
+      <!-- Profil Dropdown -->
+      <div class="profile-dropdown" id="profileDropdown">
+        <button class="profile-btn" onclick="toggleProfile(event)">
+          <div class="profile-icon">
+            {{ user.first_name|first|default:user.username|first|upper }}
+          </div>
+          <span>
+            {% if user.first_name and user.last_name %}
+              {{ user.first_name }} {{ user.last_name }}
+            {% else %}
+              {{ user.username }}
+            {% endif %}
+          </span>
+          <i class="fas fa-chevron-down profile-chevron"></i>
+        </button>
+        
+        <div class="profile-menu">
+          <div class="profile-menu-header">
+            <div class="profile-menu-name">
+              {% if user.first_name and user.last_name %}
+                {{ user.first_name }} {{ user.last_name }}
+              {% else %}
+                {{ user.username }}
+              {% endif %}
+            </div>
+            <div class="profile-menu-email">{{ user.email }}</div>
+          </div>
+          
+          <div class="profile-menu-items">
+            <a href="/profile/" class="profile-menu-item">
+              <i class="fas fa-user"></i>
+              <span>{% trans "My Profile" %}</span>
+            </a>
+            
+            <a href="/wallet/" class="profile-menu-item">
+              <i class="fas fa-wallet"></i>
+              <span>{% trans "Wallet" %}</span>
+              <span class="wallet-badge">
+                <i class="fas fa-coins"></i>
+                {{ wallet_balance|floatformat:2|default:"0.00" }}€
+              </span>
+            </a>
+            
+            <a href="/my-orders/" class="profile-menu-item">
+              <i class="fas fa-shopping-bag"></i>
+              <span>{% trans "My Orders" %}</span>
+            </a>
+            
+            <a href="/downloads/" class="profile-menu-item">
+              <i class="fas fa-download"></i>
+              <span>{% trans "Downloads" %}</span>
+            </a>
+            
+            <a href="/affiliate/dashboard/" class="profile-menu-item">
+              <i class="fas fa-chart-line"></i>
+              <span>{% trans "Affiliate Program" %}</span>
+            </a>
+            
+            {% if "Admin" in user_groups %}
+              <div class="profile-menu-divider"></div>
+              <a href="/dashboard/admin/" class="profile-menu-item">
+                <i class="fas fa-cog"></i>
+                <span>{% trans "Admin Dashboard" %}</span>
+              </a>
+            {% endif %}
+            
+            <div class="profile-menu-divider"></div>
+            <a href="/auth/logout/" class="profile-menu-item logout">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>{% trans "Logout" %}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <a href="/auth/login/">{% trans "Login" %}</a>
+    {% endif %}
+
+    <!-- Sprach-Dropdown -->
+    <div class="language-dropdown">
       <button class="dropbtn">
-        <img src="{% static 'flags/' %}de.png" alt="de" class="flag-icon" id="current-flag">
+        <img src="{% static 'flags/de.png' %}" alt="de" class="flag-icon" id="current-flag">
       </button>
       <div class="dropdown-content">
-        <a href="/de/shop/" onclick="switchLanguage('de')"><img src="{% static 'flags/de.png' %}" class="flag-icon"> Deutsch</a>
-        <a href="/en/shop/" onclick="switchLanguage('en')"><img src="{% static 'flags/en.png' %}" class="flag-icon"> English</a>
+        <a href="/de/" onclick="switchLanguage('de')">
+          <img src="{% static 'flags/de.png' %}" class="flag-icon"> Deutsch
+        </a>
+        <a href="/en/" onclick="switchLanguage('en')">
+          <img src="{% static 'flags/en.png' %}" class="flag-icon"> English
+        </a>
       </div>
     </div>
-    </nav>
-  </header>
+  </nav>
+</header>
 
-  <main>
+<script>
+function toggleMenu() {
+  const nav = document.getElementById("main-nav");
+  const icon = document.getElementById("menu-icon");
+  nav.classList.toggle("open");
+
+  if(nav.classList.contains("open")) {
+    icon.classList.remove("fa-bars");
+    icon.classList.add("fa-times");
+  } else {
+    icon.classList.remove("fa-times");
+    icon.classList.add("fa-bars");
+  }
+}
+
+function toggleProfile(event) {
+  event.stopPropagation();
+  const dropdown = document.getElementById("profileDropdown");
+  dropdown.classList.toggle("active");
+}
+
+// Schließen bei Klick außerhalb
+document.addEventListener("click", function(event) {
+  const nav = document.getElementById("main-nav");
+  const toggle = document.querySelector(".menu-toggle");
+  const icon = document.getElementById("menu-icon");
+  const profileDropdown = document.getElementById("profileDropdown");
+
+  // Menü schließen
+  if(nav && nav.classList.contains("open") && !nav.contains(event.target) && !toggle.contains(event.target)) {
+    nav.classList.remove("open");
+    if(icon) {
+      icon.classList.remove("fa-times");
+      icon.classList.add("fa-bars");
+    }
+  }
+
+  // Profil-Dropdown schließen
+  if(profileDropdown && !profileDropdown.contains(event.target)) {
+    profileDropdown.classList.remove("active");
+  }
+});
+
+function switchLanguage(lang) {
+  // Optional: Language switching logic
+  console.log('Switching to language:', lang);
+}
+</script>
+
+<main>
     {% block content %}{% endblock %}
-  </main>
+</main>
 
 <footer>
   <div>&copy; 2025-2026 Joel Digitals. All rights reserved.</div>
@@ -360,41 +745,31 @@ nav#main-nav::-webkit-scrollbar-thumb {
   </div>
 
   <div class="socials">
-    <a href="https://facebook.com/joeldigitalsofficial" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-    <!--<a href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>-->
-    <a href="https://instagram.com/joel_digitals_official" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-    <!--<a href="https://linkedin.com" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>-->
-    <a href="https://www.youtube.com/@JoelDigitals" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-    <a href="https://www.tiktok.com/@joel_digitals_official" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-    <a href="https://discord.gg/RWvfkFakus" target="_blank" aria-label="Discord"><i class="fab fa-discord"></i></a>
-    <a href="https://wa.me/4915253480270" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    <a href="https://facebook.com/joeldigitalsofficial" target="_blank" aria-label="Facebook">
+      <i class="fab fa-facebook-f"></i>
+    </a>
+    <a href="https://instagram.com/joel_digitals_official" target="_blank" aria-label="Instagram">
+      <i class="fab fa-instagram"></i>
+    </a>
+    <a href="https://www.youtube.com/@JoelDigitals" target="_blank" aria-label="YouTube">
+      <i class="fab fa-youtube"></i>
+    </a>
+    <a href="https://www.tiktok.com/@joel_digitals_official" target="_blank" aria-label="TikTok">
+      <i class="fab fa-tiktok"></i>
+    </a>
+    <a href="https://discord.gg/RWvfkFakus" target="_blank" aria-label="Discord">
+      <i class="fab fa-discord"></i>
+    </a>
+    <a href="https://wa.me/4915253480270" target="_blank" aria-label="WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
   </div>
 </footer>
 
 <!-- Cookie Banner -->
 {% include 'cookie_banner.html' %}
 
-<script>
-function toggleMenu() {
-  const nav = document.getElementById("main-nav");
-  nav.classList.toggle("open");
-}
-
-// Optional: Schließen bei Klick außerhalb des Menüs
-document.addEventListener("click", function (event) {
-  const nav = document.getElementById("main-nav");
-  const toggle = document.querySelector(".menu-toggle");
-
-  if (
-    nav.classList.contains("open") &&
-    !nav.contains(event.target) &&
-    !toggle.contains(event.target)
-  ) {
-    nav.classList.remove("open");
-  }
-});
-</script>
-
+<!-- Chatbot -->
 <div id="chatbot-container">
   <div id="chatbot-toggle"><i class="fa-solid fa-comments"></i></div>
   <div id="chatbot-box">
@@ -424,7 +799,6 @@ const chatToggle = document.getElementById("chatbot-toggle");
 const chatMessages = document.getElementById("chatbot-messages");
 const input = document.getElementById("chatbot-input");
 
-// Local Storage: 48 Stunden
 const STORAGE_KEY = "joel_chat_history";
 const EXPIRY_KEY = "joel_chat_expiry";
 
@@ -444,11 +818,10 @@ function saveHistory() {
         text: m.innerHTML
     }));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-    localStorage.setItem(EXPIRY_KEY, Date.now() + 48*60*60*1000); // 48h
+    localStorage.setItem(EXPIRY_KEY, Date.now() + 48*60*60*1000);
 }
 
 function linkify(text) {
-    // URLs klickbar machen
     return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
 }
 
@@ -461,13 +834,12 @@ function appendMessage(role, text) {
     saveHistory();
 }
 
-// Lade Verlauf
 loadHistory().forEach(msg => appendMessage(msg.role, msg.text));
 
-// Toggle Chat
-chatToggle.onclick = () => { chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex"; };
+chatToggle.onclick = () => { 
+  chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex"; 
+};
 
-// Nachricht senden
 input.addEventListener("keypress", async function(e) {
     if (e.key === "Enter" && this.value.trim()) {
         const msg = this.value.trim();
@@ -478,7 +850,10 @@ input.addEventListener("keypress", async function(e) {
             const response = await fetch("/de/chat/api/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: msg, lang: document.documentElement.lang.startsWith("en") ? "en" : "de" })
+                body: JSON.stringify({ 
+                  message: msg, 
+                  lang: document.documentElement.lang.startsWith("en") ? "en" : "de" 
+                })
             });
             const data = await response.json();
             appendMessage("bot", data.reply);

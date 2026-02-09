@@ -1,0 +1,452 @@
+{% extends 'base_home.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "My Profile" %} - Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .profile-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0;
+  }
+
+  .profile-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 2.5rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-email {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-body {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .profile-section {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .section-title i {
+    font-size: 1.2rem;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .info-label {
+    font-size: 0.85rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .info-value {
+    font-size: 1.1rem;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .wallet-display {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #1a1a1a;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  }
+
+  .wallet-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .wallet-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+
+  .wallet-amount {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .wallet-icon {
+    font-size: 3rem;
+    opacity: 0.3;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+
+  .btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.4);
+  }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 2px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .btn-danger {
+    background: #dc3545;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .stat-card {
+    background: var(--bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.2);
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.3rem;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 768px) {
+    .profile-container {
+      margin: 1rem;
+    }
+
+    .profile-header {
+      padding: 2rem 1rem;
+    }
+
+    .profile-body {
+      padding: 1.5rem;
+    }
+
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+    }
+
+    .profile-name {
+      font-size: 1.5rem;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #999;
+    font-style: italic;
+  }
+</style>
+
+<div class="profile-container">
+  <!-- Header mit Avatar -->
+  <div class="profile-header">
+    <div class="profile-avatar">
+      {{ user.first_name|first|default:user.username|first|upper }}
+    </div>
+    <h1 class="profile-name">
+      {% if user.first_name and user.last_name %}
+        {{ user.first_name }} {{ user.last_name }}
+      {% else %}
+        {{ user.username }}
+      {% endif %}
+    </h1>
+    <p class="profile-email">{{ user.email }}</p>
+  </div>
+
+  <!-- Body mit Informationen -->
+  <div class="profile-body">
+    
+    <!-- Wallet Section -->
+    <div class="profile-section">
+      <h2 class="section-title">
+        <i class="fas fa-wallet"></i>
+        {% trans "Wallet" %}
+      </h2>
+      <div class="wallet-display">
+        <div class="wallet-info">
+          <span class="wallet-label">{% trans "Current Balance" %}</span>
+          <span class="wallet-amount">{{ wallet_balance|floatformat:2 }} €</span>
+        </div>
+        <i class="fas fa-coins wallet-icon"></i>
+      </div>
+    </div>
+
+    <!-- Persönliche Informationen -->
+    <div class="profile-section">
+      <h2 class="section-title">
+        <i class="fas fa-user"></i>
+        {% trans "Personal Information" %}
+      </h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">{% trans "Username" %}</span>
+          <span class="info-value">{{ user.username }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{% trans "First Name" %}</span>
+          <span class="info-value">{{ user.first_name|default:"—" }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{% trans "Last Name" %}</span>
+          <span class="info-value">{{ user.last_name|default:"—" }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{% trans "Email" %}</span>
+          <span class="info-value">{{ user.email }}</span>
+        </div>
+        
+        {% if profile %}
+          {% if profile.phone %}
+          <div class="info-item">
+            <span class="info-label">{% trans "Phone" %}</span>
+            <span class="info-value">{{ profile.phone }}</span>
+          </div>
+          {% endif %}
+          
+          {% if profile.company %}
+          <div class="info-item">
+            <span class="info-label">{% trans "Company" %}</span>
+            <span class="info-value">{{ profile.company }}</span>
+          </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Adresse (falls vorhanden) -->
+    {% if profile and profile.address %}
+    <div class="profile-section">
+      <h2 class="section-title">
+        <i class="fas fa-map-marker-alt"></i>
+        {% trans "Address" %}
+      </h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">{% trans "Street" %}</span>
+          <span class="info-value">{{ profile.address|default:"—" }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{% trans "City" %}</span>
+          <span class="info-value">{{ profile.city|default:"—" }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{% trans "Postal Code" %}</span>
+          <span class="info-value">{{ profile.postal_code|default:"—" }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{% trans "Country" %}</span>
+          <span class="info-value">{{ profile.country|default:"—" }}</span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Account Statistiken -->
+    <div class="profile-section">
+      <h2 class="section-title">
+        <i class="fas fa-chart-bar"></i>
+        {% trans "Account Statistics" %}
+      </h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <i class="fas fa-calendar-alt stat-icon"></i>
+          <div class="stat-value">{{ user.date_joined|date:"d.m.Y" }}</div>
+          <div class="stat-label">{% trans "Member Since" %}</div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-clock stat-icon"></i>
+          <div class="stat-value">{{ user.last_login|date:"d.m.Y" }}</div>
+          <div class="stat-label">{% trans "Last Login" %}</div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-check-circle stat-icon"></i>
+          <div class="stat-value">{% if user.is_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}</div>
+          <div class="stat-label">{% trans "Status" %}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a href="{% url 'profile_edit' %}" class="btn btn-primary">
+        <i class="fas fa-edit"></i>
+        {% trans "Edit Profile" %}
+      </a>
+      <a href="{% url 'change_password' %}" class="btn btn-secondary">
+        <i class="fas fa-key"></i>
+        {% trans "Change Password" %}
+      </a>
+      <a href="{% url 'app_permissions' %}" class="btn btn-secondary">
+        <i class="fas fa-key"></i>
+        {% trans "App Permissions" %}
+      </a>
+      <a href="{% url 'delete_account' %}" class="btn btn-danger">
+        <i class="fas fa-trash-alt"></i>
+        {% trans "Delete Account" %}
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

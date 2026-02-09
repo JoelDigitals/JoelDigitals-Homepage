@@ -42,15 +42,25 @@
             align-items: center;
             justify-content: space-between;
         }
+        .user-info .user-name {
+            color: #333;
+            font-size: 15px;
+            font-weight: 600;
+        }
         .user-info .user-email {
             color: #666;
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+        .user-info .user-details {
+            flex: 1;
         }
         .user-info .logout-link {
             color: #667eea;
             text-decoration: none;
             font-size: 13px;
+            white-space: nowrap;
+            margin-left: 15px;
         }
         .app-info {
             background: #f0f4ff;
@@ -103,6 +113,14 @@
             color: #666;
             font-size: 13px;
             line-height: 1.4;
+        }
+        .no-scopes {
+            padding: 15px;
+            background: #fff9e6;
+            border-radius: 6px;
+            color: #856404;
+            font-size: 14px;
+            text-align: center;
         }
         .actions {
             display: flex;
@@ -158,8 +176,17 @@
         </div>
         
         <div class="user-info">
-            <span class="user-email">{{ user.email }}</span>
-            <a href="/logout/?next={{ request.path }}" class="logout-link">Abmelden</a>
+            <div class="user-details">
+                <div class="user-name">
+                    {% if user.first_name or user.last_name %}
+                        {{ user.first_name }} {{ user.last_name }}
+                    {% else %}
+                        {{ user.username }}
+                    {% endif %}
+                </div>
+                <div class="user-email">{{ user.email }}</div>
+            </div>
+            <a href="/accounts/login/?next={{ request.path }}" class="logout-link">Abmelden</a>
         </div>
         
         <div class="app-info">
@@ -169,15 +196,21 @@
         
         <div class="permissions">
             <h3>Zugriff auf folgende Daten:</h3>
-            {% for scope in scopes %}
-            <div class="permission-item">
-                <span class="icon">✓</span>
-                <div class="text">
-                    <strong>{{ scope.display_name }}</strong>
-                    <small>{{ scope.description }}</small>
+            {% if scopes %}
+                {% for scope in scopes %}
+                <div class="permission-item">
+                    <span class="icon">✓</span>
+                    <div class="text">
+                        <strong>{{ scope.display_name }}</strong>
+                        <small>{{ scope.description }}</small>
+                    </div>
                 </div>
-            </div>
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                <div class="no-scopes">
+                    ⚠️ Diese App hat keine spezifischen Berechtigungen konfiguriert.
+                </div>
+            {% endif %}
         </div>
         
         <form id="authorize-form" method="POST" action="/auth/sso/authorize/">

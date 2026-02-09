@@ -168,6 +168,10 @@ class SSOClient(models.Model):
         """Prüft ob die Callback-URL erlaubt ist"""
         return callback_url == self.callback_url
 
+class SSOClient_Authorization(models.Model):
+    """Zwischentabelle für erlaubte Scopes pro Client"""
+    client = models.ForeignKey(SSOClient, on_delete=models.CASCADE)
+    scope = models.ForeignKey(SSOScope, on_delete=models.CASCADE)
 
 class SSOAuthorization(models.Model):
     """Gespeicherte Autorisierungen (User hat App bereits genehmigt)"""

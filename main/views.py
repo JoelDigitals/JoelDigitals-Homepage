@@ -709,7 +709,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from datetime import timedelta
-from .models import SSOClient, SSOSession, SSOScope, SSOAuthorization
+from .models import SSOClient, SSOSession, SSOScope, SSOAuthorization, SSOClient_Authorization
 
 logger = logging.getLogger(__name__)
 
@@ -719,12 +719,12 @@ def sso_connect(request):
     OAuth-Flow Schritt 1: Redirect zu Login/Authorize
     - User nicht eingeloggt → Redirect zu Login
     - User eingeloggt, nicht autorisiert → Zeige Authorize-Seite
-    - User eingeloggt und bereits autorisiert → Direkt Token generieren
+    - User eingeloggt und bereits autorisiert → Direkt Token generieren ✅
     """
     client_id = request.GET.get('client_id')
     redirect_uri = request.GET.get('redirect_uri')
     state = request.GET.get('state', '')
-    scope = request.GET.get('scope', 'profile,email')  # Default scopes
+    scope = request.GET.get('scope', 'profile,email')
     
     # Validiere Client
     try:
@@ -747,21 +747,23 @@ def sso_connect(request):
         login_url = f"/auth/sso/login/?client_id={client_id}&redirect_uri={redirect_uri}&state={state}&scope={scope}"
         return redirect(login_url)
     
-    # User eingeloggt → Prüfe ob bereits autorisiert
+    # ✅ User eingeloggt → Prüfe ob bereits autorisiert
     try:
         authorization = SSOAuthorization.objects.get(
             user=request.user,
             client=client
         )
-        # Bereits autorisiert → Direkt Token generieren
+        
+        # ✅ WICHTIG: Bereits autorisiert → Direkt Token generieren und weiterleiten
+        logger.info(f"User {request.user.email} bereits autorisiert für {client.name} - direkte Weiterleitung")
         token = _generate_sso_token(request.user, client, authorization)
         callback_url = f"{redirect_uri}?token={token}&state={state}"
         return redirect(callback_url)
         
     except SSOAuthorization.DoesNotExist:
-        # Noch nicht autorisiert → Zeige Authorize-Seite
+        # ✅ Noch nicht autorisiert → Zeige Authorize-Seite
+        logger.info(f"User {request.user.email} noch nicht autorisiert für {client.name} - zeige Authorize-Seite")
         return redirect(f"/auth/sso/authorize-page/?client_id={client_id}&redirect_uri={redirect_uri}&state={state}&scope={scope}")
-
 
 def sso_login_page(request):
     """Zeigt Login-Seite für SSO"""
@@ -807,12 +809,12 @@ def sso_authorize_page(request):
             'error': 'Invalid client_id'
         })
     
-    # Parse und validiere Scopes
-    requested_scopes = [s.strip() for s in scope_string.split(',')]
-    scopes = SSOScope.objects.filter(
-        name__in=requested_scopes,
-        id__in=client.allowed_scopes.all()
-    )
+    # ✅ Lade ALLE Scopes die für diesen Client authorisiert sind
+    client_auth_scopes = SSOClient_Authorization.objects.filter(
+        client=client
+    ).select_related('scope')
+    
+    scopes = [ca.scope for ca in client_auth_scopes]
     
     return render(request, 'sso_authorize.html', {
         'user': request.user,
@@ -823,7 +825,6 @@ def sso_authorize_page(request):
         'scope_string': scope_string,
         'scopes': scopes,
     })
-
 
 @login_required
 @require_http_methods(["POST"])
@@ -842,22 +843,25 @@ def sso_authorize(request):
                 'error': 'Invalid redirect_uri'
             })
         
-        # Parse Scopes
-        requested_scopes = [s.strip() for s in scope_string.split(',')]
-        scopes = SSOScope.objects.filter(
-            name__in=requested_scopes,
-            id__in=client.allowed_scopes.all()
-        )
+        # ✅ Lade ALLE authorisierten Scopes für diesen Client (über SSOClient_Authorization)
+        client_auth_scopes = SSOClient_Authorization.objects.filter(
+            client=client
+        ).select_related('scope')
         
-        # Erstelle oder update Authorization
+        # Extrahiere die Scope-Objekte
+        scopes = [ca.scope for ca in client_auth_scopes]
+        
+        # Erstelle oder update Authorization für diesen User
         authorization, created = SSOAuthorization.objects.get_or_create(
             user=request.user,
             client=client
         )
+        
+        # Setze alle authorisierten Scopes
         authorization.scopes.set(scopes)
         authorization.save()
         
-        logger.info(f"Authorization {'created' if created else 'updated'}: {request.user.email} → {client.name}")
+        logger.info(f"Authorization {'created' if created else 'updated'}: {request.user.email} → {client.name} (Scopes: {len(scopes)})")
         
         # Generiere Token
         token = _generate_sso_token(request.user, client, authorization)
@@ -1076,3 +1080,176 @@ def _generate_sso_token(user, client, authorization):
     
     logger.info(f"SSO Session erstellt: user={user.email}, client={client.name}")
     return token
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.db import transaction
+
+
+@login_required
+def profile_view(request):
+    """
+    Zeigt das Profil des eingeloggten Benutzers an.
+    """
+    context = {
+        'user': request.user,
+        'wallet_balance': getattr(request.user, 'wallet_balance', 0.00),
+    }
+    
+    # Optional: Zusätzliche Informationen aus UserProfile laden
+    if hasattr(request.user, 'userprofile'):
+        context['profile'] = request.user.userprofile
+    
+    return render(request, 'profile/profile.html', context)
+
+
+@login_required
+def profile_edit(request):
+    """
+    Ermöglicht dem Benutzer, sein Profil zu bearbeiten.
+    """
+    if request.method == 'POST':
+        try:
+            with transaction.atomic():
+                user = request.user
+                
+                # Benutzerdaten aktualisieren
+                user.first_name = request.POST.get('first_name', '').strip()
+                user.last_name = request.POST.get('last_name', '').strip()
+                user.email = request.POST.get('email', '').strip()
+                
+                # Optional: Username ändern (falls erlaubt)
+                new_username = request.POST.get('username', '').strip()
+                if new_username and new_username != user.username:
+                    # Prüfen ob Username bereits existiert
+                    from django.contrib.auth.models import User
+                    if User.objects.filter(username=new_username).exclude(pk=user.pk).exists():
+                        messages.error(request, 'Dieser Benutzername ist bereits vergeben.')
+                        return redirect('profile_edit')
+                    user.username = new_username
+                
+                user.save()
+                
+                # Optional: Zusätzliche Profilfelder (UserProfile Model)
+                if hasattr(user, 'userprofile'):
+                    profile = user.userprofile
+                    profile.phone = request.POST.get('phone', '').strip()
+                    profile.address = request.POST.get('address', '').strip()
+                    profile.city = request.POST.get('city', '').strip()
+                    profile.postal_code = request.POST.get('postal_code', '').strip()
+                    profile.country = request.POST.get('country', '').strip()
+                    profile.company = request.POST.get('company', '').strip()
+                    profile.save()
+                
+                messages.success(request, 'Profil erfolgreich aktualisiert!')
+                return redirect('profile_view')
+                
+        except Exception as e:
+            messages.error(request, f'Fehler beim Aktualisieren: {str(e)}')
+            return redirect('profile_edit')
+    
+    context = {
+        'user': request.user,
+        'wallet_balance': getattr(request.user, 'wallet_balance', 0.00),
+    }
+    
+    if hasattr(request.user, 'userprofile'):
+        context['profile'] = request.user.userprofile
+    
+    return render(request, 'profile/profile_edit.html', context)
+
+
+@login_required
+def change_password(request):
+    """
+    Ermöglicht dem Benutzer, sein Passwort zu ändern.
+    """
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Wichtig: Session beibehalten
+            messages.success(request, 'Ihr Passwort wurde erfolgreich geändert!')
+            return redirect('profile_view')
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+    else:
+        form = PasswordChangeForm(request.user)
+    
+    context = {
+        'form': form,
+        'wallet_balance': getattr(request.user, 'wallet_balance', 0.00),
+    }
+    
+    return render(request, 'profile/change_password.html', context)
+
+
+@login_required
+def delete_account(request):
+    """
+    Ermöglicht dem Benutzer, sein Konto zu löschen (mit Bestätigung).
+    """
+    if request.method == 'POST':
+        confirmation = request.POST.get('confirm_delete', '').strip()
+        if confirmation.lower() == 'löschen':
+            user = request.user
+            user.is_active = False  # Deaktivieren statt löschen (sicherer)
+            user.save()
+            
+            # Optional: Vollständig löschen
+            # user.delete()
+            
+            messages.success(request, 'Ihr Konto wurde deaktiviert.')
+            from django.contrib.auth import logout
+            logout(request)
+            return redirect('home')
+        else:
+            messages.error(request, 'Bitte geben Sie "löschen" zur Bestätigung ein.')
+    
+    context = {
+        'wallet_balance': getattr(request.user, 'wallet_balance', 0.00),
+    }
+    
+    return render(request, 'profile/delete_account.html', context)
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils.translation import gettext as _
+from .models import SSOAuthorization
+
+
+@login_required
+def app_permissions(request):
+    """View zum Anzeigen aller autorisierten Apps"""
+    authorizations = SSOAuthorization.objects.filter(
+        user=request.user
+    ).select_related('client').prefetch_related('scopes').order_by('-last_used')
+    
+    context = {
+        'authorizations': authorizations,
+    }
+    return render(request, 'profile/app_permissions.html', context)
+
+
+@login_required
+def revoke_app_permission(request, auth_id):
+    """View zum Widerrufen einer App-Berechtigung"""
+    authorization = get_object_or_404(SSOAuthorization, id=auth_id, user=request.user)
+    
+    if request.method == 'POST':
+        app_name = authorization.client.name
+        authorization.delete()
+        messages.success(
+            request, 
+            _('Access for "{}" has been successfully revoked.').format(app_name)
+        )
+        return redirect('app_permissions')
+    
+    # Wenn kein POST, zurück zur Übersicht
+    return redirect('app_permissions')

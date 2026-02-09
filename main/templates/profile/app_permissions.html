@@ -1,0 +1,628 @@
+{% extends 'base_home.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "App Permissions" %} - Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .profile-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0;
+  }
+
+  .profile-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 2.5rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-body {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .back-link:hover {
+    gap: 0.8rem;
+    color: var(--primary-hover);
+  }
+
+  .apps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .app-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .app-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 68, 204, 0.1);
+  }
+
+  .app-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .app-info {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .app-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.2);
+  }
+
+  .app-details {
+    flex: 1;
+  }
+
+  .app-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.3rem 0;
+  }
+
+  .app-url {
+    font-size: 0.9rem;
+    color: #999;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .app-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: #999;
+  }
+
+  .meta-item i {
+    color: var(--primary);
+  }
+
+  .app-scopes {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .scopes-label {
+    font-size: 0.85rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .scopes-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .scope-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.8rem;
+    background: rgba(0, 68, 204, 0.1);
+    color: var(--primary);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .scope-tag i {
+    font-size: 0.75rem;
+  }
+
+  .revoke-btn {
+    padding: 0.6rem 1.2rem;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+
+  .revoke-btn:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #999;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+  }
+
+  .empty-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-text {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .info-box {
+    background: rgba(0, 68, 204, 0.05);
+    border: 1px solid rgba(0, 68, 204, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .info-box-icon {
+    font-size: 1.5rem;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  .info-box-content h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    color: var(--text);
+  }
+
+  .info-box-content p {
+    margin: 0;
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  /* Modal für Bestätigung */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  .modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    animation: modalSlideIn 0.3s ease;
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .modal-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: rgba(220, 53, 69, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #dc3545;
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .modal-body {
+    margin-bottom: 2rem;
+    color: #666;
+    line-height: 1.6;
+  }
+
+  .modal-app-name {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+
+  .btn-cancel {
+    background: var(--bg);
+    color: var(--text);
+    border: 2px solid var(--border);
+  }
+
+  .btn-cancel:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .btn-confirm {
+    background: #dc3545;
+    color: white;
+  }
+
+  .btn-confirm:hover {
+    background: #c82333;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    .profile-container {
+      margin: 1rem;
+    }
+
+    .profile-header {
+      padding: 2rem 1rem;
+    }
+
+    .profile-body {
+      padding: 1.5rem;
+    }
+
+    .header-icon {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+    }
+
+    .profile-name {
+      font-size: 1.5rem;
+    }
+
+    .app-card-header {
+      flex-direction: column;
+    }
+
+    .app-info {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .revoke-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .modal-content {
+      padding: 1.5rem;
+    }
+
+    .modal-actions {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="profile-container">
+  <!-- Header -->
+  <div class="profile-header">
+    <div class="header-icon">
+      <i class="fas fa-shield-alt"></i>
+    </div>
+    <h1 class="profile-name">{% trans "App Permissions" %}</h1>
+    <p class="profile-subtitle">{% trans "Manage apps that have access to your account" %}</p>
+  </div>
+
+  <!-- Body -->
+  <div class="profile-body">
+    <a href="{% url 'profile_view' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i>
+      {% trans "Back to Profile" %}
+    </a>
+
+    <!-- Info Box -->
+    <div class="info-box">
+      <i class="fas fa-info-circle info-box-icon"></i>
+      <div class="info-box-content">
+        <h3>{% trans "What are app permissions?" %}</h3>
+        <p>{% trans "These are apps and services that you've authorized to access your Joel Digitals account. You can revoke access at any time, which will require you to authorize the app again if you want to use it in the future." %}</p>
+      </div>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="background: {% if message.tags == 'success' %}rgba(76, 175, 80, 0.1){% else %}rgba(220, 53, 69, 0.1){% endif %}; border: 1px solid {% if message.tags == 'success' %}rgba(76, 175, 80, 0.3){% else %}rgba(220, 53, 69, 0.3){% endif %}; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; color: {% if message.tags == 'success' %}#2E7D32{% else %}#c82333{% endif %};">
+          <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Apps Liste -->
+    {% if authorizations %}
+      <div class="apps-list">
+        {% for auth in authorizations %}
+          <div class="app-card">
+            <div class="app-card-header">
+              <div class="app-info">
+                <div class="app-icon">
+                  <i class="fas fa-cube"></i>
+                </div>
+                <div class="app-details">
+                  <h3 class="app-name">{{ auth.client.name }}</h3>
+                  <div class="app-url">
+                    <i class="fas fa-globe"></i>
+                    {{ auth.client.redirect_uri|truncatechars:50 }}
+                  </div>
+                  <div class="app-meta">
+                    <div class="meta-item">
+                      <i class="fas fa-calendar-plus"></i>
+                      {% trans "Authorized" %}: {{ auth.created_at|date:"d.m.Y" }}
+                    </div>
+                    <div class="meta-item">
+                      <i class="fas fa-clock"></i>
+                      {% trans "Last used" %}: {{ auth.last_used|date:"d.m.Y H:i" }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button class="revoke-btn" onclick="showRevokeModal({{ auth.id }}, '{{ auth.client.name|escapejs }}')">
+                <i class="fas fa-ban"></i>
+                {% trans "Revoke Access" %}
+              </button>
+            </div>
+
+            {% if auth.scopes.all %}
+              <div class="app-scopes">
+                <div class="scopes-label">
+                  <i class="fas fa-key"></i> {% trans "Permissions" %}:
+                </div>
+                <div class="scopes-list">
+                  {% for scope in auth.scopes.all %}
+                    <span class="scope-tag">
+                      <i class="fas fa-check"></i>
+                      {{ scope.name }}
+                    </span>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-lock-open"></i>
+        </div>
+        <div class="empty-title">{% trans "No authorized apps" %}</div>
+        <div class="empty-text">
+          {% trans "You haven't authorized any apps to access your account yet." %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Revoke Modal -->
+<div id="revokeModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h2 class="modal-title">{% trans "Revoke Access" %}</h2>
+    </div>
+    <div class="modal-body">
+      <p>
+        {% trans "Are you sure you want to revoke access for" %} 
+        <span class="modal-app-name" id="modalAppName"></span>?
+      </p>
+      <p>
+        {% trans "This app will no longer be able to access your account. You will need to authorize it again if you want to use it in the future." %}
+      </p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeRevokeModal()">
+        {% trans "Cancel" %}
+      </button>
+      <form id="revokeForm" method="POST" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-confirm">
+          <i class="fas fa-ban"></i>
+          {% trans "Revoke Access" %}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showRevokeModal(authId, appName) {
+    const modal = document.getElementById('revokeModal');
+    const form = document.getElementById('revokeForm');
+    const appNameSpan = document.getElementById('modalAppName');
+    
+    appNameSpan.textContent = appName;
+    form.action = "{% url 'revoke_app_permission' 0 %}".replace('0', authId);
+    
+    modal.classList.add('active');
+  }
+
+  function closeRevokeModal() {
+    const modal = document.getElementById('revokeModal');
+    modal.classList.remove('active');
+  }
+
+  // Modal schließen bei Klick außerhalb
+  document.getElementById('revokeModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeRevokeModal();
+    }
+  });
+
+  // Modal schließen mit ESC-Taste
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeRevokeModal();
+    }
+  });
+</script>
+{% endblock %}

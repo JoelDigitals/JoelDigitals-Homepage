@@ -1,0 +1,339 @@
+{% extends 'base_home.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete Account" %} - Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .delete-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 0;
+  }
+
+  .delete-header {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    padding: 2rem;
+    border-radius: 16px 16px 0 0;
+    color: white;
+  }
+
+  .delete-header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .delete-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1rem;
+  }
+
+  .delete-body {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .warning-box {
+    background: rgba(255, 193, 7, 0.15);
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .warning-box h3 {
+    color: #ffc107;
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .warning-box ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: var(--text);
+  }
+
+  .warning-box li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+  }
+
+  .danger-box {
+    background: rgba(220, 53, 69, 0.15);
+    border: 2px solid #dc3545;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .danger-box h3 {
+    color: #dc3545;
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .danger-box p {
+    color: var(--text);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-label.required::after {
+    content: ' *';
+    color: #ff4444;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+  }
+
+  .helper-text {
+    font-size: 0.85rem;
+    color: #999;
+    margin-top: 0.3rem;
+    font-style: italic;
+  }
+
+  .form-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn {
+    padding: 0.9rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-family: inherit;
+  }
+
+  .btn-danger {
+    background: #dc3545;
+    color: white;
+    flex: 1;
+  }
+
+  .btn-danger:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+  }
+
+  .btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--text);
+    border: 2px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .alert {
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
+  }
+
+  .alert-error {
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+  }
+
+  .alert i {
+    font-size: 1.2rem;
+  }
+
+  @media (max-width: 768px) {
+    .delete-container {
+      margin: 1rem;
+    }
+
+    .delete-header, .delete-body {
+      padding: 1.5rem;
+    }
+
+    .form-buttons {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="delete-container">
+  <div class="delete-header">
+    <h1>
+      <i class="fas fa-exclamation-triangle"></i>
+      {% trans "Delete Account" %}
+    </h1>
+    <p>{% trans "This action is permanent and cannot be undone" %}</p>
+  </div>
+
+  <div class="delete-body">
+    <!-- Nachrichten -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Warnung -->
+    <div class="warning-box">
+      <h3>
+        <i class="fas fa-exclamation-triangle"></i>
+        {% trans "What will be deleted?" %}
+      </h3>
+      <ul>
+        <li>{% trans "Your personal profile information" %}</li>
+        <li>{% trans "All your orders and purchase history" %}</li>
+        <li>{% trans "Your wallet balance and transaction history" %}</li>
+        <li>{% trans "All downloads and licenses" %}</li>
+        <li>{% trans "Your affiliate program data" %}</li>
+        <li>{% trans "All saved preferences and settings" %}</li>
+      </ul>
+    </div>
+
+    <!-- Gefahr -->
+    <div class="danger-box">
+      <h3>
+        <i class="fas fa-skull-crossbones"></i>
+        {% trans "Important Notice" %}
+      </h3>
+      <p>
+        {% trans "Once you delete your account, there is no going back. Please be certain before proceeding. We recommend downloading any important data before deletion." %}
+      </p>
+    </div>
+
+    <form method="post" action="{% url 'delete_account' %}" id="deleteForm">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label class="form-label required" for="confirm_delete">
+          {% trans "Type 'löschen' to confirm" %}
+        </label>
+        <input 
+          type="text" 
+          class="form-input" 
+          id="confirm_delete" 
+          name="confirm_delete" 
+          required
+          autocomplete="off"
+          placeholder="{% trans 'Type löschen here' %}"
+        >
+        <p class="helper-text">
+          {% trans "This verification ensures you understand the consequences" %}
+        </p>
+      </div>
+
+      <!-- Buttons -->
+      <div class="form-buttons">
+        <button type="submit" class="btn btn-danger" id="deleteBtn" disabled>
+          <i class="fas fa-trash-alt"></i>
+          {% trans "Delete My Account" %}
+        </button>
+        <a href="{% url 'profile_view' %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i>
+          {% trans "Go Back" %}
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Aktiviere den Löschen-Button nur wenn "löschen" eingegeben wurde
+const confirmInput = document.getElementById('confirm_delete');
+const deleteBtn = document.getElementById('deleteBtn');
+
+confirmInput.addEventListener('input', function() {
+  if (this.value.trim().toLowerCase() === 'löschen') {
+    deleteBtn.disabled = false;
+  } else {
+    deleteBtn.disabled = true;
+  }
+});
+
+// Finale Bestätigung vor dem Absenden
+document.getElementById('deleteForm').addEventListener('submit', function(e) {
+  const confirmed = confirm(
+    '{% trans "Are you absolutely sure you want to delete your account? This action cannot be undone!" %}'
+  );
+  
+  if (!confirmed) {
+    e.preventDefault();
+  }
+});
+</script>
+{% endblock %}
