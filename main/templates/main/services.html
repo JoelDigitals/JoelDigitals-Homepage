@@ -1,210 +1,508 @@
 {% extends "base_home.html" %}
+{% load static %}
 {% load i18n %}
+
+{% block title %}{% trans "Our Services" %} – Joel Digitals{% endblock %}
+
 {% block content %}
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            color: #000;
-            font-size: 18px;
-        }
+<style>
+  .services-page-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
 
-        main {
-            padding: 40px 20px;
-            max-width: 1000px;
-            margin: auto;
-        }
+  .services-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 4rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
+  .services-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
 
-        h1, h2 {
-            color: #0044cc;
-        }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
 
-        .service-section {
-            margin-bottom: 30px;
-        }
+  .header-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
 
-        .toggle {
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            background-color: #f0f0f0;
-            padding: 15px;
-            border-radius: 6px;
-            flex-direction: column;
-        }
+  .services-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
 
-        .toggle h3 {
-            margin: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
+  .services-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+  }
 
-        .arrow {
-            transition: transform 0.3s ease;
-        }
+  .services-body {
+    background: var(--surface);
+    padding: 3rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
 
-        .expanded .arrow {
-            transform: rotate(90deg);
-        }
+  .intro-text {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: #666;
+    text-align: center;
+    margin-bottom: 3rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 
-        .content {
-            display: none;
-            padding: 15px;
-        }
+  /* Service Cards */
+  .services-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 
-        .expanded .content {
-            display: block;
-        }
+  .service-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
 
-        .feature {
-            width: 100%;
-            max-width: 600px;
-            border-radius: 10px;
-            margin-top: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-        @media (max-width: 600px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+  .service-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(0, 68, 204, 0.1);
+  }
 
-            nav {
-                margin-left: 0;
-                margin-top: 10px;
-            }
+  .service-card.expanded {
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(0, 68, 204, 0.15);
+  }
 
-            nav a {
-                display: block;
-                margin: 5px 0;
-            }
-        }
-        @media (max-width: 1000px) {
-            main {
-                padding: 20px;
-            }
-        }
-        @media (max-width: 600px) {
-            .logo-img {
-                width: 200px;
-                height: auto;
-            }
-        }
-    </style>
-    <script>
-        function toggleSection(id) {
-            const section = document.getElementById(id);
-            section.classList.toggle("expanded");
-        }
-    </script>
+  .service-header {
+    padding: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(0, 68, 204, 0.03), transparent);
+    transition: all 0.3s ease;
+  }
 
-<main>
-    <div class="container">
-        <h1>{% trans "Our Services" %}</h1>
-        <p>
-            {% trans "At Joel Digitals, we offer a wide range of services to help your business succeed in the digital world. Our team combines creativity and technical expertise to deliver solutions tailored to your needs." %}
-        </p>
+  .service-card:hover .service-header,
+  .service-card.expanded .service-header {
+    background: linear-gradient(135deg, rgba(0, 68, 204, 0.08), transparent);
+  }
 
-        <div id="service1" class="service-section">
-            <div class="toggle" onclick="toggleSection('service1')">
-                <h3>{% trans "Design (Brand, Product & Marketing)" %} <span class="arrow">▶</span></h3>
-                <p>{% trans "Creative design solutions for your brand, products, and marketing campaigns." %}</p>
-            </div>
-            <div class="content">
-                <p>{% trans "We provide end-to-end design services including brand identity, product packaging, and marketing materials. Our designs are crafted to enhance your visibility and make a lasting impression." %}</p>
-            </div>
-        </div>
+  .service-title-wrapper {
+    flex: 1;
+  }
 
-        <div id="service2" class="service-section">
-            <div class="toggle" onclick="toggleSection('service2')">
-                <h3>{% trans "Digitalization of Workflows" %} <span class="arrow">▶</span></h3>
-                <p>{% trans "Optimize and automate your business processes through digital solutions." %}</p>
-            </div>
-            <div class="content">
-                <p>{% trans "We help you transform manual workflows into efficient digital processes. From document management to task automation, our solutions save time, reduce errors, and increase productivity." %}</p>
-            </div>
-        </div>
+  .service-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
 
-        <div id="service3" class="service-section">
-            <div class="toggle" onclick="toggleSection('service3')">
-                <h3>{% trans "Web Development & Web Design" %} <span class="arrow">▶</span></h3>
-                <p>{% trans "Modern, responsive websites that showcase your business." %}</p>
-            </div>
-            <div class="content">
-                <p>{% trans "We design and develop websites that are visually appealing, user-friendly, and optimized for search engines. Our web solutions help you attract and retain customers." %}</p>
-            </div>
-        </div>
+  .service-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+  }
 
-        <div id="service4" class="service-section">
-            <div class="toggle" onclick="toggleSection('service4')">
-                <h3>{% trans "Logo Design" %} <span class="arrow">▶</span></h3>
-                <p>{% trans "Unique logos that reflect your brand identity." %}</p>
-            </div>
-            <div class="content">
-                <p>{% trans "Our logo designs are created to convey your brand values and make your business memorable. We work closely with you to ensure your logo stands out in the market." %}</p>
-            </div>
-        </div>
+  .service-teaser {
+    color: #888;
+    font-size: 0.95rem;
+    margin: 0;
+    padding-left: 3.25rem;
+  }
 
-        <div id="service5" class="service-section">
-            <div class="toggle" onclick="toggleSection('service5')">
-                <h3>{% trans "Web Applications" %} <span class="arrow">▶</span></h3>
-                <p>{% trans "Custom web applications to enhance your business operations." %}</p>
-            </div>
-            <div class="content">
-                <p>{% trans "We build scalable and secure web applications tailored to your business needs. Our solutions improve efficiency, user engagement, and data management." %}</p>
-            </div>
-        </div>
+  .toggle-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    transition: all 0.3s ease;
+    margin-left: 1rem;
+  }
 
-        <div id="service6" class="service-section">
-            <div class="toggle" onclick="toggleSection('service6')">
-                <h3>{% trans "Mobile & Windows Apps" %} <span class="arrow">▶</span></h3>
-                <p>{% trans "Cross-platform apps for mobile and desktop environments." %}</p>
-            </div>
-            <div class="content">
-                <p>{% trans "Our development team creates high-performance applications for iOS, Android, and Windows. We focus on usability, performance, and seamless integration with your systems." %}</p>
-            </div>
-        </div>
+  .service-card.expanded .toggle-icon {
+    transform: rotate(180deg);
+    background: var(--primary);
+    color: white;
+  }
 
-        <div id="service7" class="service-section">
-            <div class="toggle" onclick="toggleSection('service7')">
-                <h3>{% trans "Applications" %} <span class="arrow">▶</span></h3>
-                <p>{% trans "Custom software solutions to meet your specific business needs." %}</p>
-            </div>
-            <div class="content">
-                <p>{% trans "Whether it’s internal tools, customer platforms, or enterprise software, we develop robust applications that align with your operational goals." %}</p>
-            </div>
-        </div>
+  .service-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
 
-        <div id="service8" class="service-section">
-            <div class="toggle" onclick="toggleSection('service8')">
-                <h3>{% trans "Server Maintenance" %} <span class="arrow">▶</span></h3>
-                <p>{% trans "Keep your servers secure, updated, and running smoothly." %}</p>
-            </div>
-            <div class="content">
-                <p>{% trans "Our server maintenance services include updates, monitoring, backups, and performance tuning to ensure your systems remain reliable and secure." %}</p>
-            </div>
-        </div>
+  .service-card.expanded .service-content {
+    max-height: 500px;
+    padding: 0 1.5rem 1.5rem 1.5rem;
+  }
 
-        <div id="service9" class="service-section">
-            <div class="toggle" onclick="toggleSection('service9')">
-                <h3>{% trans "Hosting & Domains" %} <span class="arrow">▶</span></h3>
-                <p>{% trans "Reliable hosting and domain management for your online presence." %}</p>
-            </div>
-            <div class="content">
-                <p>{% trans "We provide secure hosting solutions and help you manage your domain names. Our services ensure your website and applications are always accessible and fast." %}</p>
-            </div>
-        </div>
+  .service-description {
+    color: #666;
+    line-height: 1.8;
+    margin: 0;
+    padding-left: 3.25rem;
+  }
 
+  /* CTA Section */
+  .cta-section {
+    margin-top: 3rem;
+    padding: 2.5rem;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    border-radius: 16px;
+    text-align: center;
+    color: white;
+  }
+
+  .cta-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .cta-text {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.95;
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: white;
+    color: var(--primary);
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .services-page-container {
+      margin: 1rem auto;
+    }
+
+    .services-header {
+      padding: 3rem 1.5rem;
+    }
+
+    .header-icon {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+    }
+
+    .services-title {
+      font-size: 2rem;
+    }
+
+    .services-body {
+      padding: 2rem 1.5rem;
+    }
+
+    .service-title {
+      font-size: 1.1rem;
+    }
+
+    .service-teaser,
+    .service-description {
+      padding-left: 0;
+    }
+
+    .service-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .toggle-icon {
+      align-self: flex-end;
+      margin-left: 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .services-title {
+      font-size: 1.6rem;
+    }
+
+    .cta-section {
+      padding: 1.5rem;
+    }
+  }
+</style>
+
+<script>
+  function toggleSection(id) {
+    const section = document.getElementById(id);
+    section.classList.toggle("expanded");
+  }
+</script>
+
+<div class="services-page-container">
+  <!-- Header -->
+  <div class="services-header">
+    <div class="header-icon">
+      <i class="fas fa-cogs"></i>
     </div>
-</main>
+    <h1 class="services-title">{% trans "Our Services" %}</h1>
+    <p class="services-subtitle">{% trans "Comprehensive digital solutions for your business success" %}</p>
+  </div>
+
+  <!-- Body -->
+  <div class="services-body">
+    <p class="intro-text">
+      {% trans "At Joel Digitals, we offer a wide range of services to help your business succeed in the digital world. Our team combines creativity and technical expertise to deliver solutions tailored to your needs." %}
+    </p>
+
+    <div class="services-grid">
+      <!-- Service 1 -->
+      <div id="service1" class="service-card">
+        <div class="service-header" onclick="toggleSection('service1')">
+          <div class="service-title-wrapper">
+            <h3 class="service-title">
+              <span class="service-icon"><i class="fas fa-paint-brush"></i></span>
+              {% trans "Design (Brand, Product & Marketing)" %}
+            </h3>
+            <p class="service-teaser">{% trans "Creative design solutions for your brand, products, and marketing campaigns." %}</p>
+          </div>
+          <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="service-content">
+          <p class="service-description">
+            {% trans "We provide end-to-end design services including brand identity, product packaging, and marketing materials. Our designs are crafted to enhance your visibility and make a lasting impression." %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Service 2 -->
+      <div id="service2" class="service-card">
+        <div class="service-header" onclick="toggleSection('service2')">
+          <div class="service-title-wrapper">
+            <h3 class="service-title">
+              <span class="service-icon"><i class="fas fa-sync-alt"></i></span>
+              {% trans "Digitalization of Workflows" %}
+            </h3>
+            <p class="service-teaser">{% trans "Optimize and automate your business processes through digital solutions." %}</p>
+          </div>
+          <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="service-content">
+          <p class="service-description">
+            {% trans "We help you transform manual workflows into efficient digital processes. From document management to task automation, our solutions save time, reduce errors, and increase productivity." %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Service 3 -->
+      <div id="service3" class="service-card">
+        <div class="service-header" onclick="toggleSection('service3')">
+          <div class="service-title-wrapper">
+            <h3 class="service-title">
+              <span class="service-icon"><i class="fas fa-code"></i></span>
+              {% trans "Web Development & Web Design" %}
+            </h3>
+            <p class="service-teaser">{% trans "Modern, responsive websites that showcase your business." %}</p>
+          </div>
+          <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="service-content">
+          <p class="service-description">
+            {% trans "We design and develop websites that are visually appealing, user-friendly, and optimized for search engines. Our web solutions help you attract and retain customers." %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Service 4 -->
+      <div id="service4" class="service-card">
+        <div class="service-header" onclick="toggleSection('service4')">
+          <div class="service-title-wrapper">
+            <h3 class="service-title">
+              <span class="service-icon"><i class="fas fa-pen-nib"></i></span>
+              {% trans "Logo Design" %}
+            </h3>
+            <p class="service-teaser">{% trans "Unique logos that reflect your brand identity." %}</p>
+          </div>
+          <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="service-content">
+          <p class="service-description">
+            {% trans "Our logo designs are created to convey your brand values and make your business memorable. We work closely with you to ensure your logo stands out in the market." %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Service 5 -->
+      <div id="service5" class="service-card">
+        <div class="service-header" onclick="toggleSection('service5')">
+          <div class="service-title-wrapper">
+            <h3 class="service-title">
+              <span class="service-icon"><i class="fas fa-window-maximize"></i></span>
+              {% trans "Web Applications" %}
+            </h3>
+            <p class="service-teaser">{% trans "Custom web applications to enhance your business operations." %}</p>
+          </div>
+          <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="service-content">
+          <p class="service-description">
+            {% trans "We build scalable and secure web applications tailored to your business needs. Our solutions improve efficiency, user engagement, and data management." %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Service 6 -->
+      <div id="service6" class="service-card">
+        <div class="service-header" onclick="toggleSection('service6')">
+          <div class="service-title-wrapper">
+            <h3 class="service-title">
+              <span class="service-icon"><i class="fas fa-mobile-alt"></i></span>
+              {% trans "Mobile & Windows Apps" %}
+            </h3>
+            <p class="service-teaser">{% trans "Cross-platform apps for mobile and desktop environments." %}</p>
+          </div>
+          <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="service-content">
+          <p class="service-description">
+            {% trans "Our development team creates high-performance applications for iOS, Android, and Windows. We focus on usability, performance, and seamless integration with your systems." %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Service 7 -->
+      <div id="service7" class="service-card">
+        <div class="service-header" onclick="toggleSection('service7')">
+          <div class="service-title-wrapper">
+            <h3 class="service-title">
+              <span class="service-icon"><i class="fas fa-laptop-code"></i></span>
+              {% trans "Applications" %}
+            </h3>
+            <p class="service-teaser">{% trans "Custom software solutions to meet your specific business needs." %}</p>
+          </div>
+          <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="service-content">
+          <p class="service-description">
+            {% trans "Whether it's internal tools, customer platforms, or enterprise software, we develop robust applications that align with your operational goals." %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Service 8 -->
+      <div id="service8" class="service-card">
+        <div class="service-header" onclick="toggleSection('service8')">
+          <div class="service-title-wrapper">
+            <h3 class="service-title">
+              <span class="service-icon"><i class="fas fa-server"></i></span>
+              {% trans "Server Maintenance" %}
+            </h3>
+            <p class="service-teaser">{% trans "Keep your servers secure, updated, and running smoothly." %}</p>
+          </div>
+          <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="service-content">
+          <p class="service-description">
+            {% trans "Our server maintenance services include updates, monitoring, backups, and performance tuning to ensure your systems remain reliable and secure." %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Service 9 -->
+      <div id="service9" class="service-card">
+        <div class="service-header" onclick="toggleSection('service9')">
+          <div class="service-title-wrapper">
+            <h3 class="service-title">
+              <span class="service-icon"><i class="fas fa-globe"></i></span>
+              {% trans "Hosting & Domains" %}
+            </h3>
+            <p class="service-teaser">{% trans "Reliable hosting and domain management for your online presence." %}</p>
+          </div>
+          <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+        </div>
+        <div class="service-content">
+          <p class="service-description">
+            {% trans "We provide secure hosting solutions and help you manage your domain names. Our services ensure your website and applications are always accessible and fast." %}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <h2 class="cta-title">{% trans "Ready to get started?" %}</h2>
+      <p class="cta-text">{% trans "Let's discuss how we can help transform your business." %}</p>
+      <a href="{% url 'contactz_home' %}" class="cta-button">
+        <i class="fas fa-paper-plane"></i> {% trans "Contact Us" %}
+      </a>
+    </div>
+  </div>
+</div>
 {% endblock %}

@@ -1522,3 +1522,1372 @@ msgstr "Email address"
 
 msgid "Registration successful. You can now log in."
 msgstr "Registration successful. You can now log in."
+
+# English Translation for Joel Digitals
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Digital Solutions for Tomorrow – Websites • Automation • Marketing • IT Services"
+msgstr "Digital Solutions for Tomorrow – Websites • Automation • Marketing • IT Services"
+
+msgid "Visit Our Shop"
+msgstr "Visit Our Shop"
+
+msgid "Contact Us"
+msgstr "Contact Us"
+
+msgid "Our Team"
+msgstr "Our Team"
+
+msgid "Meet Our Team"
+msgstr "Meet Our Team"
+
+msgid "We are passionate developers, designers, and strategists building modern digital products. Collaboration and innovation drive everything we do."
+msgstr "We are passionate developers, designers, and strategists building modern digital products. Collaboration and innovation drive everything we do."
+
+msgid "Learn More"
+msgstr "Learn More"
+
+msgid "Our Mission"
+msgstr "Our Mission"
+
+msgid "Helping businesses thrive in the digital era with innovative web platforms, smart automation, and strong strategies."
+msgstr "Helping businesses thrive in the digital era with innovative web platforms, smart automation, and strong strategies."
+
+msgid "About Us"
+msgstr "About Us"
+
+msgid "Our Shop"
+msgstr "Our Shop"
+
+msgid "Buy Now"
+msgstr "Buy Now"
+
+msgid "View All Products"
+msgstr "View All Products"
+
+msgid "Frequently Asked Questions"
+msgstr "Frequently Asked Questions"
+
+msgid "Read more"
+msgstr "Read more"
+
+msgid "No FAQs available at the moment."
+msgstr "No FAQs available at the moment."
+
+msgid "View all FAQs"
+msgstr "View all FAQs"
+
+msgid "Customer Rating"
+msgstr "Customer Rating"
+
+msgid "Based on %(count)s reviews"
+msgstr "Based on %(count)s reviews"
+
+msgid "Customer Testimonials"
+msgstr "Customer Testimonials"
+
+msgid "From Our Blog"
+msgstr "From Our Blog"
+
+msgid "Read More"
+msgstr "Read More"
+
+msgid "View All Articles"
+msgstr "View All Articles"
+
+msgid "Current Job Openings"
+msgstr "Current Job Openings"
+
+msgid "We are always looking for talented professionals to join our team. Check out our current positions:"
+msgstr "We are always looking for talented professionals to join our team. Check out our current positions:"
+
+msgid "View Current Jobs"
+msgstr "View Current Jobs"
+
+msgid "Opening Hours"
+msgstr "Opening Hours"
+
+msgid "You can always find our up-to-date opening hours on our dedicated page or on Google."
+msgstr "You can always find our up-to-date opening hours on our dedicated page or on Google."
+
+msgid "Google"
+msgstr "Google"
+
+msgid "Let's Work Together"
+msgstr "Let's Work Together"
+
+msgid "Have an idea or project? Reach out and let's make it real."
+msgstr "Have an idea or project? Reach out and let's make it real."
+
+# Services Page Translations
+msgid "Our Services"
+msgstr "Our Services"
+
+msgid "Comprehensive digital solutions for your business success"
+msgstr "Comprehensive digital solutions for your business success"
+
+msgid "At Joel Digitals, we offer a wide range of services to help your business succeed in the digital world. Our team combines creativity and technical expertise to deliver solutions tailored to your needs."
+msgstr "At Joel Digitals, we offer a wide range of services to help your business succeed in the digital world. Our team combines creativity and technical expertise to deliver solutions tailored to your needs."
+
+msgid "Design (Brand, Product & Marketing)"
+msgstr "Design (Brand, Product & Marketing)"
+
+msgid "Creative design solutions for your brand, products, and marketing campaigns."
+msgstr "Creative design solutions for your brand, products, and marketing campaigns."
+
+msgid "We provide end-to-end design services including brand identity, product packaging, and marketing materials. Our designs are crafted to enhance your visibility and make a lasting impression."
+msgstr "We provide end-to-end design services including brand identity, product packaging, and marketing materials. Our designs are crafted to enhance your visibility and make a lasting impression."
+
+msgid "Digitalization of Workflows"
+msgstr "Digitalization of Workflows"
+
+msgid "Optimize and automate your business processes through digital solutions."
+msgstr "Optimize and automate your business processes through digital solutions."
+
+msgid "We help you transform manual workflows into efficient digital processes. From document management to task automation, our solutions save time, reduce errors, and increase productivity."
+msgstr "We help you transform manual workflows into efficient digital processes. From document management to task automation, our solutions save time, reduce errors, and increase productivity."
+
+msgid "Web Development & Web Design"
+msgstr "Web Development & Web Design"
+
+msgid "Modern, responsive websites that showcase your business."
+msgstr "Modern, responsive websites that showcase your business."
+
+msgid "We design and develop websites that are visually appealing, user-friendly, and optimized for search engines. Our web solutions help you attract and retain customers."
+msgstr "We design and develop websites that are visually appealing, user-friendly, and optimized for search engines. Our web solutions help you attract and retain customers."
+
+msgid "Logo Design"
+msgstr "Logo Design"
+
+msgid "Unique logos that reflect your brand identity."
+msgstr "Unique logos that reflect your brand identity."
+
+msgid "Our logo designs are created to convey your brand values and make your business memorable. We work closely with you to ensure your logo stands out in the market."
+msgstr "Our logo designs are created to convey your brand values and make your business memorable. We work closely with you to ensure your logo stands out in the market."
+
+msgid "Web Applications"
+msgstr "Web Applications"
+
+msgid "Custom web applications to enhance your business operations."
+msgstr "Custom web applications to enhance your business operations."
+
+msgid "We build scalable and secure web applications tailored to your business needs. Our solutions improve efficiency, user engagement, and data management."
+msgstr "We build scalable and secure web applications tailored to your business needs. Our solutions improve efficiency, user engagement, and data management."
+
+msgid "Mobile & Windows Apps"
+msgstr "Mobile & Windows Apps"
+
+msgid "Cross-platform apps for mobile and desktop environments."
+msgstr "Cross-platform apps for mobile and desktop environments."
+
+msgid "Our development team creates high-performance applications for iOS, Android, and Windows. We focus on usability, performance, and seamless integration with your systems."
+msgstr "Our development team creates high-performance applications for iOS, Android, and Windows. We focus on usability, performance, and seamless integration with your systems."
+
+msgid "Applications"
+msgstr "Applications"
+
+msgid "Custom software solutions to meet your specific business needs."
+msgstr "Custom software solutions to meet your specific business needs."
+
+msgid "Whether it's internal tools, customer platforms, or enterprise software, we develop robust applications that align with your operational goals."
+msgstr "Whether it's internal tools, customer platforms, or enterprise software, we develop robust applications that align with your operational goals."
+
+msgid "Server Maintenance"
+msgstr "Server Maintenance"
+
+msgid "Keep your servers secure, updated, and running smoothly."
+msgstr "Keep your servers secure, updated, and running smoothly."
+
+msgid "Our server maintenance services include updates, monitoring, backups, and performance tuning to ensure your systems remain reliable and secure."
+msgstr "Our server maintenance services include updates, monitoring, backups, and performance tuning to ensure your systems remain reliable and secure."
+
+msgid "Hosting & Domains"
+msgstr "Hosting & Domains"
+
+msgid "Reliable hosting and domain management for your online presence."
+msgstr "Reliable hosting and domain management for your online presence."
+
+msgid "We provide secure hosting solutions and help you manage your domain names. Our services ensure your website and applications are always accessible and fast."
+msgstr "We provide secure hosting solutions and help you manage your domain names. Our services ensure your website and applications are always accessible and fast."
+
+msgid "Ready to get started?"
+msgstr "Ready to get started?"
+
+msgid "Let's discuss how we can help transform your business."
+msgstr "Let's discuss how we can help transform your business."
+
+# Team Page Translations
+msgid "Our Team"
+msgstr "Our Team"
+
+msgid "Meet Our Team"
+msgstr "Meet Our Team"
+
+msgid "The passionate people behind Joel Digitals"
+msgstr "The passionate people behind Joel Digitals"
+
+msgid "Back to Home"
+msgstr "Back to Home"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Phone"
+msgstr "Phone"
+
+msgid "No team members found"
+msgstr "No team members found"
+
+msgid "Check back later to meet our amazing team!"
+msgstr "Check back later to meet our amazing team!"
+
+msgid "Want to join our team?"
+msgstr "Want to join our team?"
+
+msgid "We're always looking for talented individuals to join us."
+msgstr "We're always looking for talented individuals to join us."
+
+msgid "View Open Positions"
+msgstr "View Open Positions"
+
+# About Page Translations
+msgid "About Us"
+msgstr "About Us"
+
+msgid "About Joel Digitals"
+msgstr "About Joel Digitals"
+
+msgid "Innovation. Technology. Partnership."
+msgstr "Innovation. Technology. Partnership."
+
+msgid "Joel Digitals is a forward-thinking digital agency based in Germany, specializing in tailor-made IT and web solutions for businesses of all sizes. We blend creativity, technology, and strategy to help brands build their digital future."
+msgstr "Joel Digitals is a forward-thinking digital agency based in Germany, specializing in tailor-made IT and web solutions for businesses of all sizes. We blend creativity, technology, and strategy to help brands build their digital future."
+
+msgid "Our Vision"
+msgstr "Our Vision"
+
+msgid "To empower companies to grow through innovative and intelligent digital systems — built with precision, scalability, and design excellence."
+msgstr "To empower companies to grow through innovative and intelligent digital systems — built with precision, scalability, and design excellence."
+
+msgid "Our Mission"
+msgstr "Our Mission"
+
+msgid "We develop customized platforms, applications, and automation tools that make technology accessible, efficient, and truly valuable. Our goal is to simplify the digital landscape and provide measurable results for our clients."
+msgstr "We develop customized platforms, applications, and automation tools that make technology accessible, efficient, and truly valuable. Our goal is to simplify the digital landscape and provide measurable results for our clients."
+
+msgid "Our Core Values"
+msgstr "Our Core Values"
+
+msgid "Innovation"
+msgstr "Innovation"
+
+msgid "We stay ahead of trends and deliver cutting-edge solutions."
+msgstr "We stay ahead of trends and deliver cutting-edge solutions."
+
+msgid "Transparency"
+msgstr "Transparency"
+
+msgid "Clear communication and full project visibility are central to our work."
+msgstr "Clear communication and full project visibility are central to our work."
+
+msgid "Reliability"
+msgstr "Reliability"
+
+msgid "Clients can count on us for consistent quality and dependable results."
+msgstr "Clients can count on us for consistent quality and dependable results."
+
+msgid "Partnership"
+msgstr "Partnership"
+
+msgid "We build long-term collaborations based on trust and shared success."
+msgstr "We build long-term collaborations based on trust and shared success."
+
+msgid "Sustainability"
+msgstr "Sustainability"
+
+msgid "Our systems are designed for long-term performance and maintainability."
+msgstr "Our systems are designed for long-term performance and maintainability."
+
+msgid "Our Expertise"
+msgstr "Our Expertise"
+
+msgid "From custom web applications and cloud systems to automation and AI integration, we combine deep technical knowledge with user-centered design. Our expertise covers a broad range of technologies including Django, Twilio, Tailwind, React, and modern deployment infrastructures like Render and Docker."
+msgstr "From custom web applications and cloud systems to automation and AI integration, we combine deep technical knowledge with user-centered design. Our expertise covers a broad range of technologies including Django, Twilio, Tailwind, React, and modern deployment infrastructures like Render and Docker."
+
+msgid "Our Team"
+msgstr "Our Team"
+
+msgid "Joel Digitals is made up of passionate developers, creative designers, and strategic thinkers — led by professionals who believe in technology as a tool for human progress. Each project is handled with dedication, precision, and the shared goal of exceeding expectations."
+msgstr "Joel Digitals is made up of passionate developers, creative designers, and strategic thinkers — led by professionals who believe in technology as a tool for human progress. Each project is handled with dedication, precision, and the shared goal of exceeding expectations."
+
+msgid "Collaboration & Management"
+msgstr "Collaboration & Management"
+
+msgid "Under the JDS Management system, our internal organization focuses on structured processes, transparent communication, and continuous improvement — ensuring that every client receives the highest level of service and support."
+msgstr "Under the JDS Management system, our internal organization focuses on structured processes, transparent communication, and continuous improvement — ensuring that every client receives the highest level of service and support."
+
+msgid "Our Promise"
+msgstr "Our Promise"
+
+msgid "At Joel Digitals, we don't just build projects — we create digital ecosystems that grow with your business. Our promise: innovation, clarity, and long-term partnership."
+msgstr "At Joel Digitals, we don't just build projects — we create digital ecosystems that grow with your business. Our promise: innovation, clarity, and long-term partnership."
+
+msgid "Ready to shape the future together?"
+msgstr "Ready to shape the future together?"
+
+msgid "Let's connect and create something extraordinary."
+msgstr "Let's connect and create something extraordinary."
+
+msgid "Get in Touch"
+msgstr "Get in Touch"
+
+# Opening Hours Page Translations
+msgid "Opening Hours"
+msgstr "Opening Hours"
+
+msgid "When you can reach us"
+msgstr "When you can reach us"
+
+msgid "Back to Contact Center"
+msgstr "Back to Contact Center"
+
+msgid "Call us directly"
+msgstr "Call us directly"
+
+msgid "Next 7 Days"
+msgstr "Next 7 Days"
+
+msgid "Today"
+msgstr "Today"
+
+msgid "All times marked with <strong>*</strong> are <strong>special opening hours</strong>."
+msgstr "All times marked with <strong>*</strong> are <strong>special opening hours</strong>."
+
+msgid "We look forward to your call during these hours."
+msgstr "We look forward to your call during these hours."
+
+msgid "Have questions? We're here to help!"
+msgstr "Have questions? We're here to help!"
+
+msgid "Contact Form"
+msgstr "Contact Form"
+
+# FAQ Page Translations
+msgid "FAQ"
+msgstr "FAQ"
+
+msgid "Find answers to frequently asked questions"
+msgstr "Find answers to frequently asked questions"
+
+msgid "Back to Home"
+msgstr "Back to Home"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Read more"
+msgstr "Read more"
+
+msgid "Previous"
+msgstr "Previous"
+
+msgid "Page"
+msgstr "Page"
+
+msgid "Next"
+msgstr "Next"
+
+msgid "No FAQs found"
+msgstr "No FAQs found"
+
+msgid "Try a different search term or check back later."
+msgstr "Try a different search term or check back later."
+
+msgid "Still have questions?"
+msgstr "Still have questions?"
+
+msgid "Can't find the answer you're looking for? Please contact us."
+msgstr "Can't find the answer you're looking for? Please contact us."
+
+# FAQ Detail Page Translations
+msgid "FAQ Answer"
+msgstr "FAQ Answer"
+
+msgid "Back to FAQ List"
+msgstr "Back to FAQ List"
+
+msgid "Answer"
+msgstr "Answer"
+
+msgid "More Details"
+msgstr "More Details"
+
+msgid "Related Questions"
+msgstr "Related Questions"
+
+msgid "Need more help?"
+msgstr "Need more help?"
+
+msgid "Our support team is ready to assist you with any questions."
+msgstr "Our support team is ready to assist you with any questions."
+
+msgid "Contact Support"
+msgstr "Contact Support"
+
+# Imprint Page Translations
+msgid "Imprint"
+msgstr "Imprint"
+
+msgid "Legal Information"
+msgstr "Legal Information"
+
+msgid "This Imprint is valid for all our Apps and Social Media Accounts."
+msgstr "This Imprint is valid for all our Apps and Social Media Accounts."
+
+msgid "Company Information"
+msgstr "Company Information"
+
+msgid "Smart. Digital. Reliable"
+msgstr "Smart. Digital. Reliable"
+
+msgid "Germany"
+msgstr "Germany"
+
+msgid "Email:"
+msgstr "Email:"
+
+msgid "Tax Information"
+msgstr "Tax Information"
+
+msgid "VAT ID according to § 27 a German VAT Act:"
+msgstr "VAT ID according to § 27 a German VAT Act:"
+
+msgid "As a small business owner within the meaning of Section 19 Paragraph 1 of the UStG, no VAT is charged."
+msgstr "As a small business owner within the meaning of Section 19 Paragraph 1 of the UStG, no VAT is charged."
+
+msgid "Responsible for Content"
+msgstr "Responsible for Content"
+
+msgid "Responsible for content according to § 55 Abs. 2 RStV:"
+msgstr "Responsible for content according to § 55 Abs. 2 RStV:"
+
+msgid "Address as above."
+msgstr "Address as above."
+
+msgid "EU Dispute Resolution"
+msgstr "EU Dispute Resolution"
+
+msgid "The European Commission provides a platform for online dispute resolution (ODR):"
+msgstr "The European Commission provides a platform for online dispute resolution (ODR):"
+
+msgid "We are neither obligated nor willing to participate in dispute resolution proceedings before a consumer arbitration board."
+msgstr "We are neither obligated nor willing to participate in dispute resolution proceedings before a consumer arbitration board."
+
+msgid "If you would like to get in touch, please visit our contact page."
+msgstr "If you would like to get in touch, please visit our contact page."
+
+# Terms and Conditions Page Translations
+msgid "Terms and Conditions"
+msgstr "Terms and Conditions"
+
+msgid "AGB / Terms of Service"
+msgstr "AGB / Terms of Service"
+
+msgid "operates an online shop for digital products, license keys, design services, and programming. By accessing this website or purchasing products, you accept the following terms and conditions."
+msgstr "operates an online shop for digital products, license keys, design services, and programming. By accessing this website or purchasing products, you accept the following terms and conditions."
+
+msgid "Scope of Application"
+msgstr "Scope of Application"
+
+msgid "These Terms and Conditions apply to all customers, both private individuals and companies, who purchase products or services from Joel Digitals."
+msgstr "These Terms and Conditions apply to all customers, both private individuals and companies, who purchase products or services from Joel Digitals."
+
+msgid "Contract Conclusion"
+msgstr "Contract Conclusion"
+
+msgid "A contract is concluded upon purchase through completion of the ordering process in the shop, confirmation by email, or written agreement (e.g., for individual services)."
+msgstr "A contract is concluded upon purchase through completion of the ordering process in the shop, confirmation by email, or written agreement (e.g., for individual services)."
+
+msgid "Services and Products"
+msgstr "Services and Products"
+
+msgid "Joel Digitals offers the following:"
+msgstr "Joel Digitals offers the following:"
+
+msgid "Digital products and license keys"
+msgstr "Digital products and license keys"
+
+msgid "E-books via third parties (e.g., Amazon)"
+msgstr "E-books via third parties (e.g., Amazon)"
+
+msgid "Design services (on request)"
+msgstr "Design services (on request)"
+
+msgid "Programming services such as apps, websites, Google Sites (on request)"
+msgstr "Programming services such as apps, websites, Google Sites (on request)"
+
+msgid "Usage Rights and Licenses"
+msgstr "Usage Rights and Licenses"
+
+msgid "Upon purchase of a digital product or license key, the customer receives a simple, non-exclusive right of use. Transfer or reproduction to third parties is prohibited without express permission."
+msgstr "Upon purchase of a digital product or license key, the customer receives a simple, non-exclusive right of use. Transfer or reproduction to third parties is prohibited without express permission."
+
+msgid "Delivery and Provision"
+msgstr "Delivery and Provision"
+
+msgid "Digital products and license keys are provided via email or through the customer account. For e-books via third parties, their delivery terms apply."
+msgstr "Digital products and license keys are provided via email or through the customer account. For e-books via third parties, their delivery terms apply."
+
+msgid "Prices and Payment"
+msgstr "Prices and Payment"
+
+msgid "Prices are in Euro (€). Accepted payment methods are PayPal, bank transfer, Stripe (including Apple Pay, Google Pay), and other future announced methods."
+msgstr "Prices are in Euro (€). Accepted payment methods are PayPal, bank transfer, Stripe (including Apple Pay, Google Pay), and other future announced methods."
+
+msgid "Adjustment and Support Period"
+msgstr "Adjustment and Support Period"
+
+msgid "For programmed products, there is a 7-day adjustment period for legitimate functional problems after delivery. Fundamental reprogramming is excluded."
+msgstr "For programmed products, there is a 7-day adjustment period for legitimate functional problems after delivery. Fundamental reprogramming is excluded."
+
+msgid "Right of Withdrawal"
+msgstr "Right of Withdrawal"
+
+msgid "Consumers have a statutory right of withdrawal of 14 days. However, this expires as soon as the customer expressly agrees that digital delivery begins before the deadline expires and the customer agrees to the provision."
+msgstr "Consumers have a statutory right of withdrawal of 14 days. However, this expires as soon as the customer expressly agrees that digital delivery begins before the deadline expires and the customer agrees to the provision."
+
+msgid "Returns and Refunds"
+msgstr "Returns and Refunds"
+
+msgid "After activation or delivery of digital products, returns are excluded. Design services and other services are also excluded from the right of return."
+msgstr "After activation or delivery of digital products, returns are excluded. Design services and other services are also excluded from the right of return."
+
+msgid "Liability and Warranty"
+msgstr "Liability and Warranty"
+
+msgid "Joel Digitals is liable only for intent and gross negligence within the legally permissible scope. No liability is assumed for indirect damages, lost profits, or data loss."
+msgstr "Joel Digitals is liable only for intent and gross negligence within the legally permissible scope. No liability is assumed for indirect damages, lost profits, or data loss."
+
+msgid "Applicable Law and Jurisdiction"
+msgstr "Applicable Law and Jurisdiction"
+
+msgid "German law applies, excluding the UN Convention on Contracts for the International Sale of Goods. Place of jurisdiction is Saarland, Germany."
+msgstr "German law applies, excluding the UN Convention on Contracts for the International Sale of Goods. Place of jurisdiction is Saarland, Germany."
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "For questions or problems, please contact us at:"
+msgstr "For questions or problems, please contact us at:"
+
+msgid "Questions about our terms?"
+msgstr "Questions about our terms?"
+
+msgid "Our support team is happy to help you understand our terms and conditions."
+msgstr "Our support team is happy to help you understand our terms and conditions."
+
+# Contact Center Page Translations
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Contact Center"
+msgstr "Contact Center"
+
+msgid "How can we help you today?"
+msgstr "How can we help you today?"
+
+msgid "Choose the option that best fits your needs. Our team is ready to assist you."
+msgstr "Choose the option that best fits your needs. Our team is ready to assist you."
+
+msgid "Call Us"
+msgstr "Call Us"
+
+msgid "Prefer to talk directly? Our support team is just a phone call away."
+msgstr "Prefer to talk directly? Our support team is just a phone call away."
+
+msgid "View Opening Hours"
+msgstr "View Opening Hours"
+
+msgid "Contact Form"
+msgstr "Contact Form"
+
+msgid "Have a general inquiry or question? Send us a message and we'll respond within 24 hours."
+msgstr "Have a general inquiry or question? Send us a message and we'll respond within 24 hours."
+
+msgid "Write a message"
+msgstr "Write a message"
+
+msgid "Book Appointment"
+msgstr "Book Appointment"
+
+msgid "Schedule a call or meeting at your convenience. Available for consultations and support."
+msgstr "Schedule a call or meeting at your convenience. Available for consultations and support."
+
+msgid "Schedule now"
+msgstr "Schedule now"
+
+msgid "Sales & Wishlist"
+msgstr "Sales & Wishlist"
+
+msgid "Let us know what you'd like to buy or have created. We'll collect and process your requests."
+msgstr "Let us know what you'd like to buy or have created. We'll collect and process your requests."
+
+msgid "Submit request"
+msgstr "Submit request"
+
+msgid "Support Ticket"
+msgstr "Support Ticket"
+
+msgid "Having technical issues? Create a ticket and our team will get back to you as soon as possible."
+msgstr "Having technical issues? Create a ticket and our team will get back to you as soon as possible."
+
+msgid "Create ticket"
+msgstr "Create ticket"
+
+# Appointment Confirmed Page Translations
+msgid "Appointment Confirmed"
+msgstr "Appointment Confirmed"
+
+msgid "Thank You!"
+msgstr "Thank You!"
+
+msgid "Your appointment has been confirmed"
+msgstr "Your appointment has been confirmed"
+
+msgid "Your appointment request has been successfully submitted. We will contact you shortly to confirm the details."
+msgstr "Your appointment request has been successfully submitted. We will contact you shortly to confirm the details."
+
+msgid "What happens next?"
+msgstr "What happens next?"
+
+msgid "You will receive a confirmation email shortly"
+msgstr "You will receive a confirmation email shortly"
+
+msgid "We will review your request and available time slots"
+msgstr "We will review your request and available time slots"
+
+msgid "You will get a final confirmation with all details"
+msgstr "You will get a final confirmation with all details"
+
+msgid "Add the appointment to your calendar"
+msgstr "Add the appointment to your calendar"
+
+# Sales Chat Page Translations
+msgid "Order"
+msgstr "Order"
+
+msgid "Chat"
+msgstr "Chat"
+
+msgid "Admin View"
+msgstr "Admin View"
+
+msgid "Sales Chat"
+msgstr "Sales Chat"
+
+msgid "Back to Orders"
+msgstr "Back to Orders"
+
+msgid "Back to My Orders"
+msgstr "Back to My Orders"
+
+msgid "Order ID"
+msgstr "Order ID"
+
+msgid "Customer"
+msgstr "Customer"
+
+msgid "Conversation"
+msgstr "Conversation"
+
+msgid "Reply"
+msgstr "Reply"
+
+msgid "Type your message..."
+msgstr "Type your message..."
+
+msgid "Send Message"
+msgstr "Send Message"
+
+# Sales & Wishlist Page Translations
+msgid "Let us know what you'd like to buy or have created"
+msgstr "Let us know what you'd like to buy or have created"
+
+msgid "Back to Contact Center"
+msgstr "Back to Contact Center"
+
+msgid "Your Name"
+msgstr "Your Name"
+
+msgid "Enter your name"
+msgstr "Enter your name"
+
+msgid "Your Email"
+msgstr "Your Email"
+
+msgid "Enter your email"
+msgstr "Enter your email"
+
+msgid "Subject"
+msgstr "Subject"
+
+msgid "What is this about?"
+msgstr "What is this about?"
+
+msgid "Message"
+msgstr "Message"
+
+msgid "Describe your request..."
+msgstr "Describe your request..."
+
+msgid "Add Wish"
+msgstr "Add Wish"
+
+msgid "Your Wishes"
+msgstr "Your Wishes"
+
+msgid "Wish"
+msgstr "Wish"
+
+msgid "Wish Title"
+msgstr "Wish Title"
+
+msgid "What do you want?"
+msgstr "What do you want?"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Describe your wish in detail..."
+msgstr "Describe your wish in detail..."
+
+msgid "Add Another Wish"
+msgstr "Add Another Wish"
+
+msgid "Hide Wishes"
+msgstr "Hide Wishes"
+
+msgid "Submit Request"
+msgstr "Submit Request"
+
+msgid "Your Submissions"
+msgstr "Your Submissions"
+
+msgid "Wishes:"
+msgstr "Wishes:"
+
+msgid "Open Chat"
+msgstr "Open Chat"
+
+msgid "You haven't submitted any requests yet."
+msgstr "You haven't submitted any requests yet."
+
+# Support & Tickets Page Translations
+msgid "Support & Tickets"
+msgstr "Support & Tickets"
+
+msgid "Create a ticket and our team will help you"
+msgstr "Create a ticket and our team will help you"
+
+msgid "Submit Ticket"
+msgstr "Submit Ticket"
+
+msgid "Your Tickets"
+msgstr "Your Tickets"
+
+msgid "Resolved"
+msgstr "Resolved"
+
+msgid "Open"
+msgstr "Open"
+
+msgid "You haven't submitted any support tickets yet."
+msgstr "You haven't submitted any support tickets yet."
+
+# Ticket Detail Page Translations
+msgid "Ticket"
+msgstr "Ticket"
+
+msgid "Support"
+msgstr "Support"
+
+msgid "Support Ticket"
+msgstr "Support Ticket"
+
+msgid "Back to Admin Panel"
+msgstr "Back to Admin Panel"
+
+msgid "Back to My Tickets"
+msgstr "Back to My Tickets"
+
+msgid "Created by"
+msgstr "Created by"
+
+msgid "Created"
+msgstr "Created"
+
+msgid "Updated"
+msgstr "Updated"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "No messages yet. Start the conversation!"
+msgstr "No messages yet. Start the conversation!"
+
+# System Status Page Translations
+msgid "System Status"
+msgstr "System Status"
+
+msgid "Real-time overview of our services"
+msgstr "Real-time overview of our services"
+
+msgid "Speedtest"
+msgstr "Speedtest"
+
+msgid "Global Issues"
+msgstr "Global Issues"
+
+msgid "No global issues reported. All systems operational."
+msgstr "No global issues reported. All systems operational."
+
+msgid "Apps & Services"
+msgstr "Apps & Services"
+
+msgid "Operational"
+msgstr "Operational"
+
+msgid "No apps available."
+msgstr "No apps available."
+
+# Website Analysis Page Translations
+msgid "Website Analysis"
+msgstr "Website Analysis"
+
+msgid "Get a professional assessment of your website in seconds – Performance, SEO, Security and more."
+msgstr "Get a professional assessment of your website in seconds – Performance, SEO, Security and more."
+
+msgid "100% Free"
+msgstr "100% Free"
+
+msgid "No Registration"
+msgstr "No Registration"
+
+msgid "Instant Results"
+msgstr "Instant Results"
+
+msgid "Free Website Analysis"
+msgstr "Free Website Analysis"
+
+msgid "Analyze Website"
+msgstr "Analyze Website"
+
+msgid "Error:"
+msgstr "Error:"
+
+msgid "Website URL"
+msgstr "Website URL"
+
+msgid "Enter a complete URL (including https://)"
+msgstr "Enter a complete URL (including https://)"
+
+msgid "Start Analysis"
+msgstr "Start Analysis"
+
+msgid "Why Analyze?"
+msgstr "Why Analyze?"
+
+msgid "Better Rankings"
+msgstr "Better Rankings"
+
+msgid "Google prefers fast, secure, and mobile-friendly websites in search results."
+msgstr "Google prefers fast, secure, and mobile-friendly websites in search results."
+
+msgid "More Conversions"
+msgstr "More Conversions"
+
+msgid "Faster load times lead to fewer bounces and higher revenue."
+msgstr "Faster load times lead to fewer bounces and higher revenue."
+
+msgid "Security & Trust"
+msgstr "Security & Trust"
+
+msgid "SSL and security headers protect your visitors and your business."
+msgstr "SSL and security headers protect your visitors and your business."
+
+msgid "Competitive Advantage"
+msgstr "Competitive Advantage"
+
+msgid "Identify weaknesses early and stay one step ahead."
+msgstr "Identify weaknesses early and stay one step ahead."
+
+msgid "What is Analyzed?"
+msgstr "What is Analyzed?"
+
+msgid "Comprehensive check of all important website factors"
+msgstr "Comprehensive check of all important website factors"
+
+msgid "Performance & Speed"
+msgstr "Performance & Speed"
+
+msgid "Load time, page size, compression, and server response are analyzed in detail."
+msgstr "Load time, page size, compression, and server response are analyzed in detail."
+
+msgid "SEO Optimization"
+msgstr "SEO Optimization"
+
+msgid "Meta tags, H1 structure, alt texts, sitemap, and structured data are checked."
+msgstr "Meta tags, H1 structure, alt texts, sitemap, and structured data are checked."
+
+msgid "Security & SSL"
+msgstr "Security & SSL"
+
+msgid "SSL certificate, HTTPS, security headers, and encryption are thoroughly tested."
+msgstr "SSL certificate, HTTPS, security headers, and encryption are thoroughly tested."
+
+msgid "Mobile Optimization"
+msgstr "Mobile Optimization"
+
+msgid "Responsive design, viewport, touch elements, and mobile load time are evaluated."
+msgstr "Responsive design, viewport, touch elements, and mobile load time are evaluated."
+
+msgid "Server & Infrastructure"
+msgstr "Server & Infrastructure"
+
+msgid "DNS, IP address, CDN usage, and cache configuration are examined."
+msgstr "DNS, IP address, CDN usage, and cache configuration are examined."
+
+msgid "Accessibility"
+msgstr "Accessibility"
+
+msgid "ARIA labels, language attributes, and contrasts for optimal accessibility."
+msgstr "ARIA labels, language attributes, and contrasts for optimal accessibility."
+
+# App Status Page Translations
+msgid "Status"
+msgstr "Status"
+
+msgid "Real-time Status Monitor"
+msgstr "Real-time Status Monitor"
+
+msgid "Back to Overview"
+msgstr "Back to Overview"
+
+msgid "Response Time"
+msgstr "Response Time"
+
+msgid "Known Issues"
+msgstr "Known Issues"
+
+msgid "No known issues. All systems operational!"
+msgstr "No known issues. All systems operational!"
+
+msgid "Experiencing problems with this service?"
+msgstr "Experiencing problems with this service?"
+
+msgid "Report Issue"
+msgstr "Report Issue"
+
+# Analysis Result Page Translations
+msgid "Analysis Result"
+msgstr "Analysis Result"
+
+msgid "Comprehensive performance check"
+msgstr "Comprehensive performance check"
+
+msgid "New Analysis"
+msgstr "New Analysis"
+
+msgid "Analysis Error"
+msgstr "Analysis Error"
+
+msgid "Try Again"
+msgstr "Try Again"
+
+msgid "Load Time"
+msgstr "Load Time"
+
+msgid "Page Size"
+msgstr "Page Size"
+
+msgid "Compression"
+msgstr "Compression"
+
+msgid "Title Tag"
+msgstr "Title Tag"
+
+msgid "Meta Description"
+msgstr "Meta Description"
+
+msgid "H1 Tags"
+msgstr "H1 Tags"
+
+msgid "SSL Valid"
+msgstr "SSL Valid"
+
+msgid "Security Headers"
+msgstr "Security Headers"
+
+msgid "Viewport"
+msgstr "Viewport"
+
+msgid "Mobile Friendly"
+msgstr "Mobile Friendly"
+
+msgid "HTTP Code"
+msgstr "HTTP Code"
+
+msgid "CDN Detected"
+msgstr "CDN Detected"
+
+msgid "Language Attribute"
+msgstr "Language Attribute"
+
+msgid "Alt Texts"
+msgstr "Alt Texts"
+
+msgid "Recommendations"
+msgstr "Recommendations"
+
+msgid "Warnings"
+msgstr "Warnings"
+
+msgid "Get Results by Email"
+msgstr "Get Results by Email"
+
+msgid "Send the complete analysis to your inbox and share it with your team!"
+msgstr "Send the complete analysis to your inbox and share it with your team!"
+
+msgid "Send Results"
+msgstr "Send Results"
+
+msgid "Let us optimize your website!"
+msgstr "Let us optimize your website!"
+
+msgid "Our experts will help you significantly improve performance, SEO, and security."
+msgstr "Our experts will help you significantly improve performance, SEO, and security."
+
+msgid "Book Free Consultation"
+msgstr "Book Free Consultation"
+
+msgid "Request Quote"
+msgstr "Request Quote"
+
+msgid "100% free & non-binding"
+msgstr "100% free & non-binding"
+
+msgid "Print Results"
+msgstr "Print Results"
+
+msgid "Excellent!"
+msgstr "Excellent!"
+
+msgid "Good"
+msgstr "Good"
+
+msgid "Needs Improvement"
+msgstr "Needs Improvement"
+
+msgid "Critical"
+msgstr "Critical"
+
+msgid "Your website is excellently optimized and meets all important criteria for performance, SEO, and security."
+msgstr "Your website is excellently optimized and meets all important criteria for performance, SEO, and security."
+
+msgid "Good foundation, but there is still optimization potential in individual areas. See details below."
+msgstr "Good foundation, but there is still optimization potential in individual areas. See details below."
+
+msgid "Several areas need attention. The most important improvements are listed below."
+msgstr "Several areas need attention. The most important improvements are listed below."
+
+msgid "Your website urgently needs optimization for better performance, security, and user experience."
+msgstr "Your website urgently needs optimization for better performance, security, and user experience."
+
+msgid "Performance"
+msgstr "Performance"
+
+msgid "SEO"
+msgstr "SEO"
+
+msgid "Security"
+msgstr "Security"
+
+msgid "Mobile"
+msgstr "Mobile"
+
+msgid "Server"
+msgstr "Server"
+
+# Book Appointment Page Translations
+msgid "Book Appointment"
+msgstr "Book Appointment"
+
+msgid "Schedule your meeting with us"
+msgstr "Schedule your meeting with us"
+
+msgid "First Name"
+msgstr "First Name"
+
+msgid "Last Name"
+msgstr "Last Name"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Phone"
+msgstr "Phone"
+
+msgid "Appointment Type"
+msgstr "Appointment Type"
+
+msgid "Select Date & Time"
+msgstr "Select Date & Time"
+
+msgid "Choose Date & Time"
+msgstr "Choose Date & Time"
+
+msgid "Book Now"
+msgstr "Book Now"
+
+msgid "Available Appointments"
+msgstr "Available Appointments"
+
+msgid "Loading available dates..."
+msgstr "Loading available dates..."
+
+msgid "Mon"
+msgstr "Mon"
+
+msgid "Tue"
+msgstr "Tue"
+
+msgid "Wed"
+msgstr "Wed"
+
+msgid "Thu"
+msgstr "Thu"
+
+msgid "Fri"
+msgstr "Fri"
+
+msgid "Sat"
+msgstr "Sat"
+
+msgid "Sun"
+msgstr "Sun"
+
+msgid "Available"
+msgstr "Available"
+
+msgid "Unavailable"
+msgstr "Unavailable"
+
+msgid "Available Times"
+msgstr "Available Times"
+
+msgid "Please select a date first"
+msgstr "Please select a date first"
+
+msgid "Loading available times..."
+msgstr "Loading available times..."
+
+msgid "Selected Date"
+msgstr "Selected Date"
+
+msgid "No available appointments on this day"
+msgstr "No available appointments on this day"
+
+msgid "Please select another date"
+msgstr "Please select another date"
+
+msgid "Please select an appointment type first."
+msgstr "Please select an appointment type first."
+
+msgid "Error loading available appointments."
+msgstr "Error loading available appointments."
+
+msgid "Selected"
+msgstr "Selected"
+
+msgid "at"
+msgstr "at"
+
+msgid "o'clock"
+msgstr "o'clock"
+
+# Admin Dashboard Translations
+msgid "Admin Dashboard"
+msgstr "Admin Dashboard"
+
+msgid "Welcome back"
+msgstr "Welcome back"
+
+msgid "System Online"
+msgstr "System Online"
+
+msgid "Blog Views"
+msgstr "Blog Views"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Articles"
+msgstr "Articles"
+
+msgid "Top"
+msgstr "Top"
+
+msgid "Orders"
+msgstr "Orders"
+
+msgid "new"
+msgstr "new"
+
+msgid "pending"
+msgstr "pending"
+
+msgid "Revenue"
+msgstr "Revenue"
+
+msgid "This Month"
+msgstr "This Month"
+
+msgid "Support Tickets"
+msgstr "Support Tickets"
+
+msgid "urgent"
+msgstr "urgent"
+
+msgid "high"
+msgstr "high"
+
+msgid "today"
+msgstr "today"
+
+msgid "Appointments"
+msgstr "Appointments"
+
+msgid "Today"
+msgstr "Today"
+
+msgid "this week"
+msgstr "this week"
+
+msgid "Blog Performance"
+msgstr "Blog Performance"
+
+msgid "Total Views"
+msgstr "Total Views"
+
+msgid "Post"
+msgstr "Post"
+
+msgid "Top Post"
+msgstr "Top Post"
+
+msgid "Published"
+msgstr "Published"
+
+msgid "Marketing"
+msgstr "Marketing"
+
+msgid "Posts"
+msgstr "Posts"
+
+msgid "Views"
+msgstr "Views"
+
+msgid "Drafts"
+msgstr "Drafts"
+
+msgid "Admin: Blog"
+msgstr "Admin: Blog"
+
+msgid "Manage posts"
+msgstr "Manage posts"
+
+msgid "Sales"
+msgstr "Sales"
+
+msgid "open"
+msgstr "open"
+
+msgid "processing"
+msgstr "processing"
+
+msgid "Admin: Sales"
+msgstr "Admin: Sales"
+
+msgid "Sales inquiries and customer chat"
+msgstr "Sales inquiries and customer chat"
+
+msgid "Admin: Orders"
+msgstr "Admin: Orders"
+
+msgid "Manage orders"
+msgstr "Manage orders"
+
+msgid "Admin: Appointments"
+msgstr "Admin: Appointments"
+
+msgid "Manage appointments"
+msgstr "Manage appointments"
+
+msgid "Support"
+msgstr "Support"
+
+msgid "response time"
+msgstr "response time"
+
+msgid "Admin: Tickets"
+msgstr "Admin: Tickets"
+
+msgid "Process support tickets"
+msgstr "Process support tickets"
+
+msgid "Quick Access"
+msgstr "Quick Access"
+
+msgid "New Blogpost"
+msgstr "New Blogpost"
+
+msgid "Orders"
+msgstr "Orders"
+
+msgid "Appointments"
+msgstr "Appointments"
+
+msgid "Tickets"
+msgstr "Tickets"
+
+msgid "To Website"
+msgstr "To Website"
+
+msgid "Recent Activity"
+msgstr "Recent Activity"
+
+msgid "ago"
+msgstr "ago"
+
+msgid "Now"
+msgstr "Now"
+
+msgid "No recent activities"
+msgstr "No recent activities"
+
+msgid "Unique Visitors"
+msgstr "Unique Visitors"
+
+msgid "estimated"
+msgstr "estimated"

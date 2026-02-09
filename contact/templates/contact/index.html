@@ -1,84 +1,373 @@
 {% extends "base_home.html" %}
 {% load static %}
-{% load static i18n %}
+{% load i18n %}
 
-
-{% block title %}Contact – Joel Digitals{% endblock %}
+{% block title %}{% trans "Contact" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    .contact-container {
-        background-color: #fff;
-        max-width: 800px;
-        margin: 40px auto;
-        padding: 40px 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
+  .contact-page-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .contact-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .contact-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .contact-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .contact-body {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .intro-text {
+    text-align: center;
+    color: #666;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+
+  /* Contact Options Grid */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .contact-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), #0066ff);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .contact-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(0, 68, 204, 0.15);
+  }
+
+  .contact-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .card-description {
+    color: #666;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .card-meta {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+
+  .card-link {
+    color: var(--primary);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* Phone Card Special */
+  .phone-card .card-icon {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  }
+
+  .phone-number {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #4CAF50;
+    font-family: monospace;
+  }
+
+  .hours-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--primary);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Support Card Special */
+  .support-card .card-icon {
+    background: linear-gradient(135deg, #f44336, #c62828);
+  }
+
+  /* Sales Card Special */
+  .sales-card .card-icon {
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+  }
+
+  /* Appointment Card Special */
+  .appointment-card .card-icon {
+    background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+  }
+
+  /* Form Card Special */
+  .form-card .card-icon {
+    background: linear-gradient(135deg, #00BCD4, #0097A7);
+  }
+
+  @media (max-width: 768px) {
+    .contact-page-container {
+      margin: 1rem auto;
     }
 
-    h2 {
-        margin-top: 0;
-        color: #0044cc;
-        font-weight: 700;
-        font-size: 2.2rem;
-        margin-bottom: 20px;
-        text-align: center;
+    .contact-header {
+      padding: 2rem 1.5rem;
     }
 
-    section {
-        margin-bottom: 30px;
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
     }
 
-    section h3 a {
-        color: #0044cc;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 1.3rem;
+    .contact-title {
+      font-size: 1.6rem;
     }
 
-    section h3 a:hover,
-    section h3 a:focus {
-        text-decoration: underline;
+    .contact-body {
+      padding: 1.5rem;
     }
 
-    p {
-        font-size: 1rem;
-        line-height: 1.6;
-        margin-top: 8px;
+    .contact-grid {
+      grid-template-columns: 1fr;
     }
+  }
+
+  @media (max-width: 480px) {
+    .contact-title {
+      font-size: 1.4rem;
+    }
+
+    .card-header {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .phone-number {
+      font-size: 1.1rem;
+    }
+  }
 </style>
 
-<div class="contact-container">
-    <h2>{% trans "Welcome to the Joel Digitals Contact Center" %}</h2>
-    <p>{% trans "Please choose an option:" %}</p>
+<div class="contact-page-container">
+  <!-- Header -->
+  <div class="contact-header">
+    <div class="header-icon">
+      <i class="fas fa-headset"></i>
+    </div>
+    <h1 class="contact-title">{% trans "Contact Center" %}</h1>
+    <p class="contact-subtitle">{% trans "How can we help you today?" %}</p>
+  </div>
 
-    <section>
-        <h3>📞 <a href="tel:+4915253480270">{% trans "Call" %} +49 1525 3480270</a></h3>
-        <p>{% trans "Prefer to talk directly? Call us at the above number." %}</p>
-        <p><a href="{% url 'opening_hours' %}" style="font-size: 0.9rem; color: #0044cc; text-decoration: underline;">{% trans "View Opening Hours & Info" %}</a></p>
-    </section>
+  <!-- Body -->
+  <div class="contact-body">
+    <p class="intro-text">{% trans "Choose the option that best fits your needs. Our team is ready to assist you." %}</p>
 
-    <section>
-        <h3><a href="{% url 'contact_form' %}">📬 {% trans "Contact Form" %}</a></h3>
-        <p>{% trans "Have a general inquiry or question? Send us a message via the contact form." %}</p>
-    </section>
+    <div class="contact-grid">
+      <!-- Phone -->
+      <a href="{% url 'opening_hours' %}" class="contact-card phone-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-phone-alt"></i>
+          </div>
+          <h2 class="card-title">{% trans "Call Us" %}</h2>
+        </div>
+        <p class="card-description">
+          {% trans "Prefer to talk directly? Our support team is just a phone call away." %}
+        </p>
+        <div class="card-meta">
+          <div class="phone-number">+49 1525 3480270</div>
+          <span class="hours-link">
+            <i class="fas fa-clock"></i> {% trans "View Opening Hours" %}
+          </span>
+        </div>
+      </a>
 
-    <section>
-        <h3><a href="{% url 'appointment_create' %}">📅 {% trans "Book an Appointment" %}</a></h3>
-        <p>{% trans "Choose a date and time to speak with us – appointments are available for various purposes." %}</p>
-    </section>
+      <!-- Contact Form -->
+      <a href="{% url 'contact_form' %}" class="contact-card form-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <h2 class="card-title">{% trans "Contact Form" %}</h2>
+        </div>
+        <p class="card-description">
+          {% trans "Have a general inquiry or question? Send us a message and we'll respond within 24 hours." %}
+        </p>
+        <div class="card-meta">
+          <span class="card-link">
+            {% trans "Write a message" %} <i class="fas fa-arrow-right"></i>
+          </span>
+        </div>
+      </a>
 
-    <section>
-        <h3><a href="{% url 'sales' %}">🛒 {% trans "Sales / Wishlist" %}</a></h3>
-        <p>{% trans "Let us know what you would like to buy or have created. Wishlist items are collected and stored for export" %}.</p>
-    </section>
+      <!-- Appointment -->
+      <a href="{% url 'appointment_create' %}" class="contact-card appointment-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <h2 class="card-title">{% trans "Book Appointment" %}</h2>
+        </div>
+        <p class="card-description">
+          {% trans "Schedule a call or meeting at your convenience. Available for consultations and support." %}
+        </p>
+        <div class="card-meta">
+          <span class="card-link">
+            {% trans "Schedule now" %} <i class="fas fa-arrow-right"></i>
+          </span>
+        </div>
+      </a>
 
-    <section>
-        <h3><a href="{% url 'support_tickets' %}">🛠️ Support Ticket</a></h3>
-        <p>{% trans "Having issues or technical questions? Create a support ticket, and we'll get back to you as soon as possible." %}</p>
-    </section>
+      <!-- Sales -->
+      <a href="{% url 'sales' %}" class="contact-card sales-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-shopping-cart"></i>
+          </div>
+          <h2 class="card-title">{% trans "Sales & Wishlist" %}</h2>
+        </div>
+        <p class="card-description">
+          {% trans "Let us know what you'd like to buy or have created. We'll collect and process your requests." %}
+        </p>
+        <div class="card-meta">
+          <span class="card-link">
+            {% trans "Submit request" %} <i class="fas fa-arrow-right"></i>
+          </span>
+        </div>
+      </a>
+
+      <!-- Support Ticket -->
+      <a href="{% url 'support_tickets' %}" class="contact-card support-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-tools"></i>
+          </div>
+          <h2 class="card-title">{% trans "Support Ticket" %}</h2>
+        </div>
+        <p class="card-description">
+          {% trans "Having technical issues? Create a ticket and our team will get back to you as soon as possible." %}
+        </p>
+        <div class="card-meta">
+          <span class="card-link">
+            {% trans "Create ticket" %} <i class="fas fa-arrow-right"></i>
+          </span>
+        </div>
+      </a>
+    </div>
+  </div>
 </div>
 {% endblock %}
- 

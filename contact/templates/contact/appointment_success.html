@@ -1,10 +1,247 @@
 {% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
 
-{% block title %}Termin erfolgreich – Joel Digitals{% endblock %}
+{% block title %}{% trans "Appointment Confirmed" %} – Joel Digitals{% endblock %}
 
 {% block content %}
-<div class="contactform-container">
-    <h2>Vielen Dank!</h2>
-    <p>Ihr Termin wurde erfolgreich übermittelt. Wir melden uns bald bei Ihnen.</p>
+<style>
+  .confirmation-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .confirmation-card {
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .confirmation-header {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .confirmation-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .success-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+    animation: scaleIn 0.5s ease;
+  }
+
+  @keyframes scaleIn {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .confirmation-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .confirmation-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .confirmation-body {
+    padding: 2.5rem 2rem;
+  }
+
+  .confirmation-message {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  .next-steps {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+  }
+
+  .next-steps h3 {
+    font-size: 1.1rem;
+    color: var(--text);
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .next-steps ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #666;
+  }
+
+  .next-steps li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+
+  .confirmation-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 68, 204, 0.4);
+  }
+
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--text);
+    border: 2px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .confirmation-container {
+      margin: 1rem auto;
+    }
+
+    .confirmation-header {
+      padding: 2rem 1.5rem;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2.5rem;
+    }
+
+    .confirmation-title {
+      font-size: 1.6rem;
+    }
+
+    .confirmation-body {
+      padding: 2rem 1.5rem;
+    }
+
+    .confirmation-actions {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .confirmation-title {
+      font-size: 1.4rem;
+    }
+  }
+</style>
+
+<div class="confirmation-container">
+  <div class="confirmation-card">
+    <!-- Header -->
+    <div class="confirmation-header">
+      <div class="success-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <h1 class="confirmation-title">{% trans "Thank You!" %}</h1>
+      <p class="confirmation-subtitle">{% trans "Your appointment has been confirmed" %}</p>
+    </div>
+
+    <!-- Body -->
+    <div class="confirmation-body">
+      <p class="confirmation-message">
+        {% trans "Your appointment request has been successfully submitted. We will contact you shortly to confirm the details." %}
+      </p>
+
+      <div class="next-steps">
+        <h3><i class="fas fa-list-check"></i> {% trans "What happens next?" %}</h3>
+        <ul>
+          <li>{% trans "You will receive a confirmation email shortly" %}</li>
+          <li>{% trans "We will review your request and available time slots" %}</li>
+          <li>{% trans "You will get a final confirmation with all details" %}</li>
+          <li>{% trans "Add the appointment to your calendar" %}</li>
+        </ul>
+      </div>
+
+      <div class="confirmation-actions">
+        <a href="{% url 'home' %}" class="btn btn-primary">
+          <i class="fas fa-home"></i> {% trans "Back to Home" %}
+        </a>
+        <a href="{% url 'contact' %}" class="btn btn-secondary">
+          <i class="fas fa-headset"></i> {% trans "Contact Support" %}
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -5,7 +5,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}Joel Digitals{% endblock %}</title>
+  <title>{% block title %}Joel Digitals - Dein Digitaler Partner.{% endblock %}</title>
   <meta name="google-site-verification" content="sP-l43HiT_JOY1vkAJ3NcugHJcr00jutssyop5eirvw" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
@@ -502,7 +502,7 @@
 
   <!-- Open Graph für Social Media -->
   <meta property="og:title" content="Joel Digitals – Digitale Lösungen für Ihr Business">
-  <meta property="og:description" content="Professionelle Webentwicklung, Marketing & IT-Dienstleistungen.">
+  <meta property="og:description" content="Professionelle Webentwicklung, Marketing, Design & IT-Dienstleistungen - Alles aus einer Hand.">
   <meta property="og:image" content="{% static 'images/office.png' %}">
   <meta property="og:url" content="https://www.joel-digitals.de/"> 
   <meta property="og:type" content="website">
@@ -510,7 +510,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Joel Digitals – Digitale Lösungen für Ihr Business">
-  <meta name="twitter:description" content="Professionelle Webentwicklung, Marketing & IT-Dienstleistungen.">
+  <meta name="twitter:description" content="Professionelle Webentwicklung, Marketing & IT-Dienstleistungen - Alles aus einer Hand.">
   <meta name="twitter:image" content="{% static 'images/office.png' %}">
 
   <!-- Google Ads Conversion -->
@@ -593,8 +593,8 @@
             {{ user.first_name|first|default:user.username|first|upper }}
           </div>
           <span>
-            {% if user.first_name and user.last_name %}
-              {{ user.first_name }} {{ user.last_name }}
+            {% if user.first_name %}
+              {{ user.first_name }}
             {% else %}
               {{ user.username }}
             {% endif %}

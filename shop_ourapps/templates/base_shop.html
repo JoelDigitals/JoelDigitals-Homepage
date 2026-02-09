@@ -593,8 +593,8 @@
             {{ user.first_name|first|default:user.username|first|upper }}
           </div>
           <span>
-            {% if user.first_name and user.last_name %}
-              {{ user.first_name }} {{ user.last_name }}
+            {% if user.first_name%}
+              {{ user.first_name }}
             {% else %}
               {{ user.username }}
             {% endif %}

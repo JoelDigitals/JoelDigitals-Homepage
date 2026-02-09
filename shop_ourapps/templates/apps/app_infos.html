@@ -1,112 +1,500 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}{{ app.display_name }} – Details{% endblock %}
+{% block title %}{{ app.display_name }} – {% trans "Details" %}{% endblock %}
 
 {% block content %}
 <style>
-    .app-container {
-        background-color: #fff;
-        max-width: 800px;
-        margin: 40px auto;
-        padding: 40px 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
+  .detail-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0;
+  }
+
+  .detail-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 2.5rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .detail-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .header-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .header-icon-placeholder {
+    font-size: 2.5rem;
+  }
+
+  .detail-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .detail-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .detail-body {
+    background: var(--surface);
+    padding: 2.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .back-link:hover {
+    gap: 0.8rem;
+    color: var(--primary-hover);
+  }
+
+  /* 1:1 Image Section */
+  .app-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .app-image-container {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 1 / 1;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    position: relative;
+  }
+
+  .app-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .app-image-container:hover .app-image {
+    transform: scale(1.03);
+  }
+
+  .app-image-placeholder {
+    font-size: 5rem;
+    color: #bbb;
+  }
+
+  .version-badge {
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 68, 204, 0.1);
+    color: var(--primary);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .app-description {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .app-description h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .app-description p {
+    margin: 0;
+    color: #c8c8c8;
+    line-height: 1.8;
+    font-size: 1.05rem;
+  }
+
+  .platforms-section {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .platforms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  .platform-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .platform-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .platform-btn.primary {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+
+  .platform-btn.primary:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 4px 16px rgba(0, 68, 204, 0.3);
+  }
+
+  .platform-btn.shop {
+    border-color: #FF6B6B;
+    color: #FF6B6B;
+  }
+
+  .platform-btn.shop:hover {
+    background: #FF6B6B;
+    color: white;
+  }
+
+  .platform-btn.android {
+    border-color: #3DDC84;
+    color: #3DDC84;
+  }
+
+  .platform-btn.android:hover {
+    background: #3DDC84;
+    color: #000;
+  }
+
+  .platform-btn.ios {
+    border-color: #007AFF;
+    color: #007AFF;
+  }
+
+  .platform-btn.ios:hover {
+    background: #007AFF;
+    color: white;
+  }
+
+  .platform-btn.windows {
+    border-color: #00A4EF;
+    color: #00A4EF;
+  }
+
+  .platform-btn.windows:hover {
+    background: #00A4EF;
+    color: white;
+  }
+
+  .platform-btn.macos {
+    border-color: #999;
+    color: #999;
+  }
+
+  .platform-btn.macos:hover {
+    background: #999;
+    color: white;
+  }
+
+  .platform-btn.linux {
+    border-color: #FFCC00;
+    color: #FFCC00;
+  }
+
+  .platform-btn.linux:hover {
+    background: #FFCC00;
+    color: #000;
+  }
+
+  .app-meta {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #999;
+    font-size: 0.9rem;
+  }
+
+  .meta-item i {
+    color: var(--primary);
+  }
+
+  @media (max-width: 768px) {
+    .detail-container {
+      margin: 1rem;
     }
 
-    h1 {
-        margin-top: 0;
-        color: #0044cc;
-        font-weight: 700;
-        font-size: 2.2rem;
-        margin-bottom: 20px;
-        text-align: center;
+    .detail-header {
+      padding: 2rem 1.5rem;
     }
 
-    img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 10px;
-        margin: 0 auto 30px;
-        display: block;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
     }
 
-    p {
-        font-size: 1rem;
-        line-height: 1.6;
-        margin: 15px 0;
+    .detail-title {
+      font-size: 1.5rem;
     }
 
-    p strong {
-        color: #0044cc;
+    .detail-body {
+      padding: 1.5rem;
     }
 
-    .buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        justify-content: center;
-        margin-top: 30px;
+    .app-image-container {
+      max-width: 280px;
     }
 
-    .buttons a {
-        flex: 1 1 auto;
-        min-width: 120px;
-        max-width: 180px;
-        padding: 12px 20px;
-        background-color: #0044cc;
-        color: white;
-        text-align: center;
-        text-decoration: none;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: background-color 0.3s ease;
-        box-shadow: 0 2px 6px rgba(0, 68, 204, 0.4);
+    .platforms-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
 
-    .buttons a:hover,
-    .buttons a:focus {
-        background-color: #0033a0;
-        box-shadow: 0 4px 12px rgba(0, 51, 160, 0.6);
+    .app-description {
+      padding: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .detail-header {
+      padding: 1.5rem 1rem;
     }
 
-    /* Responsive */
-    @media (max-width: 480px) {
-        .app-container {
-            padding: 30px 20px;
-        }
-
-        h1 {
-            font-size: 1.8rem;
-        }
-
-        .buttons a {
-            min-width: 100%;
-            max-width: 100%;
-        }
+    .detail-title {
+      font-size: 1.3rem;
     }
+
+    .platforms-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .app-meta {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+
+  /* Fallback für ältere Browser */
+  @supports not (aspect-ratio: 1 / 1) {
+    .app-image-container::before {
+      content: "";
+      float: left;
+      padding-top: 100%;
+    }
+    .app-image-container::after {
+      content: "";
+      display: block;
+      clear: both;
+    }
+    .app-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
 </style>
 
-<div class="app-container">
-    <h1>{{ display_name }}</h1>
-    {% if app.image %}
-        <img src="{{ app.image.url }}" alt="{{ app.name }}">
-    {% endif %}
-
-    <p><strong>Version:</strong> {{ app.version }}</p>
-    <p>{{ display_description|linebreaks }}</p>
-
-    <div class="buttons">
-        <a href="{% url 'shop' %}" target="_blank" rel="noopener noreferrer">Zum Shop   </a>
-        {% if app.link %}<a href="{{ app.link }}" target="_blank" rel="noopener noreferrer">Zur App</a>{% endif %}
-        {% if app.android_link %}<a href="{{ app.android_link }}" target="_blank" rel="noopener noreferrer">Android</a>{% endif %}
-        {% if app.ios_link %}<a href="{{ app.ios_link }}" target="_blank" rel="noopener noreferrer">iOS</a>{% endif %}
-        {% if app.windows_link %}<a href="{{ app.windows_link }}" target="_blank" rel="noopener noreferrer">Windows</a>{% endif %}
-        {% if app.macos_link %}<a href="{{ app.macos_link }}" target="_blank" rel="noopener noreferrer">macOS</a>{% endif %}
-        {% if app.linux_link %}<a href="{{ app.linux_link }}" target="_blank" rel="noopener noreferrer">Linux</a>{% endif %}
+<div class="detail-container">
+  <!-- Header -->
+  <div class="detail-header">
+    <div class="header-icon">
+      {% if app.image %}
+        <img src="{{ app.image.url }}" alt="{{ app.display_name }}">
+      {% else %}
+        <i class="fas fa-cube header-icon-placeholder"></i>
+      {% endif %}
     </div>
+    <h1 class="detail-title">{{ display_name }}</h1>
+    <p class="detail-subtitle">{% trans "App Details & Downloads" %}</p>
+  </div>
+
+  <!-- Body -->
+  <div class="detail-body">
+    <a href="{% url 'our_apps' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i>
+      {% trans "Back" %}
+    </a>
+
+    <!-- Hero Image 1:1 -->
+    <div class="app-hero">      
+      <span class="version-badge">
+        <i class="fas fa-code-branch"></i>
+        {% trans "Version" %} {{ app.version }}
+      </span>
+    </div>
+
+    <!-- Description -->
+    <div class="app-description">
+      <h3>
+        <i class="fas fa-align-left"></i>
+        {% trans "About this App" %}
+      </h3>
+      <p>{{ display_description|linebreaks }}</p>
+    </div>
+
+    <!-- Platforms -->
+    <div class="platforms-section">
+      <div class="section-title">
+        <i class="fas fa-download"></i>
+        {% trans "Available Platforms" %}
+      </div>
+      
+      <div class="platforms-grid">
+        <a href="{% url 'shop' %}" class="platform-btn shop">
+          <i class="fas fa-store"></i>
+          {% trans "Shop" %}
+        </a>
+        
+        {% if app.link %}
+          <a href="{{ app.link }}" target="_blank" rel="noopener noreferrer" class="platform-btn primary">
+            <i class="fas fa-globe"></i>
+            {% trans "Web App" %}
+          </a>
+        {% endif %}
+        
+        {% if app.android_link %}
+          <a href="{{ app.android_link }}" target="_blank" rel="noopener noreferrer" class="platform-btn android">
+            <i class="fab fa-android"></i>
+            Android
+          </a>
+        {% endif %}
+        
+        {% if app.ios_link %}
+          <a href="{{ app.ios_link }}" target="_blank" rel="noopener noreferrer" class="platform-btn ios">
+            <i class="fab fa-apple"></i>
+            iOS
+          </a>
+        {% endif %}
+        
+        {% if app.windows_link %}
+          <a href="{{ app.windows_link }}" target="_blank" rel="noopener noreferrer" class="platform-btn windows">
+            <i class="fab fa-windows"></i>
+            Windows
+          </a>
+        {% endif %}
+        
+        {% if app.macos_link %}
+          <a href="{{ app.macos_link }}" target="_blank" rel="noopener noreferrer" class="platform-btn macos">
+            <i class="fab fa-apple"></i>
+            macOS
+          </a>
+        {% endif %}
+        
+        {% if app.linux_link %}
+          <a href="{{ app.linux_link }}" target="_blank" rel="noopener noreferrer" class="platform-btn linux">
+            <i class="fab fa-linux"></i>
+            Linux
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Meta Info -->
+    <div class="app-meta">
+      <div class="meta-item">
+        <i class="fas fa-calendar"></i>
+        {% trans "Updated" %}: {{ app.updated_at|date:"d.m.Y"|default:"--" }}
+      </div>
+      <div class="meta-item">
+        <i class="fas fa-user"></i>
+        {% trans "Developer" %}: Joel Digitals
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

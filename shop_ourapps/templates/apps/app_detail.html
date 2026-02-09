@@ -1,153 +1,553 @@
-{% extends "base_shop.html" %}
+{% extends "base_home.html" %}
 {% load static %}
-{% load static i18n %}
-{% block title %}{{ app.name }} – Joel Digitals Shop{% endblock %}
+{% load i18n %}
+
+{% block title %}{{ app.display_name }} – Joel Digitals Shop{% endblock %}
 
 {% block content %}
 <style>
-    .container {
-        background-color: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        max-width: 1000px;
-        margin: auto;
-        color: black;
+  .detail-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0;
+  }
+
+  .detail-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 2.5rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .detail-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF6B6B, #EE5A6F);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .header-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .header-icon-placeholder {
+    font-size: 3rem;
+  }
+
+  .detail-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .detail-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .detail-body {
+    background: var(--surface);
+    padding: 2.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .back-link:hover {
+    gap: 0.8rem;
+    color: var(--primary-hover);
+  }
+
+  /* 1:1 Hero Image */
+  .app-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .image-wrapper {
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1 / 1;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    position: relative;
+  }
+
+  .image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .image-wrapper:hover img {
+    transform: scale(1.05);
+  }
+
+  .image-placeholder {
+    font-size: 5rem;
+    color: #bbb;
+  }
+
+  .version-badge {
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 68, 204, 0.1);
+    color: var(--primary);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  /* Sale Banner */
+  .sale-banner-section {
+    margin: 1.5rem 0;
+    text-align: center;
+  }
+
+  .sale-badge-img {
+    max-width: 300px;
+    width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    border-radius: 12px;
+  }
+
+  .sale-badge-text {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    padding: 12px 24px;
+    color: white;
+    font-weight: 700;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    display: inline-block;
+    box-shadow: 0 4px 12px rgba(238, 90, 111, 0.4);
+  }
+
+  /* Description */
+  .description-section {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .description-section h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .description-content {
+    color: #666;
+    line-height: 1.8;
+    font-size: 1.05rem;
+    white-space: pre-line;
+    margin: 0;
+  }
+
+  /* Price Section */
+  .price-section {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .discount-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #fff0f0;
+    color: #c82333;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(200, 35, 51, 0.1);
+  }
+
+  .price-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .price-old {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 1.2rem;
+  }
+
+  .price-new {
+    color: #4CAF50;
+    font-weight: 700;
+    font-size: 2rem;
+  }
+
+  .price-regular {
+    color: var(--text);
+    font-weight: 700;
+    font-size: 2rem;
+  }
+
+  /* Cart Section */
+  .cart-section {
+    background: linear-gradient(135deg, rgba(0, 68, 204, 0.05), rgba(0, 102, 255, 0.05));
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .quantity-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    background: var(--bg);
+    padding: 0.5rem;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+  }
+
+  .qty-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qty-btn:hover {
+    background: var(--primary-hover);
+    transform: scale(1.1);
+  }
+
+  .qty-input {
+    width: 60px;
+    height: 40px;
+    text-align: center;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .qty-input:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  .btn-add-cart {
+    background: var(--primary);
+    color: white;
+    padding: 1rem 2.5rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
+
+  .btn-add-cart:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 68, 204, 0.4);
+  }
+
+  .login-prompt {
+    text-align: center;
+    padding: 2rem;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 2px dashed var(--border);
+  }
+
+  .login-prompt a {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .login-prompt a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 768px) {
+    .detail-container {
+      margin: 1rem;
     }
 
-    h1, h2 {
-        color: #0044cc;
+    .detail-header {
+      padding: 2rem 1.5rem;
     }
 
-    .feature {
-        width: 100%;
-        max-width: 200px; /* kleiner als vorher (600px) */
-        border-radius: 10px;
-        margin-top: 10px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        display: block;
-        object-fit: contain;
+    .header-icon {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
     }
 
-    .button {
-        background-color: #0044cc;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 16px;
-        display: inline-block;
-        margin-top: 20px;
-        cursor: pointer;
+    .detail-title {
+      font-size: 1.6rem;
     }
 
-    .button:hover {
-        background-color: #0033a0;
+    .detail-body {
+      padding: 1.5rem;
     }
 
-    .shop-item label {
-        font-weight: bold;
+    .image-wrapper {
+      max-width: 250px;
     }
 
-    input[type="number"] {
-        width: 60px;
-        text-align: center;
-        margin: 0 10px;
-        padding: 5px;
+    .description-section,
+    .price-section,
+    .cart-section {
+      padding: 1.5rem;
     }
 
-    button[type="button"] {
-        padding: 5px 10px;
+    .price-new,
+    .price-regular {
+      font-size: 1.5rem;
     }
+  }
+
+  @media (max-width: 480px) {
+    .detail-title {
+      font-size: 1.4rem;
+    }
+
+    .quantity-control {
+      gap: 0.5rem;
+    }
+
+    .qty-btn {
+      width: 36px;
+      height: 36px;
+    }
+
+    .qty-input {
+      width: 50px;
+      height: 36px;
+    }
+
+    .btn-add-cart {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Fallback für ältere Browser */
+  @supports not (aspect-ratio: 1 / 1) {
+    .image-wrapper::before {
+      content: "";
+      float: left;
+      padding-top: 100%;
+    }
+    .image-wrapper::after {
+      content: "";
+      display: block;
+      clear: both;
+    }
+    .image-wrapper img {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
 </style>
 
-<div class="container">
-    <h1>{{ app.display_name  }}</h1>
+<div class="detail-container">
+  <!-- Header -->
+  <div class="detail-header">
+    <div class="header-icon">
+      {% if app.image %}
+        <img src="{{ app.image.url }}" alt="{{ app.display_name }}">
+      {% else %}
+        <i class="fas fa-cube header-icon-placeholder"></i>
+      {% endif %}
+    </div>
+    <h1 class="detail-title">{{ app.display_name }}</h1>
+    <p class="detail-subtitle">{% trans "App Details" %}</p>
+  </div>
 
-    {% if app.image %}
-        <img src="{{ app.image.url }}" alt="{{ app.name }}" class="feature">
-    {% endif %}
+  <!-- Body -->
+  <div class="detail-body">
+    <a href="{% url 'shop' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i>
+      {% trans "Back to Shop" %}
+    </a>
 
-    <p><strong>Version:</strong> {{ app.version }}</p>
-
-    <div style="white-space: pre-line; margin-top: 20px;">
-        <strong>{% trans "Description" %}:</strong>
-        <p>{{ app.display_description }}</p>
+    <!-- Hero Image 1:1 -->
+    <div class="app-hero">
+      <span class="version-badge">
+        <i class="fas fa-code-branch"></i>
+        {% trans "Version" %} {{ app.version }}
+      </span>
     </div>
 
-    {% if app.discount_is_active %}
-        {% if app.active_sale_name %}
-            <div style="margin-top: 12px;">
-                {% if app.sale_badge %}
-                    <img src="{{ app.sale_badge.image.url }}" alt="{{ app.active_sale_name }}" style="max-width:300px; width:100%; object-fit:contain;">
-                {% else %}
-                    <span style="
-                        background:#d10000;
-                        padding: 12px 20px;
-                        color:white;
-                        font-weight:700;
-                        border-radius:10px;
-                        font-size:1.1rem;
-                    ">
-                        {{ app.active_sale_name }}
-                    </span>
-                {% endif %}
-            </div>
+    <!-- Sale Banner -->
+    {% if app.discount_is_active and app.active_sale_name %}
+      <div class="sale-banner-section">
+        {% if app.sale_badge %}
+          <img src="{{ app.sale_badge.image.url }}" alt="{{ app.active_sale_name }}" class="sale-badge-img">
+        {% else %}
+          <span class="sale-badge-text">{{ app.active_sale_name }}</span>
         {% endif %}
-        
-        <div style="margin-left: 80px; margin-top: 20px;">
-          <span style="
-            display: inline-block;
-            background-color: #fff0f0;
-            color: #c82333;
-            padding: 6px 12px;
-            border-radius: 5px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            margin-bottom: 6px;
-          ">
-            🔖 {{ app.discount_percent }}% {% trans "Discount" %}
-          </span>
-      
-          <p style="margin: 4px 0 0;">
-            <span style="text-decoration: line-through; color: #999; font-size: 0.95rem;">{{ app.price }}€</span><br>
-            <strong style="color: #198754; font-size: 1.2rem;">€{{ app.discounted_price|floatformat:2 }}</strong>
-          </p>
+      </div>
+    {% endif %}
+
+    <!-- Description -->
+    <div class="description-section">
+      <h3>
+        <i class="fas fa-align-left"></i>
+        {% trans "Description" %}
+      </h3>
+      <p class="description-content">{{ app.display_description }}</p>
+    </div>
+
+    <!-- Price -->
+    <div class="price-section">
+      {% if app.discount_is_active %}
+        <div class="discount-badge">
+          <i class="fas fa-tag"></i>
+          {{ app.discount_percent }}% {% trans "Discount" %}
         </div>
-    {% else %}
-      <p style="margin-left: 80px; margin-top: 20px;">
-        {% trans "Price" %}: <strong>{{ app.price }}€</strong>
-      </p>
-    {% endif %}
+        <div class="price-display">
+          <span class="price-old">{{ app.price }}€</span>
+          <span class="price-new">€{{ app.discounted_price|floatformat:2 }}</span>
+        </div>
+      {% else %}
+        <div class="price-display">
+          <span class="price-regular">{{ app.price }}€</span>
+        </div>
+      {% endif %}
+    </div>
 
-
-
-
+    <!-- Cart -->
     {% if user.is_authenticated %}
+      <div class="cart-section">
         <form method="post" action="{% url 'add_to_cart' app.id %}">
-            {% csrf_token %}
-            <div style="display: flex; align-items: center; margin-top: 20px;">
-                <label for="quantity" style="margin-right: 10px;">{% trans "Quantity" %}:</label>
-                <button type="button" onclick="changeQuantity(-1)">−</button>
-                <input type="number" id="quantity" name="quantity" value="1" min="1">
-                <button type="button" onclick="changeQuantity(1)">+</button>
-            </div>
-            <button type="submit" class="button">{% trans "Add to Cart" %}</button>
+          {% csrf_token %}
+          <div class="quantity-control">
+            <button type="button" class="qty-btn" onclick="changeQuantity(-1)">
+              <i class="fas fa-minus"></i>
+            </button>
+            <input type="number" id="quantity" name="quantity" value="1" min="1" class="qty-input">
+            <button type="button" class="qty-btn" onclick="changeQuantity(1)">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+          <br>
+          <button type="submit" class="btn-add-cart">
+            <i class="fas fa-shopping-cart"></i>
+            {% trans "Add to Cart" %}
+          </button>
         </form>
+      </div>
     {% else %}
-        <p><a href="/auth/login/">Log in</a></p>
+      <div class="login-prompt">
+        <i class="fas fa-lock" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem; display: block;"></i>
+        <p>{% trans "Please log in to purchase this app" %}</p>
+        <a href="{% url 'login' %}">{% trans "Log in" %}</a>
+      </div>
     {% endif %}
+  </div>
 </div>
 
 <script>
-    function changeQuantity(amount) {
-        const input = document.getElementById('quantity');
-        const current = parseInt(input.value);
-        if (!isNaN(current)) {
-            input.value = Math.max(1, current + amount);
-        }
+  function changeQuantity(amount) {
+    const input = document.getElementById('quantity');
+    const current = parseInt(input.value);
+    if (!isNaN(current)) {
+      input.value = Math.max(1, current + amount);
     }
+  }
+
+  // Prevent negative input
+  document.getElementById('quantity').addEventListener('change', function() {
+    if (this.value < 1) this.value = 1;
+  });
 </script>
 {% endblock %}

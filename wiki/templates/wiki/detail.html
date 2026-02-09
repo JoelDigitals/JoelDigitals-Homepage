@@ -1,187 +1,616 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}{{ wiki.title }} – Wiki | Joel Digitals{% endblock %}
+{% block title %}{{ wiki.title }} – {% trans "Wiki" %} | Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    body {
-        background: url('{% static "images/wiki-bg.png" %}') no-repeat center center fixed;
-        background-size: cover;
+  .wiki-detail-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .wiki-detail-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .wiki-detail-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .wiki-detail-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .wiki-detail-meta {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .wiki-detail-body {
+    background: var(--surface);
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    gap: 0;
+    min-height: calc(100vh - 300px);
+    overflow: hidden;
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+  }
+
+  /* Sidebar / TOC */
+  .wiki-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--bg);
+    border-right: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: fit-content;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    padding: 2rem 0;
+  }
+
+  .sidebar-header {
+    padding: 0 1.5rem 1rem;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 1rem;
+  }
+
+  .sidebar-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sidebar-title i {
+    color: var(--primary);
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-item {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .toc-item:last-child {
+    border-bottom: none;
+  }
+
+  .toc-link {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+
+  .toc-link:hover {
+    background: rgba(0, 68, 204, 0.05);
+    color: var(--primary);
+    border-left-color: var(--primary);
+  }
+
+  .toc-item.active .toc-link {
+    background: rgba(0, 68, 204, 0.1);
+    color: var(--primary);
+    border-left-color: var(--primary);
+    font-weight: 600;
+  }
+
+  .toc-item.level-2 .toc-link {
+    padding-left: 2.5rem;
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  .toc-item.level-3 .toc-link {
+    padding-left: 3.5rem;
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  /* Content Area */
+  .wiki-content-wrapper {
+    flex: 1;
+    padding: 2rem 3rem;
+    overflow-x: auto;
+  }
+
+  .wiki-content {
+    max-width: 800px;
+    margin: 0 auto;
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 1.05rem;
+  }
+
+  .wiki-content h1,
+  .wiki-content h2,
+  .wiki-content h3,
+  .wiki-content h4 {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text);
+    scroll-margin-top: 100px;
+  }
+
+  .wiki-content h2 {
+    font-size: 1.6rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid var(--primary);
+    display: inline-block;
+  }
+
+  .wiki-content h3 {
+    font-size: 1.3rem;
+    color: var(--primary);
+  }
+
+  .wiki-content h4 {
+    font-size: 1.1rem;
+  }
+
+  .wiki-content p {
+    margin-bottom: 1.25rem;
+  }
+
+  .wiki-content a {
+    color: var(--primary);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--primary);
+  }
+
+  .wiki-content a:hover {
+    border-bottom-style: solid;
+  }
+
+  .wiki-content ul,
+  .wiki-content ol {
+    margin-bottom: 1.25rem;
+    padding-left: 2rem;
+  }
+
+  .wiki-content li {
+    margin-bottom: 0.5rem;
+  }
+
+  .wiki-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    background: var(--bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .wiki-content th,
+  .wiki-content td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .wiki-content th {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    font-weight: 600;
+  }
+
+  .wiki-content tr:hover {
+    background: rgba(0, 68, 204, 0.03);
+  }
+
+  .wiki-content code {
+    background: rgba(0, 68, 204, 0.1);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  .wiki-content pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 1.5rem;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    font-family: 'Courier New', monospace;
+  }
+
+  .wiki-content blockquote {
+    border-left: 4px solid var(--primary);
+    padding-left: 1.5rem;
+    margin: 1.5rem 0;
+    color: #666;
+    font-style: italic;
+    background: rgba(0, 68, 204, 0.03);
+    padding: 1rem 1.5rem;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .wiki-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  /* Mobile TOC Toggle */
+  .toc-toggle {
+    display: none;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: var(--surface);
+    border: none;
+    border-bottom: 2px solid var(--border);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .toc-toggle i {
+    transition: transform 0.3s;
+  }
+
+  .toc-toggle.active i {
+    transform: rotate(180deg);
+  }
+
+  /* Back to top button */
+  .back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+    transition: all 0.3s;
+    z-index: 100;
+  }
+
+  .back-to-top:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 68, 204, 0.4);
+  }
+
+  .back-to-top.show {
+    display: flex;
+  }
+
+  /* Overlay for mobile */
+  .wiki-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 150;
+  }
+
+  .wiki-overlay.show {
+    display: block;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .wiki-sidebar {
+      position: fixed;
+      left: -300px;
+      top: 0;
+      height: 100vh;
+      z-index: 200;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+      transition: left 0.3s ease;
     }
 
-    .container {
-        background-color: rgba(255,255,255,0.92);
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-        display: flex;
-        gap: 30px;
-        align-items: flex-start;
-        position: relative;
-        flex-wrap: wrap;
-        color: #000;
+    .wiki-sidebar.open {
+      left: 0;
     }
 
-    aside {
-        position: sticky;
-        top: 20px;
-        max-height: calc(100vh - 40px);
-        overflow-y: auto;
-        padding: 20px;
-        background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
-        border-radius: 12px;
-        box-shadow: 0 0 5px rgba(0,0,0,0.05);
-        min-width: max-content;
-        max-width: 400px;
-        flex: 1 1 250px;
+    .toc-toggle {
+      display: flex;
     }
 
-    aside h2 {
-        font-size: 18px;
-        margin-bottom: 10px;
-        color: #0044cc;
+    .wiki-content-wrapper {
+      padding: 1.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .wiki-detail-container {
+      margin: 1rem auto;
     }
 
-    aside ul {
-        list-style: none;
-        padding: 0;
+    .wiki-detail-header {
+      padding: 2rem 1.5rem;
     }
 
-    aside li {
-        margin-bottom: 8px;
+    .header-icon {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
     }
 
-    aside li.active > a {
-        font-weight: bold;
-        background-color: #b3d1ff;
-        color: #002e80;
-        border-color: #99c2ff;
+    .wiki-detail-title {
+      font-size: 1.5rem;
     }
 
-    aside li a {
-        text-decoration: none;
-        color: #0044cc;
-        display: block;
-        padding: 8px 12px;
-        background-color: #e6f0ff;
-        border-radius: 8px;
-        border: 1px solid #cce0ff;
-        transition: background-color 0.2s;
-        white-space: nowrap;
+    .wiki-detail-body {
+      flex-direction: column;
     }
 
-    aside li a:hover {
-        background-color: #d0e7ff;
-    }
-
-    .h3-indent {
-        margin-left: 15px;
+    .wiki-content-wrapper {
+      padding: 1.5rem 1rem;
     }
 
     .wiki-content {
-        flex: 3 1 600px;
-        min-width: 0;
+      font-size: 1rem;
+    }
+
+    .wiki-content h2 {
+      font-size: 1.4rem;
+    }
+
+    .wiki-content h3 {
+      font-size: 1.2rem;
     }
 
     .wiki-content table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 2rem;
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
     }
 
-    .wiki-content th,
-    .wiki-content td {
-        border: 1px solid #ccc;
-        padding: 10px;
-        text-align: left;
+    .back-to-top {
+      bottom: 1rem;
+      right: 1rem;
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .wiki-detail-title {
+      font-size: 1.3rem;
     }
 
-    .wiki-content th {
-        background-color: #f0f4ff;
-        font-weight: bold;
+    .wiki-content h2 {
+      font-size: 1.2rem;
     }
 
-    .wiki-content h2,
-    .wiki-content h3,
-    .wiki-content h4 {
-        background-color: #f5faff;
-        border-left: 5px solid #0044cc;
-        padding: 10px 15px;
-        border-radius: 10px;
-        margin-top: 40px;
-        margin-bottom: 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    .wiki-content pre {
+      padding: 1rem;
+      font-size: 0.85rem;
     }
-
-    @media (max-width: 768px) {
-        .container {
-            flex-direction: column;
-        }
-
-        aside {
-            width: 100%;
-            max-width: none;
-            position: relative;
-            top: 0;
-            margin-bottom: 20px;
-            min-width: unset;
-        }
-
-        aside li a {
-            white-space: normal;
-        }
-
-        .wiki-content {
-            width: 100%;
-        }
-    }
+  }
 </style>
 
-<main>
-    <div class="container">
-        <!-- Inhaltsverzeichnis -->
-        <aside>
-            <h2>Inhaltsverzeichnis</h2>
-            <ul id="toc-list">
-                {% for item in toc %}
-                    <li class="{% if item.level == 'h3' %}h3-indent{% endif %}">
-                        <a href="#{{ item.anchor }}">{{ item.text }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </aside>
-
-        <!-- Wiki Inhalt -->
-        <article class="wiki-content prose prose-lg max-w-none" id="wiki-content">
-            {{ content_html|safe }}
-        </article>
+<div class="wiki-detail-container">
+  <!-- Header -->
+  <div class="wiki-detail-header">
+    <div class="header-icon">
+      <i class="fas fa-book-open"></i>
     </div>
-</main>
+    <h1 class="wiki-detail-title">{{ wiki.title }}</h1>
+    <div class="wiki-detail-meta">
+      <i class="fas fa-folder"></i>
+      <span>{{ wiki.app_name }}</span>
+    </div>
+  </div>
+
+  <!-- Mobile TOC Toggle -->
+  <button class="toc-toggle" id="tocToggle">
+    <span><i class="fas fa-list"></i> {% trans "Table of Contents" %}</span>
+    <i class="fas fa-chevron-down"></i>
+  </button>
+
+  <!-- Overlay for mobile -->
+  <div class="wiki-overlay" id="wikiOverlay"></div>
+
+  <div class="wiki-detail-body">
+    <!-- Sidebar / TOC -->
+    <aside class="wiki-sidebar" id="wikiSidebar">
+      <div class="sidebar-header">
+        <h2 class="sidebar-title">
+          <i class="fas fa-list-ul"></i>
+          {% trans "Contents" %}
+        </h2>
+      </div>
+      <ul class="toc-list" id="tocList">
+        {% for item in toc %}
+          <li class="toc-item level-{{ item.level }}" data-level="{{ item.level }}">
+            <a href="#{{ item.anchor }}" class="toc-link">{{ item.text }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </aside>
+
+    <!-- Content -->
+    <main class="wiki-content-wrapper">
+      <a href="{% url 'wiki:overview' %}" class="back-link">
+        <i class="fas fa-arrow-left"></i> {% trans "Back to Wiki Overview" %}
+      </a>
+      
+      <article class="wiki-content" id="wikiContent">
+        {{ content_html|safe }}
+      </article>
+    </main>
+  </div>
+</div>
+
+<button class="back-to-top" id="backToTop" title="{% trans 'Back to top' %}">
+  <i class="fas fa-arrow-up"></i>
+</button>
 
 <script>
-// Scroll-Highlight für Inhaltsverzeichnis
 document.addEventListener("DOMContentLoaded", function () {
-    const tocLinks = document.querySelectorAll("#toc-list a");
-    const sections = Array.from(tocLinks).map(link => document.getElementById(link.getAttribute("href").substring(1)));
+  // TOC Toggle for mobile
+  const tocToggle = document.getElementById('tocToggle');
+  const wikiSidebar = document.getElementById('wikiSidebar');
+  const wikiOverlay = document.getElementById('wikiOverlay');
+  
+  if (tocToggle) {
+    tocToggle.addEventListener('click', () => {
+      tocToggle.classList.toggle('active');
+      wikiSidebar.classList.toggle('open');
+      wikiOverlay.classList.toggle('show');
+    });
+  }
+  
+  wikiOverlay.addEventListener('click', () => {
+    tocToggle.classList.remove('active');
+    wikiSidebar.classList.remove('open');
+    wikiOverlay.classList.remove('show');
+  });
 
-    const setActive = () => {
-        let current = sections[0];
-        for (const section of sections) {
-            if (section.getBoundingClientRect().top < 150) {
-                current = section;
-            } else {
-                break;
-            }
-        }
+  // Scroll spy for TOC
+  const tocLinks = document.querySelectorAll(".toc-link");
+  const sections = Array.from(tocLinks).map(link => {
+    const target = document.getElementById(link.getAttribute("href").substring(1));
+    return target;
+  }).filter(Boolean);
 
-        tocLinks.forEach(link => link.parentElement.classList.remove("active"));
-        const activeLink = document.querySelector(`#toc-list a[href="#${current.id}"]`);
-        if (activeLink) activeLink.parentElement.classList.add("active");
-    };
+  const setActive = () => {
+    let current = sections[0];
+    const scrollPos = window.scrollY + 150;
 
-    window.addEventListener("scroll", setActive);
-    setActive();
+    for (const section of sections) {
+      if (section.offsetTop <= scrollPos) {
+        current = section;
+      }
+    }
+
+    document.querySelectorAll(".toc-item").forEach(item => item.classList.remove("active"));
+    const activeLink = document.querySelector(`.toc-link[href="#${current.id}"]`);
+    if (activeLink) {
+      activeLink.closest('.toc-item').classList.add("active");
+    }
+  };
+
+  window.addEventListener("scroll", setActive);
+  setActive();
+
+  // Smooth scroll for anchor links
+  tocLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.getElementById(link.getAttribute("href").substring(1));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Close mobile sidebar
+        tocToggle?.classList.remove('active');
+        wikiSidebar.classList.remove('open');
+        wikiOverlay.classList.remove('show');
+      }
+    });
+  });
+
+  // Back to top button
+  const backToTop = document.getElementById('backToTop');
+  
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 500) {
+      backToTop.classList.add('show');
+    } else {
+      backToTop.classList.remove('show');
+    }
+  });
+  
+  backToTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 });
 </script>
 {% endblock %}

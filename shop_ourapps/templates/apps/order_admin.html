@@ -1,116 +1,656 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Bestellverwaltung – Joel Digitals{% endblock %}
+{% block title %}{% trans "Order Management" %} – Joel Digitals{% endblock %}
 
 {% block content %}
-<h1>Bestellverwaltung</h1>
-
-<nav>
-    <a href="?tab=pending" class="{% if tab == 'pending' %}active{% endif %}">📝 Ausstehend</a> |
-    <a href="?tab=completed" class="{% if tab == 'completed' %}active{% endif %}">💰 Bezahlt</a> |
-    <a href="?tab=returns" class="{% if tab == 'returns' %}active{% endif %}">↩️ Retouren</a> |
-    <a href="?tab=shipping" class="{% if tab == 'shipping' %}active{% endif %}">📦 Versand</a> |
-    <a href="?tab=finished" class="{% if tab == 'finished' %}active{% endif %}">Beendet</a>
-</nav>
-
-
 <style>
+  .admin-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
 
-.order {
-    border: 1px solid #ccc;
-    padding: 15px;
-    margin: 15px 0;
-    border-radius: 8px;
-    background-color: #1e1e1e;
-}
-.mail-form {
-    margin-top: 15px;
-}
-form select {
-    padding: 6px;
-    border-radius: 6px;
-}
-form button.btn {
-    margin-left: 10px;
-    padding: 6px 12px;
-    border-radius: 6px;
-    background-color: #0044cc;
+  .admin-header {
+    background: linear-gradient(135deg, #673AB7, #512DA8);
+    padding: 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .admin-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
     color: white;
-    border: none;
-}
+    margin: 0 auto 1rem;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    z-index: 1;
+  }
 
+  .admin-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .admin-body {
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Navigation Tabs */
+  .nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .nav-tab {
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg);
+    border: 2px solid var(--border);
+  }
+
+  .nav-tab:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .nav-tab.active {
+    background: linear-gradient(135deg, #673AB7, #512DA8);
+    color: white;
+    border-color: #673AB7;
+  }
+
+  /* Search */
+  .search-bar {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: 250px;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #673AB7;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #673AB7, #512DA8);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(103, 58, 183, 0.4);
+  }
+
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--text);
+    border: 2px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    border-color: #673AB7;
+    color: #673AB7;
+  }
+
+  /* Order Cards */
+  .orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .order-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .order-card:hover {
+    border-color: #673AB7;
+    box-shadow: 0 4px 16px rgba(103, 58, 183, 0.15);
+  }
+
+  .order-header {
+    background: linear-gradient(135deg, rgba(103, 58, 183, 0.1), rgba(81, 45, 168, 0.05));
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .order-id {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .order-customer {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .status-pending { background: #fff3e0; color: #ef6c00; }
+  .status-paid { background: #e8f5e9; color: #2e7d32; }
+  .status-processing { background: #e3f2fd; color: #1565c0; }
+  .status-shipped { background: #f3e5f5; color: #7b1fa2; }
+  .status-delivered { background: #e0f2f1; color: #00695c; }
+  .status-finished { background: #eceff1; color: #455a64; }
+  .status-return { background: #ffebee; color: #c62828; }
+  .status-canceled { background: #fafafa; color: #616161; }
+
+  .order-body {
+    padding: 1.25rem;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .info-label {
+    font-size: 0.8rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .info-value {
+    color: var(--text);
+    font-weight: 500;
+    word-break: break-word;
+  }
+
+  .bank-details {
+    background: rgba(103, 58, 183, 0.05);
+    border: 1px solid rgba(103, 58, 183, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .bank-details h4 {
+    margin: 0 0 0.75rem 0;
+    color: #673AB7;
+    font-size: 0.95rem;
+  }
+
+  .bank-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  /* Items */
+  .items-section {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: var(--surface);
+    border-radius: 8px;
+  }
+
+  .items-section h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+  }
+
+  .item:last-child {
+    border-bottom: none;
+  }
+
+  .item-name {
+    font-weight: 500;
+  }
+
+  .item-meta {
+    color: #666;
+    font-size: 0.85rem;
+  }
+
+  /* Forms */
+  .order-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--border);
+  }
+
+  .form-section {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  .form-section summary {
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 0.5rem 0;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .form-group label {
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 500;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.6rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #673AB7;
+  }
+
+  .status-form {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .status-form select {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.6rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #999;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+  }
+
+  @media (max-width: 768px) {
+    .admin-container {
+      margin: 1rem auto;
+    }
+
+    .admin-header {
+      padding: 1.5rem;
+    }
+
+    .admin-body {
+      padding: 1rem;
+    }
+
+    .nav-tabs {
+      justify-content: center;
+    }
+
+    .nav-tab {
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .search-bar {
+      flex-direction: column;
+    }
+
+    .search-input {
+      width: 100%;
+    }
+
+    .order-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .bank-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .status-form {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .status-form select,
+    .status-form button {
+      width: 100%;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 
-<form method="get" style="margin: 20px 0;">
-    <input type="text" name="q" placeholder="Suche nach Name, E-Mail oder ID" value="{{ request.GET.q }}" style="padding: 6px; width: 300px; border-radius: 6px;">
-    <input type="hidden" name="tab" value="{{ tab }}">
-    <button type="submit" class="btn">Suchen</button>
-</form>
+<div class="admin-container">
+  <!-- Header -->
+  <div class="admin-header">
+    <div class="header-icon">
+      <i class="fas fa-cogs"></i>
+    </div>
+    <h1 class="admin-title">{% trans "Order Management" %}</h1>
+  </div>
 
+  <!-- Body -->
+  <div class="admin-body">
+    <!-- Navigation -->
+    <nav class="nav-tabs">
+      <a href="?tab=pending" class="nav-tab {% if tab == 'pending' %}active{% endif %}">
+        <i class="fas fa-clock"></i> {% trans "Pending" %}
+      </a>
+      <a href="?tab=completed" class="nav-tab {% if tab == 'completed' %}active{% endif %}">
+        <i class="fas fa-check-circle"></i> {% trans "Paid" %}
+      </a>
+      <a href="?tab=returns" class="nav-tab {% if tab == 'returns' %}active{% endif %}">
+        <i class="fas fa-undo"></i> {% trans "Returns" %}
+      </a>
+      <a href="?tab=shipping" class="nav-tab {% if tab == 'shipping' %}active{% endif %}">
+        <i class="fas fa-shipping-fast"></i> {% trans "Shipping" %}
+      </a>
+      <a href="?tab=finished" class="nav-tab {% if tab == 'finished' %}active{% endif %}">
+        <i class="fas fa-flag-checkered"></i> {% trans "Finished" %}
+      </a>
+    </nav>
 
-{% for order in orders %}
-<div class="order">
-    <h3>Bestellung #{{ order.id }} von {{ order.first_name }} {{ order.last_name }}</h3>
-    <p><strong>Status:</strong> {{ order.get_status_display }}</p>
-    <p><strong>E-Mail:</strong> {{ order.email }}</p>
-    <p><strong>Adresse:</strong> {{ order.address|linebreaksbr }}</p>
-    <p><strong>Postleitzahl:</strong> {{ order.zip_code|linebreaksbr }}</p>
-    <p><strong>Stadt:</strong> {{ order.city|linebreaksbr }}</p>
-    <p><strong>Telefon:</strong> {{ order.phone }}</p>
-    <p><strong>Zahlungsmethode:</strong> {{ order.payment_method }}</p>
-    {% if order.payment_method == 'lastschrift' %}
-        <p><strong>Bankname:</strong> {{ order.bank_name }}</p> 
-        <p><strong>Kontoinhaber:</strong> {{ order.account_holder }}</p>
-        <p><strong>IBAN:</strong> {{ order.iban }}</p>
-        <p><strong>BIC:</strong> {{ order.bic }}</p>
-    {% endif %}
+    <!-- Search -->
+    <form method="get" class="search-bar">
+      <input type="text" name="q" class="search-input" placeholder="{% trans 'Search by name, email or ID...' %}" value="{{ request.GET.q }}">
+      <input type="hidden" name="tab" value="{{ tab }}">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-search"></i> {% trans "Search" %}
+      </button>
+    </form>
 
-    <p><strong>Bestelldatum:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+    <!-- Orders -->
+    {% if orders %}
+      <div class="orders-list">
+        {% for order in orders %}
+          <div class="order-card">
+            <div class="order-header">
+              <div>
+                <span class="order-id">#{{ order.id }}</span>
+                <span class="order-customer">– {{ order.first_name }} {{ order.last_name }}</span>
+              </div>
+              <span class="status-badge status-{{ order.status|lower }}">
+                {{ order.get_status_display }}
+              </span>
+            </div>
 
-    <p><strong>Gesamtbetrag:</strong> {{ order.total_amount }} €</p>
+            <div class="order-body">
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">{% trans "Email" %}</span>
+                  <span class="info-value">{{ order.email }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">{% trans "Phone" %}</span>
+                  <span class="info-value">{{ order.phone }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">{% trans "Address" %}</span>
+                  <span class="info-value">{{ order.address }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">{% trans "City / ZIP" %}</span>
+                  <span class="info-value">{{ order.zip_code }} {{ order.city }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">{% trans "Payment" %}</span>
+                  <span class="info-value">{{ order.payment_method }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">{% trans "Date" %}</span>
+                  <span class="info-value">{{ order.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">{% trans "Total" %}</span>
+                  <span class="info-value" style="color: #4CAF50; font-weight: 700;">{{ order.total_amount }} €</span>
+                </div>
+              </div>
 
-    <h4>Bestellte Apps:</h4>
-    <ul>
-        {% for item in order.items.all %}
-            <li>
-                <strong>{{ item.app }}</strong>
-                ({{ item.quantity }}×, {{ item.price }} €)
-            </li>
-        {% empty %}
-            <li><em>Keine Artikel vorhanden.</em></li>
+              {% if order.payment_method == 'lastschrift' %}
+                <div class="bank-details">
+                  <h4><i class="fas fa-university"></i> {% trans "Bank Details (SEPA)" %}</h4>
+                  <div class="bank-grid">
+                    <div class="info-item">
+                      <span class="info-label">{% trans "Bank" %}</span>
+                      <span class="info-value">{{ order.bank_name }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label">{% trans "Account Holder" %}</span>
+                      <span class="info-value">{{ order.account_holder }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label">IBAN</span>
+                      <span class="info-value" style="font-family: monospace;">{{ order.iban }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label">BIC</span>
+                      <span class="info-value" style="font-family: monospace;">{{ order.bic }}</span>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+
+              <div class="items-section">
+                <h4><i class="fas fa-box"></i> {% trans "Ordered Items" %}</h4>
+                <div class="items-list">
+                  {% for item in order.items.all %}
+                    <div class="item">
+                      <span class="item-name">{{ item.app }}</span>
+                      <span class="item-meta">{{ item.quantity }}× @ {{ item.price }} €</span>
+                    </div>
+                  {% empty %}
+                    <div class="item"><em>{% trans "No items available." %}</em></div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="order-actions">
+                <!-- Email Form -->
+                <details class="form-section">
+                  <summary>
+                    <i class="fas fa-envelope"></i> {% trans "Send access data via email" %}
+                  </summary>
+                  <form method="post" class="form-grid">
+                    {% csrf_token %}
+                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                    
+                    <div class="form-group">
+                      {{ mail_form.message_type.label_tag }}
+                      {{ mail_form.message_type }}
+                    </div>
+                    
+                    <div class="form-group">
+                      {{ mail_form.registration_codes.label_tag }}
+                      {{ mail_form.registration_codes }}
+                    </div>
+                    
+                    <div class="form-group">
+                      {{ mail_form.suggested_apps.label_tag }}
+                      {{ mail_form.suggested_apps }}
+                    </div>
+                    
+                    <div class="form-group" style="display: flex; align-items: flex-end;">
+                      <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-paper-plane"></i> {% trans "Send Email" %}
+                      </button>
+                    </div>
+                  </form>
+                </details>
+
+                <!-- Status Form -->
+                <form method="post" class="status-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="order_id" value="{{ order.id }}">
+                  
+                  <select name="new_status">
+                    {% for value, label in order.STATUS_CHOICES %}
+                      <option value="{{ value }}" {% if value == order.status %}selected{% endif %}>
+                        {{ label }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                  
+                  <button type="submit" name="update_status" class="btn btn-secondary">
+                    <i class="fas fa-sync-alt"></i> {% trans "Update Status" %}
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
         {% endfor %}
-    </ul>
-
-    <summary>Zugangsdaten per E-Mail senden</summary>
-    <form method="post" class="mail-form">
-        {% csrf_token %}
-        <input type="hidden" name="order_id" value="{{ order.id }}">
-        
-        {{ mail_form.message_type.label_tag }}
-        {{ mail_form.message_type }}
-        
-        {{ mail_form.registration_codes.label_tag }}
-        {{ mail_form.registration_codes }}
-        
-        {{ mail_form.suggested_apps.label_tag }}
-        {{ mail_form.suggested_apps }}
-        
-        <button type="submit" class="btn">E-Mail senden</button>
-    </form>
-
-    <form method="post" style="margin-top: 10px;">
-        {% csrf_token %}
-        <input type="hidden" name="order_id" value="{{ order.id }}">
-        <select name="new_status">
-            {% for value, label in order.STATUS_CHOICES %}
-                <option value="{{ value }}" {% if value == order.status %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit" name="update_status" class="btn">Status ändern</button>
-    </form>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-inbox"></i>
+        </div>
+        <h3>{% trans "No orders found" %}</h3>
+        <p>{% trans "Try adjusting your search or filter criteria." %}</p>
+      </div>
+    {% endif %}
+  </div>
 </div>
-{% endfor %}
-
-
 {% endblock %}

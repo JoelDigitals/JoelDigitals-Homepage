@@ -1,407 +1,719 @@
 {% extends "base_home.html" %}
-{% load static i18n %}
+{% load static %}
+{% load i18n %}
 
 {% block content %}
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    AOS.init({ duration: 800, once: false, mirror: true });
+    // Disable AOS on mobile for better performance
+    const isMobile = window.matchMedia('(pointer: coarse)').matches;
+    if (!isMobile) {
+      AOS.init({ duration: 800, once: true, mirror: false });
+    }
   });
 </script>
 
 <style>
-body { background:#1e1e1e; color:#f5f5f5; font-family:'Inter',sans-serif; margin:0; padding:0; box-sizing:border-box; }
-.white-wrapper { background:#2b2b2b; padding:2rem; border-radius:16px; box-shadow:0 8px 28px rgba(0,0,0,0.3); max-width:1200px; margin:0 auto; overflow:hidden; width:95%; }
-h1,h2,h3{color:#fff;}
+  :root {
+    --touch-target: 48px;
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  }
 
-/* Hero */
-.hero {
-  background: linear-gradient(135deg, rgba(58,134,255,0.6), rgba(0,86,179,0.6)),
-              url("{% static 'images/wiki-bg.png' %}") center/cover no-repeat;
-  border-radius:16px;
-  text-align:center;
-  padding:6rem 1rem;
-  margin-bottom:3rem;
-  position:relative;
-}
-.hero-content { position:relative; z-index:2; }
-.hero h1 { font-size:2.2rem; margin-bottom:1rem; text-shadow:0 4px 20px rgba(0,0,0,0.5); }
-.hero p { font-size:1rem; margin-bottom:2rem; color:#fff; }
+  .home-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-/* CTA Button */
-@keyframes pulse {
-  0% { box-shadow:0 0 0 0 rgba(58,134,255,0.7); }
-  70% { box-shadow:0 0 0 20px rgba(58,134,255,0); }
-  100% { box-shadow:0 0 0 0 rgba(58,134,255,0); }
-}
-.cta-btn {
-  display:inline-block;
-  padding:0.7rem 1.6rem;
-  border-radius:10px;
-  font-weight:600;
-  color:#fff !important;
-  background: linear-gradient(135deg, #3a86ff, #0056b3);
-  text-decoration:none;
-  transition: all .3s;
-  animation: pulse 2s infinite;
-}
-.cta-btn:hover {
-  transform: scale(1.05) translateY(-3px);
-  box-shadow:0 0 25px rgba(58,134,255,0.8);
-  background: linear-gradient(135deg, #0056b3, #003366);
-}
-
-/* Alternating Sections */
-.alt-section {
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:2rem;
-  margin:3rem 0;
-}
-.alt-section img {
-  flex:0 0 45%;
-  max-width:45%;
-  border-radius:16px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.4);
-  transition: transform .3s;
-  height: auto;
-  object-fit: cover;
-}
-.alt-section img:hover { transform: scale(1.05); }
-.alt-section .text { flex:1 1 50%; min-width:280px; }
-.alt-section:nth-child(even) { flex-direction: row-reverse; }
-.alt-section h2 { margin-bottom:1rem; }
-.alt-section p { margin-bottom:1.5rem; color:#ccc; }
-
-/* Cards */
-.services-grid, .blog-grid {
-  display:grid;
-  grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
-  gap:1.5rem;
-  margin:2rem 0;
-}
-.card {
-  background:#333;
-  border-radius:16px;
-  overflow:hidden;
-  box-shadow:0 6px 18px rgba(0,0,0,0.3);
-  transition: transform .3s, box-shadow .3s;
-  display:flex;
-  flex-direction:column;
-}
-.card:hover { transform: translateY(-6px) scale(1.02); box-shadow:0 14px 36px rgba(0,0,0,0.5);}
-.card img { 
-  width:100%; 
-  height: 200px;
-  object-fit:cover; 
-  transition: transform .3s;
-}
-.card img:hover { transform: scale(1.05); }
-.card-body { padding:1.2rem; flex:1; display:flex; flex-direction:column; color:#ddd; }
-.card-body h3 { font-size:1.2rem; margin-bottom:0.6rem; color:#fff; }
-.card-body p { flex:1; font-size:0.95rem; margin-bottom:1rem; color:#bbb; }
-.price { font-size:1.1rem; font-weight:bold; color:#3a86ff; margin-bottom:1rem; }
-
-/* Shop Section */
-.shop-section {
-  padding: 3rem 1rem;
-}
-.section-title {
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
-}
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-}
-.product-card {
-  background-color: #333333ff;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-  overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s;
-  position: relative;
-}
-.product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-}
-.product-image {
-  width: 100%;
-  height: 250px;
-  overflow: hidden;
-  background: #2b2b2b;
-}
-.product-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.product-details {
-  padding: 1.5rem;
-  text-align: center;
-}
-.product-name {
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
-}
-.product-description {
-  font-size: 0.95rem;
-  color: #bbb;
-  margin-bottom: 1rem;
-}
-.price-block {
-  margin: 0.5rem 0;
-}
-.price-old {
-  text-decoration: line-through;
-  color: #888;
-  margin-right: 0.5rem;
-}
-.price-new {
-  font-weight: bold;
-  color: #e53935;
-}
-.badge-sale {
-  display: inline-block;
-  background-color: #ffe0b2;
-  color: #e65100;
-  font-weight: 600;
-  padding: 0.3rem 0.6rem;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-}
-
-/* Sale Banner */
-.image-wrapper {
-    display: inline-block;
-    width: 100%;
+  /* Hero Section - Mobile First */
+  .hero-section {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 1.25rem;
     text-align: center;
-}
-.image-wrapper img {
-    width: 140px;
-    height: 140px;
-    object-fit: cover;
-    border-radius: 50%;
-    transition: transform 0.3s;
-}
-.product-card:hover .image-wrapper img {
-    transform: scale(1.05);
-}
-.sale-banner-overlay {
+    position: relative;
+    overflow: hidden;
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 0;
+  }
+
+  .hero-section::before {
+    content: '';
     position: absolute;
-    top: -35px;
-    left: 8px;
-    padding: 2px 6px;
-    color: #fff;
-    font-weight: bold;
-    font-size: 0.85rem;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
-    z-index: 10;
-    background: none;
-}
-.sale-banner-overlay img {
-    max-width: 120px;
-    object-fit: contain;
-}
-.sale-banner-text {
-    background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-    padding: 2px 6px;
-    border-radius: 4px;
-}
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
 
-/* Öffnungszeiten & Kontakt */
-.hours-section, .contact-section {
-  margin:4rem 0 2rem;
-  text-align:center;
-  padding:2rem;
-  background:#333;
-  border-radius:16px;
-}
-.hours-section p, .contact-section p { color:#ccc; max-width:600px; margin:1rem auto 0; font-size:1rem; }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
 
-/* Rating Section */
-.rating-stars {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.25rem;
-  margin: 1rem auto;
-  flex-wrap: wrap;
-}
-
-.rating-star {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-}
-
-.rating-star-filled {
-  color: #fbbf24;
-}
-
-.rating-star-empty {
-  color: #4b5563;
-}
-
-.rating-text {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0.5rem 0;
-  color: #fff;
-}
-
-.rating-count {
-  font-size: 0.95rem;
-  color: #9ca3af;
-  margin: 0.25rem 0 1.5rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .hero h1 { font-size:1.8rem; }
-  .hero p { font-size:0.95rem; }
-  .alt-section { flex-direction: column !important; gap:1.5rem; }
-  .alt-section img, .alt-section .text { flex:1 1 90%; max-width:90%; }
-  .cta-btn { padding:0.6rem 1.2rem; font-size:0.9rem; }
-  .white-wrapper { padding:1rem; }
-  
-  .rating-star {
-    width: 24px;
-    height: 24px;
+  .hero-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
   }
   
-  .rating-text {
+  .hero-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  .hero-title {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+    line-height: 1.2;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    line-height: 1.5;
+    padding: 0 0.5rem;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .btn-primary, .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    min-height: var(--touch-target);
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn-primary {
+    background: white;
+    color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .btn-secondary:active {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0.98);
+  }
+
+  /* Content Body */
+  .content-body {
+    background: var(--surface);
+    padding: 1.5rem 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Alternating Sections - Stacked on Mobile */
+  .alt-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: var(--bg);
+    border-radius: 16px;
+    border: 2px solid var(--border);
+  }
+
+  .alt-section img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    order: -1; /* Bild immer oben auf Mobile */
+  }
+
+  .alt-section .text {
+    width: 100%;
+  }
+
+  .section-title {
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-text {
+    color: #666;
+    line-height: 1.7;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Shop Section */
+  .shop-section {
+    margin: 2rem 0;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-header h2 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .product-card {
+    background: var(--bg);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-card:active {
+    transform: scale(0.98);
+  }
+
+  .product-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-details {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .product-description {
+    color: #666;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    flex: 1;
+  }
+
+  .price-block {
+    margin-bottom: 1rem;
+  }
+
+  .price-old {
+    text-decoration: line-through;
+    color: #888;
+    margin-right: 0.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .price-new {
+    font-weight: 700;
+    color: #f44336;
     font-size: 1.25rem;
   }
-  
-  .product-image {
-    height: 200px;
-  }
-  
-  .card img {
-    height: 180px;
-  }
-}
 
-/* Safari/iOS specific fixes */
-@supports (-webkit-touch-callout: none) {
-  .product-image img,
-  .card img,
-  .alt-section img {
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+  .badge-sale {
+    display: inline-block;
+    background: linear-gradient(135deg, #f44336, #c62828);
+    color: white;
+    font-weight: 600;
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8125rem;
+    margin-bottom: 0.75rem;
   }
-}
+
+  .btn-buy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem;
+    min-height: var(--touch-target);
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: auto;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-buy:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+
+  /* Info Cards */
+  .info-card {
+    background: var(--bg);
+    border-radius: 16px;
+    padding: 1.75rem 1.25rem;
+    margin: 1.5rem 0;
+    border: 2px solid var(--border);
+    text-align: center;
+  }
+
+  .info-card h2 {
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .info-card p {
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto 1.25rem;
+    line-height: 1.6;
+    font-size: 1rem;
+  }
+
+  /* FAQ Accordion Style for Mobile */
+  .faq-item {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .faq-item h3 {
+    color: var(--text);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .faq-item p {
+    color: #666;
+    margin-bottom: 0.75rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .faq-item .btn-primary {
+    width: auto;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    min-height: 40px;
+  }
+
+  /* Rating Section */
+  .rating-section {
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .rating-stars {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 1rem 0;
+  }
+
+  .rating-star {
+    width: 28px;
+    height: 28px;
+  }
+
+  .rating-star-filled {
+    color: #fbbf24;
+  }
+
+  .rating-star-empty {
+    color: var(--border);
+  }
+
+  .rating-text {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: var(--text);
+    margin: 0.5rem 0;
+  }
+
+  .rating-count {
+    color: #888;
+    margin-bottom: 1.25rem;
+    font-size: 0.9375rem;
+  }
+
+  /* Blog Grid */
+  .blog-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin: 1.5rem 0;
+  }
+
+  .blog-card {
+    background: var(--bg);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .blog-card:active {
+    transform: scale(0.98);
+  }
+
+  .blog-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+
+  .blog-card-body {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .blog-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .blog-card p {
+    color: #666;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    flex: 1;
+    margin-bottom: 1rem;
+  }
+
+  /* Action Buttons Container */
+  .action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+
+  .action-buttons .btn-primary,
+  .action-buttons .btn-secondary {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  /* Tablet & Desktop Breakpoints */
+  @media (min-width: 640px) {
+    .hero-section {
+      padding: 4rem 2rem;
+      border-radius: 16px 16px 0 0;
+      min-height: auto;
+    }
+
+    .hero-icon {
+      width: 120px;
+      height: 120px;
+      font-size: 3rem;
+    }
+
+    .hero-buttons {
+      flex-direction: row;
+      width: auto;
+    }
+
+    .btn-primary, .btn-secondary {
+      width: auto;
+      min-width: 180px;
+    }
+
+    .content-body {
+      padding: 2.5rem;
+      border-radius: 0 0 16px 16px;
+    }
+
+    .products-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .blog-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .alt-section {
+      padding: 2rem;
+      gap: 2rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .alt-section {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .alt-section:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+
+    .alt-section img {
+      flex: 0 0 45%;
+      max-width: 45%;
+      order: 0;
+    }
+
+    .alt-section .text {
+      flex: 1 1 50%;
+    }
+
+    .products-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .blog-grid {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .info-card {
+      padding: 2.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .content-body {
+      padding: 3rem;
+    }
+
+    .hero-section {
+      padding: 5rem 2rem;
+    }
+  }
+
+  /* Safe Area Support for Notch Devices */
+  @supports (padding-top: env(safe-area-inset-top)) {
+    .hero-section {
+      padding-top: max(3rem, env(safe-area-inset-top));
+    }
+  }
 </style>
 
-<main class="container">
-<div class="white-wrapper">
-
-  <!-- Hero -->
-  <div class="hero"> 
-    <div class="hero-content">
-      <h1>🚀 Joel Digitals – {% trans "Digital Solutions for Tomorrow" %}</h1>
-      <p>{% trans "Websites • Automation • Marketing • IT Services – everything your business needs in the digital era." %}</p>
-      
-      <a href="/shop/" class="cta-btn">🛒 {% trans "Visit Our Shop" %}</a><br>
-      <br>
-      <a href="/contact/" class="cta-btn">{% trans "Contact Us" %}</a>
+<div class="home-page-container">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-icon">
+      <img src="{% static 'favicon.png' %}" alt="{{ app.name }}">
+    </div>
+    <h1 class="hero-title">Joel Digitals</h1>
+    <p class="hero-subtitle">{% trans "Digital Solutions for Tomorrow – Websites • Automation • Marketing • IT Services" %}</p>
+    
+    <div class="hero-buttons">
+      <a href="/shop/" class="btn-primary">
+        <i class="fas fa-shopping-cart"></i> {% trans "Visit Our Shop" %}
+      </a>
+      <a href="/contact/" class="btn-secondary">
+        <i class="fas fa-envelope"></i> {% trans "Contact Us" %}
+      </a>
     </div>
   </div>
 
-  <!-- About / Team -->
-  <section class="alt-section">
-    <img src="{% static 'images/team1.png' %}" alt="{% trans 'Our Team' %}">
-    <div class="text">
-      <h2>👥 {% trans "Meet Our Team" %}</h2>
-      <p>{% trans "We are passionate developers, designers, and strategists building modern digital products. Collaboration and innovation drive everything we do." %}</p>
-      <a href="/team/" class="cta-btn">{% trans "Learn More" %}</a>
-    </div>
-  </section>
-
-  <!-- Mission -->
-  <section class="alt-section" data-aos="fade-up">
-    <img src="{% static 'images/office.png' %}" alt="{% trans 'Our Mission' %}">
-    <div class="text">
-      <h2>🎯 {% trans "Our Mission" %}</h2>
-      <p>{% trans "Helping businesses thrive in the digital era with innovative web platforms, smart automation, and strong strategies." %}</p>
-      <a href="/about/" class="cta-btn">{% trans "About Us" %}</a>
-    </div>
-  </section>
-
-  <!-- Shop -->
-  <section class="shop-section" data-aos="fade-up">
-    <h2 class="section-title" style="text-align:center; margin-top:2rem;">
-      🔥 {% trans "Our Shop" %}
-    </h2>
-
-    <div class="products-grid">
-      {% for product in products %}
-      <div class="product-card" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:100 }}">
-        
-        <div class="product-image">
-          <img src="{{ product.image.url }}" alt="{{ product.name }}">
-        </div>
-        
-        <div class="product-details">
-          <h3 class="product-name">{{ product.name }}</h3>
-          <p class="product-description">{{ product.short_description|truncatewords:18 }}</p>
-
-          {% if product.discount_is_active %}
-            <span class="badge-sale">🔖 {{ product.discount_percent }}% OFF</span>
-            <div class="price-block">
-              <span class="price-old">€{{ product.price }}</span>
-              <span class="price-new">€{{ product.discounted_price|floatformat:2 }}</span>
-            </div>
-          {% else %}
-            <div class="price-block">
-              Preis: <strong>€{{ product.price }}</strong>
-            </div>
-          {% endif %}
-
-          <a href="{% url 'app_detail' slug=product.slug %}" class="cta-btn">
-            {% trans "Buy Now" %}
-          </a>
-        </div>
+  <!-- Content Body -->
+  <div class="content-body">
+    <!-- About / Team -->
+    <section class="alt-section">
+      <img src="{% static 'images/team1.png' %}" alt="{% trans 'Our Team' %}" loading="lazy">
+      <div class="text">
+        <h2 class="section-title">
+          <i class="fas fa-users"></i> {% trans "Meet Our Team" %}
+        </h2>
+        <p class="section-text">
+          {% trans "We are passionate developers, designers, and strategists building modern digital products. Collaboration and innovation drive everything we do." %}
+        </p>
+        <a href="/team/" class="btn-primary" style="background: linear-gradient(135deg, var(--primary), #0066ff); color: white; width: 100%;">
+          {% trans "Learn More" %}
+        </a>
       </div>
-      {% endfor %}
-    </div>
+    </section>
 
-    <div class="shop-btn-wrapper" style="text-align:center; margin-top:1rem;">
-      <a href="/shop/" class="cta-btn">{% trans "View Shop" %}</a>
-    </div>
-  </section>
+    <!-- Mission -->
+    <section class="alt-section">
+      <img src="{% static 'images/office.png' %}" alt="{% trans 'Our Mission' %}" loading="lazy">
+      <div class="text">
+        <h2 class="section-title">
+          <i class="fas fa-bullseye"></i> {% trans "Our Mission" %}
+        </h2>
+        <p class="section-text">
+          {% trans "Helping businesses thrive in the digital era with innovative web platforms, smart automation, and strong strategies." %}
+        </p>
+        <a href="/about/" class="btn-primary" style="background: linear-gradient(135deg, var(--primary), #0066ff); color: white; width: 100%;">
+          {% trans "About Us" %}
+        </a>
+      </div>
+    </section>
 
-  <!-- FAQ Section -->
-  <section class="hours-section" data-aos="fade-up">
-    <h2>❓ {% trans "Frequently Asked Questions" %}</h2>
-    <div style="max-width:800px;margin:2rem auto;text-align:left;">
-      {% for faq in faqs %}
-        <div style="margin-bottom:1.2rem;border-bottom:1px solid #444;padding-bottom:0.8rem;">
-          <h3 style="color:#fff;font-size:1.1rem;margin-bottom:0.5rem;">{{ faq.question }}</h3>
-          <p style="color:#ccc;margin-bottom:0.5rem;">{{ faq.short_answer|truncatewords:20 }}</p>
-          <a href="{% url 'detail' faq.slug %}" class="cta-btn" style="font-size:0.9rem;">{% trans "Read more" %}</a>
+    <!-- Shop -->
+    <section class="shop-section">
+      <div class="section-header">
+        <h2><i class="fas fa-fire" style="color: #f44336;"></i> {% trans "Our Shop" %}</h2>
+      </div>
+
+      <div class="products-grid">
+        {% for product in products %}
+        <div class="product-card">
+          <div class="product-image">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+          </div>
+          
+          <div class="product-details">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-description">{{ product.short_description|truncatewords:18 }}</p>
+
+            {% if product.discount_is_active %}
+              <span class="badge-sale">🔥 {{ product.discount_percent }}% OFF</span>
+              <div class="price-block">
+                <span class="price-old">€{{ product.price }}</span>
+                <span class="price-new">€{{ product.discounted_price|floatformat:2 }}</span>
+              </div>
+            {% else %}
+              <div class="price-block">
+                <strong style="color: var(--primary); font-size: 1.2rem;">€{{ product.price }}</strong>
+              </div>
+            {% endif %}
+
+            <a href="{% url 'app_detail' slug=product.slug %}" class="btn-buy">
+              <i class="fas fa-shopping-cart"></i> {% trans "Buy Now" %}
+            </a>
+          </div>
         </div>
-      {% empty %}
-        <p>{% trans "No FAQs available at the moment." %}</p>
-      {% endfor %}
-    </div>
-    <div style="text-align:center;margin-top:1rem;">
-      <a href="{% url 'list' %}" class="cta-btn">{% trans "View all FAQs" %}</a>
-    </div>
-  </section>
+        {% endfor %}
+      </div>
 
-  <!-- ⭐ Durchschnittsbewertung -->
-  <section class="hours-section" data-aos="fade-up">
-    <h2 style="font-weight:700; font-size:2rem; margin-bottom:1rem;">⭐ {% trans "Rating" %}</h2>
+      <div style="text-align: center; margin-top: 2rem;">
+        <a href="/shop/" class="btn-primary" style="background: linear-gradient(135deg, #FF9800, #F57C00); width: 100%; max-width: 400px;">
+          {% trans "View All Products" %}
+        </a>
+      </div>
+    </section>
 
-    <div style="text-align:center;">
-      <!-- Sterne nebeneinander -->
+    <!-- FAQ Section -->
+    <section class="info-card">
+      <h2><i class="fas fa-question-circle" style="color: var(--primary);"></i> {% trans "Frequently Asked Questions" %}</h2>
+      
+      <div style="max-width: 800px; margin: 0 auto;">
+        {% for faq in faqs %}
+          <div class="faq-item">
+            <h3>{{ faq.question }}</h3>
+            <p>{{ faq.short_answer|truncatewords:20 }}</p>
+            <a href="{% url 'detail' faq.slug %}" class="btn-primary">
+              {% trans "Read more" %}
+            </a>
+          </div>
+        {% empty %}
+          <p style="color: #666;">{% trans "No FAQs available at the moment." %}</p>
+        {% endfor %}
+      </div>
+      
+      <div style="margin-top: 1.5rem;">
+        <a href="{% url 'list' %}" class="btn-primary" style="width: 100%; max-width: 300px;">
+          {% trans "View all FAQs" %}
+        </a>
+      </div>
+    </section>
+
+    <!-- Rating Section -->
+    <section class="info-card rating-section">
+      <h2><i class="fas fa-star" style="color: #fbbf24;"></i> {% trans "Customer Rating" %}</h2>
+
       <div class="rating-stars">
         {% for i in "12345" %}
           {% if forloop.counter <= rating.stars|default:0 %}
@@ -416,66 +728,148 @@ h1,h2,h3{color:#fff;}
         {% endfor %}
       </div>
 
-      <!-- Rating Text -->
-      <p class="rating-text">
-        {{ rating.average|default:"0.0" }} / 5
-      </p>
+      <div class="rating-text">{{ rating.average|default:"0.0" }} / 5</div>
       <p class="rating-count">
-        {% blocktrans with count=rating.count|default:"0" %}based on {{ count }} reviews{% endblocktrans %}
+        {% blocktrans with count=rating.count|default:"0" %}Based on {{ count }} reviews{% endblocktrans %}
       </p>
 
-      <!-- Button -->
-      <a href="{% url 'reviews' %}" class="cta-btn">
-        {% trans "Customer Testimonials and Reviews" %}
+      <a href="{% url 'reviews' %}" class="btn-primary" style="width: 100%; max-width: 300px;">
+        {% trans "Customer Testimonials" %}
       </a>
-    </div>
-  </section>
+    </section>
 
-  <!-- Blog -->
-  {% if latest_blog %}
-  <section data-aos="fade-up">
-    <h2 style="text-align:center; margin-top:2rem;">📖 {% trans "From Our Blog" %}</h2>
-    <div class="blog-grid">
-      {% for blog in latest_blog %}
-        <div class="card" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:100 }}">
-          {% if blog.teaser_image %}
-            <img src="{{ blog.teaser_image.url }}" alt="{{ blog.title }}">
-          {% endif %}
-          <div class="card-body">
-            <h3>{{ blog.title }}</h3>
-            <p>{{ blog.teaser_text|truncatewords_html:25|safe }}</p>
-            <a href="{% url 'blog_detail' blog.pk %}" class="cta-btn">{% trans "Read More" %}</a>
+    <!-- Blog -->
+    {% if latest_blog %}
+    <section>
+      <div class="section-header">
+        <h2><i class="fas fa-newspaper" style="color: var(--primary);"></i> {% trans "From Our Blog" %}</h2>
+      </div>
+      
+      <div class="blog-grid">
+        {% for blog in latest_blog %}
+          <div class="blog-card">
+            {% if blog.teaser_image %}
+              <img src="{{ blog.teaser_image.url }}" alt="{{ blog.title }}" loading="lazy">
+            {% endif %}
+            <div class="blog-card-body">
+              <h3>{{ blog.title }}</h3>
+              <p>{{ blog.teaser_text|truncatewords_html:25|safe }}</p>
+              <a href="{% url 'blog_detail' blog.pk %}" class="btn-buy">
+                {% trans "Read More" %}
+              </a>
+            </div>
           </div>
-        </div>
-      {% endfor %}
-    </div>
-  
-    <div style="text-align:center; margin-top:1rem;">
-      <a href="{% url 'blog_list' %}" class="cta-btn">{% trans "View All Articles" %}</a>
-    </div>
-  </section>
-  {% endif %}
+        {% endfor %}
+      </div>
+    
+      <div style="text-align: center; margin-top: 2rem;">
+        <a href="{% url 'blog_list' %}" class="btn-primary" style="width: 100%; max-width: 300px;">
+          {% trans "View All Articles" %}
+        </a>
+      </div>
+    </section>
+    {% endif %}
 
-  <!-- Jobs / Karriere -->
-  <section class="hours-section" data-aos="fade-up">
-    <h2>💼 {% trans "Current Job Openings" %}</h2>
-    <p>{% trans "We are always looking for talented professionals to join our team. Check out our current positions on JDS Management:" %}</p>
-    <a href="https://jds-management.de/jobs/1/" target="_blank" class="cta-btn">{% trans "View Current Jobs" %}</a>
-  </section>
+    <!-- Jobs -->
+    <section class="info-card">
+      <h2><i class="fas fa-briefcase" style="color: #4CAF50;"></i> {% trans "Current Job Openings" %}</h2>
+      <p>{% trans "We are always looking for talented professionals to join our team. Check out our current positions:" %}</p>
+      <a href="https://jds-management.de/jobs/1/" target="_blank" class="btn-primary" style="background: linear-gradient(135deg, #4CAF50, #2E7D32); width: 100%; max-width: 300px;">
+        <i class="fas fa-external-link-alt"></i> {% trans "View Current Jobs" %}
+      </a>
+    </section>
 
-  <!-- Öffnungszeiten -->
-  <section class="hours-section" data-aos="fade-up">
-    <h2>🕒 {% trans "Opening Hours" %}</h2>
-    <p>{% trans "You can always find our up-to-date opening hours on our" %} <a href="/opening-hours/" class="cta-btn">{% trans "Opening Hours Page" %}</a> {% trans "or on our" %} <a href="https://share.google/KbSv1wxc4geGIpGFX" target="_blank" class="cta-btn">Google</a>.</p>
-  </section>
+    <!-- Opening Hours -->
+    <section class="info-card">
+      <h2><i class="fas fa-clock" style="color: #9C27B0;"></i> {% trans "Opening Hours" %}</h2>
+      <p>{% trans "You can always find our up-to-date opening hours on our dedicated page or on Google." %}</p>
+      <div class="action-buttons">
+        <a href="/opening-hours/" class="btn-primary" style="flex: 1;">
+          <i class="fas fa-calendar-alt"></i> {% trans "Opening Hours" %}
+        </a>
+        <a href="https://share.google/KbSv1wxc4geGIpGFX" target="_blank" class="btn-secondary" style="flex: 1; background: var(--bg); color: var(--text); border: 2px solid var(--border);">
+          <i class="fab fa-google"></i> Google
+        </a>
+      </div>
+    </section>
 
-  <!-- Kontakt -->
-  <section class="contact-section" data-aos="zoom-in">
-    <h2>📩 {% trans "Let's Work Together" %}</h2>
-    <p>{% trans "Have an idea or project? Reach out and let's make it real." %}</p>
-    <a href="/contact/" class="cta-btn">{% trans "Contact Us" %}</a>
-  </section>
-
+    <!-- Contact CTA -->
+    <section class="info-card" style="background: linear-gradient(135deg, var(--primary), #0066ff); border: none;">
+      <h2 style="color: white;"><i class="fas fa-handshake"></i> {% trans "Let's Work Together" %}</h2>
+      <p style="color: rgba(255,255,255,0.9);">{% trans "Have an idea or project? Reach out and let's make it real." %}</p>
+      <a href="/contact/" class="btn-primary" style="background: white; color: var(--primary); width: 100%; max-width: 300px;">
+        <i class="fas fa-paper-plane"></i> {% trans "Contact Us" %}
+      </a>
+    </section>
+  </div>
 </div>
-</main>
+
+<!-- Mobile Bottom Navigation (optional, für App-Feeling) -->
+<style>
+  @media (max-width: 768px) {
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 0.5rem 0 calc(0.5rem + var(--safe-area-bottom));
+      z-index: 1000;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .mobile-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.75rem;
+      padding: 0.5rem;
+      min-width: 60px;
+    }
+    
+    .mobile-nav a i {
+      font-size: 1.25rem;
+    }
+    
+    .mobile-nav a.active {
+      color: var(--primary);
+    }
+    
+    /* Padding für fixed nav */
+    body {
+      padding-bottom: 70px;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .mobile-nav {
+      display: none;
+    }
+  }
+</style>
+
+<nav class="mobile-nav">
+  <a href="/" class="active">
+    <i class="fas fa-home"></i>
+    <span>Home</span>
+  </a>
+  <a href="/shop/">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Shop</span>
+  </a>
+  <a href="/contact/">
+    <i class="fas fa-envelope"></i>
+    <span>Contact</span>
+  </a>
+  <a href="/opening-hours/">
+    <i class="fas fa-clock"></i>
+    <span>Hours</span>
+  </a>
+</nav>
 {% endblock %}

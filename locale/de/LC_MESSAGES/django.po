@@ -1522,3 +1522,1372 @@ msgstr "E-Mail-Adresse"
 
 msgid "Registration successful. You can now log in."
 msgstr "Registrierung erfolgreich. Du kannst dich jetzt einloggen."
+
+# German Translation for Joel Digitals
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Digital Solutions for Tomorrow – Websites • Automation • Marketing • IT Services"
+msgstr "Digitale Lösungen für Morgen – Websites • Automation • Marketing • IT-Dienstleistungen"
+
+msgid "Visit Our Shop"
+msgstr "Besuchen Sie unseren Shop"
+
+msgid "Contact Us"
+msgstr "Kontaktieren Sie uns"
+
+msgid "Our Team"
+msgstr "Unser Team"
+
+msgid "Meet Our Team"
+msgstr "Lernen Sie unser Team kennen"
+
+msgid "We are passionate developers, designers, and strategists building modern digital products. Collaboration and innovation drive everything we do."
+msgstr "Wir sind leidenschaftliche Entwickler, Designer und Strategen, die moderne digitale Produkte entwickeln. Zusammenarbeit und Innovation treiben alles, was wir tun."
+
+msgid "Learn More"
+msgstr "Mehr erfahren"
+
+msgid "Our Mission"
+msgstr "Unsere Mission"
+
+msgid "Helping businesses thrive in the digital era with innovative web platforms, smart automation, and strong strategies."
+msgstr "Wir helfen Unternehmen, im digitalen Zeitalter zu gedeihen, mit innovativen Webplattformen, intelligenter Automation und starken Strategien."
+
+msgid "About Us"
+msgstr "Über uns"
+
+msgid "Our Shop"
+msgstr "Unser Shop"
+
+msgid "Buy Now"
+msgstr "Jetzt kaufen"
+
+msgid "View All Products"
+msgstr "Alle Produkte ansehen"
+
+msgid "Frequently Asked Questions"
+msgstr "Häufig gestellte Fragen"
+
+msgid "Read more"
+msgstr "Mehr lesen"
+
+msgid "No FAQs available at the moment."
+msgstr "Derzeit keine FAQs verfügbar."
+
+msgid "View all FAQs"
+msgstr "Alle FAQs ansehen"
+
+msgid "Customer Rating"
+msgstr "Kundenbewertung"
+
+msgid "Based on %(count)s reviews"
+msgstr "Basierend auf %(count)s Bewertungen"
+
+msgid "Customer Testimonials"
+msgstr "Kundenstimmen"
+
+msgid "From Our Blog"
+msgstr "Aus unserem Blog"
+
+msgid "Read More"
+msgstr "Weiterlesen"
+
+msgid "View All Articles"
+msgstr "Alle Artikel ansehen"
+
+msgid "Current Job Openings"
+msgstr "Aktuelle Stellenangebote"
+
+msgid "We are always looking for talented professionals to join our team. Check out our current positions:"
+msgstr "Wir suchen immer nach talentierten Fachkräften, die unser Team verstärken. Schauen Sie sich unsere aktuellen Positionen an:"
+
+msgid "View Current Jobs"
+msgstr "Aktuelle Jobs ansehen"
+
+msgid "Opening Hours"
+msgstr "Öffnungszeiten"
+
+msgid "You can always find our up-to-date opening hours on our dedicated page or on Google."
+msgstr "Sie finden unsere aktuellen Öffnungszeiten immer auf unserer dedizierten Seite oder auf Google."
+
+msgid "Google"
+msgstr "Google"
+
+msgid "Let's Work Together"
+msgstr "Lassen Sie uns zusammenarbeiten"
+
+msgid "Have an idea or project? Reach out and let's make it real."
+msgstr "Haben Sie eine Idee oder ein Projekt? Melden Sie sich und lassen Sie uns es verwirklichen."
+
+# Services Page Translations
+msgid "Our Services"
+msgstr "Unsere Dienstleistungen"
+
+msgid "Comprehensive digital solutions for your business success"
+msgstr "Umfassende digitale Lösungen für Ihren Geschäftserfolg"
+
+msgid "At Joel Digitals, we offer a wide range of services to help your business succeed in the digital world. Our team combines creativity and technical expertise to deliver solutions tailored to your needs."
+msgstr "Bei Joel Digitals bieten wir eine breite Palette von Dienstleistungen an, um Ihr Unternehmen in der digitalen Welt erfolgreich zu machen. Unser Team vereint Kreativität und technische Expertise, um maßgeschneiderte Lösungen zu liefern."
+
+msgid "Design (Brand, Product & Marketing)"
+msgstr "Design (Marke, Produkt & Marketing)"
+
+msgid "Creative design solutions for your brand, products, and marketing campaigns."
+msgstr "Kreative Designlösungen für Ihre Marke, Produkte und Marketingkampagnen."
+
+msgid "We provide end-to-end design services including brand identity, product packaging, and marketing materials. Our designs are crafted to enhance your visibility and make a lasting impression."
+msgstr "Wir bieten umfassende Design-Dienstleistungen einschließlich Markenidentität, Produktverpackung und Marketingmaterialien. Unsere Designs werden entwickelt, um Ihre Sichtbarkeit zu erhöhen und einen bleibenden Eindruck zu hinterlassen."
+
+msgid "Digitalization of Workflows"
+msgstr "Digitalisierung von Arbeitsabläufen"
+
+msgid "Optimize and automate your business processes through digital solutions."
+msgstr "Optimieren und automatisieren Sie Ihre Geschäftsprozesse durch digitale Lösungen."
+
+msgid "We help you transform manual workflows into efficient digital processes. From document management to task automation, our solutions save time, reduce errors, and increase productivity."
+msgstr "Wir helfen Ihnen, manuelle Arbeitsabläufe in effiziente digitale Prozesse zu transformieren. Von Dokumentenmanagement bis zur Aufgabenautomatisierung – unsere Lösungen sparen Zeit, reduzieren Fehler und steigern die Produktivität."
+
+msgid "Web Development & Web Design"
+msgstr "Webentwicklung & Webdesign"
+
+msgid "Modern, responsive websites that showcase your business."
+msgstr "Moderne, responsive Websites, die Ihr Unternehmen präsentieren."
+
+msgid "We design and develop websites that are visually appealing, user-friendly, and optimized for search engines. Our web solutions help you attract and retain customers."
+msgstr "Wir gestalten und entwickeln Websites, die optisch ansprechend, benutzerfreundlich und für Suchmaschinen optimiert sind. Unsere Weblösungen helfen Ihnen, Kunden zu gewinnen und zu binden."
+
+msgid "Logo Design"
+msgstr "Logodesign"
+
+msgid "Unique logos that reflect your brand identity."
+msgstr "Einzigartige Logos, die Ihre Markenidentität widerspiegeln."
+
+msgid "Our logo designs are created to convey your brand values and make your business memorable. We work closely with you to ensure your logo stands out in the market."
+msgstr "Unsere Logodesigns werden entwickelt, um Ihre Markenwerte zu vermitteln und Ihr Unternehmen unvergesslich zu machen. Wir arbeiten eng mit Ihnen zusammen, um sicherzustellen, dass Ihr Logo auf dem Markt auffällt."
+
+msgid "Web Applications"
+msgstr "Webanwendungen"
+
+msgid "Custom web applications to enhance your business operations."
+msgstr "Maßgeschneiderte Webanwendungen zur Optimierung Ihrer Geschäftsabläufe."
+
+msgid "We build scalable and secure web applications tailored to your business needs. Our solutions improve efficiency, user engagement, and data management."
+msgstr "Wir entwickeln skalierbare und sichere Webanwendungen, die auf Ihre Geschäftsanforderungen zugeschnitten sind. Unsere Lösungen verbessern Effizienz, Nutzerbindung und Datenmanagement."
+
+msgid "Mobile & Windows Apps"
+msgstr "Mobile & Windows-Apps"
+
+msgid "Cross-platform apps for mobile and desktop environments."
+msgstr "Plattformübergreifende Apps für mobile und Desktop-Umgebungen."
+
+msgid "Our development team creates high-performance applications for iOS, Android, and Windows. We focus on usability, performance, and seamless integration with your systems."
+msgstr "Unser Entwicklungsteam erstellt leistungsstarke Anwendungen für iOS, Android und Windows. Wir konzentrieren uns auf Benutzerfreundlichkeit, Performance und nahtlose Integration mit Ihren Systemen."
+
+msgid "Applications"
+msgstr "Anwendungen"
+
+msgid "Custom software solutions to meet your specific business needs."
+msgstr "Maßgeschneiderte Softwarelösungen für Ihre spezifischen Geschäftsanforderungen."
+
+msgid "Whether it's internal tools, customer platforms, or enterprise software, we develop robust applications that align with your operational goals."
+msgstr "Ob interne Tools, Kundenplattformen oder Unternehmenssoftware – wir entwickeln robuste Anwendungen, die mit Ihren betrieblichen Zielen übereinstimmen."
+
+msgid "Server Maintenance"
+msgstr "Serverwartung"
+
+msgid "Keep your servers secure, updated, and running smoothly."
+msgstr "Halten Sie Ihre Server sicher, aktuell und reibungslos am Laufen."
+
+msgid "Our server maintenance services include updates, monitoring, backups, and performance tuning to ensure your systems remain reliable and secure."
+msgstr "Unsere Serverwartungsdienste umfassen Updates, Überwachung, Backups und Performance-Tuning, um sicherzustellen, dass Ihre Systeme zuverlässig und sicher bleiben."
+
+msgid "Hosting & Domains"
+msgstr "Hosting & Domains"
+
+msgid "Reliable hosting and domain management for your online presence."
+msgstr "Zuverlässiges Hosting und Domain-Management für Ihre Online-Präsenz."
+
+msgid "We provide secure hosting solutions and help you manage your domain names. Our services ensure your website and applications are always accessible and fast."
+msgstr "Wir bieten sichere Hosting-Lösungen und helfen Ihnen bei der Verwaltung Ihrer Domainnamen. Unsere Dienste stellen sicher, dass Ihre Website und Anwendungen immer erreichbar und schnell sind."
+
+msgid "Ready to get started?"
+msgstr "Bereit loszulegen?"
+
+msgid "Let's discuss how we can help transform your business."
+msgstr "Lassen Sie uns besprechen, wie wir Ihr Unternehmen transformieren können."
+
+# Team Page Translations
+msgid "Our Team"
+msgstr "Unser Team"
+
+msgid "Meet Our Team"
+msgstr "Lernen Sie unser Team kennen"
+
+msgid "The passionate people behind Joel Digitals"
+msgstr "Die leidenschaftlichen Menschen hinter Joel Digitals"
+
+msgid "Back to Home"
+msgstr "Zurück zur Startseite"
+
+msgid "Email"
+msgstr "E-Mail"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "No team members found"
+msgstr "Keine Teammitglieder gefunden"
+
+msgid "Check back later to meet our amazing team!"
+msgstr "Schauen Sie später wieder vorbei, um unser großartiges Team kennenzulernen!"
+
+msgid "Want to join our team?"
+msgstr "Möchten Sie unserem Team beitreten?"
+
+msgid "We're always looking for talented individuals to join us."
+msgstr "Wir suchen immer nach talentierten Menschen, die zu uns stoßen möchten."
+
+msgid "View Open Positions"
+msgstr "Offene Stellen ansehen"
+
+# About Page Translations
+msgid "About Us"
+msgstr "Über uns"
+
+msgid "About Joel Digitals"
+msgstr "Über Joel Digitals"
+
+msgid "Innovation. Technology. Partnership."
+msgstr "Innovation. Technologie. Partnerschaft."
+
+msgid "Joel Digitals is a forward-thinking digital agency based in Germany, specializing in tailor-made IT and web solutions for businesses of all sizes. We blend creativity, technology, and strategy to help brands build their digital future."
+msgstr "Joel Digitals ist eine zukunftsorientierte Digitalagentur mit Sitz in Deutschland, die sich auf maßgeschneiderte IT- und Weblösungen für Unternehmen aller Größen spezialisiert hat. Wir vereinen Kreativität, Technologie und Strategie, um Marken dabei zu helfen, ihre digitale Zukunft aufzubauen."
+
+msgid "Our Vision"
+msgstr "Unsere Vision"
+
+msgid "To empower companies to grow through innovative and intelligent digital systems — built with precision, scalability, and design excellence."
+msgstr "Unternehmen befähigen, durch innovative und intelligente digitale Systeme zu wachsen – gebaut mit Präzision, Skalierbarkeit und Design-Exzellenz."
+
+msgid "Our Mission"
+msgstr "Unsere Mission"
+
+msgid "We develop customized platforms, applications, and automation tools that make technology accessible, efficient, and truly valuable. Our goal is to simplify the digital landscape and provide measurable results for our clients."
+msgstr "Wir entwickeln maßgeschneiderte Plattformen, Anwendungen und Automatisierungstools, die Technologie zugänglich, effizient und wirklich wertvoll machen. Unser Ziel ist es, die digitale Landschaft zu vereinfachen und messbare Ergebnisse für unsere Kunden zu liefern."
+
+msgid "Our Core Values"
+msgstr "Unsere Kernwerte"
+
+msgid "Innovation"
+msgstr "Innovation"
+
+msgid "We stay ahead of trends and deliver cutting-edge solutions."
+msgstr "Wir bleiben Trends voraus und liefern Spitzenlösungen."
+
+msgid "Transparency"
+msgstr "Transparenz"
+
+msgid "Clear communication and full project visibility are central to our work."
+msgstr "Klare Kommunikation und volle Projekttransparenz stehen im Mittelpunkt unserer Arbeit."
+
+msgid "Reliability"
+msgstr "Zuverlässigkeit"
+
+msgid "Clients can count on us for consistent quality and dependable results."
+msgstr "Kunden können sich auf konstante Qualität und verlässliche Ergebnisse verlassen."
+
+msgid "Partnership"
+msgstr "Partnerschaft"
+
+msgid "We build long-term collaborations based on trust and shared success."
+msgstr "Wir bauen langfristige Zusammenarbeiten auf Basis von Vertrauen und gemeinsamem Erfolg auf."
+
+msgid "Sustainability"
+msgstr "Nachhaltigkeit"
+
+msgid "Our systems are designed for long-term performance and maintainability."
+msgstr "Unsere Systeme sind für langfristige Leistung und Wartbarkeit konzipiert."
+
+msgid "Our Expertise"
+msgstr "Unsere Expertise"
+
+msgid "From custom web applications and cloud systems to automation and AI integration, we combine deep technical knowledge with user-centered design. Our expertise covers a broad range of technologies including Django, Twilio, Tailwind, React, and modern deployment infrastructures like Render and Docker."
+msgstr "Von maßgeschneiderten Webanwendungen und Cloud-Systemen bis hin zu Automation und KI-Integration verbinden wir tiefes technisches Wissen mit nutzerzentriertem Design. Unsere Expertise deckt eine breite Palette von Technologien ab, einschließlich Django, Twilio, Tailwind, React und modernen Deployment-Infrastrukturen wie Render und Docker."
+
+msgid "Our Team"
+msgstr "Unser Team"
+
+msgid "Joel Digitals is made up of passionate developers, creative designers, and strategic thinkers — led by professionals who believe in technology as a tool for human progress. Each project is handled with dedication, precision, and the shared goal of exceeding expectations."
+msgstr "Joel Digitals besteht aus leidenschaftlichen Entwicklern, kreativen Designern und strategischen Denkern – angeführt von Fachleuten, die an Technologie als Werkzeug für menschlichen Fortschritt glauben. Jedes Projekt wird mit Hingabe, Präzision und dem gemeinsamen Ziel, Erwartungen zu übertreffen, bearbeitet."
+
+msgid "Collaboration & Management"
+msgstr "Zusammenarbeit & Management"
+
+msgid "Under the JDS Management system, our internal organization focuses on structured processes, transparent communication, and continuous improvement — ensuring that every client receives the highest level of service and support."
+msgstr "Im Rahmen des JDS Management-Systems konzentriert sich unsere interne Organisation auf strukturierte Prozesse, transparente Kommunikation und kontinuierliche Verbesserung – um sicherzustellen, dass jeder Kunde den höchsten Grad an Service und Unterstützung erhält."
+
+msgid "Our Promise"
+msgstr "Unser Versprechen"
+
+msgid "At Joel Digitals, we don't just build projects — we create digital ecosystems that grow with your business. Our promise: innovation, clarity, and long-term partnership."
+msgstr "Bei Joel Digitals bauen wir nicht nur Projekte – wir schaffen digitale Ökosysteme, die mit Ihrem Unternehmen wachsen. Unser Versprechen: Innovation, Klarheit und langfristige Partnerschaft."
+
+msgid "Ready to shape the future together?"
+msgstr "Bereit, gemeinsam die Zukunft zu gestalten?"
+
+msgid "Let's connect and create something extraordinary."
+msgstr "Lassen Sie uns verbinden und etwas Außergewöhnliches schaffen."
+
+msgid "Get in Touch"
+msgstr "Kontakt aufnehmen"
+
+# Opening Hours Page Translations
+msgid "Opening Hours"
+msgstr "Öffnungszeiten"
+
+msgid "When you can reach us"
+msgstr "Wann Sie uns erreichen können"
+
+msgid "Back to Contact Center"
+msgstr "Zurück zum Kontaktzentrum"
+
+msgid "Call us directly"
+msgstr "Rufen Sie uns direkt an"
+
+msgid "Next 7 Days"
+msgstr "Nächste 7 Tage"
+
+msgid "Today"
+msgstr "Heute"
+
+msgid "All times marked with <strong>*</strong> are <strong>special opening hours</strong>."
+msgstr "Alle Zeiten, die mit <strong>*</strong> markiert sind, sind <strong>Sonderöffnungszeiten</strong>."
+
+msgid "We look forward to your call during these hours."
+msgstr "Wir freuen uns auf Ihren Anruf zu diesen Zeiten."
+
+msgid "Have questions? We're here to help!"
+msgstr "Haben Sie Fragen? Wir sind hier, um zu helfen!"
+
+msgid "Contact Form"
+msgstr "Kontaktformular"
+
+# FAQ Page Translations
+msgid "FAQ"
+msgstr "FAQ"
+
+msgid "Find answers to frequently asked questions"
+msgstr "Finden Sie Antworten auf häufig gestellte Fragen"
+
+msgid "Back to Home"
+msgstr "Zurück zur Startseite"
+
+msgid "Search"
+msgstr "Suchen"
+
+msgid "Read more"
+msgstr "Mehr lesen"
+
+msgid "Previous"
+msgstr "Zurück"
+
+msgid "Page"
+msgstr "Seite"
+
+msgid "Next"
+msgstr "Weiter"
+
+msgid "No FAQs found"
+msgstr "Keine FAQs gefunden"
+
+msgid "Try a different search term or check back later."
+msgstr "Versuchen Sie einen anderen Suchbegriff oder schauen Sie später wieder vorbei."
+
+msgid "Still have questions?"
+msgstr "Noch Fragen?"
+
+msgid "Can't find the answer you're looking for? Please contact us."
+msgstr "Können Sie die gesuchte Antwort nicht finden? Bitte kontaktieren Sie uns."
+
+# FAQ Detail Page Translations
+msgid "FAQ Answer"
+msgstr "FAQ Antwort"
+
+msgid "Back to FAQ List"
+msgstr "Zurück zur FAQ-Liste"
+
+msgid "Answer"
+msgstr "Antwort"
+
+msgid "More Details"
+msgstr "Weitere Details"
+
+msgid "Related Questions"
+msgstr "Verwandte Fragen"
+
+msgid "Need more help?"
+msgstr "Brauchen Sie mehr Hilfe?"
+
+msgid "Our support team is ready to assist you with any questions."
+msgstr "Unser Support-Team steht Ihnen bei allen Fragen zur Verfügung."
+
+msgid "Contact Support"
+msgstr "Support kontaktieren"
+
+# Imprint Page Translations
+msgid "Imprint"
+msgstr "Impressum"
+
+msgid "Legal Information"
+msgstr "Rechtliche Informationen"
+
+msgid "This Imprint is valid for all our Apps and Social Media Accounts."
+msgstr "Dieses Impressum gilt für alle unsere Apps und Social Media Accounts."
+
+msgid "Company Information"
+msgstr "Unternehmensinformationen"
+
+msgid "Smart. Digital. Reliable"
+msgstr "Smart. Digital. Zuverlässig"
+
+msgid "Germany"
+msgstr "Deutschland"
+
+msgid "Email:"
+msgstr "E-Mail:"
+
+msgid "Tax Information"
+msgstr "Steuerinformationen"
+
+msgid "VAT ID according to § 27 a German VAT Act:"
+msgstr "USt-IdNr. gemäß § 27 a UStG:"
+
+msgid "As a small business owner within the meaning of Section 19 Paragraph 1 of the UStG, no VAT is charged."
+msgstr "Als Kleinunternehmer im Sinne von § 19 Abs. 1 UStG wird keine Umsatzsteuer berechnet."
+
+msgid "Responsible for Content"
+msgstr "Verantwortlich für den Inhalt"
+
+msgid "Responsible for content according to § 55 Abs. 2 RStV:"
+msgstr "Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:"
+
+msgid "Address as above."
+msgstr "Anschrift wie oben."
+
+msgid "EU Dispute Resolution"
+msgstr "EU-Streitbeilegung"
+
+msgid "The European Commission provides a platform for online dispute resolution (ODR):"
+msgstr "Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:"
+
+msgid "We are neither obligated nor willing to participate in dispute resolution proceedings before a consumer arbitration board."
+msgstr "Wir sind weder verpflichtet noch bereit, an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."
+
+msgid "If you would like to get in touch, please visit our contact page."
+msgstr "Wenn Sie Kontakt aufnehmen möchten, besuchen Sie bitte unsere Kontaktseite."
+
+# Terms and Conditions Page Translations
+msgid "Terms and Conditions"
+msgstr "Allgemeine Geschäftsbedingungen"
+
+msgid "AGB / Terms of Service"
+msgstr "AGB / Nutzungsbedingungen"
+
+msgid "operates an online shop for digital products, license keys, design services, and programming. By accessing this website or purchasing products, you accept the following terms and conditions."
+msgstr "betreibt einen Online-Shop für digitale Produkte, Lizenzschlüssel, Design-Dienstleistungen und Programmierung. Durch den Zugriff auf diese Website oder den Kauf von Produkten akzeptieren Sie die folgenden Allgemeinen Geschäftsbedingungen."
+
+msgid "Scope of Application"
+msgstr "Geltungsbereich"
+
+msgid "These Terms and Conditions apply to all customers, both private individuals and companies, who purchase products or services from Joel Digitals."
+msgstr "Diese Allgemeinen Geschäftsbedingungen gelten für alle Kunden, sowohl Privatpersonen als auch Unternehmen, die Produkte oder Dienstleistungen von Joel Digitals erwerben."
+
+msgid "Contract Conclusion"
+msgstr "Vertragsschluss"
+
+msgid "A contract is concluded upon purchase through completion of the ordering process in the shop, confirmation by email, or written agreement (e.g., for individual services)."
+msgstr "Ein Vertrag kommt beim Kauf durch Abschluss des Bestellvorgangs im Shop, Bestätigung per E-Mail oder schriftliche Vereinbarung (z.B. für individuelle Leistungen) zustande."
+
+msgid "Services and Products"
+msgstr "Leistungen und Produkte"
+
+msgid "Joel Digitals offers the following:"
+msgstr "Joel Digitals bietet folgendes an:"
+
+msgid "Digital products and license keys"
+msgstr "Digitale Produkte und Lizenzschlüssel"
+
+msgid "E-books via third parties (e.g., Amazon)"
+msgstr "E-Books über Dritte (z.B. Amazon)"
+
+msgid "Design services (on request)"
+msgstr "Design-Dienstleistungen (auf Anfrage)"
+
+msgid "Programming services such as apps, websites, Google Sites (on request)"
+msgstr "Programmierleistungen wie Apps, Websites, Google Sites (auf Anfrage)"
+
+msgid "Usage Rights and Licenses"
+msgstr "Nutzungsrechte und Lizenzen"
+
+msgid "Upon purchase of a digital product or license key, the customer receives a simple, non-exclusive right of use. Transfer or reproduction to third parties is prohibited without express permission."
+msgstr "Beim Kauf eines digitalen Produkts oder Lizenzschlüssels erhält der Kunde ein einfaches, nicht ausschließliches Nutzungsrecht. Übertragung oder Vervielfältigung an Dritte ist ohne ausdrückliche Genehmigung untersagt."
+
+msgid "Delivery and Provision"
+msgstr "Lieferung und Bereitstellung"
+
+msgid "Digital products and license keys are provided via email or through the customer account. For e-books via third parties, their delivery terms apply."
+msgstr "Digitale Produkte und Lizenzschlüssel werden per E-Mail oder über das Kundenkonto bereitgestellt. Für E-Books über Dritte gelten deren Lieferbedingungen."
+
+msgid "Prices and Payment"
+msgstr "Preise und Zahlung"
+
+msgid "Prices are in Euro (€). Accepted payment methods are PayPal, bank transfer, Stripe (including Apple Pay, Google Pay), and other future announced methods."
+msgstr "Preise sind in Euro (€). Akzeptierte Zahlungsmethoden sind PayPal, Banküberweisung, Stripe (inklusive Apple Pay, Google Pay) und andere zukünftig angekündigte Methoden."
+
+msgid "Adjustment and Support Period"
+msgstr "Nachbesserungs- und Supportzeitraum"
+
+msgid "For programmed products, there is a 7-day adjustment period for legitimate functional problems after delivery. Fundamental reprogramming is excluded."
+msgstr "Für programmierte Produkte gibt es einen 7-tägigen Nachbesserungszeitraum für berechtigte Funktionsprobleme nach Lieferung. Grundlegende Neuprogrammierung ist ausgeschlossen."
+
+msgid "Right of Withdrawal"
+msgstr "Widerrufsrecht"
+
+msgid "Consumers have a statutory right of withdrawal of 14 days. However, this expires as soon as the customer expressly agrees that digital delivery begins before the deadline expires and the customer agrees to the provision."
+msgstr "Verbraucher haben ein gesetzliches Widerrufsrecht von 14 Tagen. Dieses erlischt jedoch, sobald der Kunde ausdrücklich zustimmt, dass die digitale Lieferung vor Fristablauf beginnt und der Kunde der Bereitstellung zustimmt."
+
+msgid "Returns and Refunds"
+msgstr "Rückgaben und Erstattungen"
+
+msgid "After activation or delivery of digital products, returns are excluded. Design services and other services are also excluded from the right of return."
+msgstr "Nach Aktivierung oder Lieferung digitaler Produkte sind Rückgaben ausgeschlossen. Design-Dienstleistungen und andere Dienstleistungen sind ebenfalls vom Rückgaberecht ausgeschlossen."
+
+msgid "Liability and Warranty"
+msgstr "Haftung und Gewährleistung"
+
+msgid "Joel Digitals is liable only for intent and gross negligence within the legally permissible scope. No liability is assumed for indirect damages, lost profits, or data loss."
+msgstr "Joel Digitals haftet nur für Vorsatz und grobe Fahrlässigkeit im gesetzlich zulässigen Umfang. Für indirekte Schäden, entgangenen Gewinn oder Datenverlust wird keine Haftung übernommen."
+
+msgid "Applicable Law and Jurisdiction"
+msgstr "Anwendbares Recht und Gerichtsstand"
+
+msgid "German law applies, excluding the UN Convention on Contracts for the International Sale of Goods. Place of jurisdiction is Saarland, Germany."
+msgstr "Es gilt deutsches Recht unter Ausschluss des UN-Kaufrechts. Gerichtsstand ist Saarland, Deutschland."
+
+msgid "Contact"
+msgstr "Kontakt"
+
+msgid "For questions or problems, please contact us at:"
+msgstr "Bei Fragen oder Problemen kontaktieren Sie uns bitte unter:"
+
+msgid "Questions about our terms?"
+msgstr "Fragen zu unseren Bedingungen?"
+
+msgid "Our support team is happy to help you understand our terms and conditions."
+msgstr "Unser Support-Team hilft Ihnen gerne bei der Verständigung unserer Allgemeinen Geschäftsbedingungen."
+
+# Contact Center Page Translations
+msgid "Contact"
+msgstr "Kontakt"
+
+msgid "Contact Center"
+msgstr "Kontaktzentrum"
+
+msgid "How can we help you today?"
+msgstr "Wie können wir Ihnen heute helfen?"
+
+msgid "Choose the option that best fits your needs. Our team is ready to assist you."
+msgstr "Wählen Sie die Option, die am besten zu Ihren Bedürfnissen passt. Unser Team steht bereit, um Ihnen zu helfen."
+
+msgid "Call Us"
+msgstr "Rufen Sie uns an"
+
+msgid "Prefer to talk directly? Our support team is just a phone call away."
+msgstr "Möchten Sie lieber direkt sprechen? Unser Support-Team ist nur einen Anruf entfernt."
+
+msgid "View Opening Hours"
+msgstr "Öffnungszeiten ansehen"
+
+msgid "Contact Form"
+msgstr "Kontaktformular"
+
+msgid "Have a general inquiry or question? Send us a message and we'll respond within 24 hours."
+msgstr "Haben Sie eine allgemeine Anfrage oder Frage? Senden Sie uns eine Nachricht und wir antworten innerhalb von 24 Stunden."
+
+msgid "Write a message"
+msgstr "Nachricht schreiben"
+
+msgid "Book Appointment"
+msgstr "Termin buchen"
+
+msgid "Schedule a call or meeting at your convenience. Available for consultations and support."
+msgstr "Planen Sie einen Anruf oder ein Treffen zu Ihrer Bequemlichkeit. Verfügbar für Beratungen und Support."
+
+msgid "Schedule now"
+msgstr "Jetzt planen"
+
+msgid "Sales & Wishlist"
+msgstr "Verkauf & Wunschliste"
+
+msgid "Let us know what you'd like to buy or have created. We'll collect and process your requests."
+msgstr "Lassen Sie uns wissen, was Sie kaufen oder erstellen lassen möchten. Wir sammeln und bearbeiten Ihre Anfragen."
+
+msgid "Submit request"
+msgstr "Anfrage senden"
+
+msgid "Support Ticket"
+msgstr "Support-Ticket"
+
+msgid "Having technical issues? Create a ticket and our team will get back to you as soon as possible."
+msgstr "Haben Sie technische Probleme? Erstellen Sie ein Ticket und unser Team wird sich so schnell wie möglich bei Ihnen melden."
+
+msgid "Create ticket"
+msgstr "Ticket erstellen"
+
+# Appointment Confirmed Page Translations
+msgid "Appointment Confirmed"
+msgstr "Termin bestätigt"
+
+msgid "Thank You!"
+msgstr "Vielen Dank!"
+
+msgid "Your appointment has been confirmed"
+msgstr "Ihr Termin wurde bestätigt"
+
+msgid "Your appointment request has been successfully submitted. We will contact you shortly to confirm the details."
+msgstr "Ihre Terminanfrage wurde erfolgreich übermittelt. Wir werden uns in Kürze mit Ihnen in Verbindung setzen, um die Details zu bestätigen."
+
+msgid "What happens next?"
+msgstr "Was passiert als Nächstes?"
+
+msgid "You will receive a confirmation email shortly"
+msgstr "Sie erhalten in Kürze eine Bestätigungs-E-Mail"
+
+msgid "We will review your request and available time slots"
+msgstr "Wir prüfen Ihre Anfrage und verfügbare Zeitfenster"
+
+msgid "You will get a final confirmation with all details"
+msgstr "Sie erhalten eine finale Bestätigung mit allen Details"
+
+msgid "Add the appointment to your calendar"
+msgstr "Fügen Sie den Termin Ihrem Kalender hinzu"
+
+# Sales Chat Page Translations
+msgid "Order"
+msgstr "Bestellung"
+
+msgid "Chat"
+msgstr "Chat"
+
+msgid "Admin View"
+msgstr "Admin-Ansicht"
+
+msgid "Sales Chat"
+msgstr "Verkaufs-Chat"
+
+msgid "Back to Orders"
+msgstr "Zurück zu Bestellungen"
+
+msgid "Back to My Orders"
+msgstr "Zurück zu meinen Bestellungen"
+
+msgid "Order ID"
+msgstr "Bestellnummer"
+
+msgid "Customer"
+msgstr "Kunde"
+
+msgid "Conversation"
+msgstr "Konversation"
+
+msgid "Reply"
+msgstr "Antworten"
+
+msgid "Type your message..."
+msgstr "Geben Sie Ihre Nachricht ein..."
+
+msgid "Send Message"
+msgstr "Nachricht senden"
+
+# Sales & Wishlist Page Translations
+msgid "Let us know what you'd like to buy or have created"
+msgstr "Lassen Sie uns wissen, was Sie kaufen oder erstellen lassen möchten"
+
+msgid "Back to Contact Center"
+msgstr "Zurück zum Kontaktzentrum"
+
+msgid "Your Name"
+msgstr "Ihr Name"
+
+msgid "Enter your name"
+msgstr "Geben Sie Ihren Namen ein"
+
+msgid "Your Email"
+msgstr "Ihre E-Mail"
+
+msgid "Enter your email"
+msgstr "Geben Sie Ihre E-Mail ein"
+
+msgid "Subject"
+msgstr "Betreff"
+
+msgid "What is this about?"
+msgstr "Worum geht es?"
+
+msgid "Message"
+msgstr "Nachricht"
+
+msgid "Describe your request..."
+msgstr "Beschreiben Sie Ihre Anfrage..."
+
+msgid "Add Wish"
+msgstr "Wunsch hinzufügen"
+
+msgid "Your Wishes"
+msgstr "Ihre Wünsche"
+
+msgid "Wish"
+msgstr "Wunsch"
+
+msgid "Wish Title"
+msgstr "Wunschtitel"
+
+msgid "What do you want?"
+msgstr "Was möchten Sie?"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "Describe your wish in detail..."
+msgstr "Beschreiben Sie Ihren Wunsch im Detail..."
+
+msgid "Add Another Wish"
+msgstr "Weiteren Wunsch hinzufügen"
+
+msgid "Hide Wishes"
+msgstr "Wünsche ausblenden"
+
+msgid "Submit Request"
+msgstr "Anfrage senden"
+
+msgid "Your Submissions"
+msgstr "Ihre Einreichungen"
+
+msgid "Wishes:"
+msgstr "Wünsche:"
+
+msgid "Open Chat"
+msgstr "Chat öffnen"
+
+msgid "You haven't submitted any requests yet."
+msgstr "Sie haben noch keine Anfragen eingereicht."
+
+# Support & Tickets Page Translations
+msgid "Support & Tickets"
+msgstr "Support & Tickets"
+
+msgid "Create a ticket and our team will help you"
+msgstr "Erstellen Sie ein Ticket und unser Team hilft Ihnen"
+
+msgid "Submit Ticket"
+msgstr "Ticket einreichen"
+
+msgid "Your Tickets"
+msgstr "Ihre Tickets"
+
+msgid "Resolved"
+msgstr "Gelöst"
+
+msgid "Open"
+msgstr "Offen"
+
+msgid "You haven't submitted any support tickets yet."
+msgstr "Sie haben noch keine Support-Tickets eingereicht."
+
+# Ticket Detail Page Translations
+msgid "Ticket"
+msgstr "Ticket"
+
+msgid "Support"
+msgstr "Support"
+
+msgid "Support Ticket"
+msgstr "Support-Ticket"
+
+msgid "Back to Admin Panel"
+msgstr "Zurück zum Admin-Panel"
+
+msgid "Back to My Tickets"
+msgstr "Zurück zu meinen Tickets"
+
+msgid "Created by"
+msgstr "Erstellt von"
+
+msgid "Created"
+msgstr "Erstellt"
+
+msgid "Updated"
+msgstr "Aktualisiert"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "No messages yet. Start the conversation!"
+msgstr "Noch keine Nachrichten. Beginnen Sie die Konversation!"
+
+# System Status Page Translations
+msgid "System Status"
+msgstr "Systemstatus"
+
+msgid "Real-time overview of our services"
+msgstr "Echtzeit-Übersicht unserer Dienste"
+
+msgid "Speedtest"
+msgstr "Speedtest"
+
+msgid "Global Issues"
+msgstr "Globale Probleme"
+
+msgid "No global issues reported. All systems operational."
+msgstr "Keine globalen Probleme gemeldet. Alle Systeme funktionsfähig."
+
+msgid "Apps & Services"
+msgstr "Apps & Dienste"
+
+msgid "Operational"
+msgstr "Funktionsfähig"
+
+msgid "No apps available."
+msgstr "Keine Apps verfügbar."
+
+# Website Analysis Page Translations
+msgid "Website Analysis"
+msgstr "Website-Analyse"
+
+msgid "Get a professional assessment of your website in seconds – Performance, SEO, Security and more."
+msgstr "Erhalten Sie in Sekunden eine professionelle Bewertung Ihrer Website – Leistung, SEO, Sicherheit und mehr."
+
+msgid "100% Free"
+msgstr "100% kostenlos"
+
+msgid "No Registration"
+msgstr "Keine Registrierung"
+
+msgid "Instant Results"
+msgstr "Sofortige Ergebnisse"
+
+msgid "Free Website Analysis"
+msgstr "Kostenlose Website-Analyse"
+
+msgid "Analyze Website"
+msgstr "Website analysieren"
+
+msgid "Error:"
+msgstr "Fehler:"
+
+msgid "Website URL"
+msgstr "Website-URL"
+
+msgid "Enter a complete URL (including https://)"
+msgstr "Geben Sie eine vollständige URL ein (inklusive https://)"
+
+msgid "Start Analysis"
+msgstr "Analyse starten"
+
+msgid "Why Analyze?"
+msgstr "Warum analysieren?"
+
+msgid "Better Rankings"
+msgstr "Bessere Rankings"
+
+msgid "Google prefers fast, secure, and mobile-friendly websites in search results."
+msgstr "Google bevorzugt schnelle, sichere und mobile-friendly Websites in den Suchergebnissen."
+
+msgid "More Conversions"
+msgstr "Mehr Conversions"
+
+msgid "Faster load times lead to fewer bounces and higher revenue."
+msgstr "Schnellere Ladezeiten führen zu weniger Absprüngen und höheren Umsätzen."
+
+msgid "Security & Trust"
+msgstr "Sicherheit & Vertrauen"
+
+msgid "SSL and security headers protect your visitors and your business."
+msgstr "SSL und Sicherheits-Header schützen Ihre Besucher und Ihr Unternehmen."
+
+msgid "Competitive Advantage"
+msgstr "Wettbewerbsvorteil"
+
+msgid "Identify weaknesses early and stay one step ahead."
+msgstr "Erkennen Sie Schwächen frühzeitig und bleiben Sie einen Schritt voraus."
+
+msgid "What is Analyzed?"
+msgstr "Was wird analysiert?"
+
+msgid "Comprehensive check of all important website factors"
+msgstr "Umfassende Prüfung aller wichtigen Website-Faktoren"
+
+msgid "Performance & Speed"
+msgstr "Leistung & Geschwindigkeit"
+
+msgid "Load time, page size, compression, and server response are analyzed in detail."
+msgstr "Ladezeit, Seitengröße, Komprimierung und Server-Antwort werden detailliert analysiert."
+
+msgid "SEO Optimization"
+msgstr "SEO-Optimierung"
+
+msgid "Meta tags, H1 structure, alt texts, sitemap, and structured data are checked."
+msgstr "Meta-Tags, H1-Struktur, Alt-Texte, Sitemap und strukturierte Daten werden geprüft."
+
+msgid "Security & SSL"
+msgstr "Sicherheit & SSL"
+
+msgid "SSL certificate, HTTPS, security headers, and encryption are thoroughly tested."
+msgstr "SSL-Zertifikat, HTTPS, Sicherheits-Header und Verschlüsselung werden gründlich getestet."
+
+msgid "Mobile Optimization"
+msgstr "Mobile Optimierung"
+
+msgid "Responsive design, viewport, touch elements, and mobile load time are evaluated."
+msgstr "Responsives Design, Viewport, Touch-Elemente und mobile Ladezeit werden bewertet."
+
+msgid "Server & Infrastructure"
+msgstr "Server & Infrastruktur"
+
+msgid "DNS, IP address, CDN usage, and cache configuration are examined."
+msgstr "DNS, IP-Adresse, CDN-Nutzung und Cache-Konfiguration werden untersucht."
+
+msgid "Accessibility"
+msgstr "Barrierefreiheit"
+
+msgid "ARIA labels, language attributes, and contrasts for optimal accessibility."
+msgstr "ARIA-Labels, Sprachattribute und Kontraste für optimale Barrierefreiheit."
+
+# App Status Page Translations
+msgid "Status"
+msgstr "Status"
+
+msgid "Real-time Status Monitor"
+msgstr "Echtzeit-Status-Monitor"
+
+msgid "Back to Overview"
+msgstr "Zurück zur Übersicht"
+
+msgid "Response Time"
+msgstr "Antwortzeit"
+
+msgid "Known Issues"
+msgstr "Bekannte Probleme"
+
+msgid "No known issues. All systems operational!"
+msgstr "Keine bekannten Probleme. Alle Systeme funktionsfähig!"
+
+msgid "Experiencing problems with this service?"
+msgstr "Haben Sie Probleme mit diesem Dienst?"
+
+msgid "Report Issue"
+msgstr "Problem melden"
+
+# Analysis Result Page Translations
+msgid "Analysis Result"
+msgstr "Analyse-Ergebnis"
+
+msgid "Comprehensive performance check"
+msgstr "Umfassende Leistungsprüfung"
+
+msgid "New Analysis"
+msgstr "Neue Analyse"
+
+msgid "Analysis Error"
+msgstr "Analyse-Fehler"
+
+msgid "Try Again"
+msgstr "Erneut versuchen"
+
+msgid "Load Time"
+msgstr "Ladezeit"
+
+msgid "Page Size"
+msgstr "Seitengröße"
+
+msgid "Compression"
+msgstr "Komprimierung"
+
+msgid "Title Tag"
+msgstr "Titel-Tag"
+
+msgid "Meta Description"
+msgstr "Meta-Beschreibung"
+
+msgid "H1 Tags"
+msgstr "H1-Tags"
+
+msgid "SSL Valid"
+msgstr "SSL gültig"
+
+msgid "Security Headers"
+msgstr "Sicherheits-Header"
+
+msgid "Viewport"
+msgstr "Viewport"
+
+msgid "Mobile Friendly"
+msgstr "Mobile Friendly"
+
+msgid "HTTP Code"
+msgstr "HTTP-Code"
+
+msgid "CDN Detected"
+msgstr "CDN erkannt"
+
+msgid "Language Attribute"
+msgstr "Sprach-Attribut"
+
+msgid "Alt Texts"
+msgstr "Alt-Texte"
+
+msgid "Recommendations"
+msgstr "Empfehlungen"
+
+msgid "Warnings"
+msgstr "Warnungen"
+
+msgid "Get Results by Email"
+msgstr "Ergebnisse per E-Mail erhalten"
+
+msgid "Send the complete analysis to your inbox and share it with your team!"
+msgstr "Senden Sie die vollständige Analyse an Ihr Postfach und teilen Sie sie mit Ihrem Team!"
+
+msgid "Send Results"
+msgstr "Ergebnisse senden"
+
+msgid "Let us optimize your website!"
+msgstr "Lassen Sie uns Ihre Website optimieren!"
+
+msgid "Our experts will help you significantly improve performance, SEO, and security."
+msgstr "Unsere Experten helfen Ihnen, Leistung, SEO und Sicherheit erheblich zu verbessern."
+
+msgid "Book Free Consultation"
+msgstr "Kostenlose Beratung buchen"
+
+msgid "Request Quote"
+msgstr "Angebot anfordern"
+
+msgid "100% free & non-binding"
+msgstr "100% kostenlos & unverbindlich"
+
+msgid "Print Results"
+msgstr "Ergebnisse drucken"
+
+msgid "Excellent!"
+msgstr "Ausgezeichnet!"
+
+msgid "Good"
+msgstr "Gut"
+
+msgid "Needs Improvement"
+msgstr "Verbesserungsbedürftig"
+
+msgid "Critical"
+msgstr "Kritisch"
+
+msgid "Your website is excellently optimized and meets all important criteria for performance, SEO, and security."
+msgstr "Ihre Website ist ausgezeichnet optimiert und erfüllt alle wichtigen Kriterien für Leistung, SEO und Sicherheit."
+
+msgid "Good foundation, but there is still optimization potential in individual areas. See details below."
+msgstr "Gute Grundlage, aber es gibt noch Optimierungspotenzial in einzelnen Bereichen. Siehe Details unten."
+
+msgid "Several areas need attention. The most important improvements are listed below."
+msgstr "Mehrere Bereiche erfordern Aufmerksamkeit. Die wichtigsten Verbesserungen sind unten aufgeführt."
+
+msgid "Your website urgently needs optimization for better performance, security, and user experience."
+msgstr "Ihre Website benötigt dringend Optimierung für bessere Leistung, Sicherheit und Benutzererfahrung."
+
+msgid "Performance"
+msgstr "Leistung"
+
+msgid "SEO"
+msgstr "SEO"
+
+msgid "Security"
+msgstr "Sicherheit"
+
+msgid "Mobile"
+msgstr "Mobile"
+
+msgid "Server"
+msgstr "Server"
+
+# Book Appointment Page Translations
+msgid "Book Appointment"
+msgstr "Termin buchen"
+
+msgid "Schedule your meeting with us"
+msgstr "Planen Sie Ihr Treffen mit uns"
+
+msgid "First Name"
+msgstr "Vorname"
+
+msgid "Last Name"
+msgstr "Nachname"
+
+msgid "Email"
+msgstr "E-Mail"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Appointment Type"
+msgstr "Terminart"
+
+msgid "Select Date & Time"
+msgstr "Datum & Uhrzeit wählen"
+
+msgid "Choose Date & Time"
+msgstr "Datum & Uhrzeit wählen"
+
+msgid "Book Now"
+msgstr "Jetzt buchen"
+
+msgid "Available Appointments"
+msgstr "Verfügbare Termine"
+
+msgid "Loading available dates..."
+msgstr "Verfügbare Daten werden geladen..."
+
+msgid "Mon"
+msgstr "Mo"
+
+msgid "Tue"
+msgstr "Di"
+
+msgid "Wed"
+msgstr "Mi"
+
+msgid "Thu"
+msgstr "Do"
+
+msgid "Fri"
+msgstr "Fr"
+
+msgid "Sat"
+msgstr "Sa"
+
+msgid "Sun"
+msgstr "So"
+
+msgid "Available"
+msgstr "Verfügbar"
+
+msgid "Unavailable"
+msgstr "Nicht verfügbar"
+
+msgid "Available Times"
+msgstr "Verfügbare Zeiten"
+
+msgid "Please select a date first"
+msgstr "Bitte wählen Sie zuerst ein Datum"
+
+msgid "Loading available times..."
+msgstr "Verfügbare Zeiten werden geladen..."
+
+msgid "Selected Date"
+msgstr "Ausgewähltes Datum"
+
+msgid "No available appointments on this day"
+msgstr "Keine verfügbaren Termine an diesem Tag"
+
+msgid "Please select another date"
+msgstr "Bitte wählen Sie ein anderes Datum"
+
+msgid "Please select an appointment type first."
+msgstr "Bitte wählen Sie zuerst eine Terminart."
+
+msgid "Error loading available appointments."
+msgstr "Fehler beim Laden der verfügbaren Termine."
+
+msgid "Selected"
+msgstr "Ausgewählt"
+
+msgid "at"
+msgstr "um"
+
+msgid "o'clock"
+msgstr "Uhr"
+
+# Admin Dashboard Translations
+msgid "Admin Dashboard"
+msgstr "Admin-Dashboard"
+
+msgid "Welcome back"
+msgstr "Willkommen zurück"
+
+msgid "System Online"
+msgstr "System online"
+
+msgid "Blog Views"
+msgstr "Blog-Aufrufe"
+
+msgid "Total"
+msgstr "Gesamt"
+
+msgid "Articles"
+msgstr "Artikel"
+
+msgid "Top"
+msgstr "Top"
+
+msgid "Orders"
+msgstr "Bestellungen"
+
+msgid "new"
+msgstr "neu"
+
+msgid "pending"
+msgstr "ausstehend"
+
+msgid "Revenue"
+msgstr "Umsatz"
+
+msgid "This Month"
+msgstr "Dieser Monat"
+
+msgid "Support Tickets"
+msgstr "Support-Tickets"
+
+msgid "urgent"
+msgstr "dringend"
+
+msgid "high"
+msgstr "hoch"
+
+msgid "today"
+msgstr "heute"
+
+msgid "Appointments"
+msgstr "Termine"
+
+msgid "Today"
+msgstr "Heute"
+
+msgid "this week"
+msgstr "diese Woche"
+
+msgid "Blog Performance"
+msgstr "Blog-Performance"
+
+msgid "Total Views"
+msgstr "Gesamtaufrufe"
+
+msgid "Post"
+msgstr "Beitrag"
+
+msgid "Top Post"
+msgstr "Top-Beitrag"
+
+msgid "Published"
+msgstr "Veröffentlicht"
+
+msgid "Marketing"
+msgstr "Marketing"
+
+msgid "Posts"
+msgstr "Beiträge"
+
+msgid "Views"
+msgstr "Aufrufe"
+
+msgid "Drafts"
+msgstr "Entwürfe"
+
+msgid "Admin: Blog"
+msgstr "Admin: Blog"
+
+msgid "Manage posts"
+msgstr "Beiträge verwalten"
+
+msgid "Sales"
+msgstr "Verkauf"
+
+msgid "open"
+msgstr "offen"
+
+msgid "processing"
+msgstr "in Bearbeitung"
+
+msgid "Admin: Sales"
+msgstr "Admin: Verkauf"
+
+msgid "Sales inquiries and customer chat"
+msgstr "Verkaufsanfragen und Kunden-Chat"
+
+msgid "Admin: Orders"
+msgstr "Admin: Bestellungen"
+
+msgid "Manage orders"
+msgstr "Bestellungen verwalten"
+
+msgid "Admin: Appointments"
+msgstr "Admin: Termine"
+
+msgid "Manage appointments"
+msgstr "Termine verwalten"
+
+msgid "Support"
+msgstr "Support"
+
+msgid "response time"
+msgstr "Reaktionszeit"
+
+msgid "Admin: Tickets"
+msgstr "Admin: Tickets"
+
+msgid "Process support tickets"
+msgstr "Support-Tickets bearbeiten"
+
+msgid "Quick Access"
+msgstr "Schnellzugriff"
+
+msgid "New Blogpost"
+msgstr "Neuer Blogbeitrag"
+
+msgid "Orders"
+msgstr "Bestellungen"
+
+msgid "Appointments"
+msgstr "Termine"
+
+msgid "Tickets"
+msgstr "Tickets"
+
+msgid "To Website"
+msgstr "Zur Website"
+
+msgid "Recent Activity"
+msgstr "Letzte Aktivitäten"
+
+msgid "ago"
+msgstr "vor"
+
+msgid "Now"
+msgstr "Jetzt"
+
+msgid "No recent activities"
+msgstr "Keine letzten Aktivitäten"
+
+msgid "Unique Visitors"
+msgstr "Einzigartige Besucher"
+
+msgid "estimated"
+msgstr "geschätzt"

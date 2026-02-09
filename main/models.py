@@ -125,6 +125,7 @@ class SpecialOpeningHour(models.Model):
         return f"{self.date}: {self.open_time.strftime('%H:%M')} – {self.close_time.strftime('%H:%M')}"
 # models.py - Ergänzungen
 from django.db import models
+from shop_ourapps.models import App
 from django.contrib.auth.models import User
 import secrets
 
@@ -143,6 +144,7 @@ class SSOClient(models.Model):
     """Registrierte SSO Client-Apps"""
     name = models.CharField(max_length=100)
     client_id = models.CharField(max_length=50, unique=True)
+    app = models.ForeignKey(App, on_delete=models.CASCADE, null=True)
     client_secret = models.CharField(max_length=100)
     callback_url = models.URLField(max_length=500)
     is_active = models.BooleanField(default=True)

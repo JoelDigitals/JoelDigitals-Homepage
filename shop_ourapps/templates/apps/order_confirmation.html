@@ -1,62 +1,477 @@
-{% extends "base_shop.html" %}
+{% extends "base_home.html" %}
 {% load static %}
-{% block title %}Bestellbestätigung – Joel Digitals{% endblock %}
+{% load i18n %}
+
+{% block title %}{% trans "Order Confirmation" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    .container {
-        background-color: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        max-width: 1000px;
-        margin: auto;
-        color: #000;
+  .confirmation-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .confirmation-card {
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+  }
+
+  /* Success Header */
+  .success-header {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    padding: 3rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .success-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .success-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+    animation: scaleIn 0.5s ease;
+  }
+
+  @keyframes scaleIn {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .success-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .success-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Body */
+  .confirmation-body {
+    padding: 2rem;
+  }
+
+  .customer-greeting {
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .customer-greeting strong {
+    color: var(--primary);
+  }
+
+  .confirmation-message {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Order Info */
+  .order-info {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    color: #666;
+    font-size: 0.95rem;
+  }
+
+  .info-value {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .info-value.highlight {
+    color: #4CAF50;
+    font-size: 1.2rem;
+  }
+
+  .order-id {
+    font-family: monospace;
+    background: rgba(0, 68, 204, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    color: var(--primary);
+  }
+
+  /* Bank Transfer Notice */
+  .bank-transfer-box {
+    background: linear-gradient(135deg, #fff8e1, #ffecb3);
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .bank-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #ffc107;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #333;
+    flex-shrink: 0;
+  }
+
+  .bank-content h3 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-size: 1.1rem;
+  }
+
+  .bank-content p {
+    margin: 0;
+    color: #666;
+    line-height: 1.6;
+  }
+
+  .reference-code {
+    display: inline-block;
+    background: #333;
+    color: #ffc107;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+  }
+
+  /* Items Section */
+  .items-section {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+  }
+
+  .item-row:hover {
+    border-color: var(--primary);
+    transform: translateX(4px);
+  }
+
+  .item-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .item-qty {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .item-name {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .item-price {
+    font-weight: 700;
+    color: #4CAF50;
+    font-size: 1.1rem;
+  }
+
+  /* Actions */
+  .confirmation-actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn {
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 68, 204, 0.4);
+  }
+
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--text);
+    border: 2px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .confirmation-container {
+      margin: 1rem auto;
     }
 
-    .container h1 {
-        color: #4CAF50;
+    .success-header {
+      padding: 2rem 1.5rem;
     }
 
-    .container p, .container li {
-        font-size: 16px;
-        color: #333;
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2.5rem;
     }
 
-    ul {
-        list-style-type: none;
-        padding-left: 0;
+    .success-title {
+      font-size: 1.6rem;
     }
+
+    .confirmation-body {
+      padding: 1.5rem;
+    }
+
+    .customer-greeting {
+      font-size: 1.1rem;
+    }
+
+    .bank-transfer-box {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .bank-icon {
+      margin: 0 auto;
+    }
+
+    .item-row {
+      flex-direction: column;
+      gap: 0.75rem;
+      text-align: center;
+    }
+
+    .confirmation-actions {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .success-title {
+      font-size: 1.4rem;
+    }
+
+    .info-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+  }
 </style>
 
-<div class="container">
-    <h1>Bestellbestätigung</h1>
-
-    <p><strong>Vielen Dank, {{ order.first_name }} {{ order.last_name }}!</strong></p>
-    <p>Ihre Bestellung wurde erfolgreich aufgegeben. Eine Bestätigung wurde an Ihre E-Mail-Adresse gesendet.</p>
-
-    <div style="margin-top: 20px;">
-        <p><strong>Bestell-ID:</strong> {{ order.id }}</p>
-        <p><strong>Gesamtbetrag:</strong> €{{ order.total_amount }}</p>
-        <p><strong>Zahlungsmethode:</strong> {{ order.payment_method }}</p>
+<div class="confirmation-container">
+  <div class="confirmation-card">
+    <!-- Success Header -->
+    <div class="success-header">
+      <div class="success-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <h1 class="success-title">{% trans "Order Confirmation" %}</h1>
+      <p class="success-subtitle">{% trans "Your order has been successfully placed" %}</p>
     </div>
 
-    {% if order.payment_method == 'bank_transfer' %}
-        <div style="margin-top: 20px;">
-            <p>
-                Bitte überweisen Sie den Betrag mit folgendem Verwendungszweck:
-                <strong>{{ order.id }}</strong>.
-            </p>
+    <!-- Body -->
+    <div class="confirmation-body">
+      <p class="customer-greeting">
+        {% trans "Thank you" %}, <strong>{{ order.first_name }} {{ order.last_name }}</strong>!
+      </p>
+      
+      <p class="confirmation-message">
+        {% trans "We have sent a confirmation email to your email address. You can also view your order details in your account." %}
+      </p>
+
+      <!-- Order Info -->
+      <div class="order-info">
+        <div class="info-row">
+          <span class="info-label">{% trans "Order ID" %}</span>
+          <span class="info-value order-id">#{{ order.id }}</span>
         </div>
-    {% endif %}
+        <div class="info-row">
+          <span class="info-label">{% trans "Total Amount" %}</span>
+          <span class="info-value highlight">€{{ order.total_amount|floatformat:2 }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">{% trans "Payment Method" %}</span>
+          <span class="info-value">{{ order.payment_method }}</span>
+        </div>
+      </div>
 
-    <div style="margin-top: 20px;">
-        <p><strong>Bestellpositionen:</strong></p>
-        <ul>
-            {% for item in order.items.all %}
-                <li>{{ item.quantity }}x {{ item.app.name }} – €{{ item.price }}</li>
-            {% endfor %}
-        </ul>
+      <!-- Bank Transfer Notice -->
+      {% if order.payment_method == 'bank_transfer' %}
+        <div class="bank-transfer-box">
+          <div class="bank-icon">
+            <i class="fas fa-university"></i>
+          </div>
+          <div class="bank-content">
+            <h3>{% trans "Bank Transfer Instructions" %}</h3>
+            <p>
+              {% trans "Please transfer the total amount with the following reference:" %}
+              <br>
+              <span class="reference-code">{{ order.id }}</span>
+            </p>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Items -->
+      <div class="items-section">
+        <h2 class="section-title">
+          <i class="fas fa-box"></i>
+          {% trans "Order Items" %}
+        </h2>
+        
+        <div class="items-list">
+          {% for item in order.items.all %}
+            <div class="item-row">
+              <div class="item-info">
+                <span class="item-qty">{{ item.quantity }}</span>
+                <span class="item-name">{{ item.app.name }}</span>
+              </div>
+              <span class="item-price">€{{ item.price|floatformat:2 }}</span>
+            </div>
+          {% empty %}
+            <p style="text-align: center; color: #999; padding: 2rem;">
+              {% trans "No items found" %}
+            </p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="confirmation-actions">
+        <a href="{% url 'order_detail' order.id %}" class="btn btn-primary">
+          <i class="fas fa-file-invoice"></i>
+          {% trans "View Order Details" %}
+        </a>
+        <a href="{% url 'shop' %}" class="btn btn-secondary">
+          <i class="fas fa-store"></i>
+          {% trans "Continue Shopping" %}
+        </a>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

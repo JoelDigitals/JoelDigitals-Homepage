@@ -1,121 +1,394 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Our Team" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-  .team-container {
-    max-width: 1100px;
-    margin: 3rem auto;
-    padding: 2rem;
-    font-family: 'Inter', sans-serif;
-    color: #1e1e1e;
+  .team-page-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
   }
-  h1 {
+
+  .team-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 4rem 2rem;
+    border-radius: 16px 16px 0 0;
     text-align: center;
-    color: #0076ebff;
-    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
   }
+
+  .team-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .team-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .team-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .team-body {
+    background: var(--surface);
+    padding: 3rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+  }
+
+  /* Team Grid */
   .team-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
   }
+
   .member-card {
-    background: white;
+    background: var(--bg);
     border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    padding: 2rem;
+    border: 2px solid var(--border);
     text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .member-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), #0066ff);
+    transform: scaleX(0);
     transition: transform 0.3s ease;
   }
+
   .member-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
+    border-color: var(--primary);
+    box-shadow: 0 12px 28px rgba(0, 68, 204, 0.15);
   }
+
+  .member-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .member-photo-wrapper {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 1.5rem;
+    position: relative;
+  }
+
   .member-photo {
-    width: 140px;
-    height: 140px;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     border-radius: 50%;
-    margin-bottom: 1rem;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border: 4px solid var(--surface);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
   }
+
+  .member-card:hover .member-photo {
+    transform: scale(1.05);
+    border-color: var(--primary);
+  }
+
   .member-name {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: 700;
-    margin-bottom: 0.3rem;
-    color: #003366;
+    color: var(--text);
+    margin-bottom: 0.25rem;
   }
+
   .member-position {
     font-size: 1rem;
     font-weight: 600;
-    color: #666;
+    color: var(--primary);
     margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
+
   .member-bio {
     font-size: 0.95rem;
-    color: #444;
-    margin-bottom: 1rem;
-    min-height: 70px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    min-height: 80px;
   }
+
+  /* Social Links */
   .social-links {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.95rem;
-    color: #3a86ff;
-    font-weight: 500;
+    gap: 1rem;
     flex-wrap: wrap;
   }
-  .social-links a {
-    display: flex;
+
+  .social-link {
+    display: inline-flex;
     align-items: center;
-    color: #3a86ff;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    background: var(--surface);
+    border-radius: 8px;
+    color: #666;
     text-decoration: none;
-    transition: color 0.3s ease;
-    gap: 0.3rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border);
   }
-  .social-links a:hover {
-    color: #0056b3;
+
+  .social-link:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-2px);
   }
-  .social-links svg {
-    fill: currentColor;
+
+  .social-link i {
+    font-size: 1rem;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+  }
+
+  .empty-state i {
+    font-size: 4rem;
+    color: var(--border);
+    margin-bottom: 1rem;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    margin-top: 3rem;
+    padding: 2.5rem;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    border-radius: 16px;
+    text-align: center;
+    color: white;
+  }
+
+  .cta-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .cta-text {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.95;
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: white;
+    color: var(--primary);
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .team-page-container {
+      margin: 1rem auto;
+    }
+
+    .team-header {
+      padding: 3rem 1.5rem;
+    }
+
+    .header-icon {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+    }
+
+    .team-title {
+      font-size: 2rem;
+    }
+
+    .team-body {
+      padding: 2rem 1.5rem;
+    }
+
+    .team-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .member-card {
+      padding: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .team-title {
+      font-size: 1.6rem;
+    }
+
+    .member-photo-wrapper {
+      width: 120px;
+      height: 120px;
+    }
+
+    .social-links {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .social-link {
+      width: 100%;
+      justify-content: center;
+    }
   }
 </style>
 
-<main class="team-container">
-  <h1>Meet Our Team</h1>
-  <div class="team-grid">
-    {% for member in members %}
-    <div class="member-card">
-      <img class="member-photo" src="{{ member.photo.url }}" alt="{{ member.first_name }} {{ member.last_name }}">
-      <div class="member-name">{{ member.first_name }} {{ member.last_name }}</div>
-      <div class="member-position">{{ member.position }}</div>
-      <div class="member-bio">{{ member.bio|linebreaksbr }}</div>
-      <div class="social-links">
-        {% if member.email %}
-          <a href="mailto:{{ member.email }}" title="Email">
-            <svg height="16" width="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zM4 8l8 5 8-5v-2l-8 5-8-5v2z"/>
-            </svg>
-            <span>{{ member.email }}</span>
-          </a>
-        {% endif %}
-        
-        {% if member.phone_number %}
-          <a href="tel:{{ member.phone_number }}" title="Phone">
-            <svg height="16" width="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M6.62 10.79a15.093 15.093 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.4 21 3 13.6 3 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"/>
-            </svg>
-            <span>{{ member.phone_number }}</span>
-          </a>
-        {% endif %}
-      </div>
-
+<div class="team-page-container">
+  <!-- Header -->
+  <div class="team-header">
+    <div class="header-icon">
+      <i class="fas fa-users"></i>
     </div>
-    {% empty %}
-    <p>No team members found.</p>
-    {% endfor %}
+    <h1 class="team-title">{% trans "Meet Our Team" %}</h1>
+    <p class="team-subtitle">{% trans "The passionate people behind Joel Digitals" %}</p>
   </div>
-</main>
+
+  <!-- Body -->
+  <div class="team-body">
+    <a href="{% url 'home' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> {% trans "Back to Home" %}
+    </a>
+
+    {% if members %}
+      <div class="team-grid">
+        {% for member in members %}
+        <div class="member-card">
+          <div class="member-photo-wrapper">
+            <img class="member-photo" src="{{ member.photo.url }}" alt="{{ member.first_name }} {{ member.last_name }}">
+          </div>
+          
+          <div class="member-name">{{ member.first_name }} {{ member.last_name }}</div>
+          <div class="member-position">{{ member.position }}</div>
+          <div class="member-bio">{{ member.bio|linebreaksbr }}</div>
+          
+          <div class="social-links">
+            {% if member.email %}
+              <a href="mailto:{{ member.email }}" class="social-link" title="{% trans 'Email' %}">
+                <i class="fas fa-envelope"></i>
+                <span>{{ member.email }}</span>
+              </a>
+            {% endif %}
+            
+            {% if member.phone_number %}
+              <a href="tel:{{ member.phone_number }}" class="social-link" title="{% trans 'Phone' %}">
+                <i class="fas fa-phone-alt"></i>
+                <span>{{ member.phone_number }}</span>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-user-slash"></i>
+        <h3>{% trans "No team members found" %}</h3>
+        <p>{% trans "Check back later to meet our amazing team!" %}</p>
+      </div>
+    {% endif %}
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <h2 class="cta-title">{% trans "Want to join our team?" %}</h2>
+      <p class="cta-text">{% trans "We're always looking for talented individuals to join us." %}</p>
+      <a href="https://jds-management.de/jobs/1/" target="_blank" class="cta-button">
+        <i class="fas fa-briefcase"></i> {% trans "View Open Positions" %}
+      </a>
+    </div>
+  </div>
+</div>
 {% endblock %}

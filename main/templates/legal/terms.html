@@ -1,77 +1,464 @@
 {% extends "base_home.html" %}
+{% load static %}
 {% load i18n %}
-{% block title %}{% trans "AGB / Terms and Conditions – Joel Digitals" %}{% endblock %}
+
+{% block title %}{% trans "Terms and Conditions" %} – Joel Digitals{% endblock %}
+
 {% block content %}
 <style>
-    .container {
-        background-color: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        max-width: 1000px;
-        margin: 40px auto;
-        font-size: 18px;
-        color: #000;
+  .terms-page-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .terms-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 4rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .terms-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .terms-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .terms-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .terms-body {
+    background: var(--surface);
+    padding: 3rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+  }
+
+  /* Intro */
+  .terms-intro {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 1.75rem;
+    border-left: 4px solid var(--primary);
+    margin-bottom: 2.5rem;
+    color: #666;
+    line-height: 1.8;
+    font-size: 1.05rem;
+  }
+
+  .terms-intro strong {
+    color: var(--text);
+  }
+
+  /* Sections */
+  .terms-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .terms-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .section-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .section-content {
+    color: #666;
+    line-height: 1.8;
+    font-size: 1.05rem;
+    padding-left: 3.5rem;
+  }
+
+  .section-content p {
+    margin-bottom: 1rem;
+  }
+
+  .section-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .section-content li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+  }
+
+  .section-content li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* Contact Link */
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .contact-link:hover {
+    text-decoration: underline;
+    gap: 0.75rem;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    margin-top: 3rem;
+    padding: 2.5rem;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    border-radius: 16px;
+    text-align: center;
+    color: white;
+  }
+
+  .cta-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .cta-text {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.95;
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: white;
+    color: var(--primary);
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .terms-page-container {
+      margin: 1rem auto;
     }
-    h2 { margin-top: 0; }
-    a.mail-link { color: #0044cc; text-decoration: none; }
-    a.mail-link:hover { text-decoration: underline; }
-    .contact-button {
-        background-color: #0044cc; color: white;
-        padding: 10px 20px; border: none;
-        border-radius: 5px; cursor: pointer;
-        text-decoration: none; display: inline-block;
-        font-size: 18px; margin-top: 20px;
+
+    .terms-header {
+      padding: 3rem 1.5rem;
     }
-    .contact-button:hover { background-color: #0033a0; }
+
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
+    }
+
+    .terms-title {
+      font-size: 2rem;
+    }
+
+    .terms-body {
+      padding: 2rem 1.5rem;
+    }
+
+    .section-content {
+      padding-left: 0;
+    }
+
+    .section-header {
+      align-items: flex-start;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .terms-title {
+      font-size: 1.6rem;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+    }
+
+    .cta-section {
+      padding: 1.5rem;
+    }
+  }
 </style>
 
-<div class="container">
-    <!-- =================== DEUTSCH =================== -->
-    <h2>{% trans "Allgemeine Geschäftsbedingungen (AGB)" %}</h2>
-    <p><strong>Joel Digitals</strong> {% trans "betreibt einen Online-Shop für digitale Produkte, Lizenzschlüssel, Design-Leistungen und Programmierung. Mit dem Zugriff auf diese Website oder dem Kauf von Produkten akzeptieren Sie die nachfolgenden Bedingungen." %}</p>
+<div class="terms-page-container">
+  <!-- Header -->
+  <div class="terms-header">
+    <div class="header-icon">
+      <i class="fas fa-file-contract"></i>
+    </div>
+    <h1 class="terms-title">{% trans "Terms and Conditions" %}</h1>
+    <p class="terms-subtitle">{% trans "AGB / Terms of Service" %}</p>
+  </div>
 
-    <h3>{% trans "1. Geltungsbereich" %}</h3>
-    <p>{% trans "Diese AGB gelten für alle Kunden, sowohl Privatpersonen als auch Unternehmen, die Produkte oder Dienstleistungen von Joel Digitals erwerben." %}</p>
+  <!-- Body -->
+  <div class="terms-body">
+    <a href="{% url 'home' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> {% trans "Back to Home" %}
+    </a>
 
-    <h3>{% trans "2. Vertragsschluss" %}</h3>
-    <p>{% trans "Ein Vertrag kommt zustande mit dem Kauf durch Abschluss des Bestellprozesses im Shop, durch Bestätigung per E-Mail oder durch schriftliche Vereinbarung (z. B. bei individuellen Leistungen)." %}</p>
+    <!-- Intro -->
+    <div class="terms-intro">
+      <strong>Joel Digitals</strong> {% trans "operates an online shop for digital products, license keys, design services, and programming. By accessing this website or purchasing products, you accept the following terms and conditions." %}
+    </div>
 
-    <h3>{% trans "3. Leistungen und Produkte" %}</h3>
-    <p>{% trans "Joel Digitals bietet Folgendes an:" %}</p>
-    <ul>
-        <li>{% trans "Digitale Produkte und Lizenzschlüssel" %}</li>
-        <li>{% trans "E-Books über Drittanbieter (z. B. Amazon)" %}</li>
-        <li>{% trans "Design-Leistungen (auf Anfrage)" %}</li>
-        <li>{% trans "Programmier-Leistungen wie Apps, Webseiten, Google Sites (auf Anfrage)" %}</li>
-    </ul>
+    <!-- Section 1 -->
+    <div class="terms-section">
+      <div class="section-header">
+        <span class="section-number">1</span>
+        <h2 class="section-title">{% trans "Scope of Application" %}</h2>
+      </div>
+      <div class="section-content">
+        <p>{% trans "These Terms and Conditions apply to all customers, both private individuals and companies, who purchase products or services from Joel Digitals." %}</p>
+      </div>
+    </div>
 
-    <h3>{% trans "4. Nutzungsrechte und Lizenzen" %}</h3>
-    <p>{% trans "Mit dem Kauf eines digitalen Produkts oder Lizenzschlüssels erhält der Kunde ein einfaches, nicht exklusives Nutzungsrecht. Eine Weitergabe oder Vervielfältigung an Dritte ist ohne ausdrückliche Genehmigung untersagt." %}</p>
+    <!-- Section 2 -->
+    <div class="terms-section">
+      <div class="section-header">
+        <span class="section-number">2</span>
+        <h2 class="section-title">{% trans "Contract Conclusion" %}</h2>
+      </div>
+      <div class="section-content">
+        <p>{% trans "A contract is concluded upon purchase through completion of the ordering process in the shop, confirmation by email, or written agreement (e.g., for individual services)." %}</p>
+      </div>
+    </div>
 
-    <h3>{% trans "5. Lieferung und Bereitstellung" %}</h3>
-    <p>{% trans "Digitale Produkte und Lizenzschlüssel werden per E-Mail oder über das Kundenkonto bereitgestellt. Für E-Books über Drittanbieter gelten deren Lieferbedingungen." %}</p>
+    <!-- Section 3 -->
+    <div class="terms-section">
+      <div class="section-header">
+        <span class="section-number">3</span>
+        <h2 class="section-title">{% trans "Services and Products" %}</h2>
+      </div>
+      <div class="section-content">
+        <p>{% trans "Joel Digitals offers the following:" %}</p>
+        <ul>
+          <li>{% trans "Digital products and license keys" %}</li>
+          <li>{% trans "E-books via third parties (e.g., Amazon)" %}</li>
+          <li>{% trans "Design services (on request)" %}</li>
+          <li>{% trans "Programming services such as apps, websites, Google Sites (on request)" %}</li>
+        </ul>
+      </div>
+    </div>
 
-    <h3>{% trans "6. Preise und Zahlung" %}</h3>
-    <p>{% trans "Preise verstehen sich in Euro (€). Akzeptierte Zahlungsmethoden sind PayPal, Überweisung, Stripe (inkl. Apple Pay, Google Pay) und weitere zukünftig angekündigte Methoden." %}</p>
+    <!-- Section 4 -->
+    <div class="terms-section">
+      <div class="section-header">
+        <span class="section-number">4</span>
+        <h2 class="section-title">{% trans "Usage Rights and Licenses" %}</h2>
+      </div>
+      <div class="section-content">
+        <p>{% trans "Upon purchase of a digital product or license key, the customer receives a simple, non-exclusive right of use. Transfer or reproduction to third parties is prohibited without express permission." %}</p>
+      </div>
+    </div>
 
-    <h3>{% trans "7. Anpassungs- und Supportfrist" %}</h3>
-    <p>{% trans "Für programmierte Produkte besteht eine 7-tägige Anpassungsfrist bei berechtigten funktionalen Problemen nach Lieferung. Grundlegende Neuprogrammierungen sind davon ausgeschlossen." %}</p>
+    <!-- Section 5 -->
+    <div class="terms-section">
+      <div class="section-header">
+        <span class="section-number">5</span>
+        <h2 class="section-title">{% trans "Delivery and Provision" %}</h2>
+      </div>
+      <div class="section-content">
+        <p>{% trans "Digital products and license keys are provided via email or through the customer account. For e-books via third parties, their delivery terms apply." %}</p>
+      </div>
+    </div>
 
-    <h3>{% trans "8. Widerrufsrecht" %}</h3>
-    <p>{% trans "Verbraucher haben ein gesetzliches Widerrufsrecht von 14 Tagen. Dieses erlischt jedoch, sobald der Kunde ausdrücklich zustimmt, dass die digitale Lieferung vor Ablauf der Frist beginnt und der Kunde mit der Bereitstellung einverstanden ist." %}</p>
+    <!-- Section 6 -->
+    <div class="terms-section">
+      <div class="section-header">
+        <span class="section-number">6</span>
+        <h2 class="section-title">{% trans "Prices and Payment" %}</h2>
+      </div>
+      <div class="section-content">
+        <p>{% trans "Prices are in Euro (€). Accepted payment methods are PayPal, bank transfer, Stripe (including Apple Pay, Google Pay), and other future announced methods." %}</p>
+      </div>
+    </div>
 
-    <h3>{% trans "9. Rückgabe und Erstattungen" %}</h3>
-    <p>{% trans "Nach Aktivierung oder Lieferung digitaler Produkte ist eine Rückgabe ausgeschlossen. Design-Leistungen und andere Services sind ebenfalls vom Rückgaberecht ausgeschlossen." %}</p>
+    <!-- Section 7 -->
+    <div class="terms-section">
+      <div class="section-header">
+        <span class="section-number">7</span>
+        <h2 class="section-title">{% trans "Adjustment and Support Period" %}</h2>
+      </div>
+      <div class="section-content">
+        <p>{% trans "For programmed products, there is a 7-day adjustment period for legitimate functional problems after delivery. Fundamental reprogramming is excluded." %}</p>
+      </div>
+    </div>
 
-    <h3>{% trans "10. Haftung und Gewährleistung" %}</h3>
-    <p>{% trans "Joel Digitals haftet nur für Vorsatz und grobe Fahrlässigkeit im gesetzlich zulässigen Rahmen. Für indirekte Schäden, entgangene Gewinne oder Datenverluste wird keine Haftung übernommen." %}</p>
+    <!-- Section 8 -->
+    <div class="terms-section">
+      <div class="section-header">
+        <span class="section-number">8</span>
+        <h2 class="section-title">{% trans "Right of Withdrawal" %}</h2>
+      </div>
+      <div class="section-content">
+        <p>{% trans "Consumers have a statutory right of withdrawal of 14 days. However, this expires as soon as the customer expressly agrees that digital delivery begins before the deadline expires and the customer agrees to the provision." %}</p>
+      </div>
+    </div>
 
-    <h3>{% trans "11. Anwendbares Recht und Gerichtsstand" %}</h3>
-    <p>{% trans "Es gilt deutsches Recht unter Ausschluss des UN-Kaufrechts. Gerichtsstand ist Saarland, Deutschland." %}</p>
+    <!-- Section 9 -->
+    <div class="terms-section">
+      <div class="section-header">
+        <span class="section-number">9</span>
+        <h2 class="section-title">{% trans "Returns and Refunds" %}</h2>
+      </div>
+      <div class="section-content">
+        <p>{% trans "After activation or delivery of digital products, returns are excluded. Design services and other services are also excluded from the right of return." %}</p>
+      </div>
+    </div>
 
-    <h3>{% trans "12. Kontakt" %}</h3>
-    <p>{% trans "Bei Fragen oder Problemen kontaktieren Sie uns unter:" %} <a class="mail-link" href="mailto:support@joel-digitals.com">support@joel-digitals.com</a></p>
+    <!-- Section 10 -->
+    <div class="terms-section">
+      <div class="section-header">
+        <span class="section-number">10</span>
+        <h2 class="section-title">{% trans "Liability and Warranty" %}</h2>
+      </div>
+      <div class="section-content">
+        <p>{% trans "Joel Digitals is liable only for intent and gross negligence within the legally permissible scope. No liability is assumed for indirect damages, lost profits, or data loss." %}</p>
+      </div>
+    </div>
 
+    <!-- Section 11 -->
+    <div class="terms-section">
+      <div class="section-header">
+        <span class="section-number">11</span>
+        <h2 class="section-title">{% trans "Applicable Law and Jurisdiction" %}</h2>
+      </div>
+      <div class="section-content">
+        <p>{% trans "German law applies, excluding the UN Convention on Contracts for the International Sale of Goods. Place of jurisdiction is Saarland, Germany." %}</p>
+      </div>
+    </div>
+
+    <!-- Section 12 -->
+    <div class="terms-section">
+      <div class="section-header">
+        <span class="section-number">12</span>
+        <h2 class="section-title">{% trans "Contact" %}</h2>
+      </div>
+      <div class="section-content">
+        <p>
+          {% trans "For questions or problems, please contact us at:" %} 
+          <a href="mailto:support@joel-digitals.com" class="contact-link">
+            support@joel-digitals.com <i class="fas fa-envelope"></i>
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <h2 class="cta-title">{% trans "Questions about our terms?" %}</h2>
+      <p class="cta-text">{% trans "Our support team is happy to help you understand our terms and conditions." %}</p>
+      <a href="{% url 'contactz_home' %}" class="cta-button">
+        <i class="fas fa-headset"></i> {% trans "Contact Support" %}
+      </a>
+    </div>
+  </div>
 </div>
 {% endblock %}

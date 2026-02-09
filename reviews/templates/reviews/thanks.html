@@ -1,43 +1,234 @@
 {% extends "base_home.html" %}
+{% load static %}
 {% load i18n %}
 
+{% block title %}{% trans "Thank You" %} – Joel Digitals{% endblock %}
+
 {% block content %}
-<section class="min-h-[70vh] flex items-center justify-center px-4">
-  <div class="max-w-xl w-full text-center bg-gray-900 rounded-2xl p-8 shadow-xl">
+<style>
+  .thankyou-page-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    <!-- Icon -->
-    <div class="text-5xl mb-4">🎉</div>
+  .thankyou-card {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    border: 2px solid var(--border);
+    width: 100%;
+  }
 
-    <!-- Titel -->
-    <h1 class="text-2xl sm:text-3xl font-bold mb-4">
-      {% trans "Thank you for your review!" %}
-    </h1>
+  .success-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10b981, #059669);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+    animation: scaleIn 0.5s ease;
+  }
 
-    <!-- Text -->
-    <p class="text-gray-300 mb-6 leading-relaxed">
+  @keyframes scaleIn {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .thankyou-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  .thankyou-text {
+    color: #666;
+    line-height: 1.7;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Google CTA Box */
+  .google-cta {
+    background: var(--bg);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 2px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .google-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4285F4, #34A853, #FBBC05, #EA4335);
+  }
+
+  .google-cta-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .google-cta-title i {
+    color: #fbbf24;
+  }
+
+  .google-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1f2937;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+  }
+
+  .google-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+  }
+
+  .google-btn i {
+    font-size: 1.25rem;
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #888;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+    gap: 0.75rem;
+  }
+
+  /* Confetti Animation */
+  .confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: #fbbf24;
+    position: absolute;
+    animation: fall linear forwards;
+  }
+
+  @keyframes fall {
+    to {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .thankyou-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .thankyou-title {
+      font-size: 1.6rem;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2.5rem;
+    }
+
+    .google-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="thankyou-page-container">
+  <div class="thankyou-card">
+    <div class="success-icon">
+      <i class="fas fa-check"></i>
+    </div>
+
+    <h1 class="thankyou-title">{% trans "Thank you for your review!" %}</h1>
+    
+    <p class="thankyou-text">
       {% trans "Your review has been submitted successfully and will be published shortly after approval." %}
     </p>
 
     <!-- Google CTA -->
-    <div class="bg-gray-800 rounded-xl p-5 mb-6">
-      <p class="font-semibold mb-3">
-        ⭐ {% trans "Rate us on Google as well" %}
-      </p>
-
-      <a href="https://g.page/r/CS8zMNPtOaaIEAE/review"
-         target="_blank"
+    <div class="google-cta">
+      <div class="google-cta-title">
+        <i class="fas fa-star"></i>
+        {% trans "Rate us on Google as well" %}
+      </div>
+      
+      <a href="https://g.page/r/CS8zMNPtOaaIEAE/review" 
+         target="_blank" 
          rel="noopener"
-         class="inline-block w-full sm:w-auto px-6 py-3 rounded-lg bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-semibold hover:opacity-90 transition">
+         class="google-btn">
+        <i class="fab fa-google"></i>
         {% trans "Leave a Google review" %}
       </a>
     </div>
 
-    <!-- Zurück -->
-    <a href="{% url 'home' %}"
-       class="text-sm text-gray-400 hover:text-white transition">
-      ← {% trans "Back to homepage" %}
+    <!-- Back Link -->
+    <a href="{% url 'home' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i>
+      {% trans "Back to homepage" %}
     </a>
-
   </div>
-</section>
+</div>
+
+<script>
+  // Simple confetti effect
+  document.addEventListener('DOMContentLoaded', () => {
+    const colors = ['#fbbf24', '#3a86ff', '#10b981', '#f44336', '#9C27B0'];
+    for (let i = 0; i < 50; i++) {
+      setTimeout(() => {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        confetti.style.opacity = Math.random();
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 5000);
+      }, i * 50);
+    }
+  });
+</script>
 {% endblock %}

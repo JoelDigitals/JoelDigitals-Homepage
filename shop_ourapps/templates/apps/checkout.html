@@ -1,4 +1,4 @@
-{% extends "base_shop.html" %}
+{% extends "base_home.html" %}
 {% load static %}
 {% load i18n %}
 
@@ -6,149 +6,689 @@
 
 {% block content %}
 <style>
-    .container {
-        background-color: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        max-width: 1000px;
-        margin: auto;
-        color: #000;
+  .checkout-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem; /* Padding für Mobile */
+    box-sizing: border-box;
+  }
+
+  .checkout-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 2rem 1.5rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .checkout-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #9C27B0, #E91E63);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .checkout-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+    word-break: break-word;
+  }
+
+  .checkout-subtitle {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .checkout-body {
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    overflow: hidden; /* Verhindert Overflow */
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+  }
+
+  .back-link:hover {
+    gap: 0.8rem;
+    color: var(--primary-hover);
+  }
+
+  /* Order Summary */
+  .summary-section {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    word-break: break-word;
+  }
+
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(0, 68, 204, 0.03);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .item-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0; /* Wichtig für Text-Overflow */
+  }
+
+  .item-qty {
+    background: var(--primary);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    min-width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .item-name {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.95rem;
+    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-pricing {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    font-size: 0.9rem;
+  }
+
+  .price-strike {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.85rem;
+  }
+
+  .price-final {
+    font-weight: 700;
+    color: #4CAF50;
+    font-size: 1rem;
+  }
+
+  .price-regular {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .discount-badge-small {
+    background: #fff0f0;
+    color: #c82333;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* Totals */
+  .totals-box {
+    background: linear-gradient(135deg, rgba(0, 68, 204, 0.05), rgba(0, 102, 255, 0.05));
+    border-radius: 10px;
+    padding: 1.25rem;
+    border: 2px solid var(--border);
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    gap: 1rem;
+  }
+
+  .total-row:last-child {
+    border-bottom: none;
+    border-top: 2px solid var(--primary);
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+  }
+
+  .total-label {
+    color: #666;
+    font-size: 0.95rem;
+  }
+
+  .total-value {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  .total-grand .total-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .total-grand .total-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .discount-line {
+    color: #4CAF50;
+  }
+
+  /* Form Styles - WICHTIGE FIXES */
+  .form-section {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    overflow: hidden; /* Verhindert Overflow */
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile: immer 1 Spalte */
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0; /* Verhindert Overflow */
+  }
+
+  .form-group.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    word-break: break-word;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%; /* Volle Breite */
+    max-width: 100%; /* Max Breite begrenzen */
+    padding: 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--surface);
+    color: var(--text);
+    transition: all 0.3s ease;
+    box-sizing: border-box; /* Wichtig für Padding */
+    -webkit-appearance: none; /* iOS Standard-Styles entfernen */
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.1);
+  }
+
+  .form-group input::placeholder {
+    color: #999;
+    font-size: 0.9rem;
+  }
+
+  /* Select Pfeil für Mobile */
+  .form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2rem;
+  }
+
+  .checkbox-group {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .checkbox-label:hover {
+    background: rgba(0, 68, 204, 0.05);
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: var(--primary);
+    flex-shrink: 0;
+    min-width: 20px; /* Verhindert Schrumpfen */
+  }
+
+  .checkbox-text {
+    color: #666;
+    line-height: 1.5;
+    font-size: 0.9rem;
+    word-break: break-word;
+    flex: 1;
+  }
+
+  .checkbox-text a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    word-break: break-word;
+  }
+
+  /* Submit Button */
+  .submit-section {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+
+  .btn-submit {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 16px rgba(0, 68, 204, 0.3);
+    width: 100%; /* Mobile: volle Breite */
+    max-width: 400px;
+    box-sizing: border-box;
+  }
+
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 68, 204, 0.4);
+  }
+
+  /* Empty State */
+  .empty-cart {
+    text-align: center;
+    padding: 3rem 1.5rem;
+  }
+
+  .empty-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto 1rem;
+    color: #ccc;
+  }
+
+  /* Desktop Styles */
+  @media (min-width: 768px) {
+    .checkout-container {
+      padding: 0;
+      margin: 2rem auto;
     }
-    h1, h2 {
-        color: #0044cc;
+
+    .checkout-header {
+      padding: 3rem 2.5rem;
     }
-    .form-input {
-        margin-bottom: 10px;
+
+    .header-icon {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
     }
-    .form-input input, textarea, select {
-        width: 100%;
-        padding: 8px;
-        margin-top: 5px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+
+    .checkout-title {
+      font-size: 2.2rem;
     }
-    .button {
-        background-color: #0044cc;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 16px;
-        display: inline-block;
-        margin-top: 20px;
+
+    .checkout-subtitle {
+      font-size: 1rem;
     }
-    .button:hover {
-        background-color: #0033a0;
+
+    .checkout-body {
+      padding: 2.5rem;
     }
-    .message {
-        padding: 10px;
-        margin-bottom: 20px;
-        border-radius: 5px;
+
+    .form-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
     }
-    .message.error { background-color: #f8d7da; color: #721c24; }
-    .message.success { background-color: #d4edda; color: #155724; }
-    .message.warning { background-color: #fff3cd; color: #856404; }
+
+    .btn-submit {
+      width: auto;
+      padding: 1rem 3rem;
+    }
+
+    .item-name {
+      font-size: 1rem;
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+    }
+  }
+
+  /* Extra kleine Screens */
+  @media (max-width: 380px) {
+    .checkout-container {
+      padding: 0 0.5rem;
+    }
+
+    .checkout-body {
+      padding: 1rem;
+    }
+
+    .checkout-title {
+      font-size: 1.5rem;
+    }
+
+    .item-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .item-pricing {
+      justify-content: flex-start;
+      width: 100%;
+    }
+  }
 </style>
-<div class="container">
-    <h1>{% trans "Checkout" %}</h1>
 
-    <h2>{% trans "Your Items" %}</h2>
-    <ul>
-        {% for item in items %}
-            <li style="margin-bottom: 0.5rem;">
-                {{ item.quantity }} × 
-                {% if "de" in lang %}{{ item.app.name }}{% else %}{{ item.app.name_english }}{% endif %}
-                {% if item.app.discount_percent > 0 %}
-                    <span style="text-decoration: line-through; color: #888; font-size: 0.95rem; margin-left: 10px;">
-                      €{{ item.app.price|floatformat:2 }}
-                    </span>
-                    <strong style="color: #198754; margin-left: 4px;">
-                      €{{ item.app.discounted_price|floatformat:2 }}
-                    </strong>
-                    <span style="
-                      display: inline-block;
-                      background-color: #fff0f0;
-                      color: #c82333;
-                      padding: 2px 6px;
-                      border-radius: 4px;
-                      font-size: 0.8rem;
-                      margin-left: 6px;
-                    ">
-                      🔖 {{ item.app.discount_percent }}%
-                    </span>
-                {% else %}
-                    – €{{ item.app.price|floatformat:2 }}
-                {% endif %}
-            </li>
-        {% empty %} 
-            <li>{% trans "Your cart is empty." %}</li>
-        {% endfor %}
-    </ul>
+<div class="checkout-container">
+  <!-- Header -->
+  <div class="checkout-header">
+    <div class="header-icon">
+      <i class="fas fa-credit-card"></i>
+    </div>
+    <h1 class="checkout-title">{% trans "Checkout" %}</h1>
+    <p class="checkout-subtitle">{% trans "Complete your purchase" %}</p>
+  </div>
 
-    <p><strong>{% trans "Subtotal" %}:</strong> €{{ subtotal|floatformat:2 }}</p>
-    <p id="discount-line" style="display: {% if discount_amount > 0 %}block{% else %}none{% endif %};">
-        <strong>{% trans "Discount" %}:</strong> -€<span id="discount-amount">{{ discount_amount|floatformat:2 }}</span>
-    </p>
-    <p><strong>{% trans "Total" %}:</strong> €<span id="total-amount">{{ total|floatformat:2 }}</span></p>
+  <!-- Body -->
+  <div class="checkout-body">
+    <a href="{% url 'cart_view' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i>
+      {% trans "Back to Cart" %}
+    </a>
 
-    <form method="post">
-        {% csrf_token %}
-        <div class="form-input"><label>{% trans "First Name" %}</label><input type="text" name="first_name" required></div>
-        <div class="form-input"><label>{% trans "Last Name" %}</label><input type="text" name="last_name" required></div>
-        <div class="form-input"><label>{% trans "Company Name (optional)" %}</label><input type="text" name="company_name"></div>
-        <div class="form-input"><label>{% trans "VAT Number (optional)" %}</label><input type="text" name="vat_number"></div>
-        <div class="form-input"><label>{% trans "Phone Number" %}</label><input type="text" name="phone" required></div>
-        <div class="form-input"><label>{% trans "Email" %}</label><input type="email" name="email" required></div>
-        <div class="form-input"><label>{% trans "Street Address" %}</label><input type="text" name="address" required></div>
-        <div class="form-input"><label>{% trans "ZIP / Postcode" %}</label><input type="text" name="zip_code" required></div>
-        <div class="form-input"><label>{% trans "City" %}</label><input type="text" name="city" required></div>
-        <div class="form-input"><label>{% trans "Affiliate Code" %}</label><input type="text" name="affiliate_code" placeholder="{% trans "Affiliate-Code" %}"></div>
-        <div class="form-input"><label>{% trans "Discount Code" %}</label><input type="text" name="discount_code" placeholder="{% trans "Discount code" %}" id="discount-code-input"></div>
-        <div class="form-input">
-            <label>{% trans "Payment Method" %}</label>
-            <select name="payment_method" required>
-                <option value="">{% trans "-- Please choose --" %}</option>
-                <option value="wallet">{% trans "Wallet" %} (Balance: €{{ wallet_balance|floatformat:2 }})</option>
-                <option value="paypal">PayPal</option>
-                <option value="stripe">{% trans "Apple Pay / Google Pay / Credit Card (Stripe)" %}</option>
-                <option value="bank_transfer">{% trans "Bank Transfer" %}</option>
-                <!--<option value="lastschrift">{% trans "SEPA LAstschrift" %}</option>-->
-            </select>
-        </div>
-
-        <script>
-        document.querySelector('select[name="payment_method"]').addEventListener('change', function() {
-            const lastschriftDiv = document.getElementById('lastschrift-details');
-            if (this.value === 'lastschrift') {
-                lastschriftDiv.style.display = 'block';
-                lastschriftDiv.querySelectorAll('input').forEach(i => i.required = true);
-            } else {
-                lastschriftDiv.style.display = 'none';
-                lastschriftDiv.querySelectorAll('input').forEach(i => i.required = false);
-            }
-        });
-        </script>
-
-        <div class="form-input">
-            <label style="display: flex; align-items: center;">
-                <input type="checkbox" name="accept_terms" required style="margin-right: 10px;">
-                {% trans "I have read and accept the" %} <a href="{% url 'terms' %}" target="_blank">{% trans "Terms and Conditions" %}</a>
-            </label>
-            <label style="display: flex; align-items: center;">
-                <input type="checkbox" name="accept_privacy" required style="margin-right: 10px;">
-                {% trans "I have read and accept the" %} <a href="{% url 'privacy' %}" target="_blank">{% trans "Privacy Policy" %}</a>
-            </label>
-            <!--<label style="display: flex; align-items: center;">
-                <input type="checkbox" name="accept_newsletter" style="margin-right: 10px;">
-                {% trans "I want to receive the newsletter" %}
-            </label>-->
-        </div>
+    {% if items %}
+      <!-- Order Summary -->
+      <div class="summary-section">
+        <h2 class="section-title">
+          <i class="fas fa-shopping-bag"></i>
+          {% trans "Your Items" %}
+        </h2>
         
-        <button class="button" type="submit">{% trans "Place Order" %}</button>
-    </form>
+        <div class="items-list">
+          {% for item in items %}
+            <div class="item-row">
+              <div class="item-info">
+                <span class="item-qty">{{ item.quantity }}</span>
+                <span class="item-name">
+                  {% if "de" in lang %}{{ item.app.name }}{% else %}{{ item.app.name_english }}{% endif %}
+                </span>
+              </div>
+              <div class="item-pricing">
+                {% if item.app.discount_percent > 0 %}
+                  <span class="price-strike">€{{ item.app.price|floatformat:2 }}</span>
+                  <span class="price-final">€{{ item.app.discounted_price|floatformat:2 }}</span>
+                  <span class="discount-badge-small">-{{ item.app.discount_percent }}%</span>
+                {% else %}
+                  <span class="price-regular">€{{ item.app.price|floatformat:2 }}</span>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="totals-box">
+          <div class="total-row">
+            <span class="total-label">{% trans "Subtotal" %}</span>
+            <span class="total-value">€{{ subtotal|floatformat:2 }}</span>
+          </div>
+          <div class="total-row discount-line" id="discount-line" style="display: {% if discount_amount > 0 %}flex{% else %}none{% endif %};">
+            <span class="total-label">{% trans "Discount" %}</span>
+            <span class="total-value" style="color: #4CAF50;">-€<span id="discount-amount">{{ discount_amount|floatformat:2 }}</span></span>
+          </div>
+          <div class="total-row total-grand">
+            <span class="total-label">{% trans "Total" %}</span>
+            <span class="total-value">€<span id="total-amount">{{ total|floatformat:2 }}</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Checkout Form -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i class="fas fa-user"></i>
+          {% trans "Billing Information" %}
+        </h2>
+
+        <form method="post" id="checkout-form">
+          {% csrf_token %}
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label>{% trans "First Name" %} *</label>
+              <input type="text" name="first_name" required placeholder="{% trans 'Max' %}">
+            </div>
+
+            <div class="form-group">
+              <label>{% trans "Last Name" %} *</label>
+              <input type="text" name="last_name" required placeholder="{% trans 'Mustermann' %}">
+            </div>
+
+            <div class="form-group">
+              <label>{% trans "Company" %} ({% trans "optional" %})</label>
+              <input type="text" name="company_name" placeholder="{% trans 'Company Ltd.' %}">
+            </div>
+
+            <div class="form-group">
+              <label>{% trans "VAT Number" %} ({% trans "optional" %})</label>
+              <input type="text" name="vat_number" placeholder="DE123456789">
+            </div>
+
+            <div class="form-group">
+              <label>{% trans "Phone" %} *</label>
+              <input type="tel" name="phone" required placeholder="+49 123 456789">
+            </div>
+
+            <div class="form-group">
+              <label>{% trans "Email" %} *</label>
+              <input type="email" name="email" required placeholder="max@example.com">
+            </div>
+
+            <div class="form-group full-width">
+              <label>{% trans "Street Address" %} *</label>
+              <input type="text" name="address" required placeholder="{% trans 'Main Street 123' %}">
+            </div>
+
+            <div class="form-group">
+              <label>{% trans "ZIP Code" %} *</label>
+              <input type="text" name="zip_code" required placeholder="12345">
+            </div>
+
+            <div class="form-group">
+              <label>{% trans "City" %} *</label>
+              <input type="text" name="city" required placeholder="{% trans 'Berlin' %}">
+            </div>
+
+            <div class="form-group">
+              <label>{% trans "Affiliate Code" %}</label>
+              <input type="text" name="affiliate_code" placeholder="{% trans 'Partner2024' %}">
+            </div>
+
+            <div class="form-group">
+              <label>{% trans "Discount Code" %}</label>
+              <input type="text" name="discount_code" id="discount-code-input" placeholder="{% trans 'SAVE20' %}">
+            </div>
+
+            <div class="form-group full-width">
+              <label>{% trans "Payment Method" %} *</label>
+              <select name="payment_method" required>
+                <option value="">{% trans "-- Please choose --" %}</option>
+                <option value="wallet">
+                  {% trans "Wallet" %} ({{ wallet_balance|floatformat:2 }} €)
+                </option>
+                <option value="paypal">PayPal</option>
+                <option value="stripe">
+                  {% trans "Card / Apple Pay / Google Pay" %}
+                </option>
+                <option value="bank_transfer">
+                  {% trans "Bank Transfer" %}
+                </option>
+              </select>
+            </div>
+
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" name="accept_terms" required>
+                <span class="checkbox-text">
+                  {% trans "I accept the" %} 
+                  <a href="{% url 'terms' %}" target="_blank">{% trans "Terms of Service" %}</a> *
+                </span>
+              </label>
+
+              <label class="checkbox-label">
+                <input type="checkbox" name="accept_privacy" required>
+                <span class="checkbox-text">
+                  {% trans "I accept the" %} 
+                  <a href="{% url 'privacy' %}" target="_blank">{% trans "Privacy Policy" %}</a> *
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="submit-section">
+            <button type="submit" class="btn-submit">
+              <i class="fas fa-lock"></i>
+              {% trans "Place Order" %}
+            </button>
+          </div>
+        </form>
+      </div>
+
+    {% else %}
+      <div class="empty-cart">
+        <div class="empty-icon">
+          <i class="fas fa-shopping-basket"></i>
+        </div>
+        <h2>{% trans "Your cart is empty" %}</h2>
+        <p>{% trans "Add some items before checking out" %}</p>
+        <br>
+        <a href="{% url 'shop' %}" class="btn-submit" style="text-decoration: none;">
+          <i class="fas fa-store"></i>
+          {% trans "Browse Shop" %}
+        </a>
+      </div>
+    {% endif %}
+  </div>
 </div>
 
 <script>
@@ -176,19 +716,16 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(response => response.json())
             .then(data => {
                 if (data.valid) {
-                    discountLine.style.display = "block";
+                    discountLine.style.display = "flex";
                     discountAmount.textContent = parseFloat(data.discount).toFixed(2);
                     totalAmount.textContent = parseFloat(data.new_total).toFixed(2);
                 } else {
                     discountLine.style.display = "none";
                     discountAmount.textContent = "0.00";
                     totalAmount.textContent = "{{ total|floatformat:2 }}";
-                    if (discountInput.value.trim()) {
-                        alert(data.message);
-                    }
                 }
             });
-        }, 500); // debounce
+        }, 500);
     });
 });
 </script>

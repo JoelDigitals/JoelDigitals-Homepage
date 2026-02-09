@@ -6,84 +6,421 @@
 
 {% block content %}
 <style>
-main {
-    padding: 40px 20px;
-    max-width: 1000px;
-    margin: auto;
-    flex: 1;
-}
+  .status-page-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
 
-.container {
-    background-color: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    color: #000;
-}
+  .status-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 4rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-h1, h2 {
-    color: #0044cc;
-}
+  .status-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
 
-ul {
-    list-style-type: none;
-    padding-left: 0;
-}
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
 
-.app-button {
-    display: inline-block;
-    margin: 8px;
-    padding: 10px 20px;
-    background-color: #0044cc;
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
     color: white;
-    border: none;
-    border-radius: 6px;
+    margin: 0 auto 1.5rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .status-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .status-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .status-body {
+    background: var(--surface);
+    padding: 3rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
     text-decoration: none;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
 
-.app-button:hover {
-    background-color: #002f99;
-}
+  .back-link:hover {
+    color: var(--primary);
+  }
 
-@media (max-width: 600px) {
-    .container {
-        padding: 20px;
+  /* Quick Actions */
+  .quick-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
+
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 68, 204, 0.4);
+  }
+
+  /* Status Sections */
+  .status-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .status-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+  }
+
+  .section-icon.global {
+    background: linear-gradient(135deg, #f44336, #c62828);
+  }
+
+  .section-icon.apps {
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  /* Issue Cards */
+  .issues-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .issue-card {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border-left: 4px solid #f44336;
+    border: 2px solid var(--border);
+    transition: all 0.3s ease;
+  }
+
+  .issue-card:hover {
+    border-color: #f44336;
+    box-shadow: 0 8px 24px rgba(244, 67, 54, 0.1);
+  }
+
+  .issue-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .issue-title i {
+    color: #f44336;
+  }
+
+  .issue-desc {
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Empty State */
+  .empty-state {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    border: 2px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    color: #10b981;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state-text {
+    color: #10b981;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  /* Apps Grid */
+  .apps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .app-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.3s ease;
+  }
+
+  .app-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 68, 204, 0.15);
+  }
+
+  .app-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .app-info {
+    flex: 1;
+  }
+
+  .app-name {
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+
+  .app-status {
+    font-size: 0.875rem;
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .app-status i {
+    font-size: 0.6rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .status-page-container {
+      margin: 1rem auto;
     }
-}
 
-@media (max-width: 400px) {
-    h1, h2 {
-        font-size: 24px;
+    .status-header {
+      padding: 3rem 1.5rem;
     }
-}
+
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
+    }
+
+    .status-title {
+      font-size: 2rem;
+    }
+
+    .status-body {
+      padding: 2rem 1.5rem;
+    }
+
+    .quick-actions {
+      flex-direction: column;
+    }
+
+    .action-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .apps-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .status-title {
+      font-size: 1.6rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+    }
+  }
 </style>
 
-<main>
-    <div class="container">
-        <h1>{% trans "System Status" %}</h1>
-
-        <a href="{% url 'speedtest_form' %}" class="app-button">{% trans "Speedtest" %}</a>
-
-        <h2>{% trans "Global Issues" %}</h2>
-        {% if global_issues %}
-            <ul>
-                {% for issue in global_issues %}
-                    <li><strong>{{ issue.title }}</strong>: {{ issue.description }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>{% trans "No global issues reported." %}</p>
-        {% endif %}
-
-        <h2>{% trans "Apps" %}</h2>
-        <div>
-            {% for app in apps %}
-                <a href="{% url 'app_detail' app.id %}" class="app-button">{{ app.name }}</a>
-            {% endfor %}
-        </div>
+<div class="status-page-container">
+  <!-- Header -->
+  <div class="status-header">
+    <div class="header-icon">
+      <i class="fas fa-server"></i>
     </div>
-</main>
+    <h1 class="status-title">{% trans "System Status" %}</h1>
+    <p class="status-subtitle">{% trans "Real-time overview of our services" %}</p>
+  </div>
+
+  <!-- Body -->
+  <div class="status-body">
+    <a href="{% url 'home' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> {% trans "Back to Home" %}
+    </a>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <a href="{% url 'speedtest_form' %}" class="action-btn">
+        <i class="fas fa-tachometer-alt"></i> {% trans "Speedtest" %}
+      </a>
+    </div>
+
+    <!-- Global Issues -->
+    <div class="status-section">
+      <div class="section-header">
+        <div class="section-icon global">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h2 class="section-title">{% trans "Global Issues" %}</h2>
+      </div>
+
+      {% if global_issues %}
+        <div class="issues-list">
+          {% for issue in global_issues %}
+            <div class="issue-card">
+              <div class="issue-title">
+                <i class="fas fa-bug"></i>
+                {{ issue.title }}
+              </div>
+              <p class="issue-desc">{{ issue.description }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-check-circle"></i>
+          <p class="empty-state-text">{% trans "No global issues reported. All systems operational." %}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Apps -->
+    <div class="status-section">
+      <div class="section-header">
+        <div class="section-icon apps">
+          <i class="fas fa-rocket"></i>
+        </div>
+        <h2 class="section-title">{% trans "Apps & Services" %}</h2>
+      </div>
+
+      <div class="apps-grid">
+        {% for app in apps %}
+          <a href="{% url 'app_detail' app.id %}" class="app-card">
+            <div class="app-icon">
+              <i class="fas fa-cube"></i>
+            </div>
+            <div class="app-info">
+              <div class="app-name">{{ app.name }}</div>
+              <div class="app-status">
+                <i class="fas fa-circle"></i> {% trans "Operational" %}
+              </div>
+            </div>
+          </a>
+        {% empty %}
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <i class="fas fa-cubes"></i>
+            <p class="empty-state-text">{% trans "No apps available." %}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

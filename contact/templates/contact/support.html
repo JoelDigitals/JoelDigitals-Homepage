@@ -1,147 +1,495 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Support & Tickets – Joel Digitals{% endblock %}
+{% block title %}{% trans "Support & Tickets" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    body, .support-container {
-        font-family: Arial, sans-serif;
-        color: #000;
+  .support-page-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .support-header {
+    background: linear-gradient(135deg, #f44336, #c62828);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .support-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .support-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .support-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .support-body {
+    background: var(--surface);
+    padding: 2.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: #f44336;
+  }
+
+  /* Form Styling */
+  .support-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #f44336;
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+  }
+
+  .form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .form-group .helptext {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.25rem;
+  }
+
+  .form-group .errorlist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    color: #f44336;
+    font-size: 0.875rem;
+  }
+
+  .submit-btn {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #f44336, #c62828);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    align-self: flex-start;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+  }
+
+  /* Tickets Section */
+  .tickets-section {
+    margin-top: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-title i {
+    color: #f44336;
+  }
+
+  .tickets-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .ticket-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ticket-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #f44336, #c62828);
+  }
+
+  .ticket-card.resolved::before {
+    background: linear-gradient(180deg, #4CAF50, #2E7D32);
+  }
+
+  .ticket-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border-color: #f44336;
+  }
+
+  .ticket-card.resolved:hover {
+    border-color: #4CAF50;
+  }
+
+  .ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .ticket-subject {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 1.15rem;
+    margin: 0;
+  }
+
+  .ticket-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-open {
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+    border: 1px solid rgba(244, 67, 54, 0.2);
+  }
+
+  .status-resolved {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.2);
+  }
+
+  .ticket-description {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .ticket-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #888;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .meta-item i {
+    color: #f44336;
+    font-size: 0.875rem;
+  }
+
+  .ticket-card.resolved .meta-item i {
+    color: #4CAF50;
+  }
+
+  .chat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+
+  .chat-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 2px dashed var(--border);
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    color: var(--border);
+    margin-bottom: 1rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .support-page-container {
+      margin: 1rem auto;
     }
 
-    .support-container {
-        max-width: 1000px;
-        margin: 40px auto;
-        background-color: #fff;
-        padding: 40px 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
+    .support-header {
+      padding: 2rem 1.5rem;
     }
 
-    h2 {
-        color: #0044cc;
-        font-weight: 700;
-        font-size: 2.2rem;
-        margin-top: 0;
-        margin-bottom: 20px;
-        text-align: center;
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
     }
 
-    form {
-        margin-bottom: 40px;
+    .support-title {
+      font-size: 1.6rem;
     }
 
-    form label {
-        display: block;
-        margin-top: 10px;
-        font-weight: 600;
+    .support-body {
+      padding: 1.5rem;
     }
 
-    input[type="text"], input[type="email"], textarea {
-        width: 100%;
-        padding: 10px;
-        margin-top: 5px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        font-size: 1rem;
-        box-sizing: border-box;
-        font-family: inherit;
+    .submit-btn {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .support-title {
+      font-size: 1.4rem;
     }
 
-    button.btn, input[type="submit"] {
-        background-color: #0044cc;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1.1rem;
-        margin-top: 20px;
-        transition: background-color 0.3s ease;
+    .ticket-header {
+      flex-direction: column;
     }
 
-    button.btn:hover, input[type="submit"]:hover {
-        background-color: #0033a0;
+    .ticket-meta {
+      flex-direction: column;
+      gap: 0.5rem;
     }
-
-    section {
-        margin-bottom: 40px;
-    }
-
-    .ticket {
-        background-color: white;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .status-open {
-        color: red;
-        font-weight: 700;
-    }
-
-    .status-resolved {
-        color: green;
-        font-weight: 700;
-    }
-
-    small {
-        display: block;
-        margin-top: 5px;
-        color: #555;
-    }
-
-    a.btn {
-        display: inline-block;
-        margin-top: 10px;
-        text-decoration: none;
-    }
-
-    /* Responsive */
-    @media (max-width: 600px) {
-        .support-container {
-            padding: 30px 20px;
-        }
-        h2 {
-            font-size: 1.8rem;
-        }
-    }
+  }
 </style>
 
-<div class="support-container">
-    <h2>🛠️ Support & Ticketsystem</h2>
+<div class="support-page-container">
+  <!-- Header -->
+  <div class="support-header">
+    <div class="header-icon">
+      <i class="fas fa-tools"></i>
+    </div>
+    <h1 class="support-title">{% trans "Support & Tickets" %}</h1>
+    <p class="support-subtitle">{% trans "Create a ticket and our team will help you" %}</p>
+  </div>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Ticket absenden">
+  <!-- Body -->
+  <div class="support-body">
+    <a href="{% url 'contactz_home' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> {% trans "Back to Contact Center" %}
+    </a>
+
+    <!-- Ticket Form -->
+    <form method="post" class="support-form" novalidate>
+      {% csrf_token %}
+      
+      {% for field in form %}
+      <div class="form-group">
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.help_text %}
+        <span class="helptext">{{ field.help_text }}</span>
+        {% endif %}
+        {% if field.errors %}
+        <ul class="errorlist">
+          {% for error in field.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <button type="submit" class="submit-btn">
+        <i class="fas fa-paper-plane"></i> {% trans "Submit Ticket" %}
+      </button>
     </form>
 
-    <section>
-        <h3>📋 Deine Tickets</h3>
-        {% if tickets %}
-            {% for ticket in tickets %}
-                <div class="ticket"> 
-                    <strong>{{ ticket.subject }}</strong> – 
-                    <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
-                        {% if ticket.is_resolved %}Gelöst{% else %}Offen{% endif %}
-                    </span>
-                    <p>{{ ticket.description|linebreaks }}</p>
-                    <small>Ticket-ID: {{ ticket.ticket_number }} | Erstellt am {{ ticket.created_at|date:"d.m.Y H:i" }}</small>
-                    <small>App: {{ ticket.app_name }} | Plattform: {{ ticket.platform }}</small>
-                    {% if ticket.is_resolved %}
-                        <small>Gelöst am {{ ticket.resolved_at|date:"d.m.Y H:i" }}</small>
-                    {% endif %}
-                    {% if not ticket.is_archived %}
-                        <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">Zum Ticket-Chat</a>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>Du hast noch keine Support-Tickets eingereicht.</p>
-        {% endif %}
-    </section>
+    <!-- Tickets List -->
+    <div class="tickets-section">
+      <h2 class="section-title">
+        <i class="fas fa-clipboard-list"></i>
+        {% trans "Your Tickets" %}
+      </h2>
+
+      {% if tickets %}
+        <div class="tickets-grid">
+          {% for ticket in tickets %}
+            <div class="ticket-card {% if ticket.is_resolved %}resolved{% endif %}">
+              <div class="ticket-header">
+                <h3 class="ticket-subject">{{ ticket.subject }}</h3>
+                <span class="ticket-status {% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
+                  <i class="fas fa-{% if ticket.is_resolved %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+                  {% if ticket.is_resolved %}{% trans "Resolved" %}{% else %}{% trans "Open" %}{% endif %}
+                </span>
+              </div>
+              
+              <div class="ticket-description">
+                {{ ticket.description|linebreaks }}
+              </div>
+
+              <div class="ticket-meta">
+                <span class="meta-item">
+                  <i class="fas fa-hashtag"></i>
+                  {{ ticket.ticket_number }}
+                </span>
+                <span class="meta-item">
+                  <i class="fas fa-calendar"></i>
+                  {{ ticket.created_at|date:"d.m.Y H:i" }}
+                </span>
+                <span class="meta-item">
+                  <i class="fas fa-mobile-alt"></i>
+                  {{ ticket.app_name }} ({{ ticket.platform }})
+                </span>
+                {% if ticket.is_resolved and ticket.resolved_at %}
+                <span class="meta-item">
+                  <i class="fas fa-check"></i>
+                  {% trans "Resolved" %}: {{ ticket.resolved_at|date:"d.m.Y H:i" }}
+                </span>
+                {% endif %}
+              </div>
+
+              {% if not ticket.is_archived %}
+                <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="chat-btn">
+                  <i class="fas fa-comments"></i> {% trans "Open Chat" %}
+                </a>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <p>{% trans "You haven't submitted any support tickets yet." %}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

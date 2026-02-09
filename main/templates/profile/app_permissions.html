@@ -131,17 +131,15 @@
   }
 
   .app-icon {
-    width: 60px;
-    height: 60px;
+    width: 48px;
+    height: 48px;
+  }
+  
+  .app-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 12px;
-    background: linear-gradient(135deg, var(--primary), #0066ff);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    color: white;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.2);
   }
 
   .app-details {
@@ -503,7 +501,7 @@
             <div class="app-card-header">
               <div class="app-info">
                 <div class="app-icon">
-                  <i class="fas fa-cube"></i>
+                  <img src="{{ auth.client.app.image.url }}" alt="{{ app.name }}">
                 </div>
                 <div class="app-details">
                   <h3 class="app-name">{{ auth.client.name }}</h3>

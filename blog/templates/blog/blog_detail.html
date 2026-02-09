@@ -1,228 +1,634 @@
 {% extends "base_home.html" %}
-{% load static i18n %}
+{% load static %}
+{% load i18n %}
 
 {% block title %}{{ post.title }} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    .post-container {
-        background-color: #fff;
-        color: #000;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-        max-width: 1000px;
-        margin: auto;
-        word-wrap: break-word;
+  .blog-detail-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  /* Article Header */
+  .article-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .article-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: white;
+    gap: 0.75rem;
+  }
+
+  .article-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 1rem 0;
+    line-height: 1.3;
+  }
+
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Article Body */
+  .article-body {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Featured Image */
+  .featured-image {
+    width: 100%;
+    margin: 0 0 2rem 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+  }
+
+  .featured-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    max-height: 500px;
+  }
+
+  /* Article Content */
+  .article-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text);
+  }
+
+  .article-content h2,
+  .article-content h3,
+  .article-content h4 {
+    color: var(--text);
+    margin: 2rem 0 1rem 0;
+  }
+
+  .article-content p {
+    margin-bottom: 1.5rem;
+  }
+
+  .article-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+  }
+
+  .article-content a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+
+  .article-content a:hover {
+    text-decoration: underline;
+  }
+
+  .article-content blockquote {
+    border-left: 4px solid var(--primary);
+    padding-left: 1.5rem;
+    margin: 1.5rem 0;
+    color: #666;
+    font-style: italic;
+  }
+
+  .article-content ul,
+  .article-content ol {
+    margin-bottom: 1.5rem;
+    padding-left: 2rem;
+  }
+
+  .article-content li {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Comments Section */
+  .comments-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border);
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .comment-form {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.1);
+  }
+
+  .btn-submit {
+    background: var(--primary);
+    color: white;
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-submit:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
+
+  .login-prompt {
+    background: var(--bg);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .login-prompt a {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  /* Comments List */
+  .comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .comment {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+  }
+
+  .comment:hover {
+    border-color: var(--primary);
+  }
+
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .comment-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .author-name {
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .comment-date {
+    color: #999;
+    font-size: 0.85rem;
+  }
+
+  .comment-text {
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .btn-show-more {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .btn-show-more:hover {
+    background: var(--primary);
+    color: white;
+  }
+
+  /* Related Posts */
+  .related-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border);
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .related-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .related-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(0, 68, 204, 0.15);
+  }
+
+  .related-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+  }
+
+  .related-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .related-card:hover .related-image img {
+    transform: scale(1.05);
+  }
+
+  .related-content {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .related-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.75rem 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .related-teaser {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+  }
+
+  .btn-read {
+    background: var(--primary);
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    align-self: flex-start;
+  }
+
+  .btn-read:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .blog-detail-container {
+      margin: 1rem auto;
     }
 
-    .post-container img {
-        width: 100%;
-        height: auto;
-        border-radius: 10px;
-        margin: 20px 0;
-        object-fit: contain; /* 1:1 Darstellung */
-        background-color: #f9f9f9;
+    .article-header {
+      padding: 2rem 1.5rem;
     }
 
-    h2 {
-        font-size: 2em;
-        font-weight: 700;
-        margin-bottom: 10px;
+    .article-title {
+      font-size: 1.6rem;
     }
 
-    .btn {
-        background-color: #0044cc;
-        color: #fff !important;
-        padding: 10px 16px;
-        border-radius: 6px;
-        text-decoration: none;
-        display: inline-block;
-        margin-top: 20px;
-        transition: background-color 0.3s ease;
+    .article-body {
+      padding: 1.5rem;
     }
 
-    .btn:hover {
-        background-color: #002f99;
+    .article-content {
+      font-size: 1rem;
     }
 
-    /* Kommentare */
-    .comments {
-        margin-top: 40px;
-        border-top: 1px solid #ddd;
-        padding-top: 25px;
+    .comment-header {
+      flex-direction: column;
+      align-items: flex-start;
     }
 
-    .comments h3 {
-        font-size: 1.5em;
-        font-weight: 600;
-        margin-bottom: 15px;
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .article-title {
+      font-size: 1.4rem;
     }
 
-    .comment {
-        margin-top: 15px;
-        padding: 15px;
-        background-color: #f8f8f8;
-        border-radius: 8px;
+    .article-meta {
+      flex-direction: column;
+      gap: 0.5rem;
     }
+  }
 
-    .comment strong {
-        color: #0044cc;
+  /* Fallback */
+  @supports not (aspect-ratio: 16 / 9) {
+    .related-image {
+      position: relative;
+      height: 0;
+      padding-top: 56.25%;
     }
-
-    .show-more {
-        background: none;
-        border: none;
-        color: #0044cc;
-        cursor: pointer;
-        font-weight: 600;
-        margin-top: 10px;
-        transition: color 0.3s;
+    .related-image img {
+      position: absolute;
+      top: 0;
+      left: 0;
     }
-
-    .show-more:hover {
-        color: #002f99;
-    }
-
-    /* Kommentarformular */
-    form {
-        margin-top: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    form input, form textarea {
-        width: 100%;
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-    }
-
-    /* Related posts */
-    .related {
-        margin-top: 60px;
-    }
-
-    .related h3 {
-        font-size: 1.4em;
-        font-weight: 600;
-        margin-bottom: 15px;
-    }
-
-    .blog-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
-    }
-
-    .blog-card {
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        overflow: hidden;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .blog-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-    }
-
-    .blog-card img {
-        width: 100%;
-        height: 180px;
-        object-fit: cover;
-        background-color: #f2f2f2;
-    }
-
-    .blog-card-content {
-        padding: 15px;
-    }
-
-    @media (max-width: 768px) {
-        .post-container {
-            padding: 20px;
-        }
-    }
+  }
 </style>
 
-<main>
-    <div class="post-container">
-        <h2>{{ post.title }}</h2>
-        <p><em>{% trans "Published on" %} {{ post.published_at|date:"d.m.Y H:i" }}</em></p>
-        <p><strong>👁️ {% trans "Views" %}:</strong> {{ post.views }}</p>
-
-        {% if post.teaser_image %}
-            <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}">
+<div class="blog-detail-container">
+  <!-- Article Header -->
+  <header class="article-header">
+    <div class="header-content">
+      <a href="{% url 'blog_list' %}" class="back-link">
+        <i class="fas fa-arrow-left"></i> {% trans "Back to Blog" %}
+      </a>
+      
+      <h1 class="article-title">{{ post.title }}</h1>
+      
+      <div class="article-meta">
+        <span class="meta-item">
+          <i class="fas fa-calendar-alt"></i>
+          {{ post.published_at|date:"d.m.Y" }}
+        </span>
+        <span class="meta-item">
+          <i class="fas fa-eye"></i>
+          {{ post.views }} {% trans "views" %}
+        </span>
+        {% if post.category %}
+          <span class="meta-item">
+            <i class="fas fa-folder"></i>
+            {{ post.category.name }}
+          </span>
         {% endif %}
-
-        <div>
-            {{ post.content|safe }}
-        </div>
-
-        <a href="{% url 'blog_list' %}" class="btn">← {% trans "Back to Blog Overview" %}</a>
-
-        <div class="comments">
-            <h3>💬 {% trans "Comments" %}</h3>
-
-            {% if user.is_authenticated %}
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn">{% trans "Submit Comment" %}</button>
-            </form>
-            {% else %}
-                <p><a href="{% url 'login' %}">{% trans "Log in" %}</a> {% trans "to write a comment." %}</p>
-            {% endif %}
-
-            <div id="comment-list">
-                {% for comment in comments %}
-                    <div class="comment" {% if forloop.counter > 2 %}style="display:none;"{% endif %}>
-                        <strong>{{ comment.user.username }}</strong> {% trans "on" %} {{ comment.created_at|date:"d.m.Y H:i" }}<br>
-                        {{ comment.text|linebreaks }}
-                    </div>
-                {% empty %}
-                    <p>{% trans "No comments yet." %}</p>
-                {% endfor %}
-            </div>
-
-            {% if comments|length > 2 %}
-                <button id="showMoreBtn" class="show-more">{% trans "Show more comments" %}</button>
-            {% endif %}
-        </div>
-
-        <div class="related">
-            <h3>📖 {% trans "Read next" %}</h3>
-            <div class="blog-grid">
-                {% for next_post in related_posts %}
-                    <div class="blog-card">
-                        {% if next_post.teaser_image %}
-                            <img src="{{ next_post.teaser_image.url }}" alt="{{ next_post.title }}">
-                        {% endif %}
-                        <div class="blog-card-content">
-                            <h4>{{ next_post.title }}</h4>
-                            <p>{{ next_post.teaser_text|safe }}</p>
-                            <a href="{% url 'blog_detail' next_post.pk %}" class="btn">{% trans "Read" %}</a>
-                        </div>
-                    </div>
-                {% empty %}
-                    <p>{% trans "No further articles found." %}</p>
-                {% endfor %}
-            </div>
-        </div>
+      </div>
     </div>
-</main>
+  </header>
+
+  <!-- Article Body -->
+  <article class="article-body">
+    {% if post.teaser_image %}
+      <div class="featured-image">
+        <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}">
+      </div>
+    {% endif %}
+
+    <div class="article-content">
+      {{ post.content|safe }}
+    </div>
+
+    <!-- Comments -->
+    <section class="comments-section">
+      <h2 class="section-title">
+        <i class="fas fa-comments"></i>
+        {% trans "Comments" %}
+        {% if comments %}<span style="color: #999; font-size: 1rem;">({{ comments|length }})</span>{% endif %}
+      </h2>
+
+      {% if user.is_authenticated %}
+        <form method="post" class="comment-form">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="{{ form.text.id_for_label }}">{% trans "Your comment" %}</label>
+            {{ form.text }}
+          </div>
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-paper-plane"></i> {% trans "Submit Comment" %}
+          </button>
+        </form>
+      {% else %}
+        <div class="login-prompt">
+          <i class="fas fa-lock" style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem; display: block;"></i>
+          <p>
+            <a href="{% url 'login' %}">{% trans "Log in" %}</a> 
+            {% trans "to write a comment." %}
+          </p>
+        </div>
+      {% endif %}
+
+      <div class="comments-list" id="comment-list">
+        {% for comment in comments %}
+          <div class="comment" {% if forloop.counter > 3 %}style="display:none;"{% endif %}>
+            <div class="comment-header">
+              <div class="comment-author">
+                <div class="author-avatar">
+                  {{ comment.user.username|first|upper }}
+                </div>
+                <span class="author-name">{{ comment.user.username }}</span>
+              </div>
+              <span class="comment-date">
+                <i class="fas fa-clock"></i> {{ comment.created_at|date:"d.m.Y H:i" }}
+              </span>
+            </div>
+            <p class="comment-text">{{ comment.text|linebreaks }}</p>
+          </div>
+        {% empty %}
+          <p style="text-align: center; color: #999; padding: 2rem;">
+            <i class="fas fa-comment-slash" style="font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.3;"></i>
+            {% trans "No comments yet. Be the first!" %}
+          </p>
+        {% endfor %}
+      </div>
+
+      {% if comments|length > 3 %}
+        <button id="showMoreBtn" class="btn-show-more">
+          <i class="fas fa-chevron-down"></i> {% trans "Show more comments" %}
+        </button>
+      {% endif %}
+    </section>
+
+    <!-- Related Posts -->
+    {% if related_posts %}
+      <section class="related-section">
+        <h2 class="section-title">
+          <i class="fas fa-book-open"></i>
+          {% trans "Read next" %}
+        </h2>
+        
+        <div class="related-grid">
+          {% for next_post in related_posts %}
+            <article class="related-card">
+              {% if next_post.teaser_image %}
+                <div class="related-image">
+                  <img src="{{ next_post.teaser_image.url }}" alt="{{ next_post.title }}">
+                </div>
+              {% endif %}
+              <div class="related-content">
+                <h3 class="related-title">{{ next_post.title }}</h3>
+                <p class="related-teaser">{{ next_post.teaser_text|striptags|safe }}</p>
+                <a href="{% url 'blog_detail' next_post.pk %}" class="btn-read">
+                  {% trans "Read" %} <i class="fas fa-arrow-right"></i>
+                </a>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  </article>
+</div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const btn = document.getElementById("showMoreBtn");
-        if (btn) {
-            btn.addEventListener("click", () => {
-                document.querySelectorAll("#comment-list .comment").forEach(el => el.style.display = "block");
-                btn.style.display = "none";
-            });
-        }
-    });
+  document.addEventListener("DOMContentLoaded", function() {
+    const btn = document.getElementById("showMoreBtn");
+    if (btn) {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#comment-list .comment").forEach(el => {
+          el.style.display = "block";
+          el.style.animation = "fadeIn 0.3s ease";
+        });
+        btn.style.display = "none";
+      });
+    }
+  });
 </script>
 {% endblock %}

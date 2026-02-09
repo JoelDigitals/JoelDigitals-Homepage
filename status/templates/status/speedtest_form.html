@@ -1,77 +1,76 @@
 {% extends "base_home.html" %}
+{% load static %}
 {% load i18n %}
-{% block title %}{% trans "Website-Analyse" %} – Joel Digitals{% endblock %}
+
+{% block title %}{% trans "Website Analysis" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-  :root {
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --bg-dark: #0a0a0a;
-    --bg-card: #111111;
-    --border-subtle: #2a2a2a;
-    --border-hover: #3a3a3a;
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0a0;
-    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-    --shadow-glow: 0 0 40px rgba(102, 126, 234, 0.15);
+  .analysis-page-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
   }
 
-  .analysis-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-  }
-
-  /* Hero Section */
-  .hero-section {
-    background: var(--primary-gradient);
-    border-radius: 24px;
+  .analysis-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
     padding: 4rem 2rem;
-    margin: 2rem 0 3rem;
+    border-radius: 16px 16px 0 0;
     text-align: center;
     position: relative;
     overflow: hidden;
-    box-shadow: var(--shadow-lg), 0 0 60px rgba(102, 126, 234, 0.2);
   }
 
-  .hero-section::before {
+  .analysis-header::before {
     content: '';
     position: absolute;
     top: -50%;
-    left: -50%;
+    right: -50%;
     width: 200%;
     height: 200%;
     background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: rotate 20s linear infinite;
+    animation: pulse 15s ease-in-out infinite;
   }
 
-  @keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
   }
 
-  .hero-content {
+  .header-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     position: relative;
     z-index: 1;
   }
 
-  .hero-title {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 800;
+  .analysis-title {
+    font-size: 2.5rem;
+    font-weight: 700;
     color: white;
-    margin-bottom: 1rem;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
   }
 
-  .hero-subtitle {
-    font-size: 1.25rem;
-    color: rgba(255,255,255,0.9);
-    margin-bottom: 2rem;
+  .analysis-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
     max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto 2rem;
   }
 
   .badge-container {
@@ -79,72 +78,102 @@
     justify-content: center;
     gap: 1rem;
     flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
   }
 
   .badge {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 12px;
-    padding: 0.75rem 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    padding: 0.625rem 1.25rem;
     color: white;
     font-weight: 600;
     font-size: 0.9rem;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    transition: all 0.3s ease;
   }
 
-  .badge:hover {
-    background: rgba(255,255,255,0.25);
-    transform: translateY(-2px);
+  .analysis-body {
+    background: var(--surface);
+    padding: 3rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
-  /* Main Grid Layout */
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+  }
+
+  /* Main Grid */
   .main-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 2rem;
     margin-bottom: 3rem;
   }
 
-  @media (min-width: 1024px) {
+  @media (max-width: 968px) {
     .main-grid {
-      grid-template-columns: 1fr 1.2fr;
-      align-items: start;
+      grid-template-columns: 1fr;
     }
   }
 
-  /* Card Component */
+  /* Cards */
   .glass-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: 20px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
     padding: 2rem;
-    box-shadow: var(--shadow-md);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
   }
 
   .glass-card:hover {
-    border-color: var(--border-hover);
-    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(0, 68, 204, 0.1);
   }
 
   .card-header {
-    margin-bottom: 1.5rem;
-  }
-
-  .card-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    margin-bottom: 1.5rem;
   }
 
-  /* Form Styling */
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+  }
+
+  .card-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  /* Form */
   .analysis-form {
     display: flex;
     flex-direction: column;
@@ -158,99 +187,79 @@
   }
 
   .input-label {
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: var(--text);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.5px;
   }
 
   .url-input {
     width: 100%;
-    background: #1a1a1a;
-    border: 2px solid var(--border-subtle);
-    border-radius: 16px;
-    padding: 1.25rem 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     font-size: 1rem;
-    color: var(--text-primary);
+    color: var(--text);
     transition: all 0.3s ease;
+    box-sizing: border-box;
   }
 
   .url-input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    background: #0f0f0f;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.1);
   }
 
   .url-input::placeholder {
-    color: #666;
+    color: #888;
   }
 
   .input-hint {
     font-size: 0.875rem;
-    color: #666;
+    color: #888;
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
 
   .submit-btn {
-    background: var(--primary-gradient);
+    background: linear-gradient(135deg, var(--primary), #0066ff);
     color: white;
     border: none;
-    border-radius: 16px;
-    padding: 1.25rem 2rem;
-    font-size: 1.125rem;
-    font-weight: 700;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
     transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  }
-
-  .submit-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.6s;
-  }
-
-  .submit-btn:hover::before {
-    left: 100%;
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
   }
 
   .submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
-  }
-
-  .submit-btn:active {
-    transform: translateY(0);
+    box-shadow: 0 6px 20px rgba(0, 68, 204, 0.4);
   }
 
   /* Error Alert */
   .alert-error {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(244, 67, 54, 0.1);
+    border: 2px solid rgba(244, 67, 54, 0.3);
     border-radius: 12px;
-    padding: 1rem;
-    color: #fca5a5;
+    padding: 1rem 1.25rem;
+    color: #f44336;
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    margin-bottom: 1.5rem;
   }
 
-  /* Benefits Side Panel */
+  /* Benefits */
   .benefits-list {
     display: flex;
     flex-direction: column;
@@ -262,76 +271,76 @@
     align-items: flex-start;
     gap: 1rem;
     padding: 1.25rem;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border-subtle);
-    border-radius: 16px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
     transition: all 0.3s ease;
   }
 
   .benefit-card:hover {
-    background: rgba(255,255,255,0.05);
-    border-color: var(--border-hover);
+    border-color: var(--primary);
     transform: translateX(4px);
   }
 
   .benefit-icon {
-    font-size: 1.75rem;
-    flex-shrink: 0;
     width: 48px;
     height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.05);
-    border-radius: 12px;
+    font-size: 1.5rem;
+    flex-shrink: 0;
   }
 
   .benefit-content h4 {
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.25rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.25rem 0;
   }
 
   .benefit-content p {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
+    font-size: 0.9rem;
+    color: #666;
     line-height: 1.5;
+    margin: 0;
   }
 
-  /* Features Grid */
+  /* Features Section */
   .features-section {
-    margin-top: 4rem;
+    margin-top: 3rem;
   }
 
   .section-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
   }
 
   .section-title {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin-bottom: 0.75rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
   }
 
   .section-subtitle {
-    color: var(--text-secondary);
-    font-size: 1.125rem;
+    color: #888;
+    font-size: 1.1rem;
   }
 
   .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
   }
 
   .feature-box {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: 20px;
-    padding: 2rem;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
   }
@@ -343,15 +352,15 @@
     left: 0;
     width: 100%;
     height: 4px;
-    background: var(--accent-gradient);
+    background: var(--feature-color);
     transform: scaleX(0);
-    transition: transform 0.4s ease;
+    transition: transform 0.3s ease;
   }
 
   .feature-box:hover {
-    transform: translateY(-8px);
-    border-color: var(--border-hover);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    border-color: var(--feature-color);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   }
 
   .feature-box:hover::before {
@@ -359,226 +368,252 @@
   }
 
   .feature-icon-wrap {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     margin-bottom: 1.25rem;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
-  .icon-perf { --accent-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); background: var(--accent-gradient); }
-  .icon-seo { --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); background: var(--accent-gradient); }
-  .icon-sec { --accent-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); background: var(--accent-gradient); }
-  .icon-mob { --accent-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%); background: var(--accent-gradient); }
-  .icon-srv { --accent-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%); background: var(--accent-gradient); }
-  .icon-acc { --accent-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); background: var(--accent-gradient); }
+  .icon-perf { --feature-color: #f093fb; background: linear-gradient(135deg, #f093fb, #f5576c); }
+  .icon-seo { --feature-color: #4facfe; background: linear-gradient(135deg, #4facfe, #00f2fe); }
+  .icon-sec { --feature-color: #43e97b; background: linear-gradient(135deg, #43e97b, #38f9d7); }
+  .icon-mob { --feature-color: #fa709a; background: linear-gradient(135deg, #fa709a, #fee140); }
+  .icon-srv { --feature-color: #30cfd0; background: linear-gradient(135deg, #30cfd0, #330867); }
+  .icon-acc { --feature-color: #a8edea; background: linear-gradient(135deg, #a8edea, #fed6e3); }
 
   .feature-box h3 {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--text);
     margin-bottom: 0.75rem;
   }
 
   .feature-box p {
-    color: var(--text-secondary);
+    color: #666;
     line-height: 1.6;
     font-size: 0.95rem;
+    margin: 0;
   }
 
   /* Responsive */
   @media (max-width: 768px) {
-    .hero-section {
-      padding: 2.5rem 1.5rem;
+    .analysis-page-container {
+      margin: 1rem auto;
     }
-    
-    .glass-card {
-      padding: 1.5rem;
+
+    .analysis-header {
+      padding: 3rem 1.5rem;
     }
-    
+
+    .header-icon {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+    }
+
+    .analysis-title {
+      font-size: 2rem;
+    }
+
+    .analysis-body {
+      padding: 2rem 1.5rem;
+    }
+
+    .badge-container {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .main-grid {
+      gap: 1.5rem;
+    }
+
     .features-grid {
       grid-template-columns: 1fr;
     }
   }
+
+  @media (max-width: 480px) {
+    .analysis-title {
+      font-size: 1.6rem;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+    }
+
+    .benefit-card {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .benefit-icon {
+      margin: 0 auto;
+    }
+  }
 </style>
 
-<main class="analysis-container" style="background: var(--bg-dark); min-height: 100vh; padding-top: 2rem; padding-bottom: 4rem;">
-  
-  <!-- Hero -->
-  <section class="hero-section">
-    <div class="hero-content">
-      <h1 class="hero-title">
-        {% trans "Kostenlose Website-Analyse" %}
-      </h1>
-      <p class="hero-subtitle">
-        {% trans "Erhalte in Sekunden eine professionelle Bewertung deiner Website – Performance, SEO, Sicherheit und mehr." %}
-      </p>
-      <div class="badge-container">
-        <span class="badge">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          {% trans "100% kostenlos" %}
-        </span>
-        <span class="badge">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          {% trans "Keine Anmeldung" %}
-        </span>
-        <span class="badge">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          {% trans "Sofortige Ergebnisse" %}
-        </span>
-      </div>
+<div class="analysis-page-container">
+  <!-- Header -->
+  <div class="analysis-header">
+    <div class="header-icon">
+      <i class="fas fa-tachometer-alt"></i>
     </div>
-  </section>
-
-  <!-- Main Content Grid -->
-  <div class="main-grid">
-    <!-- Analysis Form -->
-    <div class="glass-card">
-      <div class="card-header">
-        <h2 class="card-title">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-          {% trans "Website analysieren" %}
-        </h2>
-      </div>
-
-      {% if error %}
-        <div class="alert-error" style="margin-bottom: 1.5rem;">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-          </svg>
-          <div>
-            <strong>{% trans "Fehler:" %}</strong> {{ error }}
-          </div>
-        </div>
-      {% endif %}
-
-      <form method="get" action="{% url 'speedtest_result' %}" class="analysis-form">
-        <div class="input-group">
-          <label for="url" class="input-label">{% trans "Website-URL" %}</label>
-          <input 
-            type="url" 
-            name="url" 
-            id="url"
-            placeholder="https://beispiel.de" 
-            class="url-input"
-            required
-            value="{{ request.GET.url|default:'' }}"
-          >
-          <span class="input-hint">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            {% trans "Gib eine vollständige URL ein (inkl. https://)" %}
-          </span>
-        </div>
-
-        <button type="submit" class="submit-btn">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
-          {% trans "Analyse starten" %}
-        </button>
-      </form>
-    </div>
-
-    <!-- Benefits Panel -->
-    <div class="glass-card">
-      <div class="card-header">
-        <h2 class="card-title">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          {% trans "Warum analysieren?" %}
-        </h2>
-      </div>
-      
-      <div class="benefits-list">
-        <div class="benefit-card">
-          <div class="benefit-icon">🚀</div>
-          <div class="benefit-content">
-            <h4>{% trans "Bessere Rankings" %}</h4>
-            <p>{% trans "Google bevorzugt schnelle, sichere und mobile Websites in den Suchergebnissen." %}</p>
-          </div>
-        </div>
-
-        <div class="benefit-card">
-          <div class="benefit-icon">💰</div>
-          <div class="benefit-content">
-            <h4>{% trans "Mehr Conversions" %}</h4>
-            <p>{% trans "Schnellere Ladezeiten führen zu weniger Absprüngen und höheren Umsätzen." %}</p>
-          </div>
-        </div>
-
-        <div class="benefit-card">
-          <div class="benefit-icon">🔐</div>
-          <div class="benefit-content">
-            <h4>{% trans "Sicherheit & Vertrauen" %}</h4>
-            <p>{% trans "SSL und Security-Header schützen deine Besucher und dein Unternehmen." %}</p>
-          </div>
-        </div>
-
-        <div class="benefit-card">
-          <div class="benefit-icon">📊</div>
-          <div class="benefit-content">
-            <h4>{% trans "Wettbewerbsvorteil" %}</h4>
-            <p>{% trans "Erkenne Schwachstellen frühzeitig und bleibe einen Schritt voraus." %}</p>
-          </div>
-        </div>
-      </div>
+    <h1 class="analysis-title">{% trans "Free Website Analysis" %}</h1>
+    <p class="analysis-subtitle">{% trans "Get a professional assessment of your website in seconds – Performance, SEO, Security and more." %}</p>
+    
+    <div class="badge-container">
+      <span class="badge">
+        <i class="fas fa-check-circle"></i> {% trans "100% Free" %}
+      </span>
+      <span class="badge">
+        <i class="fas fa-check-circle"></i> {% trans "No Registration" %}
+      </span>
+      <span class="badge">
+        <i class="fas fa-check-circle"></i> {% trans "Instant Results" %}
+      </span>
     </div>
   </div>
 
-  <!-- Features Section -->
-  <section class="features-section">
-    <div class="section-header">
-      <h2 class="section-title">{% trans "Was wird analysiert?" %}</h2>
-      <p class="section-subtitle">{% trans "Umfassende Prüfung aller wichtigen Website-Faktoren" %}</p>
+  <!-- Body -->
+  <div class="analysis-body">
+    <a href="{% url 'home' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> {% trans "Back to Home" %}
+    </a>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+      <!-- Analysis Form -->
+      <div class="glass-card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-search"></i></div>
+          <h2 class="card-title">{% trans "Analyze Website" %}</h2>
+        </div>
+
+        {% if error %}
+          <div class="alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <div><strong>{% trans "Error:" %}</strong> {{ error }}</div>
+          </div>
+        {% endif %}
+
+        <form method="get" action="{% url 'speedtest_result' %}" class="analysis-form">
+          <div class="input-group">
+            <label for="url" class="input-label">{% trans "Website URL" %}</label>
+            <input 
+              type="url" 
+              name="url" 
+              id="url"
+              placeholder="https://example.com" 
+              class="url-input"
+              required
+              value="{{ request.GET.url|default:'' }}"
+            >
+            <span class="input-hint">
+              <i class="fas fa-info-circle"></i>
+              {% trans "Enter a complete URL (including https://)" %}
+            </span>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-bolt"></i> {% trans "Start Analysis" %}
+          </button>
+        </form>
+      </div>
+
+      <!-- Benefits Panel -->
+      <div class="glass-card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-question-circle"></i></div>
+          <h2 class="card-title">{% trans "Why Analyze?" %}</h2>
+        </div>
+        
+        <div class="benefits-list">
+          <div class="benefit-card">
+            <div class="benefit-icon"><i class="fas fa-rocket"></i></div>
+            <div class="benefit-content">
+              <h4>{% trans "Better Rankings" %}</h4>
+              <p>{% trans "Google prefers fast, secure, and mobile-friendly websites in search results." %}</p>
+            </div>
+          </div>
+
+          <div class="benefit-card">
+            <div class="benefit-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="benefit-content">
+              <h4>{% trans "More Conversions" %}</h4>
+              <p>{% trans "Faster load times lead to fewer bounces and higher revenue." %}</p>
+            </div>
+          </div>
+
+          <div class="benefit-card">
+            <div class="benefit-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="benefit-content">
+              <h4>{% trans "Security & Trust" %}</h4>
+              <p>{% trans "SSL and security headers protect your visitors and your business." %}</p>
+            </div>
+          </div>
+
+          <div class="benefit-card">
+            <div class="benefit-icon"><i class="fas fa-trophy"></i></div>
+            <div class="benefit-content">
+              <h4>{% trans "Competitive Advantage" %}</h4>
+              <p>{% trans "Identify weaknesses early and stay one step ahead." %}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="features-grid">
-      <article class="feature-box">
-        <div class="feature-icon-wrap icon-perf">⚡</div>
-        <h3>{% trans "Performance & Speed" %}</h3>
-        <p>{% trans "Ladezeit, Seitengröße, Komprimierung und Server-Response werden detailliert analysiert." %}</p>
-      </article>
+    <!-- Features Section -->
+    <section class="features-section">
+      <div class="section-header">
+        <h2 class="section-title">{% trans "What is Analyzed?" %}</h2>
+        <p class="section-subtitle">{% trans "Comprehensive check of all important website factors" %}</p>
+      </div>
 
-      <article class="feature-box">
-        <div class="feature-icon-wrap icon-seo">🎯</div>
-        <h3>{% trans "SEO-Optimierung" %}</h3>
-        <p>{% trans "Meta-Tags, H1-Struktur, Alt-Texte, Sitemap und strukturierte Daten werden geprüft." %}</p>
-      </article>
+      <div class="features-grid">
+        <article class="feature-box" style="--feature-color: #f093fb;">
+          <div class="feature-icon-wrap icon-perf"><i class="fas fa-bolt"></i></div>
+          <h3>{% trans "Performance & Speed" %}</h3>
+          <p>{% trans "Load time, page size, compression, and server response are analyzed in detail." %}</p>
+        </article>
 
-      <article class="feature-box">
-        <div class="feature-icon-wrap icon-sec">🔒</div>
-        <h3>{% trans "Sicherheit & SSL" %}</h3>
-        <p>{% trans "SSL-Zertifikat, HTTPS, Security-Header und Verschlüsselung werden umfassend getestet." %}</p>
-      </article>
+        <article class="feature-box" style="--feature-color: #4facfe;">
+          <div class="feature-icon-wrap icon-seo"><i class="fas fa-search"></i></div>
+          <h3>{% trans "SEO Optimization" %}</h3>
+          <p>{% trans "Meta tags, H1 structure, alt texts, sitemap, and structured data are checked." %}</p>
+        </article>
 
-      <article class="feature-box">
-        <div class="feature-icon-wrap icon-mob">📱</div>
-        <h3>{% trans "Mobile Optimierung" %}</h3>
-        <p>{% trans "Responsive Design, Viewport, Touch-Elemente und mobile Ladezeit werden bewertet." %}</p>
-      </article>
+        <article class="feature-box" style="--feature-color: #43e97b;">
+          <div class="feature-icon-wrap icon-sec"><i class="fas fa-lock"></i></div>
+          <h3>{% trans "Security & SSL" %}</h3>
+          <p>{% trans "SSL certificate, HTTPS, security headers, and encryption are thoroughly tested." %}</p>
+        </article>
 
-      <article class="feature-box">
-        <div class="feature-icon-wrap icon-srv">🖥️</div>
-        <h3>{% trans "Server & Infrastruktur" %}</h3>
-        <p>{% trans "DNS, IP-Adresse, CDN-Nutzung und Cache-Konfiguration werden untersucht." %}</p>
-      </article>
+        <article class="feature-box" style="--feature-color: #fa709a;">
+          <div class="feature-icon-wrap icon-mob"><i class="fas fa-mobile-alt"></i></div>
+          <h3>{% trans "Mobile Optimization" %}</h3>
+          <p>{% trans "Responsive design, viewport, touch elements, and mobile load time are evaluated." %}</p>
+        </article>
 
-      <article class="feature-box">
-        <div class="feature-icon-wrap icon-acc">♿</div>
-        <h3>{% trans "Barrierefreiheit" %}</h3>
-        <p>{% trans "ARIA-Labels, Sprachangaben und Kontraste für optimale Zugänglichkeit." %}</p>
-      </article>
-    </div>
-  </section>
+        <article class="feature-box" style="--feature-color: #30cfd0;">
+          <div class="feature-icon-wrap icon-srv"><i class="fas fa-server"></i></div>
+          <h3>{% trans "Server & Infrastructure" %}</h3>
+          <p>{% trans "DNS, IP address, CDN usage, and cache configuration are examined." %}</p>
+        </article>
 
-</main>
+        <article class="feature-box" style="--feature-color: #a8edea;">
+          <div class="feature-icon-wrap icon-acc"><i class="fas fa-universal-access"></i></div>
+          <h3>{% trans "Accessibility" %}</h3>
+          <p>{% trans "ARIA labels, language attributes, and contrasts for optimal accessibility." %}</p>
+        </article>
+      </div>
+    </section>
+  </div>
+</div>
 {% endblock %}

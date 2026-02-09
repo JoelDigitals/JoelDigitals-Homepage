@@ -1,5 +1,6 @@
-{% extends "base_shop.html" %}
-{% load static i18n %}
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
 
 {% block title %}
 {% trans "Invoice Preview" %} - {% trans "Order" %} #{{ order.id }} – Joel Digitals
@@ -7,210 +8,685 @@
 
 {% block content %}
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f9f9f9;
-    color: #333;
+  .invoice-page-container {
+    max-width: 1000px;
     margin: 2rem auto;
-    max-width: 900px;
+    padding: 0 1rem;
+    box-sizing: border-box;
   }
-  .invoice-container {
-    background: white;
-    padding: 2rem 3rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+
+  .invoice-card {
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+  }
+
+  /* Header */
+  .invoice-header-section {
+    background: linear-gradient(135deg, #2e7d32, #4CAF50);
+    padding: 2rem;
     position: relative;
+    overflow: hidden;
   }
-  header.invoice-header {
+
+  .invoice-header-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 1;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
-    border-bottom: 2px solid #2e7d32;
-    padding-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
-  header.invoice-header h1 {
-    color: #2e7d32;
-    margin: 0;
+
+  .invoice-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .invoice-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 1.8rem;
-  }
-  .invoice-header img {
-    max-height: 60px;
-  }
-  .download-button {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-  }
-  .download-button a {
-    background: #2e7d32;
     color: white;
-    padding: 0.6rem 1.2rem;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
+    border: 3px solid rgba(255, 255, 255, 0.3);
   }
-  .download-button a:hover {
-    background: #1b4d1b;
-  }
-  section.addresses {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-  }
-  .address-block {
-    width: 45%;
-    font-size: 0.95rem;
-  }
-  .address-block strong {
-    font-size: 1.1rem;
-    margin-bottom: 0.4rem;
-    display: block;
-  }
-  table.invoice-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 2rem;
-    font-size: 0.95rem;
-  }
-  table.invoice-table th, table.invoice-table td {
-    border: 1px solid #ddd;
-    padding: 0.75rem 1rem;
-  }
-  table.invoice-table th {
-    background: #e8f5e9;
-    color: #2e7d32;
-    font-weight: 600;
-    text-align: left;
-  }
-  table.invoice-table td:nth-child(4),
-  table.invoice-table td:nth-child(5),
-  table.invoice-table td:nth-child(6),
-  table.invoice-table td:nth-child(7) {
-    text-align: right;
-  }
-  .totals {
-    width: 40%;
-    margin-left: auto;
-    font-size: 1rem;
-    font-weight: 600;
-  }
-  .totals div {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.4rem 0;
-  }
-  .payment-status {
-    margin-top: 1.5rem;
+
+  .invoice-title-text h1 {
+    margin: 0;
+    color: white;
+    font-size: 1.8rem;
     font-weight: 700;
   }
-  .payment-status.paid { color: #2e7d32; }
-  .payment-status.unpaid { color: #b83232; }
-  footer.invoice-footer {
-    margin-top: 3rem;
+
+  .invoice-title-text p {
+    margin: 0.25rem 0 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+  }
+
+  .header-logo {
+    height: 50px;
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+  }
+
+  /* Download Button */
+  .download-section {
+    padding: 1rem 2rem;
+    background: var(--bg);
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .btn-download {
+    background: linear-gradient(135deg, #2e7d32, #4CAF50);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+  }
+
+  .btn-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
+  }
+
+  /* Invoice Body */
+  .invoice-body {
+    padding: 2rem;
+    background: white;
+    color: #333;
+  }
+
+  /* Addresses */
+  .addresses-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .address-box {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1.5rem;
+  }
+
+  .address-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #666;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .address-content {
+    line-height: 1.8;
+  }
+
+  .address-content strong {
+    font-size: 1.1rem;
+    color: #2e7d32;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Meta Info */
+  .invoice-meta {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .meta-label {
     font-size: 0.85rem;
     color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .meta-value {
+    font-weight: 700;
+    color: #333;
+    font-size: 1.1rem;
+  }
+
+  /* Table */
+  .invoice-table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+  }
+
+  .invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  .invoice-table thead {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  }
+
+  .invoice-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 700;
+    color: #2e7d32;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .invoice-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: top;
+  }
+
+  .invoice-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .invoice-table tbody tr:hover {
+    background: #f8f9fa;
+  }
+
+  .invoice-table td.numeric {
+    text-align: right;
+    font-family: monospace;
+    font-size: 0.95rem;
+  }
+
+  .discount-cell {
+    color: #c82333;
+    font-weight: 600;
+  }
+
+  .total-cell {
+    font-weight: 700;
+    color: #2e7d32;
+  }
+
+  /* Totals Section */
+  .totals-section {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2rem;
+  }
+
+  .totals-box {
+    background: #f8f9fa;
+    border: 2px solid #2e7d32;
+    border-radius: 10px;
+    padding: 1.5rem;
+    min-width: 300px;
+  }
+
+  .vat-notice {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed #ccc;
+    font-style: italic;
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .total-label {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .total-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2e7d32;
+  }
+
+  /* Payment Status */
+  .payment-status-box {
+    padding: 1.25rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .status-paid {
+    background: #e8f5e9;
+    border: 2px solid #4CAF50;
+    color: #2e7d32;
+  }
+
+  .status-unpaid {
+    background: #ffebee;
+    border: 2px solid #f44336;
+    color: #c62828;
+  }
+
+  .status-refunded {
+    background: #fff3e0;
+    border: 2px solid #ff9800;
+    color: #ef6c00;
+  }
+
+  .status-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: white;
+  }
+
+  .status-paid .status-icon { color: #4CAF50; }
+  .status-unpaid .status-icon { color: #f44336; }
+  .status-refunded .status-icon { color: #ff9800; }
+
+  .status-content h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+  }
+
+  .status-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    opacity: 0.9;
+  }
+
+  /* Footer */
+  .invoice-footer {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e9ecef;
     text-align: center;
-    border-top: 1px solid #ddd;
-    padding-top: 1rem;
+  }
+
+  .bank-details {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .bank-details h4 {
+    margin: 0 0 1rem 0;
+    color: #2e7d32;
+    font-size: 1.1rem;
+  }
+
+  .bank-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    text-align: left;
+  }
+
+  .bank-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .bank-label {
+    font-size: 0.8rem;
+    color: #666;
+    text-transform: uppercase;
+  }
+
+  .bank-value {
+    font-family: monospace;
+    font-weight: 600;
+    color: #333;
+    word-break: break-all;
+  }
+
+  .company-footer {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .invoice-page-container {
+      margin: 1rem auto;
+      padding: 0 0.5rem;
+    }
+
+    .invoice-header-section {
+      padding: 1.5rem;
+    }
+
+    .header-content {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .invoice-title {
+      flex-direction: column;
+    }
+
+    .download-section {
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .invoice-body {
+      padding: 1.5rem;
+    }
+
+    .addresses-section {
+      grid-template-columns: 1fr;
+    }
+
+    .invoice-table-wrapper {
+      overflow-x: scroll;
+    }
+
+    .invoice-table {
+      min-width: 700px;
+    }
+
+    .totals-section {
+      justify-content: center;
+    }
+
+    .totals-box {
+      width: 100%;
+      min-width: unset;
+    }
+
+    .payment-status-box {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .bank-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media print {
+    .invoice-header-section,
+    .download-section {
+      display: none;
+    }
+    
+    .invoice-card {
+      box-shadow: none;
+    }
+    
+    .invoice-body {
+      padding: 0;
+    }
   }
 </style>
 
-<div class="invoice-container">
-  <header class="invoice-header">
-    <h1>{% trans "Invoice" %} #{{ order.id }}</h1>
-    <img src="{% static 'images/logo.png' %}" alt="Joel Digitals Logo" /> 
-  </header>
-
-  <div class="download-button">
-    <a href="{% url 'download_invoice' order.id %}" target="_blank" rel="noopener">
-      {% trans "Download PDF" %}
-    </a>
-  </div>
-
-  <section class="addresses">
-    <div class="address-block sender">
-      <strong>Joel Digitals</strong>
-      Niederwiesstraße 20<br>
-      66822 Lebach<br>
-      {% trans "Tel" %}: +49 1525 3480270<br>
-      {% trans "Email" %}: buy.joel-digitals@gmx.de
+<div class="invoice-page-container">
+  <div class="invoice-card">
+    <!-- Header -->
+    <div class="invoice-header-section">
+      <div class="header-content">
+        <div class="invoice-title">
+          <div class="invoice-icon">
+            <i class="fas fa-file-invoice"></i>
+          </div>
+          <div class="invoice-title-text">
+            <h1>{% trans "Invoice" %} #{{ order.id }}</h1>
+            <p>Joel Digitals</p>
+          </div>
+        </div>
+        <img src="{% static 'images/logo.png' %}" alt="Joel Digitals Logo" class="header-logo">
+      </div>
     </div>
 
-    <div class="address-block recipient">
-      <strong>{{ order.first_name }} {{ order.last_name }}</strong><br>
-      {% if order.company_name %}{{ order.company_name }}<br>{% endif %}
-      {{ order.address }}<br>
-      {{ order.zip_code }} {{ order.city }}<br>
-      {% if order.country %}{{ order.country }}<br>{% endif %}
-      {% if order.email %}{% trans "Email" %}: {{ order.email }}<br>{% endif %}
-      {% if order.phone %}{% trans "Phone" %}: {{ order.phone }}<br>{% endif %}
+    <!-- Download Button -->
+    <div class="download-section">
+      <a href="{% url 'download_invoice' order.id %}" target="_blank" rel="noopener" class="btn-download">
+        <i class="fas fa-download"></i>
+        {% trans "Download PDF" %}
+      </a>
     </div>
-  </section>
 
-  <section>
-    <p>{% trans "Date" %}: {{ now|date:"d.m.Y" }}</p>
-  </section>
+    <!-- Invoice Body -->
+    <div class="invoice-body">
+      <!-- Addresses -->
+      <div class="addresses-section">
+        <div class="address-box">
+          <div class="address-label">{% trans "From" %}</div>
+          <div class="address-content">
+            <strong>Joel Digitals</strong>
+            Niederwiesstraße 20<br>
+            66822 Lebach<br>
+            {% trans "Tel" %}: +49 1525 3480270<br>
+            {% trans "Email" %}: buy@joel-digitals.com
+          </div>
+        </div>
 
-  <table class="invoice-table">
-    <thead>
-      <tr>
-        <th>{% trans "Description" %}</th>
-        <th>{% trans "Product No." %}</th>
-        <th>{% trans "Quantity" %}</th>
-        <th>{% trans "Unit Price" %}</th>
-        <th>{% trans "Discount" %}</th>
-        <th>{% trans "Price after Discount" %}</th>
-        <th>{% trans "Total Price" %}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in items %}
-      <tr>
-        <td>
-          {% if lang == "de" or lang|slice:":2" == "de" %}
-            {{ item.app.name }}
-          {% elif lang == "en" or lang|slice:":2" == "en" %}
-            {{ item.app.name_english }}
-          {% else %}
-            {{ item.app.name }}
-          {% endif %}
-        </td>
-        <td>{{ item.app.product_number }}</td>
-        <td>{{ item.quantity }}</td>
-        <td>{{ item.app.price|floatformat:2 }} €</td>
-        <td>{{ item.discount_percent }}%</td>
-        <td>{{ item.discount_price|floatformat:2 }} €</td>
-        <td>{{ item.price|floatformat:2 }} €</td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="7" style="text-align:center;">{% trans "No items available." %}</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        <div class="address-box">
+          <div class="address-label">{% trans "Bill To" %}</div>
+          <div class="address-content">
+            <strong>{{ order.first_name }} {{ order.last_name }}</strong>
+            {% if order.company_name %}{{ order.company_name }}<br>{% endif %}
+            {{ order.address }}<br>
+            {{ order.zip_code }} {{ order.city }}<br>
+            {% if order.country %}{{ order.country }}<br>{% endif %}
+            {% if order.email %}{% trans "Email" %}: {{ order.email }}<br>{% endif %}
+            {% if order.phone %}{% trans "Phone" %}: {{ order.phone }}<br>{% endif %}
+          </div>
+        </div>
+      </div>
 
-  <div class="totals">
-    <p>{% trans "As a small business according to §19 UStG, no VAT is charged." %}</p>
-    <div><strong>{% trans "Total amount" %}:</strong><strong>{{ brutto }} €</strong></div>
+      <!-- Meta -->
+      <div class="invoice-meta">
+        <div class="meta-item">
+          <span class="meta-label">{% trans "Invoice Date" %}</span>
+          <span class="meta-value">{{ now|date:"d.m.Y" }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">{% trans "Order ID" %}</span>
+          <span class="meta-value">#{{ order.id }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">{% trans "Payment Method" %}</span>
+          <span class="meta-value">{{ order.payment_method }}</span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="invoice-table-wrapper">
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>{% trans "Description" %}</th>
+              <th>{% trans "Product No." %}</th>
+              <th style="text-align: center;">{% trans "Qty" %}</th>
+              <th style="text-align: right;">{% trans "Unit Price" %}</th>
+              <th style="text-align: right;">{% trans "Discount" %}</th>
+              <th style="text-align: right;">{% trans "Net Price" %}</th>
+              <th style="text-align: right;">{% trans "Total" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>
+                {% if lang == "de" or lang|slice:":2" == "de" %}
+                  {{ item.app.name }}
+                {% elif lang == "en" or lang|slice:":2" == "en" %}
+                  {{ item.app.name_english }}
+                {% else %}
+                  {{ item.app.name }}
+                {% endif %}
+              </td>
+              <td>{{ item.app.product_number }}</td>
+              <td style="text-align: center;">{{ item.quantity }}</td>
+              <td class="numeric">{{ item.app.price|floatformat:2 }} €</td>
+              <td class="numeric discount-cell">{{ item.discount_percent }}%</td>
+              <td class="numeric">{{ item.discount_price|floatformat:2 }} €</td>
+              <td class="numeric total-cell">{{ item.price|floatformat:2 }} €</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" style="text-align:center; padding: 2rem; color: #999;">
+                <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                {% trans "No items available." %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Totals -->
+      <div class="totals-section">
+        <div class="totals-box">
+          <div class="vat-notice">
+            <i class="fas fa-info-circle"></i>
+            {% trans "As a small business according to §19 UStG, no VAT is charged." %}
+          </div>
+          <div class="total-row">
+            <span class="total-label">{% trans "Total Amount" %}</span>
+            <span class="total-amount">{{ brutto|floatformat:2 }} €</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Status -->
+      {% if order.status == 'Received' %}
+        <div class="payment-status-box status-unpaid">
+          <div class="status-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="status-content">
+            <h3>{% trans "Payment Pending" %}</h3>
+            <p>{% trans "Please transfer the total amount within 14 days." %}</p>
+          </div>
+        </div>
+      {% elif order.status == 'Return' %}
+        <div class="payment-status-box status-refunded">
+          <div class="status-icon">
+            <i class="fas fa-undo"></i>
+          </div>
+          <div class="status-content">
+            <h3>{% trans "Return Requested" %}</h3>
+            <p>{% trans "The return has been requested!" %}</p>
+          </div>
+        </div>
+      {% elif order.status == 'Back at Joel Digitals' %}
+        <div class="payment-status-box status-refunded">
+          <div class="status-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="status-content">
+            <h3>{% trans "Refunded" %}</h3>
+            <p>{% trans "The amount was refunded." %}</p>
+          </div>
+        </div>
+      {% elif order.status == 'Canceled' %}
+        <div class="payment-status-box status-refunded">
+          <div class="status-icon">
+            <i class="fas fa-times-circle"></i>
+          </div>
+          <div class="status-content">
+            <h3>{% trans "Canceled" %}</h3>
+            <p>{% trans "Cancellation successful. The amount will be/has been refunded." %}</p>
+          </div>
+        </div>
+      {% else %}
+        <div class="payment-status-box status-paid">
+          <div class="status-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="status-content">
+            <h3>{% trans "Paid" %}</h3>
+            <p>{% trans "This invoice has already been paid. Thank you!" %}</p>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Footer -->
+      <footer class="invoice-footer">
+        <div class="bank-details">
+          <h4><i class="fas fa-university"></i> {% trans "Bank Details" %}</h4>
+          <div class="bank-grid">
+            <div class="bank-item">
+              <span class="bank-label">{% trans "Bank" %}</span>
+              <span class="bank-value">Banking Circle S.A.</span>
+            </div>
+            <div class="bank-item">
+              <span class="bank-label">IBAN</span>
+              <span class="bank-value">DE35 2022 0800 0056 4323 94</span>
+            </div>
+            <div class="bank-item">
+              <span class="bank-label">BIC</span>
+              <span class="bank-value">SXPYDEHHXXX</span>
+            </div>
+            <div class="bank-item">
+              <span class="bank-label">PayPal</span>
+              <span class="bank-value">buy.joel-digitals@gmx.de</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="company-footer">
+          <strong>Joel Digitals</strong> | Niederwiesstraße 20 | 66822 Lebach<br>
+          {% trans "Managing Director" %}: Joel Nicolay | {% trans "Email" %}: buy@joel-digitals.com
+        </div>
+      </footer>
+    </div>
   </div>
-
-  {% if order.status == 'Received' %}
-    <p class="payment-status unpaid">{% trans "Please transfer the total amount within 14 days." %}</p>
-  {% elif order.status == 'Return' %}
-    <p class="payment-status unpaid">{% trans "The return has been requested!" %}</p>
-  {% elif order.status == 'Back at Joel Digitals' %}
-    <p class="payment-status paid">{% trans "The amount was refunded." %}</p>
-  {% elif order.status == 'Canceled' %}
-    <p class="payment-status paid">{% trans "Cancellation successful. The amount will be/has been refunded." %}</p>
-  {% else %}
-    <p class="payment-status paid">{% trans "This invoice has already been paid. Thank you!" %}</p>
-  {% endif %}
-
-  <footer class="invoice-footer">
-    <p>{% trans "Bank details" %}: Banking Circle S.A. - German Branch | IBAN: DE35 2022 0800 0056 4323 94 | BIC: SXPYDEHHXXX</p>
-    <p>PayPal: buy.joel-digitals@gmx.de</p>
-    <p>Joel Digitals | Niederwiesstraße 20 | 66822 Lebach</p>
-  </footer>
 </div>
 {% endblock %}

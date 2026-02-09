@@ -1,79 +1,272 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Kontaktformular – Joel Digitals{% endblock %}
+{% block title %}{% trans "Contact Form" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    .contactform-container {
-        background-color: #fff;
-        max-width: 600px;
-        margin: 40px auto;
-        padding: 40px 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
+  .contactform-page-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .contactform-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contactform-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .contactform-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .contactform-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .contactform-body {
+    background: var(--surface);
+    padding: 2.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Form Styling */
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.1);
+  }
+
+  .form-group textarea {
+    min-height: 150px;
+    resize: vertical;
+  }
+
+  .form-group .helptext {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.25rem;
+  }
+
+  .form-group .errorlist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    color: #f44336;
+    font-size: 0.875rem;
+  }
+
+  .form-group .errorlist li {
+    margin-top: 0.25rem;
+  }
+
+  .form-group input.error,
+  .form-group textarea.error,
+  .form-group select.error {
+    border-color: #f44336;
+  }
+
+  /* Submit Button */
+  .submit-btn {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 68, 204, 0.4);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .contactform-page-container {
+      margin: 1rem auto;
     }
 
-    h2 {
-        margin-top: 0;
-        color: #0044cc;
-        font-weight: 700;
-        font-size: 2rem;
-        margin-bottom: 25px;
-        text-align: center;
+    .contactform-header {
+      padding: 2rem 1.5rem;
     }
 
-    form {
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
     }
 
-    form p {
-        margin: 0;
-        font-size: 1rem;
-        line-height: 1.4;
+    .contactform-title {
+      font-size: 1.6rem;
     }
 
-    button.btn {
-        padding: 12px 20px;
-        background-color: #0044cc;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        box-shadow: 0 2px 6px rgba(0, 68, 204, 0.4);
+    .contactform-body {
+      padding: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .contactform-title {
+      font-size: 1.4rem;
     }
 
-    button.btn:hover,
-    button.btn:focus {
-        background-color: #0033a0;
-        box-shadow: 0 4px 12px rgba(0, 51, 160, 0.6);
+    .submit-btn {
+      width: 100%;
     }
-
-    /* Responsive */
-    @media (max-width: 480px) {
-        .contactform-container {
-            padding: 30px 20px;
-        }
-
-        h2 {
-            font-size: 1.6rem;
-        }
-    }
+  }
 </style>
 
-<div class="contactform-container">
-    <h2>Kontaktformular</h2>
-    <form method="post" novalidate>
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn" type="submit">Senden</button>
+<div class="contactform-page-container">
+  <!-- Header -->
+  <div class="contactform-header">
+    <div class="header-icon">
+      <i class="fas fa-envelope"></i>
+    </div>
+    <h1 class="contactform-title">{% trans "Contact Form" %}</h1>
+    <p class="contactform-subtitle">{% trans "Send us a message and we'll get back to you" %}</p>
+  </div>
+
+  <!-- Body -->
+  <div class="contactform-body">
+    <a href="{% url 'contactz_home' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> {% trans "Back to Contact Center" %}
+    </a>
+
+    <form method="post" novalidate class="contact-form">
+      {% csrf_token %}
+      
+      {% for field in form %}
+      <div class="form-group">
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.help_text %}
+        <span class="helptext">{{ field.help_text }}</span>
+        {% endif %}
+        {% if field.errors %}
+        <ul class="errorlist">
+          {% for error in field.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <button type="submit" class="submit-btn">
+        <i class="fas fa-paper-plane"></i> {% trans "Send Message" %}
+      </button>
     </form>
+  </div>
 </div>
 {% endblock %}

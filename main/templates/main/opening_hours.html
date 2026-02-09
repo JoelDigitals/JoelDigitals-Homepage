@@ -1,9 +1,8 @@
 {% extends "base_home.html" %}
 {% load static %}
-{% load static i18n %}
-
 {% load i18n %}
-{% block title %}Opening Hours – Joel Digitals{% endblock %}
+
+{% block title %}{% trans "Opening Hours" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
@@ -15,122 +14,429 @@
 </script>
 
 <style>
-body {
-  background: #1e1e1e;
-  color: #f5f5f5;
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+  .hours-page-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
 
-.white-wrapper {
-  background: #2b2b2b;
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.3);
-  max-width: 800px;
-  margin: 2rem auto;
-  overflow: hidden;
-  width: 95%;
-  text-align: center;
-}
+  .hours-header {
+    background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+    padding: 4rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-h2, h3 {
-  color: #fff;
-  margin-bottom: 1rem;
-}
+  .hours-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
 
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 1rem auto 2rem auto;
-  max-width: 400px;
-}
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
 
-ul li {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.6rem 1rem;
-  border-bottom: 1px solid #444;
-  border-radius: 6px;
-  transition: background 0.3s;
-}
+  .header-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
 
-ul li.highlight {
-  background: rgba(58,134,255,0.2);
-  font-weight: bold;
-}
+  .hours-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
 
-.day-label {
-  font-weight: 600;
-  color: #fff;
-}
+  .hours-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
 
-.time-open { color: #4caf50; font-weight: 600; }
-.time-closed { color: #ff5252; font-weight: 600; }
-.special { color: #ff9800; font-style: italic; }
+  .hours-body {
+    background: var(--surface);
+    padding: 3rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
 
-/* CTA Button */
-.cta-btn {
-  display:inline-block;
-  padding:0.6rem 1.4rem;
-  border-radius:10px;
-  font-weight:600;
-  color:#fff !important;
-  background: linear-gradient(135deg, #3a86ff, #0056b3);
-  text-decoration:none;
-  transition: all .3s;
-}
-.cta-btn:hover {
-  transform: scale(1.05) translateY(-3px);
-  box-shadow:0 0 20px rgba(58,134,255,0.7);
-  background: linear-gradient(135deg, #0056b3, #003366);
-}
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
 
-.phone-number {
-  font-size: 1.3rem;
-  color: #4caf50;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
-  margin-bottom: 1rem;
-}
-.phone-number:hover { text-decoration: underline; }
+  .back-link:hover {
+    color: #9C27B0;
+  }
 
-p {
-  color: #ccc;
-  margin-top: 0.8rem;
-}
+  /* Phone Card */
+  .phone-card {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.05));
+    border: 2px solid rgba(76, 175, 80, 0.3);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .phone-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4CAF50, #2E7D32);
+  }
+
+  .phone-label {
+    font-size: 0.9rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+  }
+
+  .phone-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4CAF50;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+  }
+
+  .phone-number:hover {
+    color: #2E7D32;
+    transform: scale(1.05);
+  }
+
+  .phone-number i {
+    font-size: 1.5rem;
+  }
+
+  /* Hours List */
+  .hours-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .hours-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .hours-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    transition: all 0.3s ease;
+  }
+
+  .hours-item:hover {
+    transform: translateX(5px);
+    border-color: #9C27B0;
+  }
+
+  .hours-item.today {
+    background: linear-gradient(135deg, rgba(156, 39, 176, 0.1), rgba(123, 31, 162, 0.05));
+    border-color: #9C27B0;
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.15);
+  }
+
+  .hours-item.today .day-label {
+    color: #9C27B0;
+    font-weight: 700;
+  }
+
+  .day-label {
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .today-badge {
+    background: #9C27B0;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .time-open {
+    color: #4CAF50;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .time-closed {
+    color: #f44336;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .time-special {
+    color: #FF9800;
+    font-weight: 600;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Info Box */
+  .info-box {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    border-left: 4px solid #FF9800;
+  }
+
+  .info-box p {
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .info-box strong {
+    color: var(--text);
+  }
+
+  /* CTA Section */
+  .cta-section {
+    text-align: center;
+    margin-top: 2.5rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(156, 39, 176, 0.1), rgba(123, 31, 162, 0.05));
+    border-radius: 16px;
+    border: 2px solid var(--border);
+  }
+
+  .cta-text {
+    color: #666;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hours-page-container {
+      margin: 1rem auto;
+    }
+
+    .hours-header {
+      padding: 3rem 1.5rem;
+    }
+
+    .header-icon {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+    }
+
+    .hours-title {
+      font-size: 2rem;
+    }
+
+    .hours-body {
+      padding: 2rem 1.5rem;
+    }
+
+    .phone-number {
+      font-size: 1.5rem;
+    }
+
+    .hours-item {
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    .day-label {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hours-title {
+      font-size: 1.6rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+    }
+  }
 </style>
 
-<main class="container">
-  <div class="white-wrapper" data-aos="zoom-in">
-    <h2>🕒 {% trans "Opening Hours & Contact" %}</h2>
-
-    <p>{% trans "Phone:" %} <a href="tel:{{ phone_number }}" class="phone-number">{{ phone_number }}</a></p>
-
-    <h3 data-aos="fade-up">{% trans "Our Opening Hours (Next 7 Days)" %}</h3>
-    <ul>
-      {% for day, time in opening_times.items %}
-        <li class="{% if day == today %}highlight{% endif %}" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}">
-          <span class="day-label">{{ day }}</span>
-          {% if "Closed" in time %}
-            <span class="time-closed">{{ time }}</span>
-          {% else %}
-            <span class="time-open">{{ time }}</span>
-          {% endif %}
-        </li>
-      {% endfor %}
-    </ul>
-
-    <p>{% blocktrans %}All times marked with <span class="special">*</span> are <strong>special opening hours</strong>.{% endblocktrans %}</p>
-    <p>{% trans "We look forward to your call during these hours." %}</p>
-    {% url 'contact_form' as contact_url %}
-    <p>{% blocktrans with contact_url=contact_url %}
-    If you have any questions, feel free to use our <a href="{{ contact_url }}" class="cta-btn">Contact Form</a>.
-    {% endblocktrans %}</p>
-    
+<div class="hours-page-container">
+  <!-- Header -->
+  <div class="hours-header">
+    <div class="header-icon">
+      <i class="fas fa-clock"></i>
+    </div>
+    <h1 class="hours-title">{% trans "Opening Hours" %}</h1>
+    <p class="hours-subtitle">{% trans "When you can reach us" %}</p>
   </div>
-</main>
+
+  <!-- Body -->
+  <div class="hours-body">
+    <a href="{% url 'contactz_home' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> {% trans "Back to Contact Center" %}
+    </a>
+
+    <!-- Phone Card -->
+    <div class="phone-card" data-aos="zoom-in">
+      <div class="phone-label">{% trans "Call us directly" %}</div>
+      <a href="tel:{{ phone_number }}" class="phone-number">
+        <i class="fas fa-phone-alt"></i>
+        {{ phone_number }}
+      </a>
+    </div>
+
+    <!-- Hours List -->
+    <div class="hours-section">
+      <h2 class="section-title">
+        <i class="fas fa-calendar-week" style="color: #9C27B0;"></i>
+        {% trans "Next 7 Days" %}
+      </h2>
+      
+      <ul class="hours-list">
+        {% for day, time in opening_times.items %}
+          <li class="hours-item {% if day == today %}today{% endif %}" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}">
+            <span class="day-label">
+              {{ day }}
+              {% if day == today %}
+                <span class="today-badge">{% trans "Today" %}</span>
+              {% endif %}
+            </span>
+            
+            {% if "Closed" in time %}
+              <span class="time-closed">
+                <i class="fas fa-times-circle"></i>
+                {{ time }}
+              </span>
+            {% elif "*" in time %}
+              <span class="time-special">
+                <i class="fas fa-star"></i>
+                {{ time }}
+              </span>
+            {% else %}
+              <span class="time-open">
+                <i class="fas fa-check-circle"></i>
+                {{ time }}
+              </span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Info Box -->
+    <div class="info-box">
+      <p>
+        <i class="fas fa-info-circle" style="color: #FF9800; margin-right: 0.5rem;"></i>
+        {% blocktrans %}
+          All times marked with <strong>*</strong> are <strong>special opening hours</strong>.
+        {% endblocktrans %}
+      </p>
+    </div>
+
+    <p style="text-align: center; color: #666; margin-bottom: 1.5rem;">
+      {% trans "We look forward to your call during these hours." %}
+    </p>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <p class="cta-text">{% trans "Have questions? We're here to help!" %}</p>
+      {% url 'contact_form' as contact_url %}
+      <a href="{{ contact_url }}" class="btn-primary">
+        <i class="fas fa-envelope"></i> {% trans "Contact Form" %}
+      </a>
+    </div>
+  </div>
+</div>
 {% endblock %}

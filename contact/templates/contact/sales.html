@@ -1,226 +1,570 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Sales / Wishlist – Joel Digitals{% endblock %}
+{% block title %}{% trans "Sales & Wishlist" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    .sales-container {
-        background-color: #fff;
-        max-width: 800px;
-        margin: 40px auto;
-        padding: 40px 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
+  .sales-page-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .sales-header {
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sales-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .sales-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .sales-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .sales-body {
+    background: var(--surface);
+    padding: 2.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Form Styling */
+  .sales-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #FF9800;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+  }
+
+  .form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    padding: 0.875rem 1.5rem;
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+  }
+
+  .btn-secondary {
+    padding: 0.75rem 1.25rem;
+    background: var(--bg);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-secondary:hover {
+    border-color: #FF9800;
+    color: #FF9800;
+  }
+
+  /* Wish Form Container */
+  .wish-section {
+    margin-top: 1.5rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    background: var(--bg);
+    display: none;
+  }
+
+  .wish-section.active {
+    display: block;
+    animation: slideDown 0.3s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .wish-section h3 {
+    color: #FF9800;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+  }
+
+  .wish-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .wish-item {
+    padding: 1.25rem;
+    background: var(--surface);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+
+  .wish-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #FF9800, #F57C00);
+    border-radius: 10px 10px 0 0;
+  }
+
+  .wish-number {
+    font-weight: 700;
+    color: #FF9800;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  /* Entries List */
+  .entries-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border);
+  }
+
+  .entries-title {
+    text-align: center;
+    color: var(--text);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .entry-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .entry-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #FF9800, #F57C00);
+  }
+
+  .entry-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border-color: #FF9800;
+  }
+
+  .entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .entry-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .entry-name {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 1.1rem;
+  }
+
+  .entry-email {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .entry-date {
+    color: #999;
+    font-size: 0.85rem;
+  }
+
+  .entry-subject {
+    font-weight: 600;
+    color: #FF9800;
+    margin-bottom: 0.75rem;
+    font-size: 1.05rem;
+  }
+
+  .entry-message {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .wishes-list {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .wishes-title {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .wish-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 152, 0, 0.1);
+    color: #FF9800;
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid rgba(255, 152, 0, 0.2);
+  }
+
+  .chat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+  }
+
+  .chat-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    color: var(--border);
+    margin-bottom: 1rem;
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: #FF9800;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .sales-page-container {
+      margin: 1rem auto;
     }
 
-    h2 {
-        margin-top: 0;
-        color: #0044cc;
-        font-weight: 700;
-        font-size: 2.2rem;
-        margin-bottom: 20px;
-        text-align: center;
+    .sales-header {
+      padding: 2rem 1.5rem;
     }
 
-    form label {
-        display: block;
-        margin-top: 15px;
-        font-weight: 600;
-        color: #0044cc;
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
     }
 
-    input[type="text"],
-    input[type="email"],
-    textarea {
-        width: 100%;
-        padding: 8px 10px;
-        margin-top: 5px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 1rem;
-        font-family: inherit;
-        box-sizing: border-box;
-        resize: vertical;
+    .sales-title {
+      font-size: 1.6rem;
     }
 
-    textarea {
-        min-height: 80px;
+    .sales-body {
+      padding: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .sales-title {
+      font-size: 1.4rem;
     }
 
-    button.btn {
-        margin-top: 20px;
-        background-color: #0044cc;
-        color: #fff;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
+    .entry-header {
+      flex-direction: column;
     }
 
-    button.btn:hover,
-    button.btn:focus {
-        background-color: #003399;
-        outline: none;
+    .btn-primary {
+      width: 100%;
     }
-
-    #wish-form-container {
-        margin-top: 20px;
-        border: 1px solid #ddd;
-        padding: 15px 20px;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-    }
-
-    .wish-field {
-        margin-bottom: 15px;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 10px;
-    }
-
-    .wish-field:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }
-
-    #wish-fields label {
-        margin-top: 10px;
-    }
-
-    h3 {
-        color: #0044cc;
-        margin-top: 0;
-    }
-
-    .entry {
-        margin-bottom: 30px;
-        padding: 15px;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    }
-
-    .entry strong {
-        color: #0044cc;
-    }
-
-    .entry ul {
-        margin-top: 8px;
-        padding-left: 20px;
-    }
-
-    .entry a.btn {
-        display: inline-block;
-        margin-top: 10px;
-        background-color: #0066ff;
-        padding: 8px 14px;
-        font-size: 0.9rem;
-        border-radius: 6px;
-        text-decoration: none;
-        color: white;
-        transition: background-color 0.3s ease;
-    }
-
-    .entry a.btn:hover,
-    .entry a.btn:focus {
-        background-color: #0044cc;
-        outline: none;
-    }
-
-    /* Responsive */
-    @media (max-width: 480px) {
-        .sales-container {
-            padding: 30px 20px;
-        }
-
-        h2 {
-            font-size: 1.8rem;
-        }
-    }
+  }
 </style>
 
-<div class="sales-container">
-    <h2>Sales / Wishlist</h2>
+<div class="sales-page-container">
+  <!-- Header -->
+  <div class="sales-header">
+    <div class="header-icon">
+      <i class="fas fa-shopping-cart"></i>
+    </div>
+    <h1 class="sales-title">{% trans "Sales & Wishlist" %}</h1>
+    <p class="sales-subtitle">{% trans "Let us know what you'd like to buy or have created" %}</p>
+  </div>
 
-    <form action="{% url 'sales' %}" method="POST" id="wish-form">           
-        {% csrf_token %}
-        <label for="name">Your Name:</label>
-        <input type="text" name="name" id="name" required>
+  <!-- Body -->
+  <div class="sales-body">
+    <a href="{% url 'contactz_home' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> {% trans "Back to Contact Center" %}
+    </a>
 
-        <label for="email">Your Email:</label>
-        <input type="email" name="email" id="email" required>
+    <form action="{% url 'sales' %}" method="POST" class="sales-form" id="wish-form">           
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="name">{% trans "Your Name" %}</label>
+        <input type="text" name="name" id="name" required placeholder="{% trans 'Enter your name' %}">
+      </div>
 
-        <label for="subject">Subject:</label>
-        <input type="text" name="subject" id="subject" required>
+      <div class="form-group">
+        <label for="email">{% trans "Your Email" %}</label>
+        <input type="email" name="email" id="email" required placeholder="{% trans 'Enter your email' %}">
+      </div>
 
-        <label for="message">Message:</label>
-        <textarea name="message" id="message" rows="4"></textarea>
+      <div class="form-group">
+        <label for="subject">{% trans "Subject" %}</label>
+        <input type="text" name="subject" id="subject" required placeholder="{% trans 'What is this about?' %}">
+      </div>
 
-        <button type="button" class="btn" id="open-wish-form">Add Wish</button>
+      <div class="form-group">
+        <label for="message">{% trans "Message" %}</label>
+        <textarea name="message" id="message" rows="4" placeholder="{% trans 'Describe your request...' %}"></textarea>
+      </div>
 
-        <div id="wish-form-container" style="display: none;">
-            <h3>Add Wishes</h3>
-            <div id="wish-fields">
-                <div class="wish-field">
-                    <label for="wish-title-0">Wish Title:</label>
-                    <input type="text" name="wishes[0][title]" id="wish-title-0" required>
+      <button type="button" class="btn-secondary" id="open-wish-form">
+        <i class="fas fa-plus"></i> {% trans "Add Wish" %}
+      </button>
 
-                    <label for="wish-description-0">Description:</label>
-                    <textarea name="wishes[0][description]" id="wish-description-0" required></textarea>
-                </div>
+      <div class="wish-section" id="wish-form-container">
+        <h3><i class="fas fa-star"></i> {% trans "Your Wishes" %}</h3>
+        <div class="wish-fields" id="wish-fields">
+          <div class="wish-item">
+            <span class="wish-number">{% trans "Wish" %} #1</span>
+            <div class="form-group">
+              <label for="wish-title-0">{% trans "Wish Title" %}</label>
+              <input type="text" name="wishes[0][title]" id="wish-title-0" required placeholder="{% trans 'What do you want?' %}">
             </div>
-            <button type="button" class="btn" id="add-wish">Add Another Wish</button>
+            <div class="form-group">
+              <label for="wish-description-0">{% trans "Description" %}</label>
+              <textarea name="wishes[0][description]" id="wish-description-0" required rows="3" placeholder="{% trans 'Describe your wish in detail...' %}"></textarea>
+            </div>
+          </div>
         </div>
+        <button type="button" class="btn-secondary" id="add-wish">
+          <i class="fas fa-plus-circle"></i> {% trans "Add Another Wish" %}
+        </button>
+      </div>
 
-        <button type="submit" class="btn">Submit Form</button>
+      <button type="submit" class="btn-primary">
+        <i class="fas fa-paper-plane"></i> {% trans "Submit Request" %}
+      </button>
     </form>
 
-    <h3 style="margin-top: 40px; text-align: center;">All submitted entries</h3>
-    {% for entry in entries %}
-        <div class="entry">
-            <strong>Name:</strong> {{ entry.name }}<br>
-            <strong>Email:</strong> {{ entry.email }}<br>
-            <strong>Subject:</strong> {{ entry.subject }}<br>
-            <strong>Message:</strong> {{ entry.message }}<br>
-            <strong>Submitted at:</strong> {{ entry.created_at }}<br>
-            <strong>Wishes:</strong>
-            <ul>
-                {% for wish in entry.wishes.all %}
-                    <li><strong>{{ wish.title }}:</strong> {{ wish.description }}</li>
-                {% endfor %}
-            </ul>
-            <a href="{% url 'sales_chat' entry.id %}" class="btn">Chat</a>
+    <!-- Entries Section -->
+    <div class="entries-section">
+      <h2 class="entries-title">{% trans "Your Submissions" %}</h2>
+      
+      {% for entry in entries %}
+        <div class="entry-card">
+          <div class="entry-header">
+            <div class="entry-meta">
+              <span class="entry-name">{{ entry.name }}</span>
+              <span class="entry-email">{{ entry.email }}</span>
+            </div>
+            <span class="entry-date">{{ entry.created_at|date:"d.m.Y H:i" }}</span>
+          </div>
+          
+          <div class="entry-subject">{{ entry.subject }}</div>
+          <div class="entry-message">{{ entry.message }}</div>
+          
+          {% if entry.wishes.all %}
+          <div class="wishes-list">
+            <div class="wishes-title">{% trans "Wishes:" %}</div>
+            {% for wish in entry.wishes.all %}
+              <span class="wish-tag">
+                <i class="fas fa-star"></i> {{ wish.title }}
+              </span>
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+          <a href="{% url 'sales_chat' entry.id %}" class="chat-btn">
+            <i class="fas fa-comments"></i> {% trans "Open Chat" %}
+          </a>
         </div>
-    {% empty %}
-        <p style="text-align: center;">You haven't submitted any wishes yet.</p>
-    {% endfor %}
+      {% empty %}
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <p>{% trans "You haven't submitted any requests yet." %}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
 </div>
 
 <script>
-    document.getElementById('open-wish-form').onclick = function() {
-        const formContainer = document.getElementById('wish-form-container');
-        formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
-    };
+  document.getElementById('open-wish-form').onclick = function() {
+    const formContainer = document.getElementById('wish-form-container');
+    formContainer.classList.toggle('active');
+    this.innerHTML = formContainer.classList.contains('active') 
+      ? '<i class="fas fa-minus"></i> {% trans "Hide Wishes" %}' 
+      : '<i class="fas fa-plus"></i> {% trans "Add Wish" %}';
+  };
 
-    document.getElementById('add-wish').onclick = function() {
-        const wishFields = document.getElementById('wish-fields');
-        const wishCount = wishFields.getElementsByClassName('wish-field').length;
-        const newWishField = document.createElement('div');
-        newWishField.className = 'wish-field';
-
-        newWishField.innerHTML = `
-            <label for="wish-title-${wishCount}">Wish Title:</label>
-            <input type="text" name="wishes[${wishCount}][title]" id="wish-title-${wishCount}" required>
-
-            <label for="wish-description-${wishCount}">Description:</label>
-            <textarea name="wishes[${wishCount}][description]" id="wish-description-${wishCount}" required></textarea>
-        `;
-        wishFields.appendChild(newWishField);
-    };
+  document.getElementById('add-wish').onclick = function() {
+    const wishFields = document.getElementById('wish-fields');
+    const wishCount = wishFields.getElementsByClassName('wish-item').length;
+    const newWishField = document.createElement('div');
+    newWishField.className = 'wish-item';
+    
+    newWishField.innerHTML = `
+      <span class="wish-number">{% trans "Wish" %} #${wishCount + 1}</span>
+      <div class="form-group">
+        <label for="wish-title-${wishCount}">{% trans "Wish Title" %}</label>
+        <input type="text" name="wishes[${wishCount}][title]" id="wish-title-${wishCount}" required placeholder="{% trans 'What do you want?' %}">
+      </div>
+      <div class="form-group">
+        <label for="wish-description-${wishCount}">{% trans "Description" %}</label>
+        <textarea name="wishes[${wishCount}][description]" id="wish-description-${wishCount}" required rows="3" placeholder="{% trans 'Describe your wish in detail...' %}"></textarea>
+      </div>
+    `;
+    wishFields.appendChild(newWishField);
+    
+    // Smooth scroll to new wish
+    newWishField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
 </script>
 {% endblock %}

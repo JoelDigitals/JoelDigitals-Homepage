@@ -1,196 +1,445 @@
 {% extends "base_home.html" %}
-{% load static i18n %}
+{% load static %}
+{% load i18n %}
 
-{% block title %}Joel Digitals – Blog{% endblock %}
+{% block title %}Joel Digitals – {% trans "Blog" %}{% endblock %}
 
 {% block content %}
 <style>
-    h2 {
-        margin-bottom: 20px;
-        color: #ffffff;
-        text-align: center;
-        font-size: 2em;
-        font-weight: 600;
+  .blog-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .blog-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .blog-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .blog-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .blog-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .blog-body {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Category Filter */
+  .category-section {
+    margin-bottom: 2rem;
+  }
+
+  .category-label {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .category-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .category-button {
+    background: var(--bg);
+    color: var(--text);
+    padding: 0.6rem 1.25rem;
+    border: 2px solid var(--border);
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .category-button:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .category-button.selected {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
+
+  /* Blog Grid */
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .blog-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+
+  .blog-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--primary);
+    box-shadow: 0 12px 24px rgba(0, 68, 204, 0.15);
+  }
+
+  /* 16:9 Image Container */
+  .blog-image-wrapper {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+    position: relative;
+  }
+
+  .blog-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .blog-card:hover img {
+    transform: scale(1.05);
+  }
+
+  /* Square images - contain instead of cover */
+  .blog-card img[data-aspect="square"] {
+    object-fit: contain;
+    background: white;
+  }
+
+  .blog-card-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 1.5rem;
+  }
+
+  .blog-meta-top {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .blog-category {
+    background: rgba(0, 68, 204, 0.1);
+    color: var(--primary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .blog-date {
+    color: #999;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .blog-card h3 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.2rem;
+    color: var(--text);
+    font-weight: 700;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.8em;
+  }
+
+  .blog-teaser {
+    color: #666;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+  }
+
+  .blog-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .blog-views {
+    color: #999;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn-read {
+    background: var(--primary);
+    color: white;
+    padding: 0.6rem 1.25rem;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .btn-read:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
+
+  /* Empty State */
+  .empty-blog {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #999;
+  }
+
+  .empty-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    margin: 0 auto 1.5rem;
+    color: #ccc;
+  }
+
+  @media (max-width: 768px) {
+    .blog-container {
+      margin: 1rem auto;
+      padding: 0 0.5rem;
     }
 
-    .category-buttons {
-        margin-bottom: 30px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
+    .blog-header {
+      padding: 2rem 1.5rem;
     }
 
-    .category-button {
-        background-color: #222;
-        color: #fff !important;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        text-decoration: none;
-        transition: background-color 0.3s ease, transform 0.2s ease;
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
     }
 
-    .category-button:hover,
-    .category-button.selected {
-        background-color: #0044cc;
-        transform: translateY(-2px);
+    .blog-title {
+      font-size: 1.8rem;
+    }
+
+    .blog-body {
+      padding: 1.5rem;
     }
 
     .blog-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 25px;
-        justify-content: center;
-        align-items: stretch;
+      grid-template-columns: 1fr;
     }
 
-    .blog-card {
-        background-color: #fff;
-        color: #000;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.12);
-        display: flex;
-        flex-direction: column;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
-        height: 100%;
+    .category-buttons {
+      justify-content: center;
     }
+  }
 
-    .blog-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-    }
-
-    /* 🔹 Bilddarstellung */
-    .blog-card img {
-        width: 100%;
-        height: 220px;
-        border-bottom: 1px solid #ddd;
-        display: block;
-        object-fit: cover;
-        background-color: #f5f5f5;
-        transition: object-fit 0.2s ease;
-    }
-
-    /* 🔹 Wenn das Bild quadratisch ist, zeige es vollständig */
-    .blog-card img:is([data-aspect="square"]) {
-        object-fit: contain;
-        background-color: #fff;
+  @media (max-width: 480px) {
+    .blog-title {
+      font-size: 1.5rem;
     }
 
     .blog-card-content {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        flex-grow: 1;
-        padding: 20px;
+      padding: 1.25rem;
     }
 
-    .blog-card h3 {
-        margin-bottom: 10px;
-        font-size: 1.3em;
-        color: #000;
-        font-weight: 600;
-        min-height: 48px;
+    .blog-image-wrapper {
+      aspect-ratio: 4 / 3;
     }
+  }
 
-    .blog-card p.teaser {
-        color: #333;
-        line-height: 1.5;
-        display: -webkit-box;
-        -webkit-line-clamp: 4;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin-bottom: 10px;
+  /* Fallback für alte Browser */
+  @supports not (aspect-ratio: 16 / 9) {
+    .blog-image-wrapper {
+      position: relative;
+      height: 0;
+      padding-top: 56.25%;
     }
-
-    .blog-meta {
-        font-size: 0.9em;
-        color: #666;
-        margin-top: auto;
+    .blog-image-wrapper img {
+      position: absolute;
+      top: 0;
+      left: 0;
     }
-
-    .btn {
-        display: inline-block;
-        background-color: #0044cc;
-        color: #fff !important;
-        padding: 10px 15px;
-        text-decoration: none;
-        border-radius: 6px;
-        margin-top: 15px;
-        font-weight: 500;
-        transition: background-color 0.3s ease;
-        align-self: flex-start;
-    }
-
-    .btn:hover {
-        background-color: #002c99;
-    }
-
-    @media (max-width: 600px) {
-        .blog-card-content {
-            padding: 15px;
-        }
-        .blog-card img {
-            height: 180px;
-        }
-        h2 {
-            font-size: 1.6em;
-        }
-    }
+  }
 </style>
 
-<h2>📘 {% trans "Blog" %}</h2>
-
-<!-- Kategorien Filter -->
-<div class="category-buttons">
-    <p style="color:white; margin-right:10px;">{% trans "Filter by Categories" %}:</p>
-    {% if category_filters %}
-        <a href="?" class="category-button">{% trans "All Categories" %}</a>
-    {% else %}
-        <a href="?" class="category-button selected">{% trans "All Categories" %}</a>
-    {% endif %}
-    {% for category in categories_with_posts %}
-        <a href="?category={{ category.id }}"
-           class="category-button {% if category.id|stringformat:'s' in category_filters %}selected{% endif %}">
-            {{ category.name }}
-        </a>
-    {% endfor %}
-</div>
-
-<div class="blog-grid">
-{% for post in posts %}
-    <div class="blog-card">
-        {% if post.teaser_image %}
-            {% comment %}
-            Wenn du willst, kannst du in deinem Model oder Template-Bereich serverseitig erkennen,
-            ob das Bild quadratisch ist, z. B. durch post.image_width == post.image_height,
-            und dann data-aspect="square" setzen.
-            {% endcomment %}
-            <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}"
-                 {% if post.teaser_image.width == post.teaser_image.height %}data-aspect="square"{% endif %}>
-        {% endif %}
-        <div class="blog-card-content">
-            <div>
-                <h3>{{ post.title }}</h3>
-                <p class="teaser">{{ post.teaser_text|striptags|safe }}</p>
-            </div>
-            <div>
-                <p class="blog-meta">
-                    <em>{% trans "Published on" %} {{ post.published_at|date:"d.m.Y" }}</em>
-                    {% if post.views %}
-                        • {{ post.views }} {% trans "views" %}
-                    {% endif %}
-                </p>
-                <a href="{% url 'blog_detail' post.pk %}" class="btn">{% trans "Read more" %}</a>
-            </div>
-        </div>
+<div class="blog-container">
+  <!-- Header -->
+  <div class="blog-header">
+    <div class="header-icon">
+      <i class="fas fa-newspaper"></i>
     </div>
-{% empty %}
-    <p style="color:white; text-align:center;">{% trans "No blog posts available yet." %}</p>
-{% endfor %}
+    <h1 class="blog-title">{% trans "Blog" %}</h1>
+    <p class="blog-subtitle">{% trans "Latest news, updates and insights" %}</p>
+  </div>
+
+  <!-- Body -->
+  <div class="blog-body">
+    <!-- Category Filter -->
+    <div class="category-section">
+      <div class="category-label">
+        <i class="fas fa-filter"></i>
+        {% trans "Filter by Category" %}:
+      </div>
+      <div class="category-buttons">
+        {% if category_filters %}
+          <a href="?" class="category-button">{% trans "All" %}</a>
+        {% else %}
+          <a href="?" class="category-button selected">{% trans "All" %}</a>
+        {% endif %}
+        {% for category in categories_with_posts %}
+          <a href="?category={{ category.id }}"
+             class="category-button {% if category.id|stringformat:'s' in category_filters %}selected{% endif %}">
+            {{ category.name }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Blog Grid -->
+    <div class="blog-grid">
+      {% for post in posts %}
+        <article class="blog-card">
+          {% if post.teaser_image %}
+            <div class="blog-image-wrapper">
+              <img src="{{ post.teaser_image.url }}" 
+                   alt="{{ post.title }}"
+                   {% if post.teaser_image.width == post.teaser_image.height %}data-aspect="square"{% endif %}>
+            </div>
+          {% endif %}
+          
+          <div class="blog-card-content">
+            <div class="blog-meta-top">
+              {% if post.category %}
+                <span class="blog-category">{{ post.category.name }}</span>
+              {% endif %}
+              <span class="blog-date">
+                <i class="fas fa-calendar-alt"></i>
+                {{ post.published_at|date:"d.m.Y" }}
+              </span>
+            </div>
+            
+            <h3>{{ post.title }}</h3>
+            
+            <p class="blog-teaser">{{ post.teaser_text|striptags|safe }}</p>
+            
+            <div class="blog-footer">
+              {% if post.views %}
+                <span class="blog-views">
+                  <i class="fas fa-eye"></i>
+                  {{ post.views }} {% trans "views" %}
+                </span>
+              {% else %}
+                <span></span>
+              {% endif %}
+              
+              <a href="{% url 'blog_detail' post.pk %}" class="btn-read">
+                {% trans "Read more" %}
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <div class="empty-blog" style="grid-column: 1 / -1;">
+          <div class="empty-icon">
+            <i class="fas fa-pen-fancy"></i>
+          </div>
+          <h2>{% trans "No posts yet" %}</h2>
+          <p>{% trans "Check back soon for new articles!" %}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
 </div>
 {% endblock %}

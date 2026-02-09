@@ -1,77 +1,502 @@
 {% extends 'base_shop.html' %}
 {% load static %}
+{% load i18n %}
 
 {% block title %}Joel Digitals Shop{% endblock %}
 
 {% block extra_head %}
 <style>
-  body { background:#1e1e1e; color:#eaeaea; }
-  .shop-header { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:1rem; gap:0.75rem; }
-  .search-box, .sort-select, .filter-input, .filter-check { padding:10px 14px; font-size:15px; border-radius:8px; background:#2b2b2b; color:#fff; border:1px solid #444; }
-  .search-box { flex:1; min-width:220px; }
-  .filters { display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; }
-  .filter-input { width:120px; }
-  .filter-check { display:flex; gap:0.5rem; align-items:center; padding:8px 10px; }
-  .category-tabs { display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1.25rem; }
-  .category-tab { padding:0.6rem 1rem; border-radius:20px; border:1px solid #007bff; background:#1e1e1e; color:#007bff; cursor:pointer; font-weight:500; transition:0.2s; }
-  .category-tab.active, .category-tab:hover { background:#007bff; color:#fff; }
-  .shop-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.2rem; }
-  .shop-card { background:#2b2b2b; border:1px solid #444; border-radius:12px; padding:1rem; box-shadow:0 3px 8px rgba(0,0,0,0.25); display:flex; flex-direction:column; transition:0.2s; }
-  .shop-card:hover { transform:translateY(-3px); box-shadow:0 6px 12px rgba(0,0,0,0.3); }
-  .shop-card img { width:140px; height:140px; object-fit:cover; border-radius:50%; margin:0 auto 1rem; display:block; }
-  .shop-card h2 { font-size:1.2rem; margin:0 0 0.4rem; color:#4da6ff; text-align:center; }
-  .shop-card p { margin:0.3rem 0; color:#ddd; flex-grow:1; text-align:center; }
-  .price-block { margin-top:0.5rem; text-align:center; }
-  .price-old { text-decoration:line-through; color:#888; margin-right:0.4rem; }
-  .price-new { color:#4dff88; font-weight:600; font-size:1.1rem; }
-  .badge-sale { background:#ff4d4d; color:#fff; padding:0.25rem 0.6rem; border-radius:6px; font-size:0.8rem; font-weight:600; display:inline-block; margin:0 auto 0.5rem; text-align:center; }
-  .btn-row { margin-top:1rem; display:flex; gap:0.5rem; }
-  .btn-shop { flex:1; background:#007bff; color:#fff; padding:0.6rem; border-radius:6px; text-align:center; text-decoration:none; transition:0.2s; }
-  .btn-shop:hover { background:#0056b3; }
-  .empty-msg { opacity:0.8; padding:0.75rem 0; text-align:center; }
+  .shop-page-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0;
+  }
 
+  .shop-header-section {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 2.5rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shop-header-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF6B6B, #EE5A6F);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .shop-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .shop-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+    margin-bottom: 2rem;
+  }
+
+  .search-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .search-box {
+    flex: 1;
+    min-width: 250px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+
+  .search-box::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .search-box:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .filter-controls {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-input {
+    width: 120px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+  }
+
+  .filter-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .filter-check {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .filter-check:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  .filter-check input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+  }
+
+  .sort-select {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+  }
+
+  .sort-select option {
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .btn-filter {
+    padding: 10px 24px;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--primary);
+    border: none;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .btn-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: white;
+  }
+
+  .shop-body {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .category-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .category-tab {
+    padding: 0.6rem 1.25rem;
+    border-radius: 25px;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .category-tab:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .category-tab.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
+
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .shop-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shop-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* 1:1 Image Container */
+  .card-image-wrapper {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .shop-card:hover .card-image {
+    transform: scale(1.05);
+  }
+
+  .card-image-placeholder {
+    font-size: 4rem;
+    color: #bbb;
+  }
+
+  .badge-sale {
+    background: #ff4d4d;
+    color: #fff;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+    margin: 0 auto 0.5rem;
+    text-align: center;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0 0 0.4rem;
+    text-align: center;
+  }
+
+  .card-description {
+    margin: 0.3rem 0;
+    color: #666;
+    flex-grow: 1;
+    text-align: center;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .price-block {
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+
+  .price-old {
+    text-decoration: line-through;
+    color: #999;
+    margin-right: 0.4rem;
+  }
+
+  .price-new {
+    color: #4dff88;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .btn-row {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-shop {
+    flex: 1;
+    background: var(--primary);
+    color: white;
+    padding: 0.6rem;
+    border-radius: 6px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-shop:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
+
+  .empty-msg {
+    grid-column: 1 / -1;
+    opacity: 0.8;
+    padding: 0.75rem 0;
+    text-align: center;
+    color: #999;
+  }
+
+  @media (max-width: 768px) {
+    .shop-page-container {
+      margin: 1rem;
+    }
+
+    .shop-header-section {
+      padding: 2rem 1.5rem;
+    }
+
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
+    }
+
+    .shop-title {
+      font-size: 1.8rem;
+    }
+
+    .search-filter-bar {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .search-box {
+      min-width: 100%;
+    }
+
+    .filter-controls {
+      justify-content: center;
+      width: 100%;
+    }
+
+    .shop-body {
+      padding: 1.5rem;
+    }
+
+    .category-tabs {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .shop-title {
+      font-size: 1.5rem;
+    }
+
+    .filter-controls {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .filter-input, .sort-select, .btn-filter {
+      width: 100%;
+    }
+  }
+
+  /* Fallback für ältere Browser */
+  @supports not (aspect-ratio: 1 / 1) {
+    .card-image-wrapper::before {
+      content: "";
+      float: left;
+      padding-top: 100%;
+    }
+    .card-image-wrapper::after {
+      content: "";
+      display: block;
+      clear: both;
+    }
+    .card-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-  <h1 class="mb-4">Joel Digitals Shop</h1>
-
-  <form method="get" class="shop-header">
-    <input type="text" name="q" value="{{ query }}" placeholder="🔍 Suche Apps…" class="search-box">
-  
-    <div class="filters">
-      <input type="number" name="min" value="{{ price_min }}" class="filter-input" placeholder="Min €">
-      <input type="number" name="max" value="{{ price_max }}" class="filter-input" placeholder="Max €">
-      <label class="filter-check">
-        <input type="checkbox" name="discount" value="1" {% if only_discount %}checked{% endif %}>
-        Nur Angebote
-      </label>
-      <select name="sort" class="sort-select">
-        <option value="name" {% if sort == "name" %}selected{% endif %}>Sortieren: Name</option>
-        <option value="price" {% if sort == "price" %}selected{% endif %}>Sortieren: Preis</option>
-        <option value="discount" {% if sort == "discount" %}selected{% endif %}>Sortieren: Rabatt</option>
-      </select>
-      <button type="submit" class="btn-shop">Filtern</button>
+<div class="shop-page-container">
+  <!-- Header mit Suche -->
+  <div class="shop-header-section">
+    <div class="header-icon">
+      <i class="fas fa-store"></i>
     </div>
-  </form>
-  
-  <div class="category-tabs">
-    <a href="?group=all{% if query %}&q={{ query }}{% endif %}" class="category-tab {% if active_group == 'all' %}active{% endif %}">Alle</a>
-    {% for g in groups %}
-      <a href="?group={{ g.pk }}{% if query %}&q={{ query }}{% endif %}" class="category-tab {% if active_group == g.pk|stringformat:'s' %}active{% endif %}">{{ g.name }}</a>
-    {% endfor %}
-    <a href="?group=ohne_gruppe{% if query %}&q={{ query }}{% endif %}" class="category-tab {% if active_group == 'ohne_gruppe' %}active{% endif %}">Ohne Gruppe</a>
+    <h1 class="shop-title">Joel Digitals Shop</h1>
+    <p class="shop-subtitle">{% trans "Discover premium apps and tools" %}</p>
+    
+    <form method="get" class="search-filter-bar">
+      <input type="text" name="q" value="{{ query }}" placeholder="🔍 {% trans 'Search apps...' %}" class="search-box">
+      
+      <div class="filter-controls">
+        <input type="number" name="min" value="{{ price_min }}" class="filter-input" placeholder="Min €" step="0.01">
+        <input type="number" name="max" value="{{ price_max }}" class="filter-input" placeholder="Max €" step="0.01">
+        
+        <label class="filter-check">
+          <input type="checkbox" name="discount" value="1" {% if only_discount %}checked{% endif %}>
+          {% trans "Only deals" %}
+        </label>
+        
+        <select name="sort" class="sort-select">
+          <option value="name" {% if sort == "name" %}selected{% endif %}>{% trans "Sort: Name" %}</option>
+          <option value="price" {% if sort == "price" %}selected{% endif %}>{% trans "Sort: Price" %}</option>
+          <option value="discount" {% if sort == "discount" %}selected{% endif %}>{% trans "Sort: Discount" %}</option>
+        </select>
+        
+        <button type="submit" class="btn-filter">
+          <i class="fas fa-filter"></i> {% trans "Filter" %}
+        </button>
+      </div>
+    </form>
   </div>
-  
-  <div class="shop-grid">
-    {% for app in apps %}
-      {% include "apps/shop_card.html" with app=app %}
-    {% empty %}
-      <div class="empty-msg">Keine Treffer.</div>
-    {% endfor %}
-  </div>
-{% endblock %}
 
+  <!-- Body mit Kategorien und Grid -->
+  <div class="shop-body">
+    <div class="category-tabs">
+      <a href="?group=all{% if query %}&q={{ query }}{% endif %}" class="category-tab {% if active_group == 'all' %}active{% endif %}">{% trans "All" %}</a>
+      {% for g in groups %}
+        <a href="?group={{ g.pk }}{% if query %}&q={{ query }}{% endif %}" class="category-tab {% if active_group == g.pk|stringformat:'s' %}active{% endif %}">{{ g.name }}</a>
+      {% endfor %}
+      <a href="?group=ohne_gruppe{% if query %}&q={{ query }}{% endif %}" class="category-tab {% if active_group == 'ohne_gruppe' %}active{% endif %}">{% trans "No Group" %}</a>
+    </div>
+    
+    <div class="shop-grid" id="shop-grid-all" data-group="all">
+      {% for app in apps %}
+        {% include "apps/shop_card.html" with app=app %}
+      {% empty %}
+        <div class="empty-msg">{% trans "No results found" %}</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
@@ -88,14 +513,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const $ = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-  const searchInput = $('#searchInput');
-  const priceMinInput = $('#priceMin');
-  const priceMaxInput = $('#priceMax');
-  const onlyDiscountInput = $('#onlyDiscount');
-  const sortSelect = $('#sortSelect');
+  const searchInput = $('input[name="q"]');
+  const priceMinInput = $('input[name="min"]');
+  const priceMaxInput = $('input[name="max"]');
+  const onlyDiscountInput = $('input[name="discount"]');
+  const sortSelect = $('select[name="sort"]');
 
   function activeGroupEl() {
-    return document.getElementById('group-' + state.activeGroup);
+    return document.getElementById('shop-grid-' + state.activeGroup);
   }
 
   function readCard(card) {
@@ -108,6 +533,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function apply() {
     const group = activeGroupEl();
+    if (!group) return;
+    
     const cards = $$('.shop-card', group);
 
     let visibleCards = [];
@@ -144,22 +571,50 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Events
-  searchInput.addEventListener('input', e => { state.query = e.target.value.toLowerCase().trim(); apply(); });
-  priceMinInput.addEventListener('input', e => { state.priceMin = e.target.value === '' ? '' : parseFloat(e.target.value); apply(); });
-  priceMaxInput.addEventListener('input', e => { state.priceMax = e.target.value === '' ? '' : parseFloat(e.target.value); apply(); });
-  onlyDiscountInput.addEventListener('change', e => { state.onlyDiscount = e.target.checked; apply(); });
-  sortSelect.addEventListener('change', e => { state.sortBy = e.target.value; apply(); });
+  if (searchInput) {
+    searchInput.addEventListener('input', e => { 
+      state.query = e.target.value.toLowerCase().trim(); 
+      apply(); 
+    });
+  }
+  
+  if (priceMinInput) {
+    priceMinInput.addEventListener('input', e => { 
+      state.priceMin = e.target.value === '' ? '' : parseFloat(e.target.value); 
+      apply(); 
+    });
+  }
+  
+  if (priceMaxInput) {
+    priceMaxInput.addEventListener('input', e => { 
+      state.priceMax = e.target.value === '' ? '' : parseFloat(e.target.value); 
+      apply(); 
+    });
+  }
+  
+  if (onlyDiscountInput) {
+    onlyDiscountInput.addEventListener('change', e => { 
+      state.onlyDiscount = e.target.checked; 
+      apply(); 
+    });
+  }
+  
+  if (sortSelect) {
+    sortSelect.addEventListener('change', e => { 
+      state.sortBy = e.target.value; 
+      apply(); 
+    });
+  }
 
   // Tabs
   $$('.category-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
       $$('.category-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
 
-      state.activeGroup = tab.dataset.group;
-      $$('.category-group').forEach(g => g.style.display = 'none');
-      activeGroupEl().style.display = 'grid';
-      apply();
+      // Navigate to href
+      window.location.href = tab.getAttribute('href');
     });
   });
 

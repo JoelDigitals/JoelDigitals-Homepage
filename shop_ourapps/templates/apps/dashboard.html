@@ -1,129 +1,581 @@
-{% extends "base_shop.html" %}
+{% extends "base_home.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Affiliate Dashboard – Joel Digitals{% endblock %}
+{% block title %}{% trans "Affiliate Dashboard" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    .dashboard-container {
-        background-color: white;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        max-width: 1000px;
-        margin: auto;
-        color: #000;
+  .affiliate-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .affiliate-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .affiliate-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .affiliate-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .affiliate-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .affiliate-body {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(0, 68, 204, 0.1);
+  }
+
+  .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    margin: 0 auto 1rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0.5rem 0;
+  }
+
+  .stat-label {
+    color: #666;
+    font-size: 0.95rem;
+  }
+
+  /* Code Section */
+  .code-section {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
+    border: 2px solid #FFD700;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .code-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .code-input-group {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .code-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+    background: var(--surface);
+    color: var(--primary);
+    font-family: monospace;
+    letter-spacing: 2px;
+  }
+
+  .btn-copy {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #333;
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .btn-copy:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 165, 0, 0.4);
+  }
+
+  .btn-copy.copied {
+    background: #4CAF50;
+    color: white;
+  }
+
+  /* Monthly Stats */
+  .monthly-section {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .monthly-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .monthly-item {
+    text-align: center;
+    padding: 1rem;
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .monthly-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+  }
+
+  .monthly-label {
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  /* Chart Section */
+  .chart-section {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+  }
+
+  /* Toast Notification */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #4CAF50;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    .affiliate-container {
+      margin: 1rem auto;
+      padding: 0 0.5rem;
     }
 
-    h1 {
-        margin-bottom: 20px;
+    .affiliate-header {
+      padding: 2rem 1rem;
     }
 
-    .stats {
-        background: #f9f9f9;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.05);
-        margin-top: 20px;
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
     }
 
-    .stats p {
-        font-size: 18px;
-        margin-bottom: 10px;
+    .affiliate-title {
+      font-size: 1.6rem;
     }
 
-    canvas {
-        margin-top: 40px;
-        max-width: 100%;
+    .affiliate-body {
+      padding: 1.5rem;
     }
 
-    .btn {
-        background-color: #0044cc;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 4px;
-        border: none;
-        cursor: pointer;
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
     }
 
-    .btn:hover {
-        background-color: #1d00d9;
+    .stat-value {
+      font-size: 1.5rem;
     }
 
-    input#affiliateCode {
-        padding: 5px;
-        font-size: 16px;
-        width: 200px;
-        margin-right: 10px;
+    .code-input-group {
+      flex-direction: column;
     }
+
+    .code-input {
+      width: 100%;
+      min-width: unset;
+    }
+
+    .btn-copy {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .chart-container {
+      height: 250px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .affiliate-title {
+      font-size: 1.4rem;
+    }
+
+    .monthly-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 
-<div class="dashboard-container">
-    <h1>Affiliate Dashboard</h1>
+<div class="affiliate-container">
+  <!-- Header -->
+  <div class="affiliate-header">
+    <div class="header-icon">
+      <i class="fas fa-handshake"></i>
+    </div>
+    <h1 class="affiliate-title">{% trans "Affiliate Dashboard" %}</h1>
+    <p class="affiliate-subtitle">{% trans "Track your earnings and performance" %}</p>
+  </div>
 
-    <div class="stats">
-        <p><strong>Gesamtumsatz:</strong> {{ sales }} €</p>
-        <p><strong>Gesamteinnahmen:</strong> {{ earnings }} €</p>
-        <p><strong>Provisionssatz:</strong> {{ commission_percent }}%</p>
-        <p><strong>Bestellungen insgesamt:</strong> {{ order_count }}</p>
+  <!-- Body -->
+  <div class="affiliate-body">
+    <!-- Main Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-euro-sign"></i>
+        </div>
+        <div class="stat-value">€{{ sales|floatformat:2 }}</div>
+        <div class="stat-label">{% trans "Total Sales" %}</div>
+      </div>
 
-        <p>
-            <strong>Affiliate-Code:</strong><br>
-            <input type="text" id="affiliateCode" value="{{ affiliate_code }}" readonly>
-            <button class="btn" onclick="copyCode()">Kopieren</button>
-        </p>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #4CAF50, #2E7D32);">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <div class="stat-value">€{{ earnings|floatformat:2 }}</div>
+        <div class="stat-label">{% trans "Total Earnings" %}</div>
+      </div>
 
-        <hr>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #FF9800, #F57C00);">
+          <i class="fas fa-percentage"></i>
+        </div>
+        <div class="stat-value">{{ commission_percent }}%</div>
+        <div class="stat-label">{% trans "Commission Rate" %}</div>
+      </div>
 
-        <h2>Diesen Monat</h2>
-        <p><strong>Umsatz:</strong> {{ monthly_sales }} €</p>
-        <p><strong>Einnahmen:</strong> {{ monthly_earnings }} €</p>
-        <p><strong>Bestellungen:</strong> {{ monthly_order_count }}</p>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #9C27B0, #7B1FA2);">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="stat-value">{{ order_count }}</div>
+        <div class="stat-label">{% trans "Total Orders" %}</div>
+      </div>
     </div>
 
-    <canvas id="salesChart" width="600" height="300"></canvas>
+    <!-- Affiliate Code -->
+    <div class="code-section">
+      <div class="code-label">
+        <i class="fas fa-ticket-alt"></i>
+        {% trans "Your Affiliate Code" %}
+      </div>
+      <div class="code-input-group">
+        <input type="text" id="affiliateCode" class="code-input" value="{{ affiliate_code }}" readonly>
+        <button class="btn-copy" onclick="copyCode()">
+          <i class="fas fa-copy"></i>
+          <span>{% trans "Copy" %}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Monthly Stats -->
+    <div class="monthly-section">
+      <h2 class="section-title">
+        <i class="fas fa-calendar-alt"></i>
+        {% trans "This Month" %}
+      </h2>
+      <div class="monthly-grid">
+        <div class="monthly-item">
+          <div class="monthly-value">€{{ monthly_sales|floatformat:2 }}</div>
+          <div class="monthly-label">{% trans "Sales" %}</div>
+        </div>
+        <div class="monthly-item">
+          <div class="monthly-value">€{{ monthly_earnings|floatformat:2 }}</div>
+          <div class="monthly-label">{% trans "Earnings" %}</div>
+        </div>
+        <div class="monthly-item">
+          <div class="monthly-value">{{ monthly_order_count }}</div>
+          <div class="monthly-label">{% trans "Orders" %}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-section">
+      <h2 class="section-title">
+        <i class="fas fa-chart-line"></i>
+        {% trans "Performance History" %}
+      </h2>
+      <div class="chart-container">
+        <canvas id="salesChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+  <i class="fas fa-check-circle"></i>
+  <span>{% trans "Code copied to clipboard!" %}</span>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const ctx = document.getElementById('salesChart').getContext('2d');
-const salesChart = new Chart(ctx, {
+  const ctx = document.getElementById('salesChart').getContext('2d');
+  
+  // Chart.js defaults für Dark Mode
+  Chart.defaults.color = '#666';
+  Chart.defaults.borderColor = 'rgba(0, 0, 0, 0.1)';
+  
+  const salesChart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: {{ chart_labels|safe }},
-        datasets: [
-            {
-                label: 'Monatlicher Umsatz (€)',
-                data: {{ chart_sales|safe }},
-                borderColor: 'rgba(54, 162, 235, 1)',
-                fill: false,
-                tension: 0.3
-            },
-            {
-                label: 'Monatliche Einnahmen (€)',
-                data: {{ chart_earnings|safe }},
-                borderColor: 'rgba(75, 192, 192, 1)',
-                fill: false,
-                tension: 0.3
-            }
-        ]
+      labels: {{ chart_labels|safe }},
+      datasets: [
+        {
+          label: '{% trans "Monthly Sales" %} (€)',
+          data: {{ chart_sales|safe }},
+          borderColor: '#0044cc',
+          backgroundColor: 'rgba(0, 68, 204, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#0044cc',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        },
+        {
+          label: '{% trans "Monthly Earnings" %} (€)',
+          data: {{ chart_earnings|safe }},
+          borderColor: '#4CAF50',
+          backgroundColor: 'rgba(76, 175, 80, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#4CAF50',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }
+      ]
     },
     options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: true
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            usePointStyle: true,
+            padding: 20,
+            font: {
+              size: 12
             }
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          padding: 12,
+          cornerRadius: 8,
+          displayColors: true
         }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          },
+          ticks: {
+            callback: function(value) {
+              return '€' + value;
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
+        }
+      }
     }
-});
+  });
 
-function copyCode() {
+  function copyCode() {
     const codeInput = document.getElementById("affiliateCode");
+    const btn = document.querySelector('.btn-copy');
+    const toast = document.getElementById('toast');
+    
+    // Kopieren
     codeInput.select();
     codeInput.setSelectionRange(0, 99999);
-    document.execCommand("copy");
-    alert("Affiliate-Code kopiert: " + codeInput.value);
-}
+    
+    try {
+      navigator.clipboard.writeText(codeInput.value).then(() => {
+        showToast();
+      }).catch(() => {
+        // Fallback für alte Browser
+        document.execCommand("copy");
+        showToast();
+      });
+    } catch (err) {
+      document.execCommand("copy");
+      showToast();
+    }
+    
+    // Button Animation
+    btn.classList.add('copied');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i> {% trans "Copied!" %}';
+    
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = originalText;
+    }, 2000);
+  }
+
+  function showToast() {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
+  }
 </script>
 {% endblock %}

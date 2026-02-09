@@ -1,178 +1,507 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Auftrag #{{ entry.id }} – Chat{% endblock %}
+{% block title %}{% trans "Order" %} #{{ entry.id }} – {% trans "Chat" %}{% endblock %}
 
 {% block content %}
 <style>
-    .chat-container {
-        background-color: #fff;
-        max-width: 800px;
-        margin: 40px auto;
-        padding: 30px 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
+  .chat-page-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .chat-header {
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .chat-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .chat-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .chat-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .chat-body {
+    background: var(--surface);
+    padding: 2.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: #FF9800;
+  }
+
+  /* Order Info Card */
+  .order-info-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .order-info-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #FF9800, #F57C00);
+  }
+
+  .order-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 1rem 0;
+  }
+
+  .order-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .meta-label {
+    color: #888;
+  }
+
+  .meta-value {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(255, 152, 0, 0.1);
+    color: #FF9800;
+    border: 1px solid rgba(255, 152, 0, 0.2);
+  }
+
+  /* Chat Section */
+  .chat-section {
+    margin: 2rem 0;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 2px solid var(--border);
+  }
+
+  .message {
+    padding: 1.25rem;
+    border-radius: 12px;
+    position: relative;
+    max-width: 85%;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message-user {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+
+  .message-admin {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+
+  .message-admin::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #FF9800, #F57C00);
+    border-radius: 12px 0 0 12px;
+  }
+
+  .message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .message-user .message-header {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .message-admin .message-header {
+    color: #888;
+  }
+
+  .message-author {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .message-time {
+    font-size: 0.8rem;
+  }
+
+  .message-content {
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .message-user .message-content {
+    color: white;
+  }
+
+  .message-admin .message-content {
+    color: var(--text);
+  }
+
+  .empty-chat {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+  }
+
+  .empty-chat i {
+    font-size: 3rem;
+    color: var(--border);
+    margin-bottom: 1rem;
+  }
+
+  /* Reply Form */
+  .reply-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border);
+  }
+
+  .reply-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group textarea {
+    padding: 1rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #FF9800;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+  }
+
+  .submit-btn {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+  }
+
+  /* Admin Badge */
+  .admin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .chat-page-container {
+      margin: 1rem auto;
     }
 
-    h1 {
-        color: #0044cc;
-        font-weight: 700;
-        font-size: 2rem;
-        margin-bottom: 10px;
-        text-align: center;
+    .chat-header {
+      padding: 2rem 1.5rem;
     }
 
-    p {
-        font-size: 1rem;
-        margin: 5px 0 15px 0;
-        text-align: center;
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
     }
 
-    .back-link {
-        display: block;
-        margin-bottom: 25px;
-        text-align: center;
-        font-weight: 600;
-        color: #0044cc;
-        text-decoration: none;
+    .chat-title {
+      font-size: 1.6rem;
     }
 
-    .back-link:hover,
-    .back-link:focus {
-        text-decoration: underline;
-        color: #0033a0;
-    }
-
-    h2 {
-        font-weight: 700;
-        color: #0044cc;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    .chat-history {
-        max-height: 400px;
-        overflow-y: auto;
-        padding: 15px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-        margin-bottom: 25px;
+    .chat-body {
+      padding: 1.5rem;
     }
 
     .message {
-        margin-bottom: 18px;
-        padding: 12px 16px;
-        border-radius: 8px;
-        line-height: 1.4;
+      max-width: 95%;
     }
 
-    .from-user {
-        background-color: #d0e6ff;
-        text-align: left;
-        color: #0a3d8c;
-        box-shadow: 0 1px 3px rgba(13, 77, 143, 0.2);
+    .submit-btn {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .chat-title {
+      font-size: 1.4rem;
     }
 
-    .from-admin {
-        background-color: #ffe0e0;
-        text-align: left;
-        color: #7a1a1a;
-        box-shadow: 0 1px 3px rgba(160, 40, 40, 0.2);
+    .order-title {
+      font-size: 1.2rem;
     }
 
-    .meta {
-        font-size: 12px;
-        color: #555;
-        margin-bottom: 6px;
-        font-weight: 600;
+    .order-meta {
+      flex-direction: column;
+      gap: 0.75rem;
     }
-
-    form textarea {
-        width: 100%;
-        min-height: 90px;
-        padding: 12px 15px;
-        font-size: 1rem;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        resize: vertical;
-        font-family: inherit;
-        box-sizing: border-box;
-        margin-bottom: 15px;
-    }
-
-    form textarea:focus {
-        outline: none;
-        border-color: #0044cc;
-        box-shadow: 0 0 6px rgba(0, 68, 204, 0.4);
-    }
-
-    form button.btn {
-        background-color: #0044cc;
-        color: white;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        box-shadow: 0 2px 6px rgba(0, 68, 204, 0.4);
-        width: 100%;
-    }
-
-    form button.btn:hover,
-    form button.btn:focus {
-        background-color: #0033a0;
-        box-shadow: 0 4px 12px rgba(0, 51, 160, 0.6);
-    }
-
-    /* Responsive */
-    @media (max-width: 480px) {
-        .chat-container {
-            padding: 25px 15px;
-            margin: 20px 10px;
-        }
-
-        h1 {
-            font-size: 1.6rem;
-        }
-
-        h2 {
-            font-size: 1.4rem;
-        }
-    }
+  }
 </style>
 
-<div class="chat-container">
-    <h1>🧾 Auftrag #{{ entry.id }} – {{ entry.title }}</h1>
-    <p><strong>Status:</strong> {{ entry.status }}</p>
-    <p><strong>Erstellt von:</strong> {{ entry.user.username }}</p>
+<div class="chat-page-container">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="header-icon">
+      <i class="fas fa-{% if user.is_staff %}user-shield{% else %}shopping-bag{% endif %}"></i>
+    </div>
+    <h1 class="chat-title">
+      {% if user.is_staff %}
+        {% trans "Admin View" %}
+      {% else %}
+        {% trans "Sales Chat" %}
+      {% endif %}
+    </h1>
+    <p class="chat-subtitle">{% trans "Order" %} #{{ entry.id }}</p>
+  </div>
 
+  <!-- Body -->
+  <div class="chat-body">
+    <!-- Back Link -->
     {% if user.is_staff %}
-        <a href="{% url 'admin_sales' %}" class="back-link">← Zurück zur Auftragsübersicht</a>
+      <a href="{% url 'admin_sales' %}" class="back-link">
+        <i class="fas fa-arrow-left"></i> {% trans "Back to Orders" %}
+      </a>
     {% else %}
-        <a href="{% url 'sales' %}" class="back-link">← Zurück zu meinen Aufträgen</a>
+      <a href="{% url 'sales' %}" class="back-link">
+        <i class="fas fa-arrow-left"></i> {% trans "Back to My Orders" %}
+      </a>
     {% endif %}
 
-    <h2>💬 Chatverlauf</h2>
-    <div class="chat-history">
-        {% for msg in messages %}
-            <div class="message {% if msg.user.is_staff %}from-admin{% else %}from-user{% endif %}">
-                <div class="meta">{{ msg.user.username }} – {{ msg.created_at|date:"d.m.Y H:i" }}</div>
-                <div class="text">{{ msg.message|linebreaks }}</div>
-            </div>
-        {% empty %}
-            <p>Noch keine Nachrichten vorhanden.</p>
-        {% endfor %}
+    <!-- Order Info -->
+    <div class="order-info-card">
+      <h2 class="order-title">{{ entry.subject|default:entry.name }}</h2>
+      
+      <div class="order-meta">
+        <div class="meta-item">
+          <i class="fas fa-hashtag" style="color: #FF9800;"></i>
+          <span class="meta-label">{% trans "Order ID" %}:</span>
+          <span class="meta-value">#{{ entry.id }}</span>
+        </div>
+        
+        <div class="meta-item">
+          <i class="fas fa-user" style="color: #FF9800;"></i>
+          <span class="meta-label">{% trans "Customer" %}:</span>
+          <span class="meta-value">{{ entry.user.username }}</span>
+        </div>
+      </div>
     </div>
 
-    <form method="post" novalidate>
+    <!-- Chat History -->
+    <div class="chat-section">
+      <h3 class="section-title">
+        <i class="fas fa-comments"></i>
+        {% trans "Conversation" %}
+      </h3>
+
+      {% if messages %}
+        <div class="chat-messages">
+          {% for msg in messages %}
+            <div class="message {% if msg.user.is_staff %}message-admin{% else %}message-user{% endif %}">
+              <div class="message-header">
+                <span class="message-author">
+                  {% if msg.user.is_staff %}
+                    <i class="fas fa-shield-alt"></i>
+                  {% else %}
+                    <i class="fas fa-user"></i>
+                  {% endif %}
+                  {{ msg.user.username }}
+                  {% if msg.user.is_staff %}
+                    <span class="admin-badge">{% trans "Staff" %}</span>
+                  {% endif %}
+                </span>
+                <span class="message-time">{{ msg.created_at|date:"d.m.Y H:i" }}</span>
+              </div>
+              <div class="message-content">{{ msg.message|linebreaks }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-chat">
+          <i class="fas fa-comment-slash"></i>
+          <p>{% trans "No messages yet. Start the conversation!" %}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Reply Form -->
+    <div class="reply-section">
+      <h3 class="section-title">
+        <i class="fas fa-reply"></i>
+        {% trans "Reply" %}
+      </h3>
+      
+      <form method="post" class="reply-form" novalidate>
         {% csrf_token %}
-        <textarea name="message" required placeholder="Nachricht eingeben..."></textarea>
-        <button type="submit" class="btn">Nachricht senden</button>
-    </form>
+        
+        <div class="form-group">
+          <textarea name="message" required placeholder="{% trans 'Type your message...' %}"></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">
+          <i class="fas fa-paper-plane"></i> {% trans "Send Message" %}
+        </button>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}
