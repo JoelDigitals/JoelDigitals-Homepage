@@ -1,101 +1,453 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Download {{ app.name }} – Joel Digitals{% endblock %}
+{% block title %}{% trans "Download" %} {{ app.name }} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    main {
-        padding: 40px 20px;
-        max-width: 1000px;
-        margin: auto;
+  .app-detail-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .app-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .app-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .header-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .header-icon i {
+    font-size: 2.5rem;
+  }
+
+  .app-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .app-version {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 1rem;
+    border-radius: 9999px;
+    display: inline-block;
+    margin-top: 0.5rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .app-body {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+  }
+
+  .app-description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text);
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--bg);
+    border-radius: 12px;
+    border-left: 4px solid var(--primary);
+  }
+
+  .download-section {
+    margin-top: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .os-filter {
+    margin-bottom: 1.5rem;
+  }
+
+  .os-filter label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  .os-filter select {
+    width: 100%;
+    max-width: 300px;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 1rem;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .os-filter select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.1);
+  }
+
+  .downloads-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .download-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    padding: 1.25rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .download-card:hover {
+    border-color: var(--primary);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.1);
+  }
+
+  .download-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+  }
+
+  .os-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .os-icon.windows { background: linear-gradient(135deg, #00a4ef, #0078d4); }
+  .os-icon.macos { background: linear-gradient(135deg, #999, #666); }
+  .os-icon.linux { background: linear-gradient(135deg, #fcc624, #e8b000); }
+  .os-icon.android { background: linear-gradient(135deg, #3ddc84, #2fa866); }
+  .os-icon.ios { background: linear-gradient(135deg, #007aff, #0051d5); }
+
+  .download-details h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+
+  .download-meta {
+    font-size: 0.875rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .download-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .download-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+    flex-shrink: 0;
+  }
+
+  .download-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 68, 204, 0.4);
+    color: white;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 2px dashed var(--border);
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    color: #666;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .empty-state p {
+    color: #666;
+    font-size: 1rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .app-detail-container {
+      margin: 1rem auto;
     }
 
-    .container {
-        background-color: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        color: #000;
+    .app-header {
+      padding: 2rem 1.5rem;
     }
 
-    h1, h2 {
-        color: #0044cc;
+    .header-icon {
+      width: 80px;
+      height: 80px;
     }
 
-    .button {
-        background-color: #0044cc;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 16px;
-        display: inline-block;
-        margin-top: 20px;
+    .header-icon i {
+      font-size: 2rem;
     }
 
-    .button:hover {
-        background-color: #0033a0;
+    .app-title {
+      font-size: 1.5rem;
     }
 
-    select, option {
-        font-size: 16px;
-        padding: 6px;
-        margin-top: 10px;
+    .app-body {
+      padding: 1.5rem;
     }
 
-    ul {
-        margin-top: 20px;
-        padding-left: 20px;
+    .download-card {
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: center;
     }
 
-    li {
-        margin-bottom: 15px;
+    .download-info {
+      width: 100%;
+      flex-direction: column;
     }
 
-    @media (max-width: 600px) {
-        .button {
-            width: 100%;
-            text-align: center;
-        }
+    .download-details h3 {
+      font-size: 1rem;
     }
+
+    .download-meta {
+      justify-content: center;
+    }
+
+    .download-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .app-title {
+      font-size: 1.3rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+    }
+  }
 </style>
 
-<main>
-    <div class="container">
-        <a href="{% url 'download_app_list' %}" class="button">← Zurück zur App-Übersicht</a>
-
-        <h1>{{ app.name }}</h1>
-        <p>{{ app.description }}</p>
-
-        <h2>Download nach Betriebssystem</h2>
-
-        <form method="get" action=".">
-            <label for="os-select">Betriebssystem wählen:</label>
-            <select name="os" id="os-select" onchange="this.form.submit()">
-                <option value="">Alle</option>
-                {% for os in operating_systems %}
-                    <option value="{{ os.name }}" {% if selected_os == os.name %}selected{% endif %}>{{ os.name }}</option>
-                {% endfor %}
-            </select>
-        </form>
-
-        {% if downloads %}
-            <ul>
-                {% for download in downloads %}
-                    <li>
-                        <strong>{{ download.operating_system.name }}</strong> – Version: {{ download.version|default:"N/A" }} –
-                        <a href="{{ download.file_url.url }}" target="_blank" rel="noopener noreferrer" class="button">Download</a>
-                        {% if download.release_date %}
-                            <span style="margin-left: 10px;">(Veröffentlicht am {{ download.release_date }})</span>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Keine Downloads für diese Auswahl verfügbar.</p>
-        {% endif %}
+<div class="app-detail-container">
+  <!-- Header -->
+  <div class="app-header">
+    <div class="header-icon">
+      {% if app.logo %}
+        <img src="{{ app.logo.url }}" alt="{{ app.name }}">
+      {% else %}
+        <i class="fas fa-cube"></i>
+      {% endif %}
     </div>
-</main>
+    <h1 class="app-title">{{ app.name }}</h1>
+    {% if app.version %}
+      <span class="app-version">v{{ app.version }}</span>
+    {% endif %}
+  </div>
+
+  <!-- Body -->
+  <div class="app-body">
+    <a href="{% url 'download_app_list' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> {% trans "Back to App Overview" %}
+    </a>
+
+    <div class="app-description">
+      {{ app.description|default:_("No description available.")|linebreaks }}
+    </div>
+
+    <div class="download-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="fas fa-download"></i>
+        </div>
+        <h2 class="section-title">{% trans "Download by Operating System" %}</h2>
+      </div>
+
+      <div class="os-filter">
+        <label for="os-select">{% trans "Select Operating System" %}:</label>
+        <select name="os" id="os-select" onchange="this.form.submit()">
+          <option value="">{% trans "All" %}</option>
+          {% for os in operating_systems %}
+            <option value="{{ os.name }}" {% if selected_os == os.name %}selected{% endif %}>
+              {{ os.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {% if downloads %}
+        <div class="downloads-list">
+          {% for download in downloads %}
+            <div class="download-card">
+              <div class="download-info">
+                <div class="os-icon {{ download.operating_system.name|lower }}">
+                  <i class="fab 
+                    {% if 'windows' in download.operating_system.name|lower %}fa-windows
+                    {% elif 'mac' in download.operating_system.name|lower %}fa-apple
+                    {% elif 'linux' in download.operating_system.name|lower %}fa-linux
+                    {% elif 'android' in download.operating_system.name|lower %}fa-android
+                    {% else %}fa-question{% endif %}">
+                  </i>
+                </div>
+                <div class="download-details">
+                  <h3>{{ download.operating_system.name }}</h3>
+                  <div class="download-meta">
+                    <span><i class="fas fa-code-branch"></i> {% trans "Version" %}: {{ download.version|default:"N/A" }}</span>
+                    {% if download.file_size %}
+                      <span><i class="fas fa-hdd"></i> {{ download.file_size }}</span>
+                    {% endif %}
+                    {% if download.release_date %}
+                      <span><i class="fas fa-calendar"></i> {{ download.release_date }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <a href="{{ download.file_url.url }}" target="_blank" rel="noopener noreferrer" class="download-button">
+                <i class="fas fa-download"></i> {% trans "Download" %}
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-box-open"></i>
+          <p>{% trans "No downloads available for this selection." %}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% endblock %}

@@ -1,60 +1,112 @@
+<!-- base_mobile.html -->
 {% load static i18n %}
 <!DOCTYPE html>
-<html lang="de">
+<html lang="{{ LANGUAGE_CODE|default:'de' }}">
 <head>
 <meta charset="UTF-8">
 <title>{% block title %}Joel Digitals Support{% endblock %}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
 
 <style>
 :root {
-    --bg: #0d0d0d;
-    --surface: #181818;
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-elevated: #1a1a1a;
     --accent: #00bcd4;
     --accent-hover: #26c6da;
-    --text: #f5f5f5;
-    --muted: #9ca3af;
-    --radius: 14px;
+    --accent-glow: rgba(0, 188, 212, 0.3);
+    --text: #ffffff;
+    --text-secondary: #a0a0a0;
+    --text-muted: #666666;
+    --border: #2a2a2a;
+    --radius: 16px;
+    --radius-sm: 12px;
     --admin: #ff9800;
+    --admin-glow: rgba(255, 152, 0, 0.3);
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
 }
 
-* { box-sizing: border-box; margin:0; padding:0; }
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-tap-highlight-color: transparent;
+}
 
 html, body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg);
     color: var(--text);
-    height: 100%;
+    min-height: 100vh;
     width: 100%;
-    overflow-x: hidden; /* fix horizontales Scrollen */
+    overflow-x: hidden;
+    line-height: 1.5;
 }
 
-a { color: var(--accent); text-decoration: none; transition: color 0.2s ease; }
-a:hover { color: var(--accent-hover); }
-
-/* Header / Navigation */
+/* Header */
 header {
     position: sticky;
     top: 0;
-    z-index: 100;
-    background: rgba(24,24,24,0.95);
-    backdrop-filter: blur(10px);
-    padding: 14px 20px;
+    z-index: 1000;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #222;
 }
 
-.brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.2rem; }
-.brand img { height:30px; width:30px; border-radius:8px; }
+.brand { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    font-weight: 700; 
+    font-size: 1.25rem;
+    color: var(--text);
+}
 
-/* Mobile Menü Button */
-.menu-toggle { display:flex; flex-direction:column; gap:4px; background:none; border:none; cursor:pointer; z-index:200; }
-.menu-toggle div { width:25px; height:3px; background: var(--text); border-radius:2px; transition: all 0.3s ease; }
+.brand img { 
+    height: 36px; 
+    width: 36px; 
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 188, 212, 0.2);
+}
+
+/* Menu Toggle */
+.menu-toggle { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 5px; 
+    background: none; 
+    border: none; 
+    cursor: pointer; 
+    z-index: 2000;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    transition: background 0.3s;
+}
+
+.menu-toggle:hover { background: var(--surface-elevated); }
+
+.menu-toggle div { 
+    width: 24px; 
+    height: 2.5px; 
+    background: var(--text); 
+    border-radius: 2px; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+}
+
+.menu-toggle.active div:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+.menu-toggle.active div:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.menu-toggle.active div:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
 
 /* Mobile Navigation */
 nav {
@@ -62,61 +114,284 @@ nav {
     top: 0;
     right: -100%;
     height: 100vh;
-    width: 75%;
-    max-width: 300px;
+    width: 85%;
+    max-width: 320px;
     background: var(--surface);
-    box-shadow: -3px 0 12px rgba(0,0,0,0.6);
+    box-shadow: -10px 0 40px rgba(0,0,0,0.8);
     display: flex;
     flex-direction: column;
-    padding: 80px 20px;
-    gap: 15px;
-    transition: right 0.3s ease;
+    padding: 100px 24px 40px;
+    gap: 8px;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-y: auto;
+    z-index: 1500;
+    border-left: 1px solid var(--border);
 }
 
-nav.show { right:0; }
+nav.show { right: 0; }
 
-/* Links */
+.nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    z-index: 1400;
+}
+
+.nav-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Navigation Items */
+.nav-section {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin: 16px 0 8px;
+    padding-left: 12px;
+    font-weight: 600;
+}
+
 nav a, nav form button {
     color: var(--text);
-    font-size:1rem;
-    font-weight:600;
-    border:none;
-    background:none;
-    text-align:left;
-    padding:12px 10px;
-    border-radius: var(--radius);
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:0.5rem;
-    transition: background 0.2s, color 0.2s;
-    width:100%;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    background: none;
+    text-align: left;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
 }
 
-nav a:hover, nav form button:hover { background: rgba(255,255,255,0.05); color: var(--accent-hover); }
+nav a::before, nav form button::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform 0.2s;
+}
+
+nav a:hover, nav form button:hover { 
+    background: var(--surface-elevated);
+    color: var(--accent-hover);
+}
+
+nav a:hover::before, nav form button:hover::before {
+    transform: scaleY(1);
+}
+
+nav a.active {
+    background: linear-gradient(90deg, rgba(0, 188, 212, 0.1), transparent);
+    color: var(--accent);
+}
+
+nav a.active::before { transform: scaleY(1); }
+
+nav a .material-symbols-rounded, 
+nav form button .material-symbols-rounded {
+    font-size: 1.5rem;
+    color: var(--accent);
+    transition: transform 0.2s;
+}
+
+nav a:hover .material-symbols-rounded,
+nav form button:hover .material-symbols-rounded {
+    transform: scale(1.1);
+}
 
 /* Desktop Navigation */
-.desktop-nav { display:none; gap:25px; align-items:center; }
-.desktop-nav a, .desktop-nav form button { background:none; border:none; color:var(--text); font-weight:600; font-size:0.95rem; cursor:pointer; transition: color 0.2s; }
-.desktop-nav a:hover, .desktop-nav form button:hover { color: var(--accent-hover); }
+.desktop-nav { 
+    display: none; 
+    gap: 8px; 
+    align-items: center; 
+}
+
+.desktop-nav a, .desktop-nav form button { 
+    background: none; 
+    border: none; 
+    color: var(--text-secondary); 
+    font-weight: 500; 
+    font-size: 0.9rem; 
+    cursor: pointer; 
+    transition: all 0.2s;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.desktop-nav a:hover, .desktop-nav form button:hover { 
+    color: var(--text);
+    background: var(--surface-elevated);
+}
+
+.desktop-nav a.active {
+    color: var(--accent);
+    background: linear-gradient(135deg, rgba(0, 188, 212, 0.1), rgba(0, 188, 212, 0.05));
+}
 
 /* Main */
-main { flex:1; width:100%; max-width:960px; margin:0 auto; padding:20px; animation: fadeIn 0.4s ease; overflow-x:hidden; }
+main { 
+    flex: 1; 
+    width: 100%; 
+    max-width: 960px; 
+    margin: 0 auto; 
+    padding: 24px 20px; 
+    animation: fadeIn 0.5s ease; 
+    min-height: calc(100vh - 140px);
+}
 
 /* Footer */
-footer { background: var(--surface); text-align:center; padding:15px; font-size:0.85rem; color:var(--muted); border-top:1px solid #222; width:100%; }
-footer a { color: var(--muted); margin:0 6px; }
-footer a:hover { color: var(--accent); }
+footer { 
+    background: var(--surface); 
+    text-align: center; 
+    padding: 24px 20px; 
+    font-size: 0.85rem; 
+    color: var(--text-muted); 
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+}
 
-/* Animation */
-@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+footer a { 
+    color: var(--text-secondary); 
+    margin: 0 8px; 
+    transition: color 0.2s;
+    position: relative;
+}
+
+footer a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--accent);
+    transition: width 0.2s;
+}
+
+footer a:hover { 
+    color: var(--accent);
+}
+
+footer a:hover::after {
+    width: 100%;
+}
+
+/* Animations */
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(20px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+    50% { box-shadow: 0 0 40px var(--accent-glow); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
 
 /* Responsive */
-@media(min-width:768px) {
-    .menu-toggle { display:none; }
-    nav { display:none; }
-    .desktop-nav { display:flex; }
+@media(min-width: 768px) {
+    .menu-toggle { display: none; }
+    nav { display: none; }
+    .desktop-nav { display: flex; }
+    .nav-overlay { display: none; }
+    
+    main {
+        padding: 32px 24px;
+    }
+}
+
+/* Utility Classes */
+.glass {
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: var(--bg);
+    border: none;
+    padding: 14px 28px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--accent-glow);
+}
+
+.card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+}
+
+.card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 </style>
 
@@ -125,53 +400,79 @@ footer a:hover { color: var(--accent); }
 <body>
 
 <header>
-    <div class="brand">
+    <a href="/mobile/" class="brand">
         <img src="{% static 'favicon.png' %}" alt="Logo">
         <span>Joel Digitals</span>
-    </div>
+    </a>
 
     <!-- Desktop -->
     <div class="desktop-nav">
         {% if user.is_authenticated %}
             {% if "Support" in user_groups %}
-                <a href="/mobile/admin-tickets/"><span class="material-symbols-rounded">confirmation_number</span> {% trans "Tickets" %}</a>
+                <a href="/mobile/admin-tickets/" class="{% if request.path == '/mobile/admin-tickets/' %}active{% endif %}">
+                    <span class="material-symbols-rounded">confirmation_number</span> {% trans "Tickets" %}
+                </a>
             {% endif %}
             {% if "Selling" in user_groups %}
-                <a href="/mobile/admin-sales/"><span class="material-symbols-rounded">storefront</span> {% trans "Sales" %}</a>
+                <a href="/mobile/admin-sales/" class="{% if request.path == '/mobile/admin-sales/' %}active{% endif %}">
+                    <span class="material-symbols-rounded">storefront</span> {% trans "Sales" %}
+                </a>
             {% endif %}
-            <a href="/mobile/admin-dashboard/"><span class="material-symbols-rounded">dashboard</span> {% trans "Dashboard" %}</a>
+            <a href="/mobile/admin-dashboard/" class="{% if request.path == '/mobile/admin-dashboard/' %}active{% endif %}">
+                <span class="material-symbols-rounded">dashboard</span> {% trans "Dashboard" %}
+            </a>
             <form method="post" action="{% url 'logout_app' %}">
                 {% csrf_token %}
-                <button type="submit"><span class="material-symbols-rounded">logout</span> {% trans "Logout" %}</button>
+                <button type="submit">
+                    <span class="material-symbols-rounded">logout</span> {% trans "Logout" %}
+                </button>
             </form>
         {% else %}
-            <a href="{% url 'login_app' %}"><span class="material-symbols-rounded">login</span> {% trans "Login" %}</a>
+            <a href="{% url 'login_app' %}">
+                <span class="material-symbols-rounded">login</span> {% trans "Login" %}
+            </a>
         {% endif %}
     </div>
 
     <!-- Mobile Button -->
-    <button class="menu-toggle" onclick="toggleMenu()" aria-label="Menü öffnen">
-        <div></div><div></div><div></div>
+    <button class="menu-toggle" onclick="toggleMenu()" aria-label="{% trans 'Menu' %}" id="menuToggle">
+        <div></div>
+        <div></div>
+        <div></div>
     </button>
 
     <!-- Mobile Menu -->
+    <div class="nav-overlay" id="navOverlay" onclick="toggleMenu()"></div>
     <nav id="mobileNav">
-        <a href="/mobile/"><span class="material-symbols-rounded">home</span> {% trans "Home" %}</a>
+        <div class="nav-section">{% trans "Menu" %}</div>
+        <a href="/mobile/" class="{% if request.path == '/mobile/' %}active{% endif %}">
+            <span class="material-symbols-rounded">home</span> {% trans "Home" %}
+        </a>
+        
         {% if user.is_authenticated %}
+            <div class="nav-section">{% trans "Admin" %}</div>
             {% if "Support" in user_groups %}
-                <a href="/mobile/admin-tickets/"><span class="material-symbols-rounded">confirmation_number</span> {% trans "Admin: Tickets" %}</a>
+                <a href="/mobile/admin-tickets/" class="{% if request.path == '/mobile/admin-tickets/' %}active{% endif %}">
+                    <span class="material-symbols-rounded">confirmation_number</span> {% trans "Tickets" %}
+                </a>
             {% endif %}
             {% if "Selling" in user_groups %}
-                <a href="/mobile/admin-sales/"><span class="material-symbols-rounded">storefront</span> {% trans "Admin: Sales" %}</a>
+                <a href="/mobile/admin-sales/" class="{% if request.path == '/mobile/admin-sales/' %}active{% endif %}">
+                    <span class="material-symbols-rounded">storefront</span> {% trans "Sales" %}
+                </a>
             {% endif %}
-            <a href="/mobile/admin-tickets/"><span class="material-symbols-rounded">confirmation_number</span> {% trans "Tickets" %}</a>
-            <a href="/mobile/admin-tickets/"><span class="material-symbols-rounded">storefront</span> {% trans "Sales" %}</a>
+            
+            <div class="nav-section">{% trans "Account" %}</div>
             <form method="post" action="{% url 'logout_app' %}">
                 {% csrf_token %}
-                <button type="submit"><span class="material-symbols-rounded">logout</span> {% trans "Logout" %}</button>
+                <button type="submit">
+                    <span class="material-symbols-rounded">logout</span> {% trans "Logout" %}
+                </button>
             </form>
         {% else %}
-            <a href="{% url 'login_app' %}"><span class="material-symbols-rounded">login</span> {% trans "Login" %}</a>
+            <a href="{% url 'login_app' %}">
+                <span class="material-symbols-rounded">login</span> {% trans "Login" %}
+            </a>
         {% endif %}
     </nav>
 </header>
@@ -181,10 +482,10 @@ footer a:hover { color: var(--accent); }
 </main>
 
 <footer>
-    &copy; 2025 Joel Digitals · 
-    <a href="/imprint/">{% trans "Impressum" %}</a> ·
-    <a href="/privacy/">{% trans "Datenschutz" %}</a> ·
-    <a href="/terms/">{% trans "AGB" %}</a>
+    &copy; 2025-2026 Joel Digitals · 
+    <a href="/imprint/">{% trans "Imprint" %}</a> ·
+    <a href="/privacy/">{% trans "Privacy Policy" %}</a> ·
+    <a href="/terms/">{% trans "Terms of Service" %}</a>
 </footer>
 
 <!-- Cookie Banner -->
@@ -193,14 +494,41 @@ footer a:hover { color: var(--accent); }
 <script>
 function toggleMenu() {
     const nav = document.getElementById('mobileNav');
+    const overlay = document.getElementById('navOverlay');
+    const toggle = document.getElementById('menuToggle');
     const body = document.body;
-    nav.classList.toggle('show');
-    body.style.overflow = nav.classList.contains('show') ? 'hidden' : 'auto';
+    
+    const isOpen = nav.classList.contains('show');
+    
+    if (isOpen) {
+        nav.classList.remove('show');
+        overlay.classList.remove('show');
+        toggle.classList.remove('active');
+        body.style.overflow = '';
+    } else {
+        nav.classList.add('show');
+        overlay.classList.add('show');
+        toggle.classList.add('active');
+        body.style.overflow = 'hidden';
+    }
 }
-document.querySelectorAll('nav a, nav button').forEach(el=>{
-    el.addEventListener('click', ()=> {
-        document.getElementById('mobileNav').classList.remove('show');
-        document.body.style.overflow = 'auto';
+
+// Close menu on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const nav = document.getElementById('mobileNav');
+        if (nav.classList.contains('show')) {
+            toggleMenu();
+        }
+    }
+});
+
+// Active state handling
+document.querySelectorAll('nav a').forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth < 768) {
+            toggleMenu();
+        }
     });
 });
 </script>

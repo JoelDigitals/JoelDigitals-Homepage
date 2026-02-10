@@ -1,176 +1,448 @@
+<!-- Startseite -->
 {% extends "base_mobile.html" %}
 {% load static i18n %}
 
-{% block title %}{% trans "Startseite – Joel Digitals" %}{% endblock %}
+{% block title %}{% trans "Home – Joel Digitals" %}{% endblock %}
 
 {% block extra_css %}
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
 <style>
 :root {
-    --bg-dark: #121212;
-    --card-bg: #1e1e1e;
-    --text-light: #fff;
+    --card-bg: #141414;
+    --card-hover: #1a1a1a;
     --accent: #00bcd4;
     --accent-hover: #26c6da;
     --admin: #ff9800;
+    --admin-hover: #ffb74d;
     --divider: #2a2a2a;
+    --text-secondary: #a0a0a0;
 }
 
-body { color: var(--text-light); }
+.hero-section {
+    text-align: center;
+    padding: 40px 20px;
+    margin-bottom: 32px;
+    position: relative;
+}
 
-.main-content { padding: 1.2rem; max-width: 900px; margin: 0 auto; }
-
-.section-header {
-    margin-top: 2rem;
-    margin-bottom: 0.5rem;
-    border-bottom: 1px solid var(--divider);
+.hero-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    border-radius: 24px;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 1.3rem;
-    color: var(--accent);
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(0, 188, 212, 0.3);
+    animation: float 3s ease-in-out infinite;
 }
-.section-header.admin { color: var(--admin); }
-.section-header span { font-size: 1.6rem; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.hero-icon .material-symbols-rounded {
+    font-size: 40px;
+    color: #000;
+}
+
+.hero-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.section-header {
+    margin: 40px 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.section-header.admin { 
+    color: var(--admin); 
+}
+
+.section-header .material-symbols-rounded {
+    font-size: 1.5rem;
+}
 
 .welcome-grid {
     display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    margin-top: 1rem;
+    gap: 16px;
+    grid-template-columns: 1fr;
 }
 
-.welcome-box {
-    background-color: var(--card-bg);
+@media (min-width: 640px) {
+    .welcome-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.welcome-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid var(--divider);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+    transform: scaleX(0);
+    transition: transform 0.3s;
+}
+
+.welcome-card.admin::before {
+    background: linear-gradient(90deg, var(--admin), var(--admin-hover));
+}
+
+.welcome-card:hover {
+    transform: translateY(-4px);
+    background: var(--card-hover);
+    border-color: var(--accent);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.welcome-card.admin:hover {
+    border-color: var(--admin);
+    box-shadow: 0 20px 40px rgba(255, 152, 0, 0.15);
+}
+
+.welcome-card:hover::before {
+    transform: scaleX(1);
+}
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
     border-radius: 14px;
-    padding: 1.2rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    border-left: 5px solid var(--accent);
-    transition: all 0.25s ease;
-}
-.welcome-box.admin { border-left-color: var(--admin); }
-.welcome-box:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.6); }
-
-.welcome-box h2 {
-    font-size: 1.1rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.6rem;
+    justify-content: center;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 15px rgba(0, 188, 212, 0.2);
 }
 
-.welcome-box ul { margin:0; padding-left:1rem; }
-.welcome-box li { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem; }
+.welcome-card.admin .card-icon {
+    background: linear-gradient(135deg, var(--admin), var(--admin-hover));
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.2);
+}
 
-.welcome-box a { color: var(--accent); text-decoration: none; }
-.welcome-box a:hover { color: var(--accent-hover); text-decoration: underline; }
+.card-icon .material-symbols-rounded {
+    font-size: 24px;
+    color: #000;
+}
 
-footer {
-    text-align:center;
-    padding:1rem;
-    color:#aaa;
-    font-size:0.9rem;
-    margin-top:2rem;
-    border-top:1px solid #222;
+.welcome-card h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.welcome-card p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.welcome-card.admin .card-link {
+    color: var(--admin);
+}
+
+.card-link:hover {
+    gap: 12px;
+    color: var(--accent-hover);
+}
+
+.welcome-card.admin .card-link:hover {
+    color: var(--admin-hover);
+}
+
+.card-link .material-symbols-rounded {
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+}
+
+.card-link:hover .material-symbols-rounded {
+    transform: translateX(4px);
+}
+
+/* Superuser Links */
+.superuser-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.superuser-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(255, 152, 0, 0.1);
+    border-radius: 10px;
+    color: var(--admin);
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.superuser-link:hover {
+    background: rgba(255, 152, 0, 0.2);
+    border-color: var(--admin);
+    transform: translateX(4px);
+}
+
+.superuser-link .material-symbols-rounded {
+    font-size: 1.1rem;
+}
+
+/* Login Card */
+.login-card {
+    text-align: center;
+    padding: 40px 24px;
+    background: linear-gradient(135deg, var(--card-bg), var(--card-hover));
+    border: 2px dashed var(--divider);
+}
+
+.login-card .card-icon {
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #666, #999);
+}
+
+.login-card h2 {
+    margin-bottom: 12px;
+}
+
+.login-card p {
+    margin-bottom: 24px;
+}
+
+.btn-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: #000;
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(0, 188, 212, 0.3);
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 188, 212, 0.4);
+}
+
+/* Animations */
+.welcome-card {
+    animation: slideUp 0.5s ease backwards;
+}
+
+.welcome-card:nth-child(1) { animation-delay: 0.1s; }
+.welcome-card:nth-child(2) { animation-delay: 0.2s; }
+.welcome-card:nth-child(3) { animation-delay: 0.3s; }
+.welcome-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="main-content">
-
-    <!-- Begrüßung -->
-    <div class="page-header" style="text-align:center; margin-bottom:1.5rem;">
-        <h2 style="display:flex;align-items:center;justify-content:center;gap:0.4rem;color:var(--accent);">
-            <span class="material-symbols-rounded">waving_hand</span>
-            {% trans "Willkommen bei Joel Digitals" %}
-        </h2>
-        <p style="color:#aaa;">{% trans "Hier findest du alle wichtigen Bereiche im Überblick." %}</p>
+<div class="hero-section">
+    <div class="hero-icon">
+        <span class="material-symbols-rounded">waving_hand</span>
     </div>
+    <h1 class="hero-title">{% trans "Welcome to Joel Digitals" %}</h1>
+    <p class="hero-subtitle">{% trans "Your central hub for support, sales, and appointments." %}</p>
+</div>
 
-    {% if user.is_authenticated %}
-    <!-- 🌐 Allgemeine Bereiche -->
+{% if user.is_authenticated %}
+    <!-- General Areas -->
     <div class="section-header">
         <span class="material-symbols-rounded">apps</span>
-        {% trans "Allgemeine Bereiche" %}
+        {% trans "General Areas" %}
     </div>
+    
     <div class="welcome-grid">
-        <div class="welcome-box">
-            <h2><span class="material-symbols-rounded">shopping_cart</span> {% trans "Verkauf" %}</h2>
-            <p>{% trans "Zugang zum Verkaufsbereich für Angebote und Kundenkommunikation." %}</p>
-            <a href="{% url 'sales_app' %}">{% trans "Zum Verkaufsbereich" %}</a>
+        <div class="welcome-card">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">shopping_cart</span>
+            </div>
+            <h2>{% trans "Sales" %}</h2>
+            <p>{% trans "Access the sales area for quotes and customer communication." %}</p>
+            <a href="{% url 'sales_app' %}" class="card-link">
+                {% trans "Go to Sales" %} <span class="material-symbols-rounded">arrow_forward</span>
+            </a>
         </div>
 
-        <div class="welcome-box">
-            <h2><span class="material-symbols-rounded">confirmation_number</span> {% trans "Tickets" %}</h2>
-            <p>{% trans "Hier kannst du Support-Tickets einsehen oder erstellen." %}</p>
-            <a href="{% url 'support_tickets_app' %}">{% trans "Zu den Tickets" %}</a>
+        <div class="welcome-card">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">confirmation_number</span>
+            </div>
+            <h2>{% trans "Tickets" %}</h2>
+            <p>{% trans "View or create support tickets here." %}</p>
+            <a href="{% url 'support_tickets_app' %}" class="card-link">
+                {% trans "Go to Tickets" %} <span class="material-symbols-rounded">arrow_forward</span>
+            </a>
         </div>
 
-        <div class="welcome-box">
-            <h2><span class="material-symbols-rounded">event</span> {% trans "Termine" %}</h2>
-            <p>{% trans "Hier kannst du deine bevorstehenden Termine einsehen." %}</p>
-            <a href="{% url 'appointments_app' %}">{% trans "Zu deinen Terminen" %}</a>
+        <div class="welcome-card">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">event</span>
+            </div>
+            <h2>{% trans "Appointments" %}</h2>
+            <p>{% trans "View your upcoming appointments here." %}</p>
+            <a href="{% url 'appointments_app' %}" class="card-link">
+                {% trans "Go to Appointments" %} <span class="material-symbols-rounded">arrow_forward</span>
+            </a>
         </div>
     </div>
 
-    <!-- 🛠 Admin- und Spezialbereiche -->
+    <!-- Admin Areas -->
     {% if is_superuser or in_support_sales or in_support_tickets %}
     <div class="section-header admin">
         <span class="material-symbols-rounded">admin_panel_settings</span>
-        {% trans "Admin- und Spezialbereiche" %}
+        {% trans "Admin & Special Areas" %}
     </div>
+    
     <div class="welcome-grid">
         {% if is_superuser %}
-        <div class="welcome-box admin">
-            <h2><span class="material-symbols-rounded">key</span> {% trans "Superuser-Bereich" %}</h2>
-            <p>{% trans "Voller Zugriff auf alle Systemfunktionen und Einstellungen." %}</p>
-            <a href="/admin/">{% trans "Webiste Admin öffnen" %}</a><br>
-            <a href="https://jds-management.de/admin/">{% trans "JDS Management Admin öffnen" %}</a><br>
-            <a href="https://jds-appstore.de/admin/">{% trans "JDS AppStore Admin öffnen" %}</a><br>
-            <a href="https://auftragnetz.de/admin/">{% trans "AuftragNetz Admin öffnen" %}</a><br>
+        <div class="welcome-card admin">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">key</span>
+            </div>
+            <h2>{% trans "Superuser Area" %}</h2>
+            <p>{% trans "Full access to all system functions and settings." %}</p>
+            <div class="superuser-links">
+                <a href="/admin/" class="superuser-link">
+                    <span class="material-symbols-rounded">language</span> {% trans "Website Admin" %}
+                </a>
+                <a href="https://jds-management.de/admin/" class="superuser-link">
+                    <span class="material-symbols-rounded">business</span> {% trans "JDS Management" %}
+                </a>
+                <a href="https://jds-appstore.de/admin/" class="superuser-link">
+                    <span class="material-symbols-rounded">apps</span> {% trans "JDS AppStore" %}
+                </a>
+                <a href="https://auftragnetz.de/admin/" class="superuser-link">
+                    <span class="material-symbols-rounded">network_node</span> {% trans "AuftragNetz" %}
+                </a>
+            </div>
         </div>
         {% endif %}
 
         {% if in_support_sales %}
-        <div class="welcome-box admin">
-            <h2><span class="material-symbols-rounded">store</span> {% trans "Verkauf (Admin)" %}</h2>
-            <p>{% trans "Verwaltung der Verkaufsanfragen und Teamaktivitäten." %}</p>
-            <a href="{% url 'admin_sales_app' %}">{% trans "Verkaufs-Admin öffnen" %}</a>
+        <div class="welcome-card admin">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">store</span>
+            </div>
+            <h2>{% trans "Sales (Admin)" %}</h2>
+            <p>{% trans "Management of sales inquiries and team activities." %}</p>
+            <a href="{% url 'admin_sales_app' %}" class="card-link">
+                {% trans "Open Sales Admin" %} <span class="material-symbols-rounded">arrow_forward</span>
+            </a>
         </div>
         {% endif %}
 
         {% if in_support_tickets %}
-        <div class="welcome-box admin">
-            <h2><span class="material-symbols-rounded">support_agent</span> {% trans "Tickets (Admin)" %}</h2>
-            <p>{% trans "Übersicht und Bearbeitung aller eingehenden Support-Tickets." %}</p>
-            <a href="{% url 'admin_tickets_app' %}">{% trans "Tickets-Admin öffnen" %}</a>
+        <div class="welcome-card admin">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">support_agent</span>
+            </div>
+            <h2>{% trans "Tickets (Admin)" %}</h2>
+            <p>{% trans "Overview and processing of all incoming support tickets." %}</p>
+            <a href="{% url 'admin_tickets_app' %}" class="card-link">
+                {% trans "Open Tickets Admin" %} <span class="material-symbols-rounded">arrow_forward</span>
+            </a>
         </div>
         {% endif %}
 
         {% if is_superuser or in_support_sales or in_support_tickets %}
-        <div class="welcome-box admin">
-            <h2><span class="material-symbols-rounded">event_available</span> {% trans "Termine (Admin)" %}</h2>
-            <p>{% trans "Verwalte alle Termine und Zugriffe für Teammitglieder." %}</p>
-            <a href="{% url 'admin_appointments_app' %}">{% trans "Termine-Admin öffnen" %}</a>
+        <div class="welcome-card admin">
+            <div class="card-icon">
+                <span class="material-symbols-rounded">event_available</span>
+            </div>
+            <h2>{% trans "Appointments (Admin)" %}</h2>
+            <p>{% trans "Manage all appointments and access for team members." %}</p>
+            <a href="{% url 'admin_appointments_app' %}" class="card-link">
+                {% trans "Open Appointments Admin" %} <span class="material-symbols-rounded">arrow_forward</span>
+            </a>
         </div>
         {% endif %}
     </div>
     {% endif %}
 
-    {% else %}
-    <!-- Nicht eingeloggt -->
-    <div class="welcome-box" style="margin-top:2rem;">
-        <h2><span class="material-symbols-rounded">lock</span> {% trans "Nicht eingeloggt" %}</h2>
-        <p>{% trans "Du bist nicht eingeloggt." %} <a href="{% url 'login_app' %}">{% trans "Hier einloggen" %}</a></p>
+{% else %}
+    <!-- Not Logged In -->
+    <div class="welcome-card login-card">
+        <div class="card-icon">
+            <span class="material-symbols-rounded">lock</span>
+        </div>
+        <h2>{% trans "Not Logged In" %}</h2>
+        <p>{% trans "Please log in to access all features and areas." %}</p>
+        <a href="{% url 'login_app' %}" class="btn-login">
+            <span class="material-symbols-rounded">login</span> {% trans "Login" %}
+        </a>
     </div>
-    {% endif %}
-
-</div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
 <script>
-console.log("Startseite geladen mit getrennten Benutzer-, Adminbereichen und Terminen.");
+console.log("Joel Digitals Support App loaded");
 </script>
 {% endblock %}

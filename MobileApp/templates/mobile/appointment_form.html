@@ -1,585 +1,790 @@
 {% extends "base_mobile.html" %}
 {% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Book Appointment" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-.form-box {
-    background: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    margin: 20px auto;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    max-width: 600px;
-    color: #2563eb;
-}
+  .appointment-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
 
-.form-box h1 {
-    font-size: 28px;
-    margin-bottom: 20px;
-    color: #2563eb;
-}
+  .appointment-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-.form-group {
-    margin-bottom: 16px;
-}
+  .appointment-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
 
-.form-row {
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .appointment-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .appointment-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .appointment-body {
+    background: var(--surface);
+    padding: 3rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+  }
+
+  /* Form Styles */
+  .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
-}
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
 
-label {
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group.full-width {
+    grid-column: 1 / -1;
+  }
+
+  label {
     display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    color: #2563eb;
-}
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
 
-input, select {
+  input, select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 14px;
-}
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 1rem;
+    background: var(--bg);
+    color: var(--text);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
 
-input:focus, select:focus {
+  input:focus, select:focus {
     outline: none;
-    border-color: #2563eb;
-}
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.1);
+  }
 
-button.btn {
-    margin-top: 10px;
-    background: #2563eb;
-    color: #fff;
+  /* Button Styles */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 14px;
-    transition: 0.2s;
-}
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
 
-button.btn:hover {
-    background: #1d4ed8;
-}
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 68, 204, 0.4);
+  }
 
-button.btn:disabled {
+  .btn:disabled {
     background: #d1d5db;
     color: #6b7280;
     cursor: not-allowed;
-}
+    transform: none;
+    box-shadow: none;
+  }
 
-button.btn-submit {
-    background: #10b981;
+  .btn-submit {
     width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    margin-top: 20px;
-}
+    padding: 1rem;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
 
-button.btn-submit:hover {
-    background: #059669;
-}
+  .btn-submit:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  }
 
-.selected-display {
-    margin-top: 10px;
-    padding: 12px;
-    background: #dbeafe;
-    border-left: 4px solid #2563eb;
-    border-radius: 6px;
+  /* Selected Display */
+  .selected-display {
+    margin-top: 1rem;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, rgba(0, 68, 204, 0.1), rgba(0, 102, 255, 0.05));
+    border-left: 4px solid var(--primary);
+    border-radius: 10px;
     display: none;
-    font-size: 14px;
-}
+    font-size: 0.95rem;
+    color: var(--text);
+  }
 
-.selected-display.show {
+  .selected-display.show {
     display: block;
-}
+  }
 
-#overlay {
+  .selected-display strong {
+    color: var(--primary);
+  }
+
+  /* Error Text */
+  .error-text {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  /* Popup Styles */
+  #overlay {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
     z-index: 999;
-}
+  }
 
-#overlay.show {
+  #overlay.show {
     display: block;
-}
+  }
 
-#datePopup {
+  #datePopup {
     display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #fff;
-    color: #2563eb;
-    border-radius: 12px;
-    padding: 0;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
     z-index: 1000;
     max-width: 900px;
     width: 90%;
     max-height: 85vh;
     overflow: hidden;
-}
+    border: 2px solid var(--border);
+  }
 
-#datePopup.show {
+  #datePopup.show {
     display: block;
-}
+  }
 
-.popup-header {
-    padding: 20px;
-    border-bottom: 1px solid #e5e7eb;
+  .popup-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
+    background: var(--bg);
+  }
 
-.popup-header h2 {
-    font-size: 22px;
-    color: #2563eb;
-}
+  .popup-header h2 {
+    font-size: 1.5rem;
+    color: var(--text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
 
-.close-btn {
+  .popup-header h2 i {
+    color: var(--primary);
+  }
+
+  .close-btn {
     background: none;
     border: none;
-    font-size: 28px;
-    color: #6b7280;
+    font-size: 1.5rem;
+    color: #666;
     cursor: pointer;
-    padding: 0;
-    margin: 0;
-    line-height: 1;
-}
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+  }
 
-.close-btn:hover {
-    color: #2563eb;
-}
+  .close-btn:hover {
+    background: rgba(0, 68, 204, 0.1);
+    color: var(--primary);
+  }
 
-.popup-content {
+  .popup-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
     max-height: calc(85vh - 80px);
     overflow-y: auto;
-}
+  }
 
-.calendar-section, .slots-section {
-    padding: 20px;
-}
+  .calendar-section, .slots-section {
+    padding: 2rem;
+  }
 
-.calendar-section {
-    border-right: 1px solid #e5e7eb;
-}
+  .calendar-section {
+    border-right: 2px solid var(--border);
+    background: var(--bg);
+  }
 
-.calendar-header {
+  .calendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
-}
+    margin-bottom: 1.5rem;
+  }
 
-.calendar-header button {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #2563eb;
+  .calendar-header button {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    font-size: 1.25rem;
+    color: var(--primary);
     cursor: pointer;
-    padding: 4px 12px;
-    border-radius: 6px;
-    transition: 0.2s;
-}
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s;
+  }
 
-.calendar-header button:hover {
-    background: #f3f4f6;
-}
+  .calendar-header button:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
 
-.calendar-header h3 {
-    font-size: 18px;
-    color: #2563eb;
-}
+  .calendar-header h3 {
+    font-size: 1.25rem;
+    color: var(--text);
+    margin: 0;
+    font-weight: 700;
+  }
 
-.calendar-weekdays {
+  .calendar-weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 4px;
     margin-bottom: 8px;
     text-align: center;
-    font-size: 12px;
+    font-size: 0.875rem;
     font-weight: 600;
-    color: #6b7280;
-}
+    color: #666;
+  }
 
-.calendar-days {
+  .calendar-days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 4px;
-}
+  }
 
-.calendar-day {
+  .calendar-day {
     aspect-ratio: 1;
     border: none;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
     cursor: pointer;
-    transition: 0.2s;
-}
+    transition: all 0.3s;
+    background: var(--surface);
+    color: var(--text);
+    font-weight: 500;
+  }
 
-.calendar-day.available {
-    background: #2563eb;
-    color: #fff;
-}
+  .calendar-day.available {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+  }
 
-.calendar-day.available:hover {
-    background: #1d4ed8;
-}
+  .calendar-day.available:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.4);
+  }
 
-.calendar-day.selected {
-    background: #10b981;
-    color: #fff;
+  .calendar-day.selected {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
-}
+  }
 
-.calendar-day.unavailable {
-    background: #f3f4f6;
+  .calendar-day.unavailable {
+    background: var(--surface);
     color: #9ca3af;
     cursor: not-allowed;
-}
+    opacity: 0.5;
+  }
 
-.calendar-legend {
+  .calendar-legend {
     display: flex;
-    gap: 16px;
-    margin-top: 12px;
-    font-size: 12px;
-}
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+  }
 
-.loading-calendar {
-    text-align: center;
-    padding: 40px 20px;
-    display: none;
-}
-
-.loading-calendar.show {
-    display: block;
-}
-
-.calendar-content {
-    display: none;
-}
-
-.calendar-content.show {
-    display: block;
-}
-
-.legend-item {
+  .legend-item {
     display: flex;
     align-items: center;
-    gap: 6px;
-}
+    gap: 0.5rem;
+  }
 
-.legend-box {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-}
+  .legend-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+  }
 
-.legend-box.available {
-    background: #2563eb;
-}
+  .legend-box.available {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+  }
 
-.legend-box.unavailable {
-    background: #f3f4f6;
-}
+  .legend-box.unavailable {
+    background: var(--surface);
+    border: 2px solid var(--border);
+  }
 
-.slots-section h3 {
-    font-size: 18px;
-    margin-bottom: 16px;
-    color: #2563eb;
-}
-
-.slots-placeholder {
+  .loading-calendar, .loading-slots {
     text-align: center;
-    padding: 60px 20px;
-    color: #6b7280;
-}
-
-.slots-placeholder.hide {
+    padding: 3rem 1rem;
     display: none;
-}
+  }
 
-.loading-slots {
-    text-align: center;
-    padding: 60px 20px;
-    display: none;
-}
-
-.loading-slots.show {
+  .loading-calendar.show, .loading-slots.show {
     display: block;
-}
+  }
 
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #e5e7eb;
-    border-top-color: #2563eb;
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin: 0 auto 16px;
-}
+    margin: 0 auto 1rem;
+  }
 
-@keyframes spin {
+  @keyframes spin {
     to { transform: rotate(360deg); }
-}
+  }
 
-.slots-container {
+  .calendar-content {
     display: none;
-}
+  }
 
-.slots-container.show {
+  .calendar-content.show {
     display: block;
-}
+  }
 
-.selected-date-info {
-    padding: 12px;
-    background: #dbeafe;
-    border-left: 4px solid #2563eb;
-    border-radius: 6px;
-    margin-bottom: 16px;
-    font-size: 14px;
-}
+  .slots-section h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
 
-.selected-date-info p:first-child {
-    color: #6b7280;
-    font-size: 12px;
-    margin-bottom: 4px;
-}
+  .slots-section h3 i {
+    color: var(--primary);
+  }
 
-.selected-date-info p:last-child {
-    font-weight: 600;
-    color: #2563eb;
-}
+  .slots-placeholder {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 2px dashed var(--border);
+  }
 
-.slots-grid {
+  .slots-placeholder.hide {
+    display: none;
+  }
+
+  .slots-placeholder i {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .slots-container {
+    display: none;
+  }
+
+  .slots-container.show {
+    display: block;
+  }
+
+  .selected-date-info {
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, rgba(0, 68, 204, 0.1), rgba(0, 102, 255, 0.05));
+    border-left: 4px solid var(--primary);
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .selected-date-info p:first-child {
+    color: #666;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .selected-date-info p:last-child {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 1.1rem;
+  }
+
+  .slots-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 0.75rem;
     max-height: 400px;
     overflow-y: auto;
-}
+  }
 
-.slot {
-    padding: 10px 16px;
-    background: #fff;
-    color: #2563eb;
-    border: 2px solid #2563eb;
-    border-radius: 6px;
+  .slot {
+    padding: 0.75rem;
+    background: var(--bg);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 8px;
     cursor: pointer;
     text-align: center;
-    font-size: 14px;
-    transition: 0.2s;
-}
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
 
-.slot:hover {
-    background: #2563eb;
-    color: #fff;
-}
+  .slot:hover:not(.disabled) {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+  }
 
-.slot.disabled {
-    background: #f3f4f6;
+  .slot.disabled {
+    background: var(--surface);
     color: #9ca3af;
-    border-color: #e5e7eb;
+    border-color: var(--border);
     cursor: not-allowed;
-}
+    opacity: 0.5;
+  }
 
-.slot.disabled:hover {
-    background: #f3f4f6;
-    color: #9ca3af;
-}
-
-.no-slots {
+  .no-slots {
     text-align: center;
-    padding: 60px 20px;
-    color: #6b7280;
+    padding: 4rem 2rem;
+    color: #666;
     display: none;
-}
+    background: var(--bg);
+    border-radius: 12px;
+    border: 2px dashed var(--border);
+  }
 
-.no-slots.show {
+  .no-slots.show {
     display: block;
-}
+  }
 
-.error-text {
+  .no-slots i {
+    font-size: 3rem;
     color: #dc2626;
-    font-size: 12px;
-    margin-top: 4px;
-}
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
 
-@media (max-width: 768px) {
-    .form-row {
-        grid-template-columns: 1fr;
+  /* Responsive */
+  @media (max-width: 768px) {
+    .appointment-container {
+      margin: 1rem auto;
     }
-    
+
+    .appointment-header {
+      padding: 2rem 1.5rem;
+    }
+
+    .header-icon {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+    }
+
+    .appointment-title {
+      font-size: 1.5rem;
+    }
+
+    .appointment-body {
+      padding: 1.5rem;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
     .popup-content {
-        grid-template-columns: 1fr;
+      grid-template-columns: 1fr;
     }
-    
+
     .calendar-section {
-        border-right: none;
-        border-bottom: 1px solid #e5e7eb;
+      border-right: none;
+      border-bottom: 2px solid var(--border);
     }
-    
+
     .slots-grid {
-        grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, 1fr);
     }
-}
+
+    .calendar-section, .slots-section {
+      padding: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .appointment-title {
+      font-size: 1.3rem;
+    }
+
+    .slots-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 
-<div class="form-box">
-    <h1>Termin vereinbaren</h1>
-    
+<div class="appointment-container">
+  <!-- Header -->
+  <div class="appointment-header">
+    <div class="header-icon">
+      <i class="fas fa-calendar-check"></i>
+    </div>
+    <h1 class="appointment-title">{% trans "Book Appointment" %}</h1>
+    <p class="appointment-subtitle">{% trans "Schedule your meeting with us" %}</p>
+  </div>
+
+  <!-- Body -->
+  <div class="appointment-body">
+
     <form method="post" id="appointmentForm">
-        {% csrf_token %}
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>Vorname:</label>
-                {{ form.first_name }}
-                {% if form.first_name.errors %}
-                    <p class="error-text">{{ form.first_name.errors.0 }}</p>
-                {% endif %}
-            </div>
-            
-            <div class="form-group">
-                <label>Nachname:</label>
-                {{ form.last_name }}
-                {% if form.last_name.errors %}
-                    <p class="error-text">{{ form.last_name.errors.0 }}</p>
-                {% endif %}
-            </div>
+      {% csrf_token %}
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label>{% trans "First Name" %}:</label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}
+            <p class="error-text"><i class="fas fa-exclamation-circle"></i> {{ form.first_name.errors.0 }}</p>
+          {% endif %}
         </div>
         
         <div class="form-group">
-            <label>E-Mail:</label>
-            {{ form.email }}
-            {% if form.email.errors %}
-                <p class="error-text">{{ form.email.errors.0 }}</p>
-            {% endif %}
+          <label>{% trans "Last Name" %}:</label>
+          {{ form.last_name }}
+          {% if form.last_name.errors %}
+            <p class="error-text"><i class="fas fa-exclamation-circle"></i> {{ form.last_name.errors.0 }}</p>
+          {% endif %}
         </div>
+      </div>
+      
+      <div class="form-group">
+        <label>{% trans "Email" %}:</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+          <p class="error-text"><i class="fas fa-exclamation-circle"></i> {{ form.email.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <label>{% trans "Phone" %}:</label>
+        {{ form.phone }}
+        {% if form.phone.errors %}
+          <p class="error-text"><i class="fas fa-exclamation-circle"></i> {{ form.phone.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <label>{% trans "Appointment Type" %}:</label>
+        {{ form.appointment_type }}
+        {% if form.appointment_type.errors %}
+          <p class="error-text"><i class="fas fa-exclamation-circle"></i> {{ form.appointment_type.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <label>{% trans "Select Date & Time" %}:</label>
+        <button type="button" id="openDatePopup" class="btn">
+          <i class="fas fa-calendar-alt"></i> {% trans "Choose Date & Time" %}
+        </button>
         
-        <div class="form-group">
-            <label>Telefon:</label>
-            {{ form.phone }}
-            {% if form.phone.errors %}
-                <p class="error-text">{{ form.phone.errors.0 }}</p>
-            {% endif %}
-        </div>
+        <input type="hidden" name="appointment_datetime" id="appointment_datetime">
         
-        <div class="form-group">
-            <label>Terminart:</label>
-            {{ form.appointment_type }}
-            {% if form.appointment_type.errors %}
-                <p class="error-text">{{ form.appointment_type.errors.0 }}</p>
-            {% endif %}
-        </div>
+        <div id="selectedDisplay" class="selected-display"></div>
         
-        <div class="form-group">
-            <label>Datum & Uhrzeit wählen:</label>
-            <button type="button" id="openDatePopup" class="btn">Datum & Zeit wählen</button>
-            
-            <input type="hidden" name="appointment_datetime" id="appointment_datetime">
-            
-            <div id="selectedDisplay" class="selected-display"></div>
-            
-            {% if form.appointment_datetime.errors %}
-                <p class="error-text">{{ form.appointment_datetime.errors.0 }}</p>
-            {% endif %}
-        </div>
-        
-        <button type="submit" class="btn btn-submit" id="submitBtn" disabled>Jetzt buchen</button>
+        {% if form.appointment_datetime.errors %}
+          <p class="error-text"><i class="fas fa-exclamation-circle"></i> {{ form.appointment_datetime.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <button type="submit" class="btn btn-submit" id="submitBtn" disabled>
+        <i class="fas fa-check-circle"></i> {% trans "Book Now" %}
+      </button>
     </form>
+  </div>
 </div>
 
 <div id="overlay"></div>
 
 <div id="datePopup">
-    <div class="popup-header">
-        <h2>Verfügbare Termine</h2>
-        <button type="button" class="close-btn" id="closePopup">&times;</button>
-    </div>
-    
-    <div class="popup-content">
-        <!-- Kalender Sektion -->
-        <div class="calendar-section">
-            <div class="loading-calendar" id="loadingCalendar">
-                <div class="spinner"></div>
-                <p>Lade verfügbare Termine...</p>
-            </div>
-            
-            <div class="calendar-content" id="calendarContent">
-                <div class="calendar-header">
-                    <button type="button" id="prevMonth">‹</button>
-                    <h3 id="currentMonth"></h3>
-                    <button type="button" id="nextMonth">›</button>
-                </div>
-                
-                <div class="calendar-weekdays">
-                    <div>Mo</div>
-                    <div>Di</div>
-                    <div>Mi</div>
-                    <div>Do</div>
-                    <div>Fr</div>
-                    <div>Sa</div>
-                    <div>So</div>
-                </div>
-                
-                <div class="calendar-days" id="calendarDays"></div>
-                
-                <div class="calendar-legend">
-                    <div class="legend-item">
-                        <div class="legend-box available"></div>
-                        <span>Verfügbar</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-box unavailable"></div>
-                        <span>Nicht verfügbar</span>
-                    </div>
-                </div>
-            </div>
+  <div class="popup-header">
+    <h2><i class="fas fa-clock"></i> {% trans "Available Appointments" %}</h2>
+    <button type="button" class="close-btn" id="closePopup">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  
+  <div class="popup-content">
+    <!-- Calendar Section -->
+    <div class="calendar-section">
+      <div class="loading-calendar" id="loadingCalendar">
+        <div class="spinner"></div>
+        <p>{% trans "Loading available dates..." %}</p>
+      </div>
+      
+      <div class="calendar-content" id="calendarContent">
+        <div class="calendar-header">
+          <button type="button" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+          <h3 id="currentMonth"></h3>
+          <button type="button" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
         </div>
         
-        <!-- Slots Sektion -->
-        <div class="slots-section">
-            <h3>Verfügbare Zeiten</h3>
-            
-            <div class="slots-placeholder" id="slotsPlaceholder">
-                <p>Bitte wählen Sie zuerst ein Datum</p>
-            </div>
-            
-            <div class="loading-slots" id="loadingSlots">
-                <div class="spinner"></div>
-                <p>Lade verfügbare Zeiten...</p>
-            </div>
-            
-            <div class="slots-container" id="slotsContainer">
-                <div class="selected-date-info">
-                    <p>Gewähltes Datum:</p>
-                    <p id="selectedDateDisplay"></p>
-                </div>
-                <div class="slots-grid" id="slotsList"></div>
-            </div>
-            
-            <div class="no-slots" id="noSlots">
-                <p>Keine verfügbaren Termine an diesem Tag</p>
-                <p style="font-size: 12px; margin-top: 8px;">Bitte wählen Sie ein anderes Datum</p>
-            </div>
+        <div class="calendar-weekdays">
+          <div>{% trans "Mon" %}</div>
+          <div>{% trans "Tue" %}</div>
+          <div>{% trans "Wed" %}</div>
+          <div>{% trans "Thu" %}</div>
+          <div>{% trans "Fri" %}</div>
+          <div>{% trans "Sat" %}</div>
+          <div>{% trans "Sun" %}</div>
         </div>
+        
+        <div class="calendar-days" id="calendarDays"></div>
+        
+        <div class="calendar-legend">
+          <div class="legend-item">
+            <div class="legend-box available"></div>
+            <span>{% trans "Available" %}</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-box unavailable"></div>
+            <span>{% trans "Unavailable" %}</span>
+          </div>
+        </div>
+      </div>
     </div>
+    
+    <!-- Slots Section -->
+    <div class="slots-section">
+      <h3><i class="fas fa-list"></i> {% trans "Available Times" %}</h3>
+      
+      <div class="slots-placeholder" id="slotsPlaceholder">
+        <i class="fas fa-hand-pointer"></i>
+        <p>{% trans "Please select a date first" %}</p>
+      </div>
+      
+      <div class="loading-slots" id="loadingSlots">
+        <div class="spinner"></div>
+        <p>{% trans "Loading available times..." %}</p>
+      </div>
+      
+      <div class="slots-container" id="slotsContainer">
+        <div class="selected-date-info">
+          <p>{% trans "Selected Date" %}:</p>
+          <p id="selectedDateDisplay"></p>
+        </div>
+        <div class="slots-grid" id="slotsList"></div>
+      </div>
+      
+      <div class="no-slots" id="noSlots">
+        <i class="fas fa-calendar-times"></i>
+        <p>{% trans "No available appointments on this day" %}</p>
+        <p style="font-size: 0.875rem; margin-top: 0.5rem;">{% trans "Please select another date" %}</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -611,7 +816,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function openPopup() {
         if (!appointmentType.value) {
-            alert('Bitte wählen Sie zuerst eine Terminart aus.');
+            alert('{% trans "Please select an appointment type first." %}');
             return;
         }
         overlay.classList.add('show');
@@ -629,7 +834,6 @@ document.addEventListener('DOMContentLoaded', function() {
     overlay.addEventListener('click', closePopup);
     
     function loadAvailableDates() {
-        // Zeige Ladescreen
         loadingCalendar.classList.add('show');
         calendarContent.classList.remove('show');
         
@@ -642,9 +846,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 renderCalendar();
             })
             .catch(error => {
-                console.error('Fehler beim Laden der Daten:', error);
+                console.error('Error loading dates:', error);
                 loadingCalendar.classList.remove('show');
-                alert('Fehler beim Laden der verfügbaren Termine.');
+                alert('{% trans "Error loading available appointments." %}');
             });
     }
     
@@ -652,7 +856,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         
-        currentMonthEl.textContent = new Date(year, month).toLocaleDateString('de-DE', {
+        currentMonthEl.textContent = new Date(year, month).toLocaleDateString('{{ LANGUAGE_CODE|default:"de" }}-DE', {
             month: 'long',
             year: 'numeric'
         });
@@ -665,7 +869,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         calendarDays.innerHTML = '';
         
-        // Leere Tage am Anfang
         for (let i = 0; i < startOffset; i++) {
             const emptyDay = document.createElement('div');
             calendarDays.appendChild(emptyDay);
@@ -674,10 +877,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
-        // Tage des Monats
         for (let day = 1; day <= lastDay.getDate(); day++) {
             const date = new Date(year, month, day);
-            // Formatiere Datum manuell um Timezone-Probleme zu vermeiden
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const isAvailable = availableDates.includes(dateStr);
             const isPast = date < today;
@@ -713,7 +914,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadSlots(dateStr) {
         const typeId = appointmentType.value;
         
-        // Alle Bereiche verstecken
         slotsPlaceholder.classList.add('hide');
         slotsContainer.classList.remove('show');
         noSlots.classList.remove('show');
@@ -734,11 +934,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 
-                // Parse Datum OHNE Timezone-Konvertierung
                 const [year, month, day] = dateStr.split('-');
                 const d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
                 
-                selectedDateDisplay.textContent = d.toLocaleDateString('de-DE', {
+                selectedDateDisplay.textContent = d.toLocaleDateString('{{ LANGUAGE_CODE|default:"de" }}-DE', {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
@@ -769,15 +968,13 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 loadingSlots.classList.remove('show');
                 noSlots.classList.add('show');
-                console.error('Fehler beim Laden der Slots:', error);
+                console.error('Error loading slots:', error);
             });
     }
     
     function selectSlot(datetime, time, dateStr) {
-        // Parse datetime korrekt (kommt im ISO-Format vom Server)
         const dt = new Date(datetime);
         
-        // Formatiere für Django (YYYY-MM-DD HH:MM:SS)
         const year = dt.getUTCFullYear();
         const month = String(dt.getUTCMonth() + 1).padStart(2, '0');
         const day = String(dt.getUTCDate()).padStart(2, '0');
@@ -787,17 +984,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         datetimeInput.value = djangoFormat;
         
-        // Parse Datum OHNE Timezone-Konvertierung für Anzeige
         const [yearStr, monthStr, dayStr] = dateStr.split('-');
         const d = new Date(parseInt(yearStr), parseInt(monthStr) - 1, parseInt(dayStr));
-        const dateFormatted = d.toLocaleDateString('de-DE', {
+        const dateFormatted = d.toLocaleDateString('{{ LANGUAGE_CODE|default:"de" }}-DE', {
             weekday: 'short',
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         });
         
-        selectedDisplay.innerHTML = `<strong>Gewählt:</strong> ${dateFormatted} um ${time} Uhr`;
+        selectedDisplay.innerHTML = `<strong>{% trans "Selected" %}:</strong> ${dateFormatted} {% trans "at" %} ${time} {% trans "o'clock" %}`;
         selectedDisplay.classList.add('show');
         submitBtn.disabled = false;
         

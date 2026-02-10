@@ -1,277 +1,592 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="de">
+<html lang="{{ LANGUAGE_CODE|default:'de' }}">
 <head>
     <meta charset="UTF-8">
-    <title>Login – Joel Digitals</title>
+    <title>{% trans "Login" %} – Joel Digitals</title>
     <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-dark: #121212;
-            --surface: #1e1e1e;
-            --accent: #4f9dff;
-            --accent-hover: #1f78ff;
-            --text: #e0e0e0;
-            --muted: #aaaaaa;
-            --error: #ff5252;
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-elevated: #1a1a1a;
+            --accent: #00bcd4;
+            --accent-hover: #26c6da;
+            --accent-glow: rgba(0, 188, 212, 0.3);
+            --text: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --border: #2a2a2a;
+            --error: #ef4444;
+            --success: #10b981;
+            --radius: 16px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         html, body {
             height: 100%;
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bg-dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
             color: var(--text);
             display: flex;
             flex-direction: column;
+            line-height: 1.5;
         }
 
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 188, 212, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 188, 212, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Header */
         header {
-            background-color: #1a1a1a;
-            padding: 10px 20px;
+            position: relative;
+            z-index: 10;
+            background: rgba(20, 20, 20, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            justify-content: center;
         }
 
-        .logo-img {
-            width: 220px;
-            height: auto;
-        }
-
-        nav a {
-            color: var(--accent);
-            margin: 0 10px;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             text-decoration: none;
         }
 
-        nav a:hover {
-            text-decoration: underline;
-            color: var(--accent-hover);
+        .brand img {
+            height: 40px;
+            width: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 188, 212, 0.2);
         }
 
+        .brand-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Main Content */
         main {
             flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 40px 20px;
-            max-width: 480px;
-            margin: auto;
+            position: relative;
+            z-index: 1;
         }
 
-        .container {
-            background-color: var(--surface);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 188, 212, 0.3);
+        }
+
+        .login-icon .material-symbols-rounded {
+            font-size: 32px;
+            color: #000;
         }
 
         h2 {
-            margin-top: 0;
-            color: white;
-        }
-
-        input, select, textarea {
-            background-color: #2c2c2c;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
             color: var(--text);
-            font-size: 16px;
-            padding: 12px 10px;
-            margin-bottom: 20px;
-            width: 100%;
-            border: 1px solid #444;
-            border-radius: 6px;
-            box-sizing: border-box;
         }
 
-        input:focus, textarea:focus, select:focus {
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+            width: 100%;
+            background: var(--surface-elevated);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            font-size: 1rem;
+            color: var(--text);
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus {
             outline: none;
             border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
         }
 
-        .btn {
-            background-color: var(--accent);
-            color: #fff;
-            padding: 14px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
+        input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 20px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-message::before {
+            content: 'error';
+            font-family: 'Material Symbols Rounded';
+            font-size: 1.2rem;
+        }
+
+        /* Button */
+        .btn-login {
             width: 100%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: #000;
+            border: none;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
         }
 
-        .btn:hover {
-            background-color: var(--accent-hover);
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4);
         }
 
-        .container p {
-            font-size: 0.9rem;
-            color: var(--muted);
+        .btn-login:active {
+            transform: translateY(0);
         }
 
-        .container a {
-            color: var(--accent);
+        .btn-login .material-symbols-rounded {
+            font-size: 1.2rem;
         }
 
-        footer {
-            background-color: #1a1a1a;
-            padding: 20px;
+        /* Register Link */
+        .register-section {
             text-align: center;
-            font-size: 14px;
-            color: var(--muted);
-            border-top: 1px solid #333;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .register-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .btn-register {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            border: 2px solid transparent;
+        }
+
+        .btn-register:hover {
+            color: var(--accent-hover);
+            border-color: var(--accent);
+            background: rgba(0, 188, 212, 0.05);
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 10;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 24px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
         }
 
         footer a {
-            color: var(--muted);
-            margin: 0 5px;
+            color: var(--text-secondary);
             text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        footer a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.2s;
         }
 
         footer a:hover {
             color: var(--accent);
         }
 
+        footer a:hover::after {
+            width: 100%;
+        }
+
+        .copyright {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Cookie Banner */
         #cookie-banner {
             position: fixed;
             bottom: 0;
-            width: 100%;
-            background-color: #222;
-            color: white;
-            padding: 15px;
-            text-align: center;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 20px 24px;
             z-index: 1000;
-            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
         }
 
-        #cookie-banner button {
-            background-color: var(--accent);
-            color: white;
+        #cookie-banner.show {
+            transform: translateY(0);
+        }
+
+        #cookie-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .btn-cookie {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: #000;
             border: none;
-            padding: 8px 16px;
-            margin-left: 10px;
-            border-radius: 5px;
+            padding: 10px 24px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
         }
 
-        #cookie-banner button:hover {
-            background-color: var(--accent-hover);
+        .btn-cookie:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
         }
 
-        #language-switch {
+        /* Language Switch */
+        .language-switch {
             position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #1e1e1e;
-            color: var(--text);
-            padding: 5px 8px;
-            border-radius: 5px;
-            font-size: 14px;
-            z-index: 1001;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        #language-switch select {
-            background: #2c2c2c;
-            color: var(--text);
-            font-size: 14px;
-            border: 1px solid #555;
-            padding: 3px 6px;
-            border-radius: 4px;
+        .language-switch .material-symbols-rounded {
+            color: var(--accent);
+            font-size: 1.2rem;
         }
 
-        @media (max-width: 600px) {
-            main {
-                padding: 20px 10px;
+        .language-switch select {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 0.875rem;
+            cursor: pointer;
+            font-family: inherit;
+            padding-right: 8px;
+        }
+
+        .language-switch select:focus {
+            outline: none;
+        }
+
+        .language-switch select option {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 32px 24px;
+                border-radius: var(--radius-sm);
             }
 
-            .container {
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: none;
+            h2 {
+                font-size: 1.5rem;
             }
 
-            .logo-img {
-                width: 180px;
+            .language-switch {
+                top: 10px;
+                right: 10px;
+                padding: 6px 10px;
             }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+
+        /* Loading Animation */
+        .btn-login.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .btn-login.loading::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
 
-<header>
-    <img src="{% static 'logo.png' %}" alt="Logo" class="logo-img">
-    <nav>
-        <!-- Optionale Navigation -->
-    </nav>
-</header>
+    <header>
+        <a href="/" class="brand">
+            <img src="{% static 'favicon.png' %}" alt="Joel Digitals">
+            <span class="brand-text">Joel Digitals</span>
+        </a>
+    </header>
 
+    <main>
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-icon">
+                        <span class="material-symbols-rounded">login</span>
+                    </div>
+                    <h2>{% trans "Welcome Back" %}</h2>
+                    <p class="login-subtitle">{% trans "Please sign in to continue" %}</p>
+                </div>
 
+                {% if form.errors %}
+                <div class="error-message">
+                    {% trans "Invalid username or password. Please try again." %}
+                </div>
+                {% endif %}
 
-<main>
-    <div class="container">
-        <h2>Login</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn">Einloggen</button>
-        </form>
-        <p>Noch keinen Account?
-            <a href="https://joel-digitals.onrender.com/auth/register/">Jetzt registrieren</a>
-        </p>
-    </div>
-</main>
+                <form method="post" id="loginForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="id_username">{% trans "Username" %}</label>
+                        <input type="text" name="username" id="id_username" placeholder="{% trans 'Enter your username' %}" required autofocus>
+                    </div>
 
-<div id="cookie-banner">
-    <span id="cookie-text">Wir verwenden Cookies, um Ihre Erfahrung zu verbessern.</span>
-    <button onclick="acceptCookies()">Akzeptieren</button>
-</div>
+                    <div class="form-group">
+                        <label for="id_password">{% trans "Password" %}</label>
+                        <input type="password" name="password" id="id_password" placeholder="{% trans 'Enter your password' %}" required>
+                    </div>
 
-<footer>
-    <a>&copy; 2025 Joel Digitals. Alle Rechte vorbehalten.</a>
-    <p>
-        <a href="/imprint/">Impressum</a> |
-        <a href="/privacy/">Datenschutz</a> |
-        <a href="/terms/">AGB</a>
-    </p>
-</footer>
+                    <button type="submit" class="btn-login" id="submitBtn">
+                        <span class="material-symbols-rounded">login</span>
+                        {% trans "Sign In" %}
+                    </button>
+                </form>
 
-<script>
-    const cookieBanner = document.getElementById("cookie-banner");
-    const cookieText = document.getElementById("cookie-text");
-    const languageSelect = document.getElementById("language-select");
+                <div class="register-section">
+                    <p class="register-text">{% trans "Don't have an account?" %}</p>
+                    <a href="https://joel-digitals.de/auth/register/" class="btn-register">
+                        {% trans "Create Account" %}
+                        <span class="material-symbols-rounded">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
 
-    function acceptCookies() {
-        localStorage.setItem("cookiesAccepted", "true");
-        cookieBanner.style.display = "none";
-    }
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/imprint/">{% trans "Imprint" %}</a>
+                <a href="/privacy/">{% trans "Privacy Policy" %}</a>
+                <a href="/terms/">{% trans "Terms of Service" %}</a>
+            </div>
+            <p class="copyright"> 2025-2026 Joel Digitals. {% trans "All rights reserved." %}</p>
+        </div>
+    </footer>
 
-    function checkCookieConsent() {
-        if (localStorage.getItem("cookiesAccepted") === "true") {
-            cookieBanner.style.display = "none";
+    <script>
+        // Cookie Banner
+        function acceptCookies() {
+            localStorage.setItem("cookiesAccepted", "true");
+            document.getElementById("cookie-banner").classList.remove("show");
         }
-    }
 
-    function updateLanguageText(lang) {
-        const texts = {
-            de: "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern.",
-            en: "We use cookies to improve your experience.",
-            fr: "Nous utilisons des cookies pour améliorer votre expérience."
-        };
-        cookieText.textContent = texts[lang] || texts["de"];
-    }
+        function checkCookieConsent() {
+            if (!localStorage.getItem("cookiesAccepted")) {
+                setTimeout(() => {
+                    document.getElementById("cookie-banner").classList.add("show");
+                }, 1000);
+            }
+        }
 
-    languageSelect.addEventListener("change", (e) => {
-        const lang = e.target.value;
-        updateLanguageText(lang);
-    });
+        // Language Switch
+        function changeLanguage(lang) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('lang', lang);
+            window.location.href = url.toString();
+        }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        checkCookieConsent();
-        updateLanguageText("de");
-    });
-</script>
+        // Form Loading State
+        document.getElementById('loginForm').addEventListener('submit', function() {
+            const btn = document.getElementById('submitBtn');
+            btn.classList.add('loading');
+            btn.innerHTML = '{% trans "Signing in..." %}';
+        });
+
+        // Initialize
+        document.addEventListener("DOMContentLoaded", () => {
+            checkCookieConsent();
+        });
+    </script>
 
 </body>
 </html>

@@ -1,108 +1,362 @@
 {% extends "base_home.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Available Apps – Download{% endblock %}
+{% block title %}{% trans "Available Apps" %} – {% trans "Download" %}{% endblock %}
 
 {% block content %}
 <style>
-    main {
-        padding: 40px 20px;
-        max-width: 1000px;
-        margin: auto;
+  .apps-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .apps-header {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .apps-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .apps-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .apps-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .apps-body {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+  }
+
+  .apps-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .app-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    padding: 1.5rem;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .app-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 68, 204, 0.15);
+    border-color: var(--primary);
+  }
+
+  .app-logo {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    border-radius: 16px;
+    background: var(--surface);
+    padding: 0.75rem;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+  }
+
+  .app-card:hover .app-logo {
+    border-color: var(--primary);
+    transform: scale(1.05);
+  }
+
+  .app-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .app-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .app-name i {
+    color: var(--primary);
+  }
+
+  .app-description {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .app-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.875rem;
+    color: #666;
+  }
+
+  .app-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .app-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+    flex-shrink: 0;
+  }
+
+  .app-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 68, 204, 0.4);
+    color: white;
+  }
+
+  .app-button i {
+    font-size: 1rem;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--bg);
+    border-radius: 16px;
+    border: 2px dashed var(--border);
+  }
+
+  .empty-state i {
+    font-size: 4rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .empty-state h3 {
+    font-size: 1.25rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state p {
+    color: #666;
+    font-size: 1rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .apps-container {
+      margin: 1rem auto;
     }
 
-    .container {
-        background-color: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        color: #000;
+    .apps-header {
+      padding: 2rem 1.5rem;
     }
 
-    h1, h2 {
-        color: #0044cc;
+    .header-icon {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
     }
 
-    .app-item {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        border: 1px solid #ccc;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        background-color: #f9f9f9;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    .apps-title {
+      font-size: 1.5rem;
     }
 
-    .app-item img {
-        width: 100px;
-        height: 100px;
-        object-fit: contain;
-        border-radius: 8px;
-        background-color: #fff;
-        padding: 5px;
+    .apps-body {
+      padding: 1.5rem;
     }
 
-    .app-item a {
-        font-size: 20px;
-        color: #0044cc;
-        text-decoration: none;
+    .app-card {
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: center;
     }
 
-    .app-item a:hover {
-        text-decoration: underline;
+    .app-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
     }
 
-    .button {
-        background-color: #0044cc;
-        color: white !important;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 16px;
-        display: inline-block;
-        margin-top: 10px;
+    .app-content {
+      width: 100%;
     }
 
-    .button:hover {
-        background-color: #0033a0;
-        color: white !important;
+    .app-name {
+      justify-content: center;
+      font-size: 1.25rem;
     }
 
-    @media (max-width: 600px) {
-        .app-item {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .button {
-            width: 100%;
-            text-align: center;
-        }
+    .app-description {
+      text-align: center;
     }
+
+    .app-meta {
+      justify-content: center;
+    }
+
+    .app-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .apps-title {
+      font-size: 1.3rem;
+    }
+
+    .app-card {
+      padding: 1.25rem;
+    }
+  }
 </style>
 
-<main>
-    <div class="container">
-        <h1>Available Apps for Download</h1>
-
-        {% if apps %}
-            {% for app in apps %}
-                <div class="app-item">
-                    {% if app.logo %}
-                        <img src="{{ app.logo.url }}" alt="{{ app.name }}">
-                    {% endif %}
-                    <div>
-                        <a href="{% url 'download_app_detail' app.id %}">{{ app.name }}</a>
-                        <p>{{ app.short_description|default:"No description available." }}</p>
-                        <a href="{% url 'download_app_detail' app.id %}" class="button">Details & Download</a>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No apps available at the moment.</p>
-        {% endif %}
+<div class="apps-container">
+  <!-- Header -->
+  <div class="apps-header">
+    <div class="header-icon">
+      <i class="fas fa-download"></i>
     </div>
-</main>
+    <h1 class="apps-title">{% trans "Available Apps" %}</h1>
+    <p class="apps-subtitle">{% trans "Download our applications for your devices" %}</p>
+  </div>
+
+  <!-- Body -->
+  <div class="apps-body">
+    <a href="{% url 'home' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> {% trans "Back to Home" %}
+    </a>
+
+    {% if apps %}
+      <div class="apps-grid">
+        {% for app in apps %}
+          <div class="app-card">
+            {% if app.logo %}
+              <img src="{{ app.logo.url }}" alt="{{ app.name }}" class="app-logo">
+            {% else %}
+              <div class="app-logo" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary), #0066ff);">
+                <i class="fas fa-cube" style="font-size: 2.5rem; color: white;"></i>
+              </div>
+            {% endif %}
+            
+            <div class="app-content">
+              <h2 class="app-name">
+                <i class="fas fa-cube"></i>
+                {{ app.name }} 
+              </h2>
+              <p class="app-description">
+                {{ app.description|default:_("No description available.")|linebreaks }}
+              </p>
+              <div class="app-meta">
+                <span><i class="fas fa-code-branch"></i> v{{ app.version|default:"1.0" }}</span>
+                <!--<span><i class="fas fa-hdd"></i> {{ app.file_size|default:"--" }}</span>
+                <span><i class="fas fa-calendar"></i> {{ app.updated_at|date:"d.m.Y"|default:"--" }}</span>-->
+              </div>
+            </div>
+            
+            <a href="{% url 'download_app_detail' app.id %}" class="app-button">
+              <i class="fas fa-info-circle"></i> {% trans "Details & Download" %}
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-box-open"></i>
+        <h3>{% trans "No apps available" %}</h3>
+        <p>{% trans "Check back later for new applications." %}</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

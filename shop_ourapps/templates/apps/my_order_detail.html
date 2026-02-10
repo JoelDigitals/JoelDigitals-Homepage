@@ -585,11 +585,11 @@
                   </td>
                   <td data-label="{% trans 'Price' %}" class="price-cell">
                     {% if item.discount_percent > 0 %}
-                      <div class="price-original">{{ item.app.price|floatformat:2 }} €</div>
+                      <div class="price-original">{{ item.single_price|floatformat:2 }} €</div>
                       <div class="price-discount">{{ item.discount_price|floatformat:2 }} €</div>
                       <div class="discount-tag">-{{ item.discount_percent }}%</div>
                     {% else %}
-                      <div class="price-regular">{{ item.app.price|floatformat:2 }} €</div>
+                      <div class="price-regular">{{ item.single_price|floatformat:2 }} €</div>
                     {% endif %}
                     <span class="price-total">{% trans "Total" %}: {{ item.price|floatformat:2 }} €</span>
                   </td>

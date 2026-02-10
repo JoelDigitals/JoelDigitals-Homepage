@@ -875,6 +875,7 @@ def checkout(request):
                 order=order,
                 app=item.app,
                 quantity=item.quantity,
+                single_price=item.app.price,
                 discount_percent=item.app.discount_percent,
                 discount_price=item.app.discounted_price,
                 price=item.quantity * item.app.discounted_price

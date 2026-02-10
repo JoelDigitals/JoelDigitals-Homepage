@@ -1,172 +1,537 @@
 {% extends "base_mobile.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Ticket {{ ticket.ticket_number }} – Support – Joel Digitals{% endblock %}
+{% block title %}{% trans "Ticket" %} {{ ticket.ticket_number }} – {% trans "Support" %} – Joel Digitals{% endblock %}
 
 {% block content %}
 <style>
-    .support-container {
-        max-width: 1000px;
-        margin: 40px auto;
-        background-color: #fff;
-        padding: 40px 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 68, 204, 0.15);
-        font-family: Arial, sans-serif;
-        color: #000;
-        line-height: 1.6;
-        font-size: 16px;
+  .ticket-page-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .ticket-header {
+    background: linear-gradient(135deg, #f44336, #c62828);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ticket-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .ticket-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ticket-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .ticket-body {
+    background: var(--surface);
+    padding: 2.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Back Link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: #f44336;
+  }
+
+  /* Ticket Info Card */
+  .ticket-info-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ticket-info-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f44336, #c62828);
+  }
+
+  .ticket-info-card.resolved::before {
+    background: linear-gradient(90deg, #4CAF50, #2E7D32);
+  }
+
+  .ticket-subject {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 1rem 0;
+  }
+
+  .ticket-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .meta-label {
+    font-size: 0.85rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .meta-value {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .ticket-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-open {
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+    border: 1px solid rgba(244, 67, 54, 0.2);
+  }
+
+  .status-resolved {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.2);
+  }
+
+  /* Chat History */
+  .chat-section {
+    margin: 2rem 0;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .message {
+    padding: 1.25rem;
+    border-radius: 12px;
+    position: relative;
+    max-width: 85%;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message-user {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+
+  .message-admin {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+
+  .message-admin::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #f44336, #c62828);
+    border-radius: 12px 0 0 12px;
+  }
+
+  .message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .message-user .message-header {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .message-admin .message-header {
+    color: #888;
+  }
+
+  .message-author {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .message-time {
+    font-size: 0.8rem;
+  }
+
+  .message-content {
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .message-user .message-content {
+    color: white;
+  }
+
+  .message-admin .message-content {
+    color: var(--text);
+  }
+
+  .empty-chat {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 2px dashed var(--border);
+  }
+
+  .empty-chat i {
+    font-size: 3rem;
+    color: var(--border);
+    margin-bottom: 1rem;
+  }
+
+  /* Reply Form */
+  .reply-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border);
+  }
+
+  .reply-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  .form-group textarea {
+    padding: 1rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #f44336;
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+  }
+
+  .submit-btn {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #f44336, #c62828);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    align-self: flex-start;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+  }
+
+  /* Admin Badge */
+  .admin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .ticket-page-container {
+      margin: 1rem auto;
     }
 
-    h2, h3 {
-        color: #002366;
-        font-weight: 700;
-        text-align: center;
-        margin-top: 0;
+    .ticket-header {
+      padding: 2rem 1.5rem;
     }
 
-    .meta-info {
-        font-size: 1rem;
-        color: #222;
-        margin-bottom: 25px;
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
     }
 
-    .status-resolved {
-        color: #007700;
-        font-weight: bold;
+    .ticket-title {
+      font-size: 1.6rem;
     }
 
-    .status-open {
-        color: #cc0000;
-        font-weight: bold;
-    }
-
-    .chat-history {
-        margin: 40px 0;
+    .ticket-body {
+      padding: 1.5rem;
     }
 
     .message {
-        margin-bottom: 25px;
-        padding: 16px;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-        color: #000;
+      max-width: 95%;
     }
 
-    .from-user {
-        background-color: #e0f0ff;
+    .ticket-meta-grid {
+      grid-template-columns: 1fr;
     }
 
-    .from-admin {
-        background-color: #ffeaea;
+    .submit-btn {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .ticket-title {
+      font-size: 1.4rem;
     }
 
-    .meta {
-        font-size: 14px;
-        font-weight: bold;
-        color: #222;
-        margin-bottom: 8px;
+    .ticket-subject {
+      font-size: 1.2rem;
     }
-
-    .text {
-        white-space: pre-wrap;
-        font-size: 1rem;
-    }
-
-    form {
-        margin-top: 40px;
-    }
-
-    textarea {
-        width: 100%;
-        padding: 14px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 1rem;
-        resize: vertical;
-        font-family: inherit;
-        color: #000;
-    }
-
-    button.btn {
-        background-color: #0044cc;
-        color: #fff;
-        padding: 12px 24px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 1.1rem;
-        margin-top: 20px;
-    }
-
-    button.btn:hover {
-        background-color: #0033a0;
-    }
-
-    .back-link {
-        display: inline-block;
-        margin-bottom: 20px;
-        text-decoration: none;
-        color: #0044cc;
-        font-weight: bold;
-    }
-
-    @media (max-width: 600px) {
-        .support-container {
-            padding: 30px 20px;
-        }
-
-        h2 {
-            font-size: 1.8rem;
-        }
-
-        .message {
-            font-size: 0.95rem;
-        }
-
-        textarea {
-            font-size: 0.95rem;
-        }
-    }
+  }
 </style>
 
-<div class="support-container">
-    {% if user.is_staff %}
-        <h2>🛠️ Admin-Ansicht: Ticket #{{ ticket.ticket_number }}</h2>
-        <p class="meta-info">
-            <strong>Erstellt von:</strong> {{ ticket.user.username }}<br>
-            <strong>Erstellt am:</strong> {{ ticket.created_at|date:"d.m.Y H:i" }}<br>
-            <strong>Zuletzt aktualisiert:</strong> {{ ticket.updated_at|date:"d.m.Y H:i" }}
-        </p>
-        <a href="{% url 'admin_tickets_app' %}" class="back-link">← Zurück zum Adminpanel</a>
-    {% else %}
-        <h2>📨 Mein Support-Ticket</h2>
-        <a href="{% url 'support_tickets_app' %}" class="back-link">← Zurück zu meinen Tickets</a>
-    {% endif %}
+<div class="ticket-page-container">
+  <!-- Header -->
+  <div class="ticket-header">
+    <div class="header-icon">
+      <i class="fas fa-{% if user.is_staff %}user-shield{% else %}ticket-alt{% endif %}"></i>
+    </div>
+    <h1 class="ticket-title">
+      {% if user.is_staff %}
+        {% trans "Admin View" %}
+      {% else %}
+        {% trans "Support Ticket" %}
+      {% endif %}
+    </h1>
+    <p class="ticket-subtitle">#{{ ticket.ticket_number }}</p>
+  </div>
 
-    <h3>{{ ticket.subject }}</h3>
-    <p><strong>Status:</strong>
-        <span class="{% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
-            {% if ticket.is_resolved %}Gelöst{% else %}Offen{% endif %}
-        </span>
-    </p>
+  <!-- Body -->
+  <div class="ticket-body">
 
-    <div class="chat-history">
-        {% for msg in messages %}
-            <div class="message {% if msg.sender.is_staff %}from-admin{% else %}from-user{% endif %}">
-                <div class="meta">{{ msg.sender.username }} – {{ msg.created_at|date:"d.m.Y H:i" }}</div>
-                <div class="text">{{ msg.message|linebreaks }}</div>
-            </div>
-        {% empty %}
-            <p>Noch keine Nachrichten vorhanden.</p>
-        {% endfor %}
+    <!-- Ticket Info -->
+    <div class="ticket-info-card {% if ticket.is_resolved %}resolved{% endif %}">
+      <h2 class="ticket-subject">{{ ticket.subject }}</h2>
+      
+      <div class="ticket-meta-grid">
+        {% if user.is_staff %}
+          <div class="meta-item">
+            <span class="meta-label">{% trans "Created by" %}</span>
+            <span class="meta-value">{{ ticket.user.username }}</span>
+          </div>
+        {% endif %}
+        
+        <div class="meta-item">
+          <span class="meta-label">{% trans "Created" %}</span>
+          <span class="meta-value">{{ ticket.created_at|date:"d.m.Y H:i" }}</span>
+        </div>
+        
+        <div class="meta-item">
+          <span class="meta-label">{% trans "Updated" %}</span>
+          <span class="meta-value">{{ ticket.updated_at|date:"d.m.Y H:i" }}</span>
+        </div>
+        
+        <div class="meta-item">
+          <span class="meta-label">{% trans "Status" %}</span>
+          <span class="ticket-status {% if ticket.is_resolved %}status-resolved{% else %}status-open{% endif %}">
+            <i class="fas fa-{% if ticket.is_resolved %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+            {% if ticket.is_resolved %}{% trans "Resolved" %}{% else %}{% trans "Open" %}{% endif %}
+          </span>
+        </div>
+      </div>
     </div>
 
-    <form method="post">
+    <!-- Chat History -->
+    <div class="chat-section">
+      <h3 class="section-title">
+        <i class="fas fa-comments"></i>
+        {% trans "Conversation" %}
+      </h3>
+
+      {% if messages %}
+        <div class="chat-messages">
+          {% for msg in messages %}
+            <div class="message {% if msg.sender.is_staff %}message-admin{% else %}message-user{% endif %}">
+              <div class="message-header">
+                <span class="message-author">
+                  {% if msg.sender.is_staff %}
+                    <i class="fas fa-shield-alt"></i>
+                  {% else %}
+                    <i class="fas fa-user"></i>
+                  {% endif %}
+                  {{ msg.sender.username }}
+                  {% if msg.sender.is_staff %}
+                    <span class="admin-badge">{% trans "Staff" %}</span>
+                  {% endif %}
+                </span>
+                <span class="message-time">{{ msg.created_at|date:"d.m.Y H:i" }}</span>
+              </div>
+              <div class="message-content">{{ msg.message|linebreaks }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-chat">
+          <i class="fas fa-comment-slash"></i>
+          <p>{% trans "No messages yet. Start the conversation!" %}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Reply Form -->
+    <div class="reply-section">
+      <h3 class="section-title">
+        <i class="fas fa-reply"></i>
+        {% trans "Reply" %}
+      </h3>
+      
+      <form method="post" class="reply-form">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn">Nachricht senden</button>
-    </form>
+        
+        <div class="form-group">
+          {{ form.message.label_tag }}
+          {{ form.message }}
+          {% if form.message.errors %}
+          <ul class="errorlist">
+            {% for error in form.message.errors %}
+            <li style="color: #f44336; font-size: 0.875rem;">{{ error }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="submit-btn">
+          <i class="fas fa-paper-plane"></i> {% trans "Send Message" %}
+        </button>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}
