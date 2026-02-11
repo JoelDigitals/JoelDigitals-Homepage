@@ -573,7 +573,7 @@
               </td>
               <td>{{ item.app.product_number }}</td>
               <td style="text-align: center;">{{ item.quantity }}</td>
-              <td class="numeric">{{ item.app.price|floatformat:2 }} €</td>
+              <td class="numeric">{{ item.single_price|floatformat:2 }} €</td>
               <td class="numeric discount-cell">{{ item.discount_percent }}%</td>
               <td class="numeric">{{ item.discount_price|floatformat:2 }} €</td>
               <td class="numeric total-cell">{{ item.price|floatformat:2 }} €</td>

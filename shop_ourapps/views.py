@@ -1347,3 +1347,9 @@ def invoice_pdf(request, order_id):
     response = HttpResponse(pdf_file.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="invoice_{order.id}.pdf"'
     return response
+
+def affiliate_info(request):
+    """
+    Öffentliche Informationsseite zum Affiliate-Programm.
+    """
+    return render(request, "apps/affiliate_info.html")

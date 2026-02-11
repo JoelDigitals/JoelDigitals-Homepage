@@ -14,6 +14,7 @@ urlpatterns = [
     path('my-orders/<int:order_id>/invoice/download/', views.invoice_pdf, name='download_invoice'),
     
     path('shop/<slug:slug>/buy/', views.purchase_app, name='purchase_app'),
+    path("affiliate/info/", views.affiliate_info, name="affiliate_info"),
     path('affiliate/dashboard/', views.affiliate_dashboard, name='affiliate_dashboard'),
     path('affiliate/eligibility/', views.affiliate_eligibility, name='affiliate_eligibility'),
     path('wallet/', views.wallet_view, name='wallet'),

@@ -1,0 +1,551 @@
+{% extends "base_home.html" %}
+{% load i18n %}
+
+{% block title %}Affiliate Programm – Joel Digitals{% endblock %}
+
+{% block content %}
+
+<style>
+  .affiliate-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0;
+  }
+
+  .affiliate-hero {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 4rem 2.5rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .affiliate-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .affiliate-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .affiliate-hero p {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 700px;
+    margin: 1rem auto 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .affiliate-body {
+    background: var(--surface);
+    padding: 2.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Commission Section */
+  .commission-section {
+    background: linear-gradient(135deg, rgba(0, 102, 255, 0.1), rgba(0, 68, 204, 0.05));
+    border: 2px solid var(--primary);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .commission-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .commission-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .commission-tier {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 2rem;
+    border: 2px solid var(--border);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .commission-tier:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(0, 68, 204, 0.15);
+  }
+
+  .commission-tier.featured {
+    border-color: #FFD700;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05));
+  }
+
+  .commission-tier.featured::before {
+    content: 'STANDARD';
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--primary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-bottom-left-radius: 8px;
+  }
+
+  .tier-percentage {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .commission-tier.featured .tier-percentage {
+    color: #FFD700;
+  }
+
+  .tier-label {
+    font-size: 1.1rem;
+    color: var(--text);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .tier-condition {
+    font-size: 0.95rem;
+    color: #888;
+    line-height: 1.5;
+  }
+
+  .commission-note {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 0.95rem;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* Code Section */
+  .code-section {
+    background: linear-gradient(135deg, rgba(0, 200, 100, 0.1), rgba(0, 150, 80, 0.05));
+    border: 2px solid #00C864;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .code-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .code-box {
+    background: var(--bg);
+    border: 2px dashed #00C864;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem auto;
+    max-width: 400px;
+  }
+
+  .code-label {
+    font-size: 0.85rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+  }
+
+  .code-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #00C864;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+  }
+
+  .code-info {
+    color: #666;
+    font-size: 0.95rem;
+    margin-top: 1rem;
+  }
+
+  .code-info strong {
+    color: #00C864;
+  }
+
+  /* Future Link Notice */
+  .future-notice {
+    background: linear-gradient(135deg, rgba(100, 100, 255, 0.1), rgba(80, 80, 200, 0.05));
+    border: 2px solid #6464FF;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .future-notice i {
+    font-size: 2rem;
+    color: #6464FF;
+    flex-shrink: 0;
+  }
+
+  .future-notice-content h3 {
+    color: var(--text);
+    margin-bottom: 0.25rem;
+    font-size: 1.2rem;
+  }
+
+  .future-notice-content p {
+    color: #888;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  /* Features Grid */
+  .features-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .affiliate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .affiliate-card {
+    background: var(--bg);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    transition: all 0.3 ease;
+    text-align: center;
+  }
+
+  .affiliate-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(0, 68, 204, 0.15);
+  }
+
+  .affiliate-card i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary);
+    display: block;
+  }
+
+  .affiliate-card h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+  }
+
+  .affiliate-card p {
+    font-size: 0.95rem;
+    color: #888;
+    line-height: 1.6;
+  }
+
+  /* CTA Section */
+  .affiliate-cta {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .affiliate-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 50%);
+  }
+
+  .cta-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-text {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .affiliate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: white;
+    color: var(--primary);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .affiliate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: #f0f0f0;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .affiliate-container {
+      margin: 1rem;
+    }
+
+    .affiliate-hero {
+      padding: 2.5rem 1.5rem;
+    }
+
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2rem;
+    }
+
+    .affiliate-hero h1 {
+      font-size: 1.8rem;
+    }
+
+    .affiliate-body {
+      padding: 1.5rem;
+    }
+
+    .commission-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .future-notice {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>
+
+<div class="affiliate-container">
+  <!-- Hero -->
+  <section class="affiliate-hero">
+    <div class="header-icon">
+      <i class="fas fa-handshake"></i>
+    </div>
+    <h1>{% trans "Verdiene mit dem Joel Digitals Affiliate Programm" %}</h1>
+    <p>{% trans "Empfehle unsere digitalen Produkte, Services und Apps weiter und erhalte attraktive Provisionen für jede erfolgreiche Empfehlung." %}</p>
+  </section>
+
+  <div class="affiliate-body">
+    
+    <!-- Commission Section -->
+    <section class="commission-section">
+      <h2 class="commission-title">
+        <i class="fas fa-percentage"></i>
+        {% trans "Provisionssätze" %}
+      </h2>
+      
+      <div class="commission-grid">
+        <div class="commission-tier featured">
+          <div class="tier-percentage">3%</div>
+          <div class="tier-label">{% trans "Standard-Provision" %}</div>
+          <div class="tier-condition">{% trans "Für alle Affiliate-Partner" %}</div>
+        </div>
+        
+        <div class="commission-tier">
+          <div class="tier-percentage">5%</div>
+          <div class="tier-label">{% trans "Erhöhte Provision" %}</div>
+          <div class="tier-condition">{% trans "Ab 5.000€ Umsatz oder nach individueller Absprache" %}</div>
+        </div>
+        
+        <div class="commission-tier">
+          <div class="tier-percentage">7%</div>
+          <div class="tier-label">{% trans "Premium-Provision" %}</div>
+          <div class="tier-condition">{% trans "Ab 12.000€ Umsatz oder nach individueller Absprache" %}</div>
+        </div>
+      </div>
+      
+      <div class="commission-note">
+        <i class="fas fa-info-circle"></i>
+        {% trans "Höhere Provisionssätze sind nach Absprache möglich – kontaktiere uns für individuelle Konditionen!" %}
+      </div>
+    </section>
+
+    <!-- Affiliate Code Section -->
+    <section class="code-section">
+      <h2 class="code-title">
+        <i class="fas fa-hashtag"></i>
+        {% trans "Dein persönlicher Affiliate-Code" %}
+      </h2>
+      
+      <p style="color: #888; margin-bottom: 1rem;">
+        {% trans "Derzeit arbeiten wir mit einem eindeutigen Affiliate-Code. Dein persönlicher Code wird dir nach Freischaltung zugewiesen." %}
+      </p>
+      
+      <div class="code-box">
+        <div class="code-label">{% trans "Beispiel-Format" %}</div>
+        <div class="code-value">DEINNAME2024</div>
+      </div>
+      
+      <div class="code-info">
+        <i class="fas fa-check-circle" style="color: #00C864; margin-right: 0.5rem;"></i>
+        {% trans "Kunden geben deinen Code beim Kauf ein – Provision wird automatisch zugeordnet" %}
+      </div>
+    </section>
+
+    <!-- Future Link Notice -->
+    <div class="future-notice">
+      <i class="fas fa-clock"></i>
+      <div class="future-notice-content">
+        <h3>{% trans "Affiliate-Links kommen bald!" %}</h3>
+        <p>{% trans "In Zukunft werden wir zusätzlich zu den Codes auch persönliche Tracking-Links einführen. Bestehende Codes bleiben selbstverständlich gültig." %}</p>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <h2 class="features-title">{% trans "Deine Vorteile als Affiliate-Partner" %}</h2>
+    
+    <section class="affiliate-grid">
+      <div class="affiliate-card">
+        <i class="fas fa-hashtag"></i>
+        <h3>{% trans "Persönlicher Code" %}</h3>
+        <p>{% trans "Du erhältst deinen eigenen eindeutigen Affiliate-Code, mit dem alle Verkäufe automatisch dir zugeordnet werden." %}</p>
+      </div>
+
+      <div class="affiliate-card">
+        <i class="fas fa-coins"></i>
+        <h3>{% trans "Faire Provisionen" %}</h3>
+        <p>{% trans "Starte mit 3% Provision. Steigere deinen Anteil auf 5% oder 7% durch hohe Umsätze oder individuelle Vereinbarungen." %}</p>
+      </div>
+
+      <div class="affiliate-card">
+        <i class="fas fa-chart-line"></i>
+        <h3>{% trans "Transparente Statistiken" %}</h3>
+        <p>{% trans "Behalte deine Verkäufe, Kunden und Provisionen jederzeit in deinem Affiliate-Dashboard im Blick." %}</p>
+      </div>
+
+      <div class="affiliate-card">
+        <i class="fas fa-wallet"></i>
+        <h3>{% trans "Schnelle Auszahlung" %}</h3>
+        <p>{% trans "Deine Provision wird zuverlässig auf dein Wallet überwiesen. Eine Auszahlung auf ein Konto ist zurzeit nur über eine Mail an buy@joel-digitals.com möglich (Mindestbetrag: 50€)." %}</p>
+      </div>
+
+      <div class="affiliate-card">
+        <i class="fas fa-handshake"></i>
+        <h3>{% trans "Individuelle Absprachen" %}</h3>
+        <p>{% trans "Bei besonderen Kooperationen oder hohen Umsatzvolumen besprechen wir gerne individuelle Konditionen." %}</p>
+      </div>
+
+      <div class="affiliate-card">
+        <i class="fas fa-rocket"></i>
+        <h3>{% trans "Zukunftssicher" %}</h3>
+        <p>{% trans "Dein Code bleibt auch bei zukünftigen Erweiterungen (z.B. Tracking-Links) gültig und aktiv." %}</p>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="affiliate-cta">
+      <h2 class="cta-title">{% trans "Werde Affiliate-Partner" %}</h2>
+      <p class="cta-text">{% trans "Starte mit 3% Provision und steigere deine Erträge durch erfolgreiche Empfehlungen." %}</p>
+      
+      {% if user.is_authenticated %}
+        <a href="/affiliate/dashboard/" class="affiliate-btn">
+          <i class="fas fa-rocket"></i>
+          {% trans "Zum Affiliate Dashboard" %}
+        </a>
+      {% else %}
+        <a href="/auth/register/" class="affiliate-btn">
+          <i class="fas fa-user-plus"></i>
+          {% trans "Jetzt kostenlos registrieren" %}
+        </a>
+      {% endif %}
+    </section>
+
+  </div>
+</div>
+
+{% endblock %}
