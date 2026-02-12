@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import user_passes_test
 from .models import BlogPost, BlogCategory
 from .forms import BlogPostForm, BlogCategoryForm
-
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.db.models import Count
@@ -141,8 +141,12 @@ def blog_create(request):
         if form.is_valid():
             blog_post = form.save(commit=False)
             if blog_post.is_published and not blog_post.published_at:
-                # Falls noch kein Datum gesetzt wurde, automatisch jetzt
                 blog_post.published_at = timezone.now()
+            
+            # Priorisierung: Wenn ImgBB URL vorhanden, teaser_image löschen
+            if blog_post.main_image_url:
+                blog_post.teaser_image = None
+            
             blog_post.save()
             form.save_m2m()
             return redirect('admin_blog')
@@ -152,7 +156,8 @@ def blog_create(request):
     return render(request, 'blog/blog_form.html', {
         'form': form,
         'action': 'Erstellen',
-        'user_groups': user_groups
+        'user_groups': user_groups,
+        'IMGBB_API_KEY': settings.IMGBB_API_KEY,  # Aus settings.py
     })
 
 @user_passes_test(is_blog_editor)
@@ -163,17 +168,23 @@ def blog_edit(request, pk):
     if request.method == 'POST':
         form = BlogPostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
-            form.save()
+            blog_post = form.save(commit=False)
+            
+            # Priorisierung beibehalten
+            if blog_post.main_image_url:
+                blog_post.teaser_image = None
+                
+            blog_post.save()
             return redirect('admin_blog')
     else:
         form = BlogPostForm(instance=post)
 
-    context = {
+    return render(request, 'blog/blog_form.html', {
         'form': form,
         'action': 'Bearbeiten',
         'user_groups': user_groups,
-    }
-    return render(request, 'blog/blog_form.html', context)
+        'IMGBB_API_KEY': settings.IMGBB_API_KEY,
+    })
 
 @user_passes_test(is_blog_editor)
 def blog_delete(request, pk):

@@ -41,6 +41,7 @@ OAUTH2_PROVIDER = {
     }
 }
 
+IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
 
 # Application definition
 

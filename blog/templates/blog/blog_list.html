@@ -390,11 +390,14 @@
     <div class="blog-grid">
       {% for post in posts %}
         <article class="blog-card">
-          {% if post.teaser_image %}
-            <div class="blog-image-wrapper">
-              <img src="{{ post.teaser_image.url }}" 
-                   alt="{{ post.title }}"
-                   {% if post.teaser_image.width == post.teaser_image.height %}data-aspect="square"{% endif %}>
+          
+          {% if post.get_main_image_url %}
+            <div class="featured-image">
+              <img src="{{ post.get_main_image_url }}" alt="{{ post.title }}" loading="lazy">
+            </div>
+          {% elif post.teaser_image %}
+            <div class="featured-image">
+              <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}">
             </div>
           {% endif %}
           

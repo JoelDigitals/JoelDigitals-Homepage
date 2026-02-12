@@ -516,7 +516,12 @@
 
   <!-- Article Body -->
   <article class="article-body">
-    {% if post.teaser_image %}
+    <!-- Featured Image mit Priorisierung -->
+    {% if post.get_main_image_url %}
+      <div class="featured-image">
+        <img src="{{ post.get_main_image_url }}" alt="{{ post.title }}" loading="lazy">
+      </div>
+    {% elif post.teaser_image %}
       <div class="featured-image">
         <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}">
       </div>
@@ -597,8 +602,13 @@
         <div class="related-grid">
           {% for next_post in related_posts %}
             <article class="related-card">
-              {% if next_post.teaser_image %}
-                <div class="related-image">
+              
+              {% if next_post.get_main_image_url %}
+                <div class="featured-image">
+                  <img src="{{ next_post.get_main_image_url }}" alt="{{ next_post.title }}" loading="lazy">
+                </div>
+              {% elif next_post.teaser_image %}
+                <div class="featured-image">
                   <img src="{{ next_post.teaser_image.url }}" alt="{{ next_post.title }}">
                 </div>
               {% endif %}

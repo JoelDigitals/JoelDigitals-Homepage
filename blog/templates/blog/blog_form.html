@@ -5,6 +5,7 @@
 {{ form.media }}
 
 {% block content %}
+{{ form.media }} 
 <style>
 .container {
     background-color: white;
@@ -20,6 +21,7 @@ h2 { text-align: center; margin-top: 0; }
 form { display: flex; flex-direction: column; gap: 20px; }
 label { font-weight: bold; margin-bottom: 5px; }
 input[type="text"],
+input[type="url"],
 input[type="file"],
 input[type="datetime-local"],
 select, textarea {
@@ -55,11 +57,37 @@ select, textarea {
     padding: 5px 0;
     border-radius: 5px;
 }
+/* ImgBB Status Styles */
+.imgbb-status {
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    display: none;
+}
+.imgbb-status.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    display: block;
+}
+.imgbb-status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    display: block;
+}
+.imgbb-preview {
+    max-width: 200px;
+    margin-top: 10px;
+    border-radius: 5px;
+    display: none;
+}
+.hidden-fields { display: none; }
 </style>
 
 <div class="container">
     <h2>{{ action }} Blogeintrag</h2>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" id="blogForm">
         {% csrf_token %}
 
         <div class="lang-section">
@@ -75,12 +103,53 @@ select, textarea {
         </div>
 
         <!-- Veröffentlichungsdatum -->
-        <!-- Veröffentlichungsdatum -->
         <div>
             {{ form.published_at.label_tag }} 
             {{ form.published_at }}
         </div>
-        {{ form.teaser_image.label_tag }} {{ form.teaser_image }}
+
+        <!-- BILD-UPLOAD BEREICH -->
+        <div style="border: 2px dashed #ccc; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
+            <h4 style="margin-top: 0;">🖼️ Bild</h4>
+            
+            <!-- File Upload für ImgBB -->
+            <label for="imgbb_upload">Neues Bild hochladen (automatisch zu ImgBB):</label>
+            <input type="file" id="imgbb_upload" accept="image/*">
+            <div id="imgbb_status" class="imgbb-status"></div>
+            <img id="imgbb_preview" class="imgbb-preview" alt="Vorschau">
+            
+            <hr style="margin: 15px 0;">
+            
+            <!-- ODER: Manuelle URL Eingabe -->
+            <label for="id_main_image_url">Oder Bild-URL direkt eingeben:</label>
+            <input type="url" name="main_image_url" id="id_main_image_url" 
+                   value="{{ form.main_image_url.value|default:'' }}" 
+                   placeholder="https://i.ibb.co/...">
+            
+            <!-- Hidden Fields für ImgBB Metadaten -->
+            <div class="hidden-fields">
+                <input type="hidden" name="main_image_thumb_url" id="id_main_image_thumb_url" 
+                       value="{{ form.main_image_thumb_url.value|default:'' }}">
+                <input type="hidden" name="main_image_medium_url" id="id_main_image_medium_url" 
+                       value="{{ form.main_image_medium_url.value|default:'' }}">
+                <input type="hidden" name="main_image_delete_url" id="id_main_image_delete_url" 
+                       value="{{ form.main_image_delete_url.value|default:'' }}">
+            </div>
+            
+            <!-- Fallback: Lokaler Upload (wenn ImgBB fehlschlägt) -->
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                <label for="id_teaser_image" style="font-weight: normal; color: #666;">
+                    📁 Fallback: Lokaler Upload (nur wenn ImgBB nicht funktioniert):
+                </label>
+                {{ form.teaser_image }}
+                {% if form.instance.teaser_image %}
+                    <p style="font-size: 14px; color: #666; margin-top: 5px;">
+                        Aktuell: {{ form.instance.teaser_image.name }}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
         {{ form.is_published.label_tag }} {{ form.is_published }}
         {{ form.categories.label_tag }} {{ form.categories }}
 
@@ -89,7 +158,79 @@ select, textarea {
     </form>
 </div>
 
-<!-- CKEditor JS einbinden -->
-<script src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
-<script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ⚠️ WICHTIG: API-Key sollte aus Django Settings kommen, nicht hardcoded!
+    // Besser: Als data-attribute im Template rendern
+    const imgbbApiKey = '{{ IMGBB_API_KEY|default:"" }}';
+    
+    const fileInput = document.getElementById('imgbb_upload');
+    const statusDiv = document.getElementById('imgbb_status');
+    const previewImg = document.getElementById('imgbb_preview');
+    
+    // Felderreferenzen
+    const mainUrlField = document.getElementById('id_main_image_url');
+    const thumbField = document.getElementById('id_main_image_thumb_url');
+    const mediumField = document.getElementById('id_main_image_medium_url');
+    const deleteField = document.getElementById('id_main_image_delete_url');
+    
+    if (fileInput && imgbbApiKey) {
+        fileInput.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Validierung
+            if (file.size > 5 * 1024 * 1024) {
+                showStatus('Datei zu groß (max 5MB)', 'error');
+                return;
+            }
+            
+            showStatus('Wird hochgeladen...', 'success');
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            try {
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Felder befüllen
+                    mainUrlField.value = data.data.url;
+                    thumbField.value = data.data.thumb?.url || data.data.url;
+                    mediumField.value = data.data.medium?.url || data.data.url;
+                    deleteField.value = data.data.delete_url || '';
+                    
+                    // Vorschau anzeigen
+                    previewImg.src = data.data.thumb?.url || data.data.url;
+                    previewImg.style.display = 'block';
+                    
+                    // Lokales File-Input zurücksetzen (verhindert doppelten Upload)
+                    document.getElementById('id_teaser_image').value = '';
+                    
+                    showStatus('✅ Bild erfolgreich zu ImgBB hochgeladen!', 'success');
+                } else {
+                    throw new Error(data.error?.message || 'Unbekannter Fehler');
+                }
+            } catch (error) {
+                console.error('Upload fehlgeschlagen:', error);
+                showStatus('❌ Upload fehlgeschlagen: ' + error.message + '. Bitte manuell hochladen oder URL eingeben.', 'error');
+            }
+        });
+    } else if (!imgbbApiKey) {
+        console.warn('ImgBB API Key nicht konfiguriert');
+    }
+    
+    function showStatus(message, type) {
+        statusDiv.textContent = message;
+        statusDiv.className = 'imgbb-status ' + type;
+    }
+});
+</script>
 {% endblock %}
