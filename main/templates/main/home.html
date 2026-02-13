@@ -748,8 +748,14 @@
       <div class="blog-grid">
         {% for blog in latest_blog %}
           <div class="blog-card">
-            {% if blog.teaser_image %}
-              <img src="{{ blog.teaser_image.url }}" alt="{{ blog.title }}" loading="lazy">
+            {% if blog.get_main_image_url %}
+              <div class="featured-image">
+                <img src="{{ blog.get_main_image_url }}" alt="{{ next_post.title }}" loading="lazy">
+              </div>
+            {% elif blog.teaser_image %}
+              <div class="featured-image">
+                <img src="{{ blog.teaser_image.url }}" alt="{{ blog.title }}">
+              </div>
             {% endif %}
             <div class="blog-card-body">
               <h3>{{ blog.title }}</h3>
