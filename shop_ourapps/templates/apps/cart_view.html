@@ -478,22 +478,22 @@
               <h2 class="item-name">{{ item.app.name }}</h2>
               
               <div class="item-pricing">
-                {% if item.app.discount_percent > 0 %}
-                  <div class="price-line">
-                    <span class="qty-badge">{{ item.quantity }}x</span>
-                    <span class="price-original">€{{ item.app.price }}</span>
-                    <span class="price-discounted">€{{ item.price }}</span>
-                    <span class="discount-tag">
-                      <i class="fas fa-tag"></i>
-                      {{ item.app.discount_percent }}%
-                    </span>
-                  </div>
-                {% else %}
-                  <div class="price-line">
-                    <span class="qty-badge">{{ item.quantity }}x</span>
-                    <span class="price-regular">€{{ item.price }}</span>
-                  </div>
-                {% endif %}
+                {% if item.app.discount_is_active %}
+  <div class="price-line">
+    <span class="qty-badge">{{ item.quantity }}x</span>
+    <span class="price-original">€{{ item.app.price }}</span>
+    <span class="price-discounted">€{{ item.price }}</span>
+    <span class="discount-tag">
+      <i class="fas fa-tag"></i>
+      {{ item.app.discount_percent }}%
+    </span>
+  </div>
+{% else %}
+  <div class="price-line">
+    <span class="qty-badge">{{ item.quantity }}x</span>
+    <span class="price-regular">€{{ item.price }}</span>
+  </div>
+{% endif %}
               </div>
 
               <div class="item-total">

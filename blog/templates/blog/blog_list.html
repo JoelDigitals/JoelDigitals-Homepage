@@ -150,31 +150,26 @@
     box-shadow: 0 12px 24px rgba(0, 68, 204, 0.15);
   }
 
-  /* 16:9 Image Container */
   .blog-image-wrapper {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
-    position: relative;
-  }
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  .blog-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
+.blog-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;  /* ← statt cover: zeigt immer das ganze Bild */
+  transition: transform 0.3s ease;
+}
 
-  .blog-card:hover img {
-    transform: scale(1.05);
-  }
-
-  /* Square images - contain instead of cover */
-  .blog-card img[data-aspect="square"] {
-    object-fit: contain;
-    background: white;
-  }
+.blog-card:hover img {
+  transform: scale(1.03);
+}
 
   .blog-card-content {
     display: flex;
@@ -271,6 +266,60 @@
     box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
   }
 
+  /* Pagination */
+  .pagination-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 42px;
+    padding: 0 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+  }
+
+  .page-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .page-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+    pointer-events: none;
+  }
+
+  .page-btn.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: default;
+  }
+
+  .page-info {
+    color: #999;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: 0.75rem;
+  }
+
   /* Empty State */
   .empty-blog {
     text-align: center;
@@ -292,64 +341,26 @@
   }
 
   @media (max-width: 768px) {
-    .blog-container {
-      margin: 1rem auto;
-      padding: 0 0.5rem;
-    }
-
-    .blog-header {
-      padding: 2rem 1.5rem;
-    }
-
-    .header-icon {
-      width: 80px;
-      height: 80px;
-      font-size: 2rem;
-    }
-
-    .blog-title {
-      font-size: 1.8rem;
-    }
-
-    .blog-body {
-      padding: 1.5rem;
-    }
-
-    .blog-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .category-buttons {
-      justify-content: center;
-    }
+    .blog-container { margin: 1rem auto; padding: 0 0.5rem; }
+    .blog-header { padding: 2rem 1.5rem; }
+    .header-icon { width: 80px; height: 80px; font-size: 2rem; }
+    .blog-title { font-size: 1.8rem; }
+    .blog-body { padding: 1.5rem; }
+    .blog-grid { grid-template-columns: 1fr; }
+    .category-buttons { justify-content: center; }
+    .pagination-section { gap: 0.35rem; }
+    .page-btn { min-width: 38px; height: 38px; font-size: 0.85rem; }
   }
 
   @media (max-width: 480px) {
-    .blog-title {
-      font-size: 1.5rem;
-    }
-
-    .blog-card-content {
-      padding: 1.25rem;
-    }
-
-    .blog-image-wrapper {
-      aspect-ratio: 4 / 3;
-    }
+    .blog-title { font-size: 1.5rem; }
+    .blog-card-content { padding: 1.25rem; }
+    .blog-image-wrapper { aspect-ratio: 4 / 3; }
   }
 
-  /* Fallback für alte Browser */
   @supports not (aspect-ratio: 16 / 9) {
-    .blog-image-wrapper {
-      position: relative;
-      height: 0;
-      padding-top: 56.25%;
-    }
-    .blog-image-wrapper img {
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
+    .blog-image-wrapper { position: relative; height: 0; padding-top: 56.25%; }
+    .blog-image-wrapper img { position: absolute; top: 0; left: 0; }
   }
 </style>
 
@@ -365,6 +376,7 @@
 
   <!-- Body -->
   <div class="blog-body">
+
     <!-- Category Filter -->
     <div class="category-section">
       <div class="category-label">
@@ -390,17 +402,17 @@
     <div class="blog-grid">
       {% for post in posts %}
         <article class="blog-card">
-          
+
           {% if post.get_main_image_url %}
-            <div class="featured-image">
+            <div class="blog-image-wrapper">
               <img src="{{ post.get_main_image_url }}" alt="{{ post.title }}" loading="lazy">
             </div>
           {% elif post.teaser_image %}
-            <div class="featured-image">
-              <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}">
+            <div class="blog-image-wrapper">
+              <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}" loading="lazy">
             </div>
           {% endif %}
-          
+
           <div class="blog-card-content">
             <div class="blog-meta-top">
               {% if post.category %}
@@ -411,11 +423,11 @@
                 {{ post.published_at|date:"d.m.Y" }}
               </span>
             </div>
-            
+
             <h3>{{ post.title }}</h3>
-            
+
             <p class="blog-teaser">{{ post.teaser_text|striptags|safe }}</p>
-            
+
             <div class="blog-footer">
               {% if post.views %}
                 <span class="blog-views">
@@ -425,7 +437,7 @@
               {% else %}
                 <span></span>
               {% endif %}
-              
+
               <a href="{% url 'blog_detail' post.pk %}" class="btn-read">
                 {% trans "Read more" %}
                 <i class="fas fa-arrow-right"></i>
@@ -443,6 +455,52 @@
         </div>
       {% endfor %}
     </div>
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+      <div class="pagination-section">
+
+        <!-- Zurück -->
+        {% if page_obj.has_previous %}
+          <a href="?{% if category_filters %}{% for c in category_filters %}category={{ c }}&{% endfor %}{% endif %}page={{ page_obj.previous_page_number }}"
+             class="page-btn">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        {% else %}
+          <span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span>
+        {% endif %}
+
+        <!-- Seitenzahlen -->
+        {% for num in page_obj.paginator.page_range %}
+          {% if num == page_obj.number %}
+            <span class="page-btn active">{{ num }}</span>
+          {% elif num == 1 or num == page_obj.paginator.num_pages or num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+            <a href="?{% if category_filters %}{% for c in category_filters %}category={{ c }}&{% endfor %}{% endif %}page={{ num }}"
+               class="page-btn">{{ num }}</a>
+          {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+            <span class="page-btn disabled">…</span>
+          {% endif %}
+        {% endfor %}
+
+        <!-- Vor -->
+        {% if page_obj.has_next %}
+          <a href="?{% if category_filters %}{% for c in category_filters %}category={{ c }}&{% endfor %}{% endif %}page={{ page_obj.next_page_number }}"
+             class="page-btn">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        {% else %}
+          <span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span>
+        {% endif %}
+
+      </div>
+
+      <p class="page-info">
+        {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+        &nbsp;·&nbsp;
+        {{ page_obj.paginator.count }} {% trans "posts total" %}
+      </p>
+    {% endif %}
+
   </div>
 </div>
 {% endblock %}

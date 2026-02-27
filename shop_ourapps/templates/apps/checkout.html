@@ -535,14 +535,13 @@
                 </span>
               </div>
               <div class="item-pricing">
-                {% if item.app.discount_percent > 0 %}
+                {% if item.app.discount_is_active %}
                   <span class="price-strike">€{{ item.app.price|floatformat:2 }}</span>
                   <span class="price-final">€{{ item.app.discounted_price|floatformat:2 }}</span>
                   <span class="discount-badge-small">-{{ item.app.discount_percent }}%</span>
                 {% else %}
                   <span class="price-regular">€{{ item.app.price|floatformat:2 }}</span>
                 {% endif %}
-              </div>
             </div>
           {% endfor %}
         </div>

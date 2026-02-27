@@ -27,12 +27,12 @@ def is_blog_editor(user):
 
 
 from django.utils import timezone
+from django.core.paginator import Paginator
 
 def blog_list(request):
     lang = request.LANGUAGE_CODE
     now = timezone.now()
 
-    # Zeige nur Posts, die veröffentlicht sind und deren Datum erreicht wurde
     categories_with_posts = BlogCategory.objects.filter(
         posts__is_published=True,
         posts__published_at__lte=now
@@ -57,13 +57,17 @@ def blog_list(request):
         post.title = post.title_en if lang == "en" else post.title_de
         post.teaser_text = (post.content_en if lang == "en" else post.content_de)[:250]
 
+    paginator = Paginator(posts, 18)
+    page_number = request.GET.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+
     return render(request, "blog/blog_list.html", {
-        "posts": posts,
+        "posts": page_obj,
+        "page_obj": page_obj,
         "categories_with_posts": categories_with_posts,
         "category_filters": category_filters,
         "lang": lang,
     })
-
 
 def blog_detail(request, pk):
     lang = request.LANGUAGE_CODE
