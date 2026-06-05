@@ -1,0 +1,168 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .content h2 {
+            color: #667eea;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        .content p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        .order-info {
+            background-color: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .order-info p {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #667eea;
+            color: #ffffff;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .cta-button:hover {
+            background-color: #764ba2;
+        }
+        .footer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .stars {
+            font-size: 24px;
+            color: #ffc107;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>⭐ Deine Bewertung ist uns wichtig!</h1>
+            <p>Hilf uns, besser zu werden</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <h2>Hallo {{ user_name }},</h2>
+            
+            <p>
+                danke dir, dass du unsere Apps gekauft hast! 🎉
+            </p>
+
+            <div class="order-info">
+                <p><strong>Bestellnummer:</strong> #{{ order_id }}</p>
+                <p><strong>Status:</strong> ✅ Zugestellt</p>
+            </div>
+
+            <p>
+                Deine Bestellung ist bei dir angekommen und du hattest Zeit, unsere Apps zu testen.
+                Wir würden uns <strong>sehr über dein Feedback</strong> freuen!
+            </p>
+
+            <p>
+                Deine ehrliche Bewertung hilft uns und anderen Nutzern, die beste Auswahl zu treffen.
+                Es dauert nur <strong>2 Minuten</strong>! ⏱️
+            </p>
+
+            <div style="text-align: center;">
+                <div class="stars">★★★★★</div>
+                <a href="https://www.joel-digitals.de/meine-bestellungen/" class="cta-button">
+                    Jetzt bewerten
+                </a>
+            </div>
+
+            <p style="margin-top: 30px;">
+                <strong>Was ist dir wichtig?</strong> 💭
+            </p>
+            <ul style="margin-left: 20px; margin-bottom: 15px;">
+                <li>Qualität der Apps</li>
+                <li>Benutzerfreundlichkeit</li>
+                <li>Kundensupport</li>
+                <li>Preis-Leistungs-Verhältnis</li>
+            </ul>
+
+            <p>
+                Lass uns wissen, wie wir besser werden können – ob Lob oder Kritik, jedes Feedback ist wertvoll für uns! 🚀
+            </p>
+
+            <p style="margin-top: 30px;">
+                Viele Grüße,<br>
+                <strong>Das Joel Digitals Team</strong>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>
+                <a href="https://www.joel-digitals.de">www.joel-digitals.de</a> | 
+                <a href="https://www.joel-digitals.de/impressum/">Impressum</a> | 
+                <a href="https://www.joel-digitals.de/datenschutz/">Datenschutz</a>
+            </p>
+            <p style="margin-top: 10px; color: #999;">
+                © 2024 Joel Digitals. Alle Rechte vorbehalten.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

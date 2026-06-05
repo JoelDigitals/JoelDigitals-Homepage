@@ -1,8 +1,87 @@
-Hallo {{ order.first_name }} {{ order.last_name }}, 
-Vielen Dank für Ihre Bestellung. Eine Rechnung wird Ihnen in Kürze zugesendet. 
-Bestell-ID: {{ order.id }} 
-Gesamtbetrag: €{{ order.total_amount }} 
-Sie erhalten die Rechung unter https://joel-digitals.de/my-orders/{{ order.id }}/invoice/. 
-Vielen Dank für Ihren Kauf! 
-Mit freundlichen Grüßen,
-Ihr Joel Digitals Team 
+{% extends 'emails/base.html' %}
+{% block content %}
+
+<!-- ════ DEUTSCH ════ -->
+<div class="section-de">
+  <span class="lang-badge lang-de">🇩🇪 Deutsch</span>
+  <p class="greeting">Hallo {{ order.first_name }} {{ order.last_name }},</p>
+  <p class="body-text">
+    vielen Dank für Ihre Bestellung bei <strong style="color:#00bfff;">Joel Digitals</strong>!
+    Wir bestätigen Ihren Zahlungseingang. Ihre Rechnung wird Ihnen in Kürze zugestellt.
+  </p>
+
+  <div class="info-box">
+    <div class="info-row">
+      <span class="info-label">Bestell-ID</span>
+      <span class="info-value">#{{ order.id }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Gesamtbetrag</span>
+      <span class="info-value" style="color:#00bfff;font-weight:700;">€{{ order.total_amount }}</span>
+    </div>
+  </div>
+
+  <p class="body-text">
+    Ihre Rechnung können Sie jederzeit unter folgendem Link abrufen:
+  </p>
+  <div class="cta-wrap">
+    <a href="https://joel-digitals.de/my-orders/{{ order.id }}/invoice/" class="cta-button">
+      📄 Rechnung abrufen
+    </a>
+  </div>
+
+  {% if registration_codes %}
+  <p style="font-size:13px;font-weight:600;color:#fff;margin:16px 0 8px;">🔑 Registrierungscodes:</p>
+  <div class="info-box">
+    {% for code in registration_codes %}
+    <div class="info-row"><span class="code-value">{{ code }}</span></div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="signature">Vielen Dank für Ihren Kauf!<br>Mit freundlichen Grüßen,<br><span class="sig-name">Ihr Joel Digitals Team</span></p>
+</div>
+
+<!-- ════ DIVIDER ════ -->
+<hr class="lang-divider" />
+
+<!-- ════ ENGLISH ════ -->
+<div class="section-en">
+  <span class="lang-badge lang-en">🇬🇧 English</span>
+  <p class="greeting">Hello {{ order.first_name }} {{ order.last_name }},</p>
+  <p class="body-text">
+    thank you for your order at <strong style="color:#00bfff;">Joel Digitals</strong>!
+    We confirm receipt of your payment. Your invoice will be sent to you shortly.
+  </p>
+
+  <div class="info-box">
+    <div class="info-row">
+      <span class="info-label">Order ID</span>
+      <span class="info-value">#{{ order.id }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Total Amount</span>
+      <span class="info-value" style="color:#00bfff;font-weight:700;">€{{ order.total_amount }}</span>
+    </div>
+  </div>
+
+  <p class="body-text">You can access your invoice at any time via the link below:</p>
+  <div class="cta-wrap">
+    <a href="https://joel-digitals.de/my-orders/{{ order.id }}/invoice/" class="cta-button">
+      📄 View Invoice
+    </a>
+  </div>
+
+  {% if registration_codes %}
+  <p style="font-size:13px;font-weight:600;color:#fff;margin:16px 0 8px;">🔑 Registration Codes:</p>
+  <div class="info-box">
+    {% for code in registration_codes %}
+    <div class="info-row"><span class="code-value">{{ code }}</span></div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="signature">Thank you for your purchase!<br>Best regards,<br><span class="sig-name">The Joel Digitals Team</span></p>
+</div>
+
+{% endblock %}

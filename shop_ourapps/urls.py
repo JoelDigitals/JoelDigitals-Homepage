@@ -31,4 +31,15 @@ urlpatterns = [
     path('order_confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
 
     path('admin-sales/orders/', views.order_admin, name='order_admin'),
+
+    # Bewertungen
+    path('shop/<slug:slug>/review/', views.submit_review, name='submit_review'),
+    path('shop/<slug:slug>/review/delete/', views.delete_review, name='delete_review'),
+
+    # Stripe Webhook (in settings: STRIPE_WEBHOOK_SECRET)
+    path('stripe/webhook/', views.stripe_webhook, name='stripe_webhook'),
+
+    # Fast-Cron Endpoint — alle 5 Min aufrufen
+    # Optional: ?token=CRON_SECRET in settings.py absichern
+    path('shop/status/emails/corn/', views.email_cron, name='email_cron'),
 ]

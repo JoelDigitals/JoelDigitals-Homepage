@@ -1,0 +1,214 @@
+{% extends 'base_home.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Support" %} - Joel Digitals{% endblock %}
+
+{% block extra_head %}
+<script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+<style>
+  .support-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .support-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--text);
+  }
+
+  .support-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--primary), #00c6ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .support-header p {
+    font-size: 1.1rem;
+    color: #999;
+  }
+
+  .support-content {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+  }
+
+  .agent-section {
+    text-align: center;
+    padding: 1.5rem 0;
+  }
+
+  .agent-section h2 {
+    color: var(--text);
+    margin-bottom: 0.8rem;
+    font-size: 1.8rem;
+  }
+
+  .agent-section p {
+    color: #999;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+  }
+
+  .agent-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(0, 68, 204, 0.1), rgba(0, 198, 255, 0.1));
+    border-radius: 12px;
+    margin: 2rem 0;
+    border: 1px solid rgba(0, 68, 204, 0.2);
+  }
+
+  .call-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: linear-gradient(135deg, var(--primary), #00c6ff);
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 68, 204, 0.4);
+    margin-top: 1.5rem;
+    border: none;
+    cursor: pointer;
+  }
+
+  .call-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 30px rgba(0, 68, 204, 0.6);
+    color: white;
+  }
+
+  .call-button i {
+    font-size: 1.3rem;
+  }
+
+  .support-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .info-card {
+    text-align: center;
+    padding: 1.8rem 1.2rem;
+    background: rgba(0, 68, 204, 0.05);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 68, 204, 0.1);
+  }
+
+  .info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 68, 204, 0.2);
+    border-color: var(--primary);
+  }
+
+  .info-card .icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .info-card h3 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+  }
+
+  .info-card p {
+    color: var(--text);
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .info-card .subtitle {
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  @media (max-width: 768px) {
+    .support-header h1 {
+      font-size: 2rem;
+    }
+
+    .support-content {
+      padding: 1.5rem;
+    }
+
+    .agent-container {
+      min-height: 300px;
+      padding: 1rem;
+    }
+
+    .support-info {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="support-container">
+  <div class="support-header">
+    <h1>🎧 {% trans "Support Center" %}</h1>
+    <p>{% trans "We are here for you - around the clock" %}</p>
+  </div>
+
+  <div class="support-content">
+    <div class="agent-section">
+      <h2>{% trans "Speak with our AI Assistant" %}</h2>
+      <p>{% trans "Click the button and start a conversation with our intelligent support agent" %}</p>
+      
+      <div class="agent-container">
+        <elevenlabs-convai agent-id="agent_3201kr51114bf6tr9rqv9bwmg7vb"></elevenlabs-convai>
+      </div>
+
+      <a href="tel:+4915253480270" class="call-button">
+        <i class="fas fa-phone-alt"></i>
+        {% trans "Call directly" %}
+      </a>
+    </div>
+
+    <div class="support-info">
+      <div class="info-card">
+        <div class="icon">📧</div>
+        <h3>{% trans "Email Support" %}</h3>
+        <p>support@joel-digitals.de</p>
+        <p class="subtitle">{% trans "Response within 24h" %}</p>
+      </div>
+
+      <div class="info-card">
+        <div class="icon">💬</div>
+        <h3>{% trans "Live Chat" %}</h3>
+        <p>{% trans "Chatbot bottom right" %}</p>
+        <p class="subtitle">{% trans "Instant responses" %}</p>
+      </div>
+
+      <div class="info-card">
+        <div class="icon">⏰</div>
+        <h3>{% trans "Availability" %}</h3>
+        <p>{% trans "24/7 AI Support" %}</p>
+        <p class="subtitle">{% trans "Mo-Fr: 9-18 Phone" %}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

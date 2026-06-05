@@ -1,5 +1,87 @@
-Hallo {{ order.first_name }} {{ order.last_name }}, 
-Vielen Dank für Ihre Bestellung. Hiermit bestätigen wir ihren Zahlungserhalt über das Wallt.
-Innerhalb der nächsten 5 Wektagen wird ihnen alles wichtige für ihren Zugang zugeschickt.
-Mit freundlichen Grüßen,
-Ihr Joel Digitals Team 
+{% extends 'emails/base.html' %}
+{% block content %}
+
+<!-- ════ DEUTSCH ════ -->
+<div class="section-de">
+  <span class="lang-badge lang-de">🇩🇪 Deutsch</span>
+  <p class="greeting">Hallo {{ order.first_name }} {{ order.last_name }},</p>
+  <p class="body-text">
+    vielen Dank für Ihre Bestellung bei <strong style="color:#00bfff;">Joel Digitals</strong>!
+    Wir bestätigen Ihren Zahlungseingang über das <strong style="color:#fff;">Wallet</strong>.
+  </p>
+  <p class="body-text">
+    Innerhalb der nächsten <strong style="color:#fff;">5 Werktage</strong> erhalten Sie alle wichtigen Informationen
+    für Ihren Zugang per E-Mail.
+  </p>
+
+  <div class="info-box">
+    <div class="info-row">
+      <span class="info-label">Bestell-ID</span>
+      <span class="info-value">#{{ order.id }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Zahlungsmethode</span>
+      <span class="info-value">💼 Wallet</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Status</span>
+      <span class="info-value" style="color:#4ade80;">✅ Zahlung erhalten</span>
+    </div>
+  </div>
+
+  {% if registration_codes %}
+  <p style="font-size:13px;font-weight:600;color:#fff;margin:16px 0 8px;">🔑 Registrierungscodes:</p>
+  <div class="info-box">
+    {% for code in registration_codes %}
+    <div class="info-row"><span class="code-value">{{ code }}</span></div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="signature">Mit freundlichen Grüßen,<br><span class="sig-name">Ihr Joel Digitals Team</span></p>
+</div>
+
+<!-- ════ DIVIDER ════ -->
+<hr class="lang-divider" />
+
+<!-- ════ ENGLISH ════ -->
+<div class="section-en">
+  <span class="lang-badge lang-en">🇬🇧 English</span>
+  <p class="greeting">Hello {{ order.first_name }} {{ order.last_name }},</p>
+  <p class="body-text">
+    thank you for your order at <strong style="color:#00bfff;">Joel Digitals</strong>!
+    We confirm receipt of your payment via <strong style="color:#fff;">Wallet</strong>.
+  </p>
+  <p class="body-text">
+    Within the next <strong style="color:#fff;">5 business days</strong>, you will receive all important
+    information for your access by email.
+  </p>
+
+  <div class="info-box">
+    <div class="info-row">
+      <span class="info-label">Order ID</span>
+      <span class="info-value">#{{ order.id }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Payment Method</span>
+      <span class="info-value">💼 Wallet</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Status</span>
+      <span class="info-value" style="color:#4ade80;">✅ Payment received</span>
+    </div>
+  </div>
+
+  {% if registration_codes %}
+  <p style="font-size:13px;font-weight:600;color:#fff;margin:16px 0 8px;">🔑 Registration Codes:</p>
+  <div class="info-box">
+    {% for code in registration_codes %}
+    <div class="info-row"><span class="code-value">{{ code }}</span></div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="signature">Best regards,<br><span class="sig-name">The Joel Digitals Team</span></p>
+</div>
+
+{% endblock %}

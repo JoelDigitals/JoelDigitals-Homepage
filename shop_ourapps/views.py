@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.core.mail import send_mail, EmailMultiAlternatives
 from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup
 from shop_ourapps.models import AffiliatePartner
 from .forms import PurchaseForm, VoucherPurchaseForm
+from .services.automation_service import OrderAutomationService
 from django.contrib import messages
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -297,9 +298,23 @@ def shop(request):
         "wallet_balance": wallet_balance,
     }
 
+    # Review-Statistiken für Sterneanzeige im Shop
+    from .models import AppReview
+    from django.db.models import Avg, Count
+    review_data = AppReview.objects.filter(is_approved=True).values('app_id').annotate(
+        avg=Avg('stars'), count=Count('id')
+    )
+    review_map = {r['app_id']: {'avg': round(r['avg'] or 0, 1), 'count': r['count']} for r in review_data}
+    for app in context['apps']:
+        stats = review_map.get(app.id, {'avg': 0, 'count': 0})
+        app.review_avg = stats['avg']
+        app.review_count = stats['count']
+
     return render(request, "apps/shop.html", context)
 
 def app_detail(request, slug):
+    from .models import AppReview
+    from django.db.models import Avg, Count
     lang = get_language()
     app = get_object_or_404(App, slug=slug)
 
@@ -310,10 +325,29 @@ def app_detail(request, slug):
     if request.user.is_authenticated:
         wallet = Wallet.objects.filter(user=request.user).first()
 
+    # Bewertungen laden
+    reviews = AppReview.objects.filter(app=app, is_approved=True).select_related('user')
+    review_stats = reviews.aggregate(avg=Avg('stars'), count=Count('id'))
+    review_count = review_stats['count'] or 0
+    user_review = AppReview.objects.filter(app=app, user=request.user).first() if request.user.is_authenticated else None
+
+    # Verteilung für Balkendiagramm (5 → 1, absteigend)
+    star_counts = {r['stars']: r['c'] for r in reviews.values('stars').annotate(c=Count('id'))}
+    review_distribution = []
+    for s in [5, 4, 3, 2, 1]:
+        cnt = star_counts.get(s, 0)
+        pct = round(cnt / review_count * 100) if review_count else 0
+        review_distribution.append({'stars': s, 'count': cnt, 'pct': pct})
+
     return render(request, 'apps/app_detail.html', {
         'app': app,
         'wallet_balance': wallet.balance if wallet else 0.00,
-        'lang': lang
+        'lang': lang,
+        'reviews': reviews,
+        'review_avg': round(review_stats['avg'] or 0, 1),
+        'review_count': review_count,
+        'user_review': user_review,
+        'review_distribution': review_distribution,
     })
 
 @login_required
@@ -978,6 +1012,27 @@ def paypal_execute(request):
     result = capture_paypal_order(token)
 
     if result.get("status") == "COMPLETED":
+        # Bestellung als bezahlt markieren
+        try:
+            purchase_units = result.get("purchase_units", [])
+            invoice_id = None
+            if purchase_units:
+                invoice_id = purchase_units[0].get("reference_id") or purchase_units[0].get("invoice_id")
+            if invoice_id:
+                order = Order.objects.filter(id=invoice_id, user=request.user).first()
+            else:
+                # Fallback: letzte unbezahlte Bestellung des Users
+                order = Order.objects.filter(
+                    user=request.user,
+                    payment_method='paypal',
+                    status='Received'
+                ).order_by('-created_at').first()
+            if order:
+                OrderAutomationService.set_paid(order)
+                messages.success(request, f"Zahlung erfolgreich! Bestellung #{order.id} ist jetzt bezahlt.")
+                return redirect('order_confirmation', order_id=order.id)
+        except Exception as e:
+            pass
         messages.success(request, "Zahlung erfolgreich!")
         return redirect('my_orders')
 
@@ -1006,6 +1061,18 @@ def create_stripe_payment(request, order_id):
 @login_required
 def order_confirmation(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    # Stripe-Callback: session_id prüfen und Zahlung bestätigen
+    session_id = request.GET.get('session_id')
+    if session_id and order.payment_method == 'stripe' and order.status == 'Received':
+        try:
+            session = stripe.checkout.Session.retrieve(session_id)
+            if session.payment_status == 'paid' and str(session.metadata.get('order_id')) == str(order.id):
+                OrderAutomationService.set_paid(order)
+                order.refresh_from_db()
+        except Exception as e:
+            pass  # Stripe-Fehler ignorieren, Status bleibt unverändert
+
     return render(request, 'apps/order_confirmation.html', {'order': order})
 
 
@@ -1107,7 +1174,7 @@ def order_admin(request):
 
     # Mapping Tabs -> Statuswerte
     tab_map = {
-        "pending": ["Received", "pending"],               # Ausstehend
+        "pending": ["Received"],               # Ausstehend
         "completed": ["Paid"],                 # Bezahlt
         "returns": ["Return", "Canceled", "Back"],   # Retouren
         "shipping": ["In Delivery", "Delivered"],    # Versand
@@ -1128,23 +1195,120 @@ def order_admin(request):
         )
 
     if request.method == 'POST':
-        form = SendAccessMailForm(request.POST)
         order_id = request.POST.get('order_id')
-        new_status = request.POST.get('new_status')
+        action = request.POST.get('action')
 
         try:
             order = Order.objects.get(id=order_id)
 
-            # Statusaktualisierung
-            if new_status in dict(Order.STATUS_CHOICES):
+            # Action: Registrierungscode versenden
+            if action == 'send_registration_code':
+                registration_code = request.POST.get('registration_code', '')
+                if registration_code:
+                    OrderAutomationService.mark_as_sent(order, registration_code)
+                    messages.success(
+                        request,
+                        f"Bestellung #{order.id}: Registrierungscode versendet. Status → 'In Delivery'"
+                    )
+                else:
+                    messages.error(request, "Registrierungscode erforderlich.")
+            
+            # Action: Bezahlungsstatus setzen
+            elif action == 'set_paid':
                 old_status = order.status
-                order.status = new_status
-                order.save()
-                messages.success(
-                    request,
-                    f"Bestellung #{order.id}: Status geändert von '{old_status}' auf '{new_status}'."
-                )
-                return redirect(f"{request.path}?tab={tab}")
+                if OrderAutomationService.set_payment_status(order):
+                    messages.success(
+                        request,
+                        f"Bestellung #{order.id}: Manuell auf 'Paid' gesetzt."
+                    )
+                else:
+                    messages.warning(
+                        request,
+                        f"Bestellung #{order.id}: Wird über {order.payment_method} automatisch gesetzt."
+                    )
+            
+            # Action: Status manuell ändern
+            elif action == 'change_status':
+                new_status = request.POST.get('new_status')
+                if new_status in dict(Order.STATUS_CHOICES):
+                    old_status = order.status
+                    order.status = new_status
+                    order.save()
+                    OrderAutomationService.log_event(
+                        order,
+                        'status_changed',
+                        old_status=old_status,
+                        new_status=new_status,
+                        note='Manuell vom Admin gesetzt'
+                    )
+                    messages.success(
+                        request,
+                        f"Bestellung #{order.id}: Status geändert von '{old_status}' auf '{new_status}'."
+                    )
+
+            return redirect(f"{request.path}?tab={tab}")
+
+        except Order.DoesNotExist:
+            messages.error(request, "Bestellung nicht gefunden.")
+
+    context = {
+        'orders': orders,
+        'tab': tab,
+        'query': query,
+        'STATUS_CHOICES': dict(Order.STATUS_CHOICES)
+    }
+    return render(request, 'apps/order_admin.html', context)
+
+
+# ==== AUTOMATISIERUNG - CronJob Views ====
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def automation_cron(request):
+    """
+    Diese URL wird alle 10 Minuten via CronJob aufgerufen.
+    Sie führt alle ausstehenden automatischen Aufgaben aus:
+    - Status nach 30 Min auf "Delivered" setzen
+    - Review-Emails versenden
+    """
+    try:
+        # Bestellungen nach 30 Min als "Delivered" markieren
+        delivery_count = OrderAutomationService.auto_deliver_after_30_minutes()
+        
+        # Review-Emails versenden
+        review_count = OrderAutomationService.send_review_emails()
+        
+        result = {
+            'status': 'success',
+            'message': f'CronJob erfolgreich ausgeführt',
+            'orders_delivered': delivery_count,
+            'review_emails_sent': review_count,
+            'timestamp': timezone.now().isoformat(),
+        }
+        
+        return JsonResponse(result, status=200)
+    
+    except Exception as e:
+        result = {
+            'status': 'error',
+            'message': str(e),
+            'timestamp': timezone.now().isoformat(),
+        }
+        return JsonResponse(result, status=500)
+@login_required
+def order_admin(request):
+    """
+    Admin-View für Bestellungen mit Tabs und Mail-Versand.
+    """
+    tab = request.GET.get('tab', 'all')
+    orders = Order.objects.all().order_by('-created_at')
+
+    if request.method == 'POST':
+        try:
+            order_id = request.POST.get('order_id')
+            order = Order.objects.get(id=order_id)
+            tab = request.POST.get('tab', tab)
+            form = SendAccessMailForm(request.POST)
 
             # Mail verschicken
             if form.is_valid():
@@ -1353,3 +1517,136 @@ def affiliate_info(request):
     Öffentliche Informationsseite zum Affiliate-Programm.
     """
     return render(request, "apps/affiliate_info.html")
+
+# ─────────────────────────────────────────────────────────────────────────────
+# STRIPE WEBHOOK — serverseitige Zahlungsbestätigung
+# ─────────────────────────────────────────────────────────────────────────────
+@csrf_exempt
+@require_POST
+def stripe_webhook(request):
+    """
+    Stripe sendet Events an diesen Endpoint.
+    Wichtigste Events: checkout.session.completed, payment_intent.succeeded
+    Einrichten: stripe.com/docs/webhooks → URL: /stripe/webhook/
+    Settings: STRIPE_WEBHOOK_SECRET = 'whsec_...'
+    """
+    payload = request.body
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
+    webhook_secret = getattr(settings, 'STRIPE_WEBHOOK_SECRET', '')
+
+    try:
+        if webhook_secret:
+            event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
+        else:
+            import json
+            event = stripe.Event.construct_from(json.loads(payload), stripe.api_key)
+    except (ValueError, stripe.error.SignatureVerificationError) as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        if session.get('payment_status') == 'paid':
+            order_id = session.get('metadata', {}).get('order_id')
+            if order_id:
+                try:
+                    order = Order.objects.get(id=order_id)
+                    OrderAutomationService.set_paid(order)
+                except Order.DoesNotExist:
+                    pass
+
+    elif event['type'] == 'payment_intent.succeeded':
+        intent = event['data']['object']
+        order_id = intent.get('metadata', {}).get('order_id')
+        if order_id:
+            try:
+                order = Order.objects.get(id=order_id)
+                OrderAutomationService.set_paid(order)
+            except Order.DoesNotExist:
+                pass
+
+    return JsonResponse({'status': 'ok'})
+
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BEWERTUNGEN / REVIEWS
+# ─────────────────────────────────────────────────────────────────────────────
+from .models import AppReview
+from django.db.models import Avg, Count
+
+@login_required
+@require_POST
+def submit_review(request, slug):
+    """Bewertung abgeben oder aktualisieren. Nur eingeloggte Nutzer."""
+    app = get_object_or_404(App, slug=slug)
+
+    stars_raw = request.POST.get('stars', '')
+    comment = request.POST.get('comment', '').strip()[:500]
+
+    try:
+        stars = int(stars_raw)
+        if stars < 0 or stars > 5:
+            raise ValueError
+    except (ValueError, TypeError):
+        messages.error(request, "Bitte wähle eine gültige Sternanzahl (0–5).")
+        return redirect('app_detail', slug=slug)
+
+    review, created = AppReview.objects.update_or_create(
+        app=app,
+        user=request.user,
+        defaults={'stars': stars, 'comment': comment, 'is_approved': True}
+    )
+
+    if created:
+        messages.success(request, "Vielen Dank für deine Bewertung! ⭐")
+    else:
+        messages.success(request, "Deine Bewertung wurde aktualisiert.")
+
+    return redirect('app_detail', slug=slug)
+
+
+@login_required
+@require_POST
+def delete_review(request, slug):
+    """Eigene Bewertung löschen."""
+    app = get_object_or_404(App, slug=slug)
+    AppReview.objects.filter(app=app, user=request.user).delete()
+    messages.success(request, "Deine Bewertung wurde gelöscht.")
+    return redirect('app_detail', slug=slug)
+
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CRON ENDPOINT  /shop/status/emails/corn/
+# Aufrufen z.B. via: curl https://domain.de/shop/status/emails/corn/?token=SECRET
+# In settings.py: CRON_SECRET = "dein-geheimes-token"
+# ─────────────────────────────────────────────────────────────────────────────
+@csrf_exempt
+def email_cron(request):
+    """
+    Fast-Cron / externer Cronjob Endpoint.
+    Führt alle Automatisierungs-Schritte durch und leitet dann nach /shop/ weiter.
+
+    Schutz: optionaler CRON_SECRET Token in settings.py.
+    Aufruf: GET /shop/status/emails/corn/?token=SECRET
+    """
+    # Token-Prüfung (optional — wenn CRON_SECRET gesetzt ist)
+    secret = getattr(settings, 'CRON_SECRET', None)
+    if secret:
+        token = request.GET.get('token', '')
+        if token != secret:
+            return redirect('shop')
+
+    try:
+        from .services.automation_service import OrderAutomationService
+
+        # Schritt 1: In-Delivery → Delivered (30 min nach Code-Versand)
+        OrderAutomationService.auto_deliver_after_30_minutes()
+
+        # Schritt 2: Review-Emails versenden (12–72h nach Lieferung) → Finished
+        OrderAutomationService.send_review_emails()
+
+    except Exception:
+        pass  # Fehler still ignorieren, damit der Cron-Dienst nicht eskaliert
+
+    return redirect('shop')

@@ -1,0 +1,12 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+<h3>Thank you for your order #{{ order.id }}</h3>
+<p>Hello {{ order.first_name }},</p>
+<p>We received your order successfully.</p>
+<ul>
+{% for item in items %}
+<li>{{ item.app.name }} x {{ item.quantity }}</li>
+{% endfor %}
+</ul>
+<p>Total: {{ order.total_amount }} €</p>
+{% endblock %}

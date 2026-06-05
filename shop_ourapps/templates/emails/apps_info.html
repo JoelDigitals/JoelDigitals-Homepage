@@ -1,208 +1,120 @@
-<!-- templates/emails/apps_info.html -->
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <title>Informationen zu unseren Apps | Information about our Apps</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #ffffff;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background-color: #1e1e1e;
-      padding: 30px;
-      border-radius: 8px;
-      position: relative;
-    }
-    h1 {
-      color: #00bfff;
-    }
-    h2 {
-      color: #00bfff;
-      margin-top: 30px;
-    }
-    p {
-      line-height: 1.6;
-    }
-    .suggestions {
-      margin-top: 30px;
-    }
-    .suggestion-box {
-      background-color: #2c2c2c;
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 6px;
-    }
-    .btn {
-      display: inline-block;
-      background-color: #00bfff;
-      color: #000;
-      padding: 10px 18px;
-      text-decoration: none;
-      border-radius: 5px;
-      margin-top: 10px;
-      margin-right: 5px;
-      transition: background 0.3s;
-    }
-    .btn:hover {
-      background-color: #33ccff;
-    }
-    .footer {
-      margin-top: 30px;
-      font-size: 0.9em;
-      color: #aaa;
-      text-align: center;
-    }
-    /* Sprachumschalter */
-    .lang-toggle {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-    }
-    .lang-btn {
-      background-color: #00bfff;
-      color: #000;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .lang-btn:hover {
-      background-color: #33ccff;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <!-- Sprachumschalter -->
-    <div class="lang-toggle">
-      <button class="lang-btn" id="langSwitch">EN</button>
-    </div>
+{% extends 'emails/base.html' %}
+{% block content %}
 
-    <!-- 🇩🇪 DEUTSCH -->
-    <div id="langDE">
-      <h1>Hallo {{ order.first_name }},</h1>
-      <p>Hier finden Sie eine Übersicht unserer Apps sowie alle wichtigen Informationen dazu.</p>
+<!-- ════ DEUTSCH ════ -->
+<div class="section-de">
+  <span class="lang-badge lang-de">🇩🇪 Deutsch</span>
+  <p class="greeting">Hallo {{ order.first_name }},</p>
+  <p class="body-text">
+    hier finden Sie eine Übersicht unserer Apps sowie alle wichtigen Informationen dazu.
+  </p>
 
-      <div class="suggestions">
-        <h2>✨ Unsere Apps:</h2>
+  <div class="suggestions-wrap">
+    <p style="font-size:13px;font-weight:600;color:#00bfff;margin-bottom:12px;">✨ Unsere Apps:</p>
 
-        <div class="suggestion-box">
-          <strong>JDS Management</strong><br>
-          Diese webbasierte Management-Plattform unterstützt Unternehmen, Teams und Einzelpersonen bei der effizienten Organisation, Überwachung und Umsetzung ihrer täglichen Aufgaben und langfristigen Projekte. Der Fokus liegt auf Benutzerfreundlichkeit und Flexibilität.
-          <br>
-          <a class="btn" href="https://joel-digitals.de/our-apps/JDS-Management/">Mehr Informationen</a>
-          <a class="btn" href="https://joel-digitals.de/wiki/Management-EN/">Wiki</a>
-          <a class="btn" href="https://jds-management.de">Zur App</a>
-        </div>
-
-        <div class="suggestion-box">
-          <strong>AuftragNetz</strong><br>
-          AuftragNetz verbindet Auftraggeber und Dienstleister auf einer modernen, sicheren Plattform. Nutzer können Projekte einstellen, passende Partner finden und den gesamten Auftragsprozess digital verwalten.
-          <br>
-          <a class="btn" href="https://joel-digitals.de/our-apps/AuftragNetz/">Mehr Informationen</a>
-          <a class="btn" href="https://auftragnetz.de">Zur App</a>
-        </div>
-      </div>
-
-      {% if suggestions %}
-      <div class="suggestions">
-        <h2>💡 Empfohlene Apps für Sie:</h2>
-        {% for item in suggestions %}
-        <div class="suggestion-box">
-          <strong>{{ item.title }}</strong><br>
-          {{ item.description }}<br>
-          <a class="btn" href="{{ item.url }}">{{ item.btn_text }}</a>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      <p>
-        Bei Fragen oder Problemen besuchen Sie bitte unser 
-        <a href="https://joel-digitals.de/contact" style="color:#00bfff;">Support-Portal</a>.
+    <div class="suggestion-box">
+      <p class="suggestion-title">JDS Management</p>
+      <p class="suggestion-desc">
+        Diese webbasierte Management-Plattform unterstützt Unternehmen, Teams und Einzelpersonen
+        bei der effizienten Organisation, Überwachung und Umsetzung ihrer täglichen Aufgaben und
+        langfristigen Projekte. Fokus auf Benutzerfreundlichkeit und Flexibilität.
       </p>
-
-      <div class="footer">
-        <p>&copy; 2025 Joel Digitals · Alle Rechte vorbehalten</p>
-        <p><a href="https://joel-digitals.de" style="color:#00bfff;">www.joel-digitals.de</a></p>
+      <div class="suggestion-links">
+        <a href="https://joel-digitals.de/our-apps/JDS-Management/" class="sug-btn">Mehr Infos</a>
+        <a href="https://joel-digitals.de/wiki/Management-EN/" class="sug-btn">Wiki</a>
+        <a href="https://jds-management.de" class="sug-btn">Zur App →</a>
       </div>
     </div>
 
-    <!-- 🇬🇧 ENGLISH -->
-    <div id="langEN" style="display:none;">
-      <h1>Hello {{ order.first_name }},</h1>
-      <p>Below you will find an overview of our apps and all important information about them.</p>
-
-      <div class="suggestions">
-        <h2>✨ Our Apps:</h2>
-
-        <div class="suggestion-box">
-          <strong>JDS Management</strong><br>
-          This web-based management platform supports organizations, teams, and individuals in efficiently organizing, monitoring, and executing daily operations and long-term projects, focusing on usability and flexibility.
-          <br>
-          <a class="btn" href="https://joel-digitals.de/our-apps/JDS-Management/">More Information</a>
-          <a class="btn" href="https://joel-digitals.de/wiki/Management-EN/">Wiki</a>
-          <a class="btn" href="https://jds-management.de">Go to App</a>
-        </div>
-
-        <div class="suggestion-box">
-          <strong>OrderNetwork</strong><br>
-          AuftragNetz connects clients and service providers on a modern, secure platform. Users can post projects, find suitable partners, and manage the entire workflow digitally.
-          <br>
-          <a class="btn" href="https://joel-digitals.de/our-apps/auftragnetz/">More Information</a>
-          <a class="btn" href="https://auftragnetz.de">Go to App</a>
-        </div>
-      </div>
-
-      {% if suggestions %}
-      <div class="suggestions">
-        <h2>💡 Recommended Apps for You:</h2>
-        {% for item in suggestions %}
-        <div class="suggestion-box">
-          <strong>{{ item.title }}</strong><br>
-          {{ item.description }}<br>
-          <a class="btn" href="{{ item.url }}">{{ item.btn_text }}</a>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      <p>
-        If you have any questions or issues, please visit our 
-        <a href="https://joel-digitals.de/contact" style="color:#00bfff;">support portal</a>.
+    <div class="suggestion-box">
+      <p class="suggestion-title">AuftragNetz</p>
+      <p class="suggestion-desc">
+        AuftragNetz verbindet Auftraggeber und Dienstleister auf einer modernen, sicheren Plattform.
+        Nutzer können Projekte einstellen, passende Partner finden und den gesamten Auftragsprozess
+        digital verwalten.
       </p>
-
-      <div class="footer">
-        <p>&copy; 2025 Joel Digitals · All rights reserved</p>
-        <p><a href="https://joel-digitals.de" style="color:#00bfff;">www.joel-digitals.de</a></p>
+      <div class="suggestion-links">
+        <a href="https://joel-digitals.de/our-apps/AuftragNetz/" class="sug-btn">Mehr Infos</a>
+        <a href="https://auftragnetz.de" class="sug-btn">Zur App →</a>
       </div>
     </div>
+
+    {% if suggestions %}
+    {% for item in suggestions %}
+    <div class="suggestion-box">
+      <p class="suggestion-title">{{ item.title }}</p>
+      <p class="suggestion-desc">{{ item.description }}</p>
+      <div class="suggestion-links">
+        <a href="{{ item.url }}" class="sug-btn">{{ item.btn_text }}</a>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
   </div>
 
-  <script>
-    const switchBtn = document.getElementById("langSwitch");
-    const de = document.getElementById("langDE");
-    const en = document.getElementById("langEN");
+  <p class="body-text">
+    Bei Fragen besuchen Sie bitte unser <a href="https://joel-digitals.de/contact" style="color:#00bfff;">Support-Portal</a>.
+  </p>
+  <p class="signature">Mit freundlichen Grüßen,<br><span class="sig-name">Ihr Joel Digitals Team</span></p>
+</div>
 
-    switchBtn.addEventListener("click", () => {
-      if (de.style.display !== "none") {
-        de.style.display = "none";
-        en.style.display = "block";
-        switchBtn.textContent = "DE";
-      } else {
-        en.style.display = "none";
-        de.style.display = "block";
-        switchBtn.textContent = "EN";
-      }
-    });
-  </script>
-</body>
-</html>
+<!-- ════ DIVIDER ════ -->
+<hr class="lang-divider" />
+
+<!-- ════ ENGLISH ════ -->
+<div class="section-en">
+  <span class="lang-badge lang-en">🇬🇧 English</span>
+  <p class="greeting">Hello {{ order.first_name }},</p>
+  <p class="body-text">
+    below you will find an overview of our apps and all important information about them.
+  </p>
+
+  <div class="suggestions-wrap">
+    <p style="font-size:13px;font-weight:600;color:#00bfff;margin-bottom:12px;">✨ Our Apps:</p>
+
+    <div class="suggestion-box">
+      <p class="suggestion-title">JDS Management</p>
+      <p class="suggestion-desc">
+        This web-based management platform supports organizations, teams, and individuals in
+        efficiently organizing, monitoring, and executing daily operations and long-term projects.
+        Focused on usability and flexibility.
+      </p>
+      <div class="suggestion-links">
+        <a href="https://joel-digitals.de/our-apps/JDS-Management/" class="sug-btn">More Info</a>
+        <a href="https://joel-digitals.de/wiki/Management-EN/" class="sug-btn">Wiki</a>
+        <a href="https://jds-management.de" class="sug-btn">Go to App →</a>
+      </div>
+    </div>
+
+    <div class="suggestion-box">
+      <p class="suggestion-title">OrderNetwork (AuftragNetz)</p>
+      <p class="suggestion-desc">
+        AuftragNetz connects clients and service providers on a modern, secure platform.
+        Users can post projects, find suitable partners, and manage the entire workflow digitally.
+      </p>
+      <div class="suggestion-links">
+        <a href="https://joel-digitals.de/our-apps/auftragnetz/" class="sug-btn">More Info</a>
+        <a href="https://auftragnetz.de" class="sug-btn">Go to App →</a>
+      </div>
+    </div>
+
+    {% if suggestions %}
+    {% for item in suggestions %}
+    <div class="suggestion-box">
+      <p class="suggestion-title">{{ item.title }}</p>
+      <p class="suggestion-desc">{{ item.description }}</p>
+      <div class="suggestion-links">
+        <a href="{{ item.url }}" class="sug-btn">{{ item.btn_text }}</a>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+
+  <p class="body-text">
+    If you have any questions, please visit our <a href="https://joel-digitals.de/contact" style="color:#00bfff;">support portal</a>.
+  </p>
+  <p class="signature">Best regards,<br><span class="sig-name">The Joel Digitals Team</span></p>
+</div>
+
+{% endblock %}

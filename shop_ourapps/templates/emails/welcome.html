@@ -1,12 +1,43 @@
-<!DOCTYPE html>
-<html lang="de">
-<head><meta charset="UTF-8" /><title>Willkommensnachricht</title></head>
-<body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px;">
-<div style="max-width: 600px; background: white; margin: auto; padding: 20px; border-radius: 8px;">
-  <h1>Willkommen bei Joel Digitals, {{ order.first_name }}!</h1>
-  <p>Danke für Ihre Bestellung. Wir freuen uns, Sie als Kunden zu haben.</p>
-  <p>Bei Fragen sind wir gerne für Sie da.</p>
-  <p>Ihr Joel Digitals Team</p>
+{% extends 'emails/base.html' %}
+{% block content %}
+
+<!-- ════ DEUTSCH ════ -->
+<div class="section-de">
+  <span class="lang-badge lang-de">🇩🇪 Deutsch</span>
+  <p class="greeting">Willkommen bei Joel Digitals, {{ order.first_name }}! 🎉</p>
+  <p class="body-text">
+    Herzlich willkommen! Wir freuen uns sehr, Sie als Kunden begrüßen zu dürfen.
+    Vielen Dank für Ihre Bestellung – Sie haben eine großartige Wahl getroffen.
+  </p>
+  <p class="body-text">
+    Unser Team ist rund um die Uhr für Sie da. Bei Fragen oder Anliegen zögern Sie nicht,
+    uns zu kontaktieren.
+  </p>
+  <div class="cta-wrap">
+    <a href="https://www.joel-digitals.de/my-orders/" class="cta-button">Meine Bestellungen</a>
+  </div>
+  <p class="signature">Mit freundlichen Grüßen,<br><span class="sig-name">Ihr Joel Digitals Team</span></p>
 </div>
-</body>
-</html>
+
+<!-- ════ DIVIDER ════ -->
+<hr class="lang-divider" />
+
+<!-- ════ ENGLISH ════ -->
+<div class="section-en">
+  <span class="lang-badge lang-en">🇬🇧 English</span>
+  <p class="greeting">Welcome to Joel Digitals, {{ order.first_name }}! 🎉</p>
+  <p class="body-text">
+    A warm welcome to you! We are thrilled to have you as our customer.
+    Thank you for your order – you've made a great choice.
+  </p>
+  <p class="body-text">
+    Our team is here for you around the clock. Don't hesitate to reach out
+    if you have any questions or concerns.
+  </p>
+  <div class="cta-wrap">
+    <a href="https://www.joel-digitals.de/my-orders/" class="cta-button">My Orders</a>
+  </div>
+  <p class="signature">Best regards,<br><span class="sig-name">The Joel Digitals Team</span></p>
+</div>
+
+{% endblock %}

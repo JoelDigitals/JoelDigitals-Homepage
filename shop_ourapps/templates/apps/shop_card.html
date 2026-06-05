@@ -30,6 +30,28 @@
     <p class="description">{{ app.display_description|truncatechars:80 }}</p>
     <p class="version">Version: {{ app.version }}</p>
 
+    <!-- Bewertungen -->
+    {% if app.review_count %}
+    <div class="review-stars-mini" style="display:flex;align-items:center;gap:6px;justify-content:center;margin:6px 0 4px;">
+      <span style="color:#ffc107;font-size:13px;letter-spacing:1px;">
+        {% with avg=app.review_avg|floatformat:0 %}
+        {% for i in "12345" %}{% if forloop.counter <= avg|add:0 %}★{% else %}<span style="color:rgba(255,255,255,0.2);">★</span>{% endif %}{% endfor %}
+        {% endwith %}
+      </span>
+      <span style="font-size:12px;color:rgba(255,255,255,0.45);">{{ app.review_avg }} ({{ app.review_count }})</span>
+    </div>
+    {% endif %}
+
+    <!-- Bewertungen -->
+    {% if app.review_count %}
+    <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin:2px 0 6px;">
+      <span style="color:#ffc107;font-size:13px;letter-spacing:1px;">
+        {% with avg=app.review_avg|stringformat:"d" %}★★★★★{% endwith %}
+      </span>
+      <span style="font-size:12px;color:rgba(128,128,128,0.8);">{{ app.review_avg }} ({{ app.review_count }})</span>
+    </div>
+    {% endif %}
+
     <div class="price-section">
       {% if app.discount_is_active %}
         <span class="badge-sale">🔖 {{ app.discount_percent }}% OFF</span>

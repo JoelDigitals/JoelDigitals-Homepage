@@ -1,0 +1,258 @@
+{% load i18n %}
+
+<footer class="joel-footer">
+    <div class="footer-container">
+        <!-- Footer Main Content -->
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>{% trans "Company" %}</h4>
+                <ul>
+                    <li><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+                    <li><a href="{% url 'our_apps' %}">{% trans "Our Apps" %}</a></li>
+                    <li><a href="{% url 'shop' %}">{% trans "Shop" %}</a></li>
+                    <li><a href="{% url 'affiliate_info' %}">{% trans "Become Partner" %}</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>{% trans "Support" %}</h4>
+                <ul>
+                    <li><a href="{% url 'contact' %}">{% trans "Contact" %}</a></li>
+                    <li><a href="/faq/">{% trans "FAQ" %}</a></li>
+                    <li><a href="/documentation/">{% trans "Documentation" %}</a></li>
+                    <li><a href="/blog/">{% trans "Blog" %}</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>{% trans "Legal" %}</h4>
+                <ul>
+                    <li><a href="/impressum/">{% trans "Imprint" %}</a></li>
+                    <li><a href="/datenschutz/">{% trans "Privacy Policy" %}</a></li>
+                    <li><a href="/agb/">{% trans "Terms & Conditions" %}</a></li>
+                    <li><a href="/cookies/">{% trans "Cookie Settings" %}</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>{% trans "Connect" %}</h4>
+                <ul class="social-links">
+                    <li><a href="https://twitter.com/joeldigitals" target="_blank" title="Twitter">
+                        <i class="fab fa-twitter"></i> Twitter
+                    </a></li>
+                    <li><a href="https://instagram.com/joeldigitals" target="_blank" title="Instagram">
+                        <i class="fab fa-instagram"></i> Instagram
+                    </a></li>
+                    <li><a href="https://youtube.com/joeldigitals" target="_blank" title="YouTube">
+                        <i class="fab fa-youtube"></i> YouTube
+                    </a></li>
+                    <li><a href="https://github.com/joeldigitals" target="_blank" title="GitHub">
+                        <i class="fab fa-github"></i> GitHub
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <hr class="footer-divider">
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <div class="footer-bottom-left">
+                <p>&copy; 2024 Joel Digitals. {% trans "All rights reserved." %}</p>
+            </div>
+            
+            <div class="footer-bottom-right">
+                <!-- Language Selector -->
+                <div class="language-selector">
+                    {% get_current_language as current_language %}
+                    {% get_language_info_list for LANGUAGES as languages %}
+                    <span class="lang-label">{% trans "Language:" %}</span>
+                    <div class="lang-options">
+                        {% for code, name in languages %}
+                            <a href="{% url 'set_language' code %}" 
+                               class="lang-option {% if code == current_language %}active{% endif %}"
+                               data-lang="{{ code }}">
+                                {{ name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+.joel-footer {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #e0e0e0;
+    margin-top: 80px;
+    padding: 60px 20px 40px;
+    font-size: 14px;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.footer-section h4 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: 10px;
+}
+
+.footer-section a {
+    color: #b0b0b0;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+    color: #667eea;
+}
+
+.social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.social-links li a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background-color: rgba(102, 126, 234, 0.1);
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.social-links li a:hover {
+    background-color: rgba(102, 126, 234, 0.2);
+    color: #667eea;
+}
+
+.footer-divider {
+    border: none;
+    border-top: 1px solid rgba(102, 126, 234, 0.2);
+    margin: 30px 0;
+}
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-bottom-left p {
+    color: #9a9a9a;
+    font-size: 13px;
+}
+
+.footer-bottom-right {
+    display: flex;
+    align-items: center;
+}
+
+.language-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.lang-label {
+    color: #b0b0b0;
+    font-weight: 500;
+}
+
+.lang-options {
+    display: flex;
+    gap: 8px;
+}
+
+.lang-option {
+    padding: 6px 12px;
+    background-color: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    color: #b0b0b0;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.lang-option:hover {
+    background-color: rgba(102, 126, 234, 0.2);
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.lang-option.active {
+    background-color: #667eea;
+    border-color: #667eea;
+    color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .footer-bottom-right {
+        width: 100%;
+    }
+
+    .language-selector {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+
+    .joel-footer {
+        padding: 40px 15px 30px;
+        margin-top: 50px;
+    }
+
+    .footer-section h4 {
+        font-size: 14px;
+    }
+
+    .social-links {
+        flex-direction: column;
+    }
+}
+</style>

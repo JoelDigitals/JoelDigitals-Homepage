@@ -1,122 +1,117 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Your Registration Codes</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #ffffff;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background-color: #1e1e1e;
-      padding: 30px;
-      border-radius: 8px;
-    }
-    h1 {
-      color: #00bfff;
-    }
-    p {
-      line-height: 1.6;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 12px;
-      border: 1px solid #444;
-      text-align: left;
-      background-color: #2a2a2a;
-    }
-    th {
-      background-color: #333;
-      color: #00bfff;
-    }
-    .footer {
-      margin-top: 30px;
-      font-size: 0.9em;
-      color: #aaa;
-      text-align: center;
-    }
-    .suggestions {
-      margin-top: 40px;
-    }
-    .suggestion-box {
-      background-color: #2c2c2c;
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 6px;
-    }
-    .btn {
-      display: inline-block;
-      background-color: #00bfff;
-      color: #000;
-      padding: 10px 18px;
-      text-decoration: none;
-      border-radius: 5px;
-      margin-top: 10px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Hello {{ order.first_name }},</h1>
-    <p>
-      Thank you for your purchase at <strong>Joel Digitals</strong>! Below are your registration codes
-      for the apps you’ve ordered. Please store them safely.
-    </p>
+{% extends 'emails/base.html' %}
+{% block content %}
 
-    {% if codes %}
-    <table>
-      <thead>
-        <tr>
-          <th>App</th>
-          <th>Registration Code</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for app, code in codes.items %}
-        <tr>
-          <td>{{ app }}</td>
-          <td><strong>{{ code }}</strong></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <p><strong>Note:</strong> No registration codes were submitted.</p>
-    {% endif %}
+<!-- ════ DEUTSCH ════ -->
+<div class="section-de">
+  <span class="lang-badge lang-de">🇩🇪 Deutsch</span>
+  <p class="greeting">Hallo {{ order.first_name }},</p>
+  <p class="body-text">
+    vielen Dank für Ihren Kauf bei <strong style="color:#00bfff;">Joel Digitals</strong>!
+    Nachfolgend finden Sie Ihre Registrierungscodes für die bestellten Apps.
+    Bitte bewahren Sie diese sicher auf.
+  </p>
 
-    <p>
-      For help or questions, visit our <a href="https://www.joel-digitals.de/contact" style="color:#00bfff;">support portal</a>
-      or reply directly to this email.
-    </p>
-
-    {% if suggestions %}
-    <div class="suggestions">
-      <h2 style="color: #00bfff;">💡 Recommended for you:</h2>
-      {% for item in suggestions %}
-      <div class="suggestion-box">
-        <strong>{{ item.title }}</strong><br>
-        {{ item.description }}<br>
-        <a class="btn" href="{{ item.url }}">{{ item.btn_text }}</a>
-      </div>
+  {% if codes %}
+  <table class="codes-table">
+    <thead>
+      <tr>
+        <th>App</th>
+        <th>Registrierungscode</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for app, code in codes.items %}
+      <tr>
+        <td>{{ app }}</td>
+        <td><span class="code-value">{{ code }}</span></td>
+      </tr>
       {% endfor %}
-    </div>
-    {% endif %}
-    
-
-    <div class="footer">
-      <p>&copy; {{ now.year }} Joel Digitals · All rights reserved</p>
-      <p>Joel Digitals  · https://www.joel-digitals.de</p>
-    </div>
+    </tbody>
+  </table>
+  {% else %}
+  <div class="info-box" style="border-color:rgba(255,193,7,0.3);background:rgba(255,193,7,0.05);">
+    <p style="color:rgba(255,255,255,0.6);font-size:13px;">⚠️ Es wurden noch keine Registrierungscodes übermittelt. Sie erhalten diese in einer separaten E-Mail.</p>
   </div>
-</body>
-</html>
+  {% endif %}
+
+  {% if suggestions %}
+  <div class="suggestions-wrap" style="margin-top:20px;">
+    <p style="font-size:13px;font-weight:600;color:#fff;margin-bottom:10px;">💡 Weitere Apps für Sie:</p>
+    {% for item in suggestions %}
+    <div class="suggestion-box">
+      <p class="suggestion-title">{{ item.title }}</p>
+      <p class="suggestion-desc">{{ item.description }}</p>
+      <div class="suggestion-links">
+        <a href="{{ item.url }}" class="sug-btn">{{ item.btn_text }}</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="body-text" style="margin-top:16px;">
+    Bei Fragen besuchen Sie unser <a href="https://www.joel-digitals.de/contact" style="color:#00bfff;">Support-Portal</a>
+    oder antworten Sie direkt auf diese E-Mail.
+  </p>
+  <p class="signature">Mit freundlichen Grüßen,<br><span class="sig-name">Ihr Joel Digitals Team</span></p>
+</div>
+
+<!-- ════ DIVIDER ════ -->
+<hr class="lang-divider" />
+
+<!-- ════ ENGLISH ════ -->
+<div class="section-en">
+  <span class="lang-badge lang-en">🇬🇧 English</span>
+  <p class="greeting">Hello {{ order.first_name }},</p>
+  <p class="body-text">
+    thank you for your purchase at <strong style="color:#00bfff;">Joel Digitals</strong>!
+    Below you will find your registration codes for the apps you have ordered.
+    Please store them in a safe place.
+  </p>
+
+  {% if codes %}
+  <table class="codes-table">
+    <thead>
+      <tr>
+        <th>App</th>
+        <th>Registration Code</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for app, code in codes.items %}
+      <tr>
+        <td>{{ app }}</td>
+        <td><span class="code-value">{{ code }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="info-box" style="border-color:rgba(255,193,7,0.3);background:rgba(255,193,7,0.05);">
+    <p style="color:rgba(255,255,255,0.6);font-size:13px;">⚠️ No registration codes were submitted yet. You will receive them in a separate email.</p>
+  </div>
+  {% endif %}
+
+  {% if suggestions %}
+  <div class="suggestions-wrap" style="margin-top:20px;">
+    <p style="font-size:13px;font-weight:600;color:#fff;margin-bottom:10px;">💡 Recommended for you:</p>
+    {% for item in suggestions %}
+    <div class="suggestion-box">
+      <p class="suggestion-title">{{ item.title }}</p>
+      <p class="suggestion-desc">{{ item.description }}</p>
+      <div class="suggestion-links">
+        <a href="{{ item.url }}" class="sug-btn">{{ item.btn_text }}</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="body-text" style="margin-top:16px;">
+    For help, visit our <a href="https://www.joel-digitals.de/contact" style="color:#00bfff;">support portal</a>
+    or reply directly to this email.
+  </p>
+  <p class="signature">Best regards,<br><span class="sig-name">The Joel Digitals Team</span></p>
+</div>
+
+{% endblock %}

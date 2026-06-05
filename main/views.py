@@ -1253,3 +1253,12 @@ def revoke_app_permission(request, auth_id):
     
     # Wenn kein POST, zurück zur Übersicht
     return redirect('app_permissions')
+
+def support_view(request):
+    """
+    Support page view with ElevenLabs Voice Agent
+    """
+    context = {
+        'page_title': 'Support - Joel Digitals',
+    }
+    return render(request, 'support.html', context)

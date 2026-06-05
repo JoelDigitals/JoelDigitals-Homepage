@@ -530,7 +530,7 @@
       <div class="login-prompt">
         <i class="fas fa-lock" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem; display: block;"></i>
         <p>{% trans "Please log in to purchase this app" %}</p>
-        <a href="{% url 'login' %}">{% trans "Log in" %}</a>
+        <a href="{% url 'login' %}?next={{ request.path }}">{% trans "Log in" %}</a>
       </div>
     {% endif %}
   </div>
@@ -550,4 +550,413 @@
     if (this.value < 1) this.value = 1;
   });
 </script>
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- BEWERTUNGEN & REZENSIONEN                                   -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════ BEWERTUNGEN ═══ -->
+<div class="reviews-section">
+<style>
+.reviews-section {
+  max-width: 860px;
+  margin: 2.5rem auto 3rem;
+  padding: 0 1rem;
+}
+
+/* ── Summary Card ── */
+.rv-summary {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 22px 26px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.rv-big-score {
+  text-align: center;
+  min-width: 70px;
+}
+.rv-big-num {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+.rv-big-stars {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  margin: 6px 0 4px;
+}
+.rv-big-stars .s { font-size: 18px; }
+.rv-big-stars .s.on  { color: #ffc107; }
+.rv-big-stars .s.off { color: rgba(255,255,255,0.15); }
+.rv-big-count {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  white-space: nowrap;
+}
+
+/* ── Bar chart ── */
+.rv-bars { flex: 1; min-width: 160px; }
+.rv-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.rv-bar-label { font-size: 12px; color: rgba(255,255,255,0.45); width: 10px; text-align: right; }
+.rv-bar-star  { font-size: 11px; color: #ffc107; }
+.rv-bar-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.rv-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffc107, #ffdb6d);
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+.rv-bar-count { font-size: 11px; color: rgba(255,255,255,0.3); width: 18px; text-align: right; }
+
+/* ── Form card ── */
+.rv-form-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(0,191,255,0.18);
+  border-radius: 14px;
+  padding: 22px 26px;
+  margin-bottom: 20px;
+}
+.rv-form-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 18px;
+}
+
+/* ── Interactive star picker ── */
+.star-picker-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.sp-star {
+  font-size: 28px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.18);
+  transition: color .12s, transform .1s;
+  user-select: none;
+  line-height: 1;
+}
+.sp-star:hover,
+.sp-star.hovered,
+.sp-star.selected {
+  color: #ffc107;
+}
+.sp-star.selected {
+  transform: scale(1.15);
+}
+.sp-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 4px;
+  min-height: 16px;
+  transition: color .15s;
+}
+
+/* ── Comment textarea ── */
+.rv-textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 11px 14px;
+  color: #fff;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  margin-top: 14px;
+  transition: border-color .15s;
+}
+.rv-textarea:focus {
+  outline: none;
+  border-color: rgba(0,191,255,0.4);
+}
+.rv-char-count {
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  float: right;
+  margin-top: 4px;
+}
+
+/* ── Submit button ── */
+.rv-submit-btn {
+  background: linear-gradient(135deg, #00bfff, #0099d6);
+  color: #000;
+  border: none;
+  padding: 10px 26px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 14px;
+}
+.rv-delete-btn {
+  background: transparent;
+  color: rgba(248,113,113,0.7);
+  border: 1px solid rgba(248,113,113,0.2);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+/* ── Individual review card ── */
+.rv-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 10px;
+}
+.rv-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.rv-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#00bfff,#764ba2);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; color: #fff;
+  flex-shrink: 0;
+}
+.rv-username { color: #fff; font-weight: 600; font-size: 14px; }
+.rv-date { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 1px; }
+.rv-stars-display {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+.rv-stars-display .s { font-size: 15px; }
+.rv-stars-display .s.on  { color: #ffc107; }
+.rv-stars-display .s.off { color: rgba(255,255,255,0.13); }
+.rv-comment {
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.rv-empty {
+  text-align: center;
+  color: rgba(255,255,255,0.25);
+  font-size: 14px;
+  padding: 28px 0;
+}
+.rv-login-hint {
+  background: rgba(0,191,255,0.04);
+  border: 1px solid rgba(0,191,255,0.12);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+}
+.rv-login-hint a { color: #00bfff; }
+</style>
+
+{% if review_count %}
+<!-- Summary -->
+<div class="rv-summary">
+  <div class="rv-big-score">
+    <div class="rv-big-num">{{ review_avg }}</div>
+    <div class="rv-big-stars">
+      {% for i in "12345" %}
+        {% if forloop.counter <= review_avg|floatformat:"0"|add:"0" %}
+          <span class="s on">★</span>
+        {% else %}
+          <span class="s off">★</span>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="rv-big-count">{{ review_count }} Bewertung{% if review_count != 1 %}en{% endif %}</div>
+  </div>
+  <div class="rv-bars">
+    {% for row in review_distribution %}
+    <div class="rv-bar-row">
+      <span class="rv-bar-label">{{ row.stars }}</span>
+      <span class="rv-bar-star">★</span>
+      <div class="rv-bar-track">
+        <div class="rv-bar-fill" style="width:{{ row.pct }}%;"></div>
+      </div>
+      <span class="rv-bar-count">{{ row.count }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Form or login hint -->
+{% if user.is_authenticated %}
+<div class="rv-form-card">
+  <p class="rv-form-title">{% if user_review %}✏️ Bewertung bearbeiten{% else %}⭐ Bewertung abgeben{% endif %}</p>
+  <form method="post" action="{% url 'submit_review' app.slug %}" id="review-form">
+    {% csrf_token %}
+    <input type="hidden" name="stars" id="stars-val" value="{{ user_review.stars|default:'' }}">
+
+    <!-- Klickbare Sterne -->
+    <div class="star-picker-row" id="star-picker">
+      <span class="sp-star" data-v="1">★</span>
+      <span class="sp-star" data-v="2">★</span>
+      <span class="sp-star" data-v="3">★</span>
+      <span class="sp-star" data-v="4">★</span>
+      <span class="sp-star" data-v="5">★</span>
+    </div>
+    <div class="sp-label" id="sp-label">Sterne auswählen</div>
+    <p id="stars-error" style="color:#f87171;font-size:12px;margin-top:4px;display:none;">Bitte wähle eine Sternanzahl.</p>
+
+    <textarea name="comment" maxlength="500" rows="3" class="rv-textarea"
+      placeholder="Deine Meinung (optional, max. 500 Zeichen)…"
+      id="rv-comment">{{ user_review.comment|default:'' }}</textarea>
+    <span class="rv-char-count" id="rv-cc">{{ user_review.comment|default:''|length }} / 500</span>
+    <br style="clear:both;">
+
+    <button type="submit" class="rv-submit-btn">
+      {% if user_review %}Aktualisieren{% else %}Absenden{% endif %}
+    </button>
+  </form>
+  {% if user_review %}
+  <form method="post" action="{% url 'delete_review' app.slug %}">
+    {% csrf_token %}
+    <button type="submit" class="rv-delete-btn">🗑 Bewertung löschen</button>
+  </form>
+  {% endif %}
+</div>
+{% else %}
+<div class="rv-login-hint">
+  <a href="{% url 'login' %}?next={{ request.path }}">Einloggen</a>, um eine Bewertung abzugeben.
+</div>
+{% endif %}
+
+<!-- Review list -->
+{% if reviews %}
+<div style="margin-top:4px;">
+  <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:12px;">{{ review_count }} Rezension{% if review_count != 1 %}en{% endif %}</p>
+  {% for review in reviews %}
+  <div class="rv-card">
+    <div class="rv-card-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="rv-avatar">{{ review.user.username|first|upper }}</div>
+        <div>
+          <div class="rv-username">{{ review.user.username }}</div>
+          <div class="rv-date">{{ review.created_at|date:"d.m.Y" }}</div>
+        </div>
+      </div>
+      <div class="rv-stars-display">
+        {% for i in "12345" %}
+          {% if forloop.counter <= review.stars %}
+            <span class="s on">★</span>
+          {% else %}
+            <span class="s off">★</span>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% if review.comment %}<p class="rv-comment">{{ review.comment }}</p>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p class="rv-empty">Noch keine Rezensionen – sei der Erste! ⭐</p>
+{% endif %}
+
+</div><!-- /reviews-section -->
+
+<script>
+(function() {
+  var picker  = document.getElementById('star-picker');
+  if (!picker) return;
+  var stars   = picker.querySelectorAll('.sp-star');
+  var hidden  = document.getElementById('stars-val');
+  var label   = document.getElementById('sp-label');
+  var errEl   = document.getElementById('stars-error');
+  var form    = document.getElementById('review-form');
+  var labels  = ['','1 Stern – Sehr schlecht','2 Sterne – Schlecht','3 Sterne – Okay','4 Sterne – Gut','5 Sterne – Ausgezeichnet ✨'];
+
+  function paint(upTo) {
+    stars.forEach(function(s) {
+      var v = parseInt(s.dataset.v);
+      s.classList.toggle('selected', v <= upTo);
+      s.classList.remove('hovered');
+    });
+    label.textContent = upTo > 0 ? labels[upTo] : 'Sterne auswählen';
+    label.style.color = upTo > 0 ? '#ffc107' : '';
+  }
+
+  // Pre-fill if editing
+  var pre = parseInt(hidden.value);
+  if (pre > 0) paint(pre);
+
+  // Hover
+  stars.forEach(function(s) {
+    s.addEventListener('mouseenter', function() {
+      var v = parseInt(s.dataset.v);
+      stars.forEach(function(x) {
+        x.classList.toggle('hovered', parseInt(x.dataset.v) <= v);
+      });
+      label.textContent = labels[v];
+      label.style.color = '#ffc107';
+    });
+  });
+  picker.addEventListener('mouseleave', function() {
+    stars.forEach(function(x) { x.classList.remove('hovered'); });
+    var cur = parseInt(hidden.value);
+    paint(cur > 0 ? cur : 0);
+    if (!(cur > 0)) { label.textContent = 'Sterne auswählen'; label.style.color = ''; }
+  });
+
+  // Click
+  stars.forEach(function(s) {
+    s.addEventListener('click', function() {
+      var v = parseInt(s.dataset.v);
+      hidden.value = v;
+      paint(v);
+      if (errEl) errEl.style.display = 'none';
+    });
+  });
+
+  // Validate
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      if (!hidden.value) {
+        e.preventDefault();
+        if (errEl) errEl.style.display = 'block';
+        picker.scrollIntoView({behavior:'smooth',block:'center'});
+      }
+    });
+  }
+
+  // Char counter
+  var ta = document.getElementById('rv-comment');
+  var cc = document.getElementById('rv-cc');
+  if (ta && cc) {
+    ta.addEventListener('input', function() { cc.textContent = ta.value.length + ' / 500'; });
+  }
+})();
+</script>
+
 {% endblock %}

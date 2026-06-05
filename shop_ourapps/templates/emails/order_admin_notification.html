@@ -1,18 +1,64 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Neue Bestellung</title>
-</head>
-<body style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px;">
-  <div style="max-width: 600px; background: white; padding: 30px; margin: auto; border-radius: 8px;">
-    <h2>Neue Bestellung erhalten</h2>
-    <p><strong>Name:</strong> {{ order.first_name }} {{ order.last_name }}</p>
-    <p><strong>Email:</strong> {{ order.email }}</p>
-    <p><strong>Bestell-ID:</strong> {{ order.id }}</p>
-    <p><strong>Bestellt am:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
-    <hr>
-    <p><a href="{{ order_url }}">Zur Bestellübersicht im Adminbereich</a></p>
+{% extends 'emails/base.html' %}
+{% block content %}
+
+<div class="section-de">
+  <span class="lang-badge" style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25);">🔔 Admin Notification</span>
+  <p class="greeting">Neue Bestellung eingegangen</p>
+
+  <div class="info-box" style="border-color:rgba(239,68,68,0.25);background:rgba(239,68,68,0.05);">
+    <div class="info-row">
+      <span class="info-label">Bestell-ID</span>
+      <span class="info-value">#{{ order.id }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Kunde</span>
+      <span class="info-value">{{ order.first_name }} {{ order.last_name }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">E-Mail</span>
+      <span class="info-value">{{ order.email }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Gesamtbetrag</span>
+      <span class="info-value" style="color:#00bfff;font-weight:700;">€{{ order.total_amount }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Datum</span>
+      <span class="info-value">{{ order.created_at|date:"d.m.Y – H:i" }} Uhr</span>
+    </div>
+    {% if order.address %}
+    <div class="info-row">
+      <span class="info-label">Adresse</span>
+      <span class="info-value">{{ order.address }}{% if order.zip_code %}, {{ order.zip_code }}{% endif %} {{ order.city }}</span>
+    </div>
+    {% endif %}
   </div>
-</body>
-</html>
+
+  <p style="font-size:13px;font-weight:600;color:#fff;margin:16px 0 8px;">Bestellte Artikel:</p>
+  <table class="codes-table">
+    <thead>
+      <tr>
+        <th>Artikel</th>
+        <th>Menge</th>
+        <th>Preis</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in order.items.all %}
+      <tr>
+        <td>{{ item.app.name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>€{{ item.single_price|default:item.app.price }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="cta-wrap" style="margin-top:20px;">
+    <a href="https://joel-digitals.de/admin/shop_ourapps/order/{{ order.id }}/change/" class="cta-button" style="font-size:13px;">
+      🛠 Im Admin öffnen
+    </a>
+  </div>
+</div>
+
+{% endblock %}

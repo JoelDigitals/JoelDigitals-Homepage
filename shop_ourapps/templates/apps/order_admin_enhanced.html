@@ -1,0 +1,594 @@
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Order Management" %} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .admin-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .admin-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .admin-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+  }
+
+  .admin-body {
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Navigation Tabs */
+  .nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .nav-tab {
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg);
+    border: 2px solid var(--border);
+  }
+
+  .nav-tab:hover,
+  .nav-tab.active {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(102, 126, 234, 0.1);
+  }
+
+  /* Search Bar */
+  .search-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 1rem;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  .search-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+  }
+
+  .search-btn:hover {
+    background: var(--primary-hover);
+  }
+
+  /* Orders Table */
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+
+  .orders-table thead {
+    background: rgba(102, 126, 234, 0.1);
+    border-bottom: 2px solid var(--border);
+  }
+
+  .orders-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .orders-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .orders-table tbody tr:hover {
+    background: rgba(102, 126, 234, 0.05);
+  }
+
+  /* Status Badges */
+  .status-badge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .status-received {
+    background: #FFA500;
+    color: white;
+  }
+
+  .status-paid {
+    background: #4CAF50;
+    color: white;
+  }
+
+  .status-in-delivery {
+    background: #2196F3;
+    color: white;
+  }
+
+  .status-delivered {
+    background: #8BC34A;
+    color: white;
+  }
+
+  .status-return,
+  .status-canceled {
+    background: #f44336;
+    color: white;
+  }
+
+  .status-finished {
+    background: #9C27B0;
+    color: white;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: rgba(102, 126, 234, 0.2);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(102, 126, 234, 0.3);
+  }
+
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal.active {
+    display: flex;
+  }
+
+  .modal-content {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    justify-content: flex-end;
+  }
+
+  /* Messages */
+  .messages {
+    margin-bottom: 1.5rem;
+  }
+
+  .alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+  }
+
+  .alert-success {
+    background: rgba(76, 175, 80, 0.2);
+    border: 2px solid #4CAF50;
+    color: #81C784;
+  }
+
+  .alert-error {
+    background: rgba(244, 67, 54, 0.2);
+    border: 2px solid #f44336;
+    color: #EF5350;
+  }
+
+  .alert-warning {
+    background: rgba(255, 152, 0, 0.2);
+    border: 2px solid #FFA500;
+    color: #FFB74D;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--border);
+  }
+
+  .empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .admin-container {
+      margin: 1rem auto;
+    }
+
+    .orders-table {
+      font-size: 0.9rem;
+    }
+
+    .orders-table th,
+    .orders-table td {
+      padding: 0.75rem 0.5rem;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+    }
+
+    .nav-tabs {
+      gap: 0.25rem;
+    }
+
+    .nav-tab {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<div class="admin-container">
+  <!-- Header -->
+  <div class="admin-header">
+    <div class="header-icon">📦</div>
+    <h1 class="admin-title">{% trans "Order Management" %}</h1>
+  </div>
+
+  <div class="admin-body">
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        {% if message.tags == 'success' %}
+          <div class="alert alert-success">{{ message }}</div>
+        {% elif message.tags == 'error' %}
+          <div class="alert alert-error">{{ message }}</div>
+        {% elif message.tags == 'warning' %}
+          <div class="alert alert-warning">{{ message }}</div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <a href="?tab=pending" class="nav-tab {% if tab == 'pending' %}active{% endif %}">
+        ⏳ {% trans "Pending" %}
+      </a>
+      <a href="?tab=completed" class="nav-tab {% if tab == 'completed' %}active{% endif %}">
+        ✅ {% trans "Paid" %}
+      </a>
+      <a href="?tab=shipping" class="nav-tab {% if tab == 'shipping' %}active{% endif %}">
+        🚚 {% trans "Shipping" %}
+      </a>
+      <a href="?tab=returns" class="nav-tab {% if tab == 'returns' %}active{% endif %}">
+        ↩️ {% trans "Returns" %}
+      </a>
+      <a href="?tab=finished" class="nav-tab {% if tab == 'finished' %}active{% endif %}">
+        ✨ {% trans "Finished" %}
+      </a>
+    </div>
+
+    <!-- Search -->
+    <form method="get" class="search-container">
+      <input type="hidden" name="tab" value="{{ tab }}">
+      <input 
+        type="text" 
+        name="q" 
+        class="search-input" 
+        placeholder="{% trans 'Search by Order ID, Name, or Email...' %}"
+        value="{{ query }}"
+      >
+      <button type="submit" class="search-btn">{% trans "Search" %}</button>
+    </form>
+
+    <!-- Orders Table -->
+    {% if orders %}
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>{% trans "Order ID" %}</th>
+          <th>{% trans "Customer" %}</th>
+          <th>{% trans "Email" %}</th>
+          <th>{% trans "Amount" %}</th>
+          <th>{% trans "Status" %}</th>
+          <th>{% trans "Payment Method" %}</th>
+          <th>{% trans "Date" %}</th>
+          <th>{% trans "Actions" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td><strong>#{{ order.id }}</strong></td>
+          <td>{{ order.first_name }} {{ order.last_name }}</td>
+          <td>{{ order.email }}</td>
+          <td>€{{ order.total_amount }}</td>
+          <td>
+            <span class="status-badge status-{{ order.status|lower|add:' ' }}">
+              {{ order.get_status_display }}
+            </span>
+          </td>
+          <td>{{ order.payment_method }}</td>
+          <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+          <td>
+            <div class="action-buttons">
+              <a href="{% url 'order_detail' order.id %}" class="btn btn-secondary">
+                👁️ {% trans "View" %}
+              </a>
+
+              {% if order.status == 'Received' %}
+                <!-- Action: Set Paid -->
+                <form method="post" style="display:inline;">
+                  {% csrf_token %}
+                  <input type="hidden" name="order_id" value="{{ order.id }}">
+                  <input type="hidden" name="action" value="set_paid">
+                  <button type="submit" class="btn btn-primary" onclick="return confirm('{% trans "Mark as Paid?" %}')">
+                    💳 {% trans "Set Paid" %}
+                  </button>
+                </form>
+
+                <!-- Action: Send Registration Code Modal -->
+                <button class="btn btn-primary" onclick="openModal('reg-code-{{ order.id }}')">
+                  📬 {% trans "Send Code" %}
+                </button>
+              {% endif %}
+
+              {% if order.status == 'Paid' %}
+                <!-- Action: Send Registration Code Modal -->
+                <button class="btn btn-primary" onclick="openModal('reg-code-{{ order.id }}')">
+                  📬 {% trans "Send Code" %}
+                </button>
+              {% endif %}
+
+              <!-- Change Status Modal -->
+              <button class="btn btn-secondary" onclick="openModal('status-{{ order.id }}')">
+                ⚙️ {% trans "Change Status" %}
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Registration Code Modal -->
+        <div id="reg-code-{{ order.id }}" class="modal">
+          <div class="modal-content">
+            <div class="modal-header">{% trans "Send Registration Code" %}</div>
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="order_id" value="{{ order.id }}">
+              <input type="hidden" name="action" value="send_registration_code">
+              
+              <div class="form-group">
+                <label for="code-{{ order.id }}">{% trans "Registration Code" %}</label>
+                <input 
+                  type="text" 
+                  id="code-{{ order.id }}" 
+                  name="registration_code" 
+                  required
+                  placeholder="e.g., ABC-DEF-GHI-JKL"
+                >
+              </div>
+
+              <div class="form-group">
+                <small>{% trans "After sending, the order status will change to 'In Delivery' and automatically become 'Delivered' after 30 minutes." %}</small>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('reg-code-{{ order.id }}')">
+                  {% trans "Cancel" %}
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  {% trans "Send Code" %}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Change Status Modal -->
+        <div id="status-{{ order.id }}" class="modal">
+          <div class="modal-content">
+            <div class="modal-header">{% trans "Change Order Status" %}</div>
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="order_id" value="{{ order.id }}">
+              <input type="hidden" name="action" value="change_status">
+              
+              <div class="form-group">
+                <label for="status-{{ order.id }}">{% trans "New Status" %}</label>
+                <select id="status-{{ order.id }}" name="new_status" required>
+                  <option value="">--- {% trans "Select Status" %} ---</option>
+                  {% for code, name in STATUS_CHOICES.items %}
+                    <option value="{{ code }}" {% if code == order.status %}selected{% endif %}>
+                      {{ name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('status-{{ order.id }}')">
+                  {% trans "Cancel" %}
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  {% trans "Change Status" %}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">📭</div>
+      <p>{% trans "No orders found." %}</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function openModal(modalId) {
+  document.getElementById(modalId).classList.add('active');
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('active');
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+  if (event.target.classList.contains('modal')) {
+    event.target.classList.remove('active');
+  }
+});
+</script>
+
+{% endblock %}

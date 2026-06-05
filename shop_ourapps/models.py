@@ -269,7 +269,7 @@ class Order(models.Model):
     vat_number = models.CharField(max_length=50, blank=True, null=True)
     payment_method = models.CharField(max_length=50)
 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')  # <--- hinzugefügt
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Received')
 
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -284,9 +284,25 @@ class Order(models.Model):
     bank_name = models.CharField(max_length=255, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    # Neue Felder für Automatisierung
+    registration_code = models.CharField(max_length=255, blank=True, null=True, help_text="Registrierungscode für den Versand")
+    registration_code_sent_at = models.DateTimeField(null=True, blank=True, help_text="Zeitpunkt, wann der Registrierungscode gesendet wurde")
+    delivered_at = models.DateTimeField(null=True, blank=True, help_text="Automatisch auf 30 Min nach registration_code_sent_at gesetzt")
+    review_email_sent_at = models.DateTimeField(null=True, blank=True, help_text="Zeitpunkt, wann Review-Email gesendet wurde")
+    review_email_scheduled_for = models.DateTimeField(null=True, blank=True, help_text="Geplante Zeit zum Versand der Review-Email (12-30 Stunden nach delivered_at)")
 
     def __str__(self):
         return f"Bestellung {self.id} von {self.user}"
+    
+    def schedule_review_email(self):
+        """Plant den Versand der Review-Email für 12-30 Stunden nach Lieferung."""
+        import random
+        if self.delivered_at and not self.review_email_scheduled_for:
+            # Zufälliger Verzug zwischen 12-30 Stunden
+            random_hours = random.randint(12, 72)
+            self.review_email_scheduled_for = self.delivered_at + timezone.timedelta(hours=random_hours)
+            self.save()
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
@@ -367,3 +383,47 @@ class DiscountCode(models.Model):
 
     def __str__(self):
         return self.code
+
+
+class OrderStatusLog(models.Model):
+    """Log für Status-Übergänge und automatische Ereignisse."""
+    STATUS_CHOICES = [
+        ('status_changed', 'Status geändert'),
+        ('registration_code_sent', 'Registrierungscode gesendet'),
+        ('auto_delivered', 'Automatisch als geliefert markiert'),
+        ('review_email_scheduled', 'Review-Email geplant'),
+        ('review_email_sent', 'Review-Email gesendet'),
+    ]
+    
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='status_logs')
+    event_type = models.CharField(max_length=50, choices=STATUS_CHOICES)
+    old_status = models.CharField(max_length=50, blank=True, null=True)
+    new_status = models.CharField(max_length=50, blank=True, null=True)
+    note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Order {self.order.id} - {self.event_type} am {self.created_at}"
+    
+    class Meta:
+        ordering = ['-created_at']
+
+class AppReview(models.Model):
+    """Produktbewertung für eine App. Nur eingeloggte Käufer können bewerten."""
+
+    STARS_CHOICES = [(i, f"{i} Stern{'e' if i != 1 else ''}") for i in range(0, 6)]
+
+    app = models.ForeignKey(App, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='app_reviews')
+    stars = models.PositiveSmallIntegerField(choices=STARS_CHOICES)
+    comment = models.TextField(max_length=500, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_approved = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('app', 'user')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} → {self.app.name}: {self.stars}★"

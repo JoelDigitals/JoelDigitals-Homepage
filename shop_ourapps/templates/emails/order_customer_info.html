@@ -1,34 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Order Confirmation – Joel Digitals</title>
-</head>
-<body style="font-family: Arial, sans-serif; background: #121212; padding: 20px; color: #ffffff;">
-  <div style="max-width: 600px; background: #1e1e1e; padding: 30px; margin: auto; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.2); color: #ffffff;">
-    <h2 style="color: #00bfff;">Thank you for your order, {{ order.first_name }}!</h2>
+{% extends 'emails/base.html' %}
+{% block content %}
 
-    <p>We are pleased to confirm that we have received your order and it is currently being processed.</p>
+<!-- ════ DEUTSCH ════ -->
+<div class="section-de">
+  <span class="lang-badge lang-de">🇩🇪 Deutsch</span>
+  <p class="greeting">Hallo {{ order.first_name }},</p>
+  <p class="body-text">
+    vielen Dank für Ihre Bestellung bei <strong style="color:#00bfff;">Joel Digitals</strong>!
+    Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich eingegangen ist und derzeit bearbeitet wird.
+  </p>
+  <p class="body-text">
+    Ihre Rechnung sowie – falls zutreffend – Ihre Registrierungscodes erhalten Sie innerhalb von <strong style="color:#fff;">10 Werktagen</strong> per E-Mail.
+    Bitte überprüfen Sie auch Ihren Spam-Ordner.
+  </p>
 
-    <p>You will receive your invoice and—if applicable—your product registration codes within <strong>10 business days</strong> via email.</p>
-
-    <p>Please keep an eye on your inbox, including your spam folder, to ensure you don't miss any important updates.</p>
-
-    <hr style="margin: 30px 0; border: none; border-top: 1px solid #444;">
-
-    <p><strong>Order Summary:</strong></p>
-    <ul style="padding-left: 20px; color: #ffffff;">
-      <li><strong>Order ID:</strong> {{ order.id }}</li>
-      <li><strong>Name:</strong> {{ order.first_name }} {{ order.last_name }}</li>
-      <li><strong>Email:</strong> {{ order.email }}</li>
-      <li><strong>Order Date:</strong> {{ order.created_at|date:"F d, Y – H:i" }}</li>
-    </ul>
-
-    <p>If you have any questions, need support, or want to check the status of your order, feel free to contact us anytime through our 
-      <a href="https://www.joel-digitals.de/contact" style="color: #00bfff;">Support Page</a>.
-    </p>
-
-    <p style="margin-top: 30px;">Best regards,<br><strong>The Joel Digitals Team</strong></p>
+  <div class="info-box">
+    <div class="info-row">
+      <span class="info-label">Bestellnummer</span>
+      <span class="info-value">#{{ order.id }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Name</span>
+      <span class="info-value">{{ order.first_name }} {{ order.last_name }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">E-Mail</span>
+      <span class="info-value">{{ order.email }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Bestelldatum</span>
+      <span class="info-value">{{ order.created_at|date:"d.m.Y – H:i" }} Uhr</span>
+    </div>
   </div>
-</body>
-</html>
+
+  <p class="body-text">
+    Bei Fragen oder Problemen stehen wir Ihnen jederzeit über unser
+    <a href="https://www.joel-digitals.de/contact" style="color:#00bfff;">Support-Portal</a> zur Verfügung.
+  </p>
+  <p class="signature">Mit freundlichen Grüßen,<br><span class="sig-name">Ihr Joel Digitals Team</span></p>
+</div>
+
+<!-- ════ DIVIDER ════ -->
+<hr class="lang-divider" />
+
+<!-- ════ ENGLISH ════ -->
+<div class="section-en">
+  <span class="lang-badge lang-en">🇬🇧 English</span>
+  <p class="greeting">Hello {{ order.first_name }},</p>
+  <p class="body-text">
+    thank you for your order at <strong style="color:#00bfff;">Joel Digitals</strong>!
+    We are pleased to confirm that your order has been successfully received and is currently being processed.
+  </p>
+  <p class="body-text">
+    You will receive your invoice and – if applicable – your registration codes within <strong style="color:#fff;">10 business days</strong> via email.
+    Please also check your spam folder.
+  </p>
+
+  <div class="info-box">
+    <div class="info-row">
+      <span class="info-label">Order ID</span>
+      <span class="info-value">#{{ order.id }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Name</span>
+      <span class="info-value">{{ order.first_name }} {{ order.last_name }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Email</span>
+      <span class="info-value">{{ order.email }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Order Date</span>
+      <span class="info-value">{{ order.created_at|date:"F d, Y – H:i" }}</span>
+    </div>
+  </div>
+
+  <p class="body-text">
+    If you have any questions, feel free to reach out via our
+    <a href="https://www.joel-digitals.de/contact" style="color:#00bfff;">support portal</a>.
+  </p>
+  <p class="signature">Best regards,<br><span class="sig-name">The Joel Digitals Team</span></p>
+</div>
+
+{% endblock %}

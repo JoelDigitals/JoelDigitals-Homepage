@@ -1,0 +1,230 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="{% get_current_language %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Order Status" %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        .status-timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .status-item {
+            display: flex;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .status-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 50px;
+            width: 2px;
+            height: 30px;
+            background: #ddd;
+        }
+        
+        .status-item.active::before {
+            background: #667eea;
+        }
+        
+        .status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 20px;
+            flex-shrink: 0;
+            border: 2px solid #ddd;
+        }
+        
+        .status-item.active .status-icon {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .status-item.completed .status-icon {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        
+        .status-content h3 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        
+        .status-content p {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        
+        .status-item.active .status-content h3 {
+            color: #667eea;
+        }
+        
+        .status-item.completed .status-content h3 {
+            color: #4CAF50;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .badge-blue {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .badge-green {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+        }
+        
+        .badge-orange {
+            background: rgba(255, 152, 0, 0.1);
+            color: #FF9800;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{% trans "Order Status" %}: #{{ order.id }}</h1>
+            <p>{% trans "Bestellung von" %} {{ order.first_name }} {{ order.last_name }}</p>
+        </div>
+        
+        <div class="status-timeline">
+            <!-- Status: Received -->
+            <div class="status-item {% if order.status != 'Received' %}completed{% endif %}{% if order.status == 'Received' %}active{% endif %}">
+                <div class="status-icon">📦</div>
+                <div class="status-content">
+                    <h3>{% trans "Order Received" %}</h3>
+                    <p>{{ order.created_at|date:"d.m.Y H:i" }}</p>
+                    <span class="badge badge-green">{% trans "Complete" %}</span>
+                </div>
+            </div>
+            
+            <!-- Status: Paid -->
+            <div class="status-item {% if order.status != 'Paid' and order.status != 'Received' %}completed{% endif %}{% if order.status == 'Paid' %}active{% endif %}">
+                <div class="status-icon">💳</div>
+                <div class="status-content">
+                    <h3>{% trans "Payment Confirmed" %}</h3>
+                    {% if order.status != 'Received' %}
+                        <p>{{ order.created_at|date:"d.m.Y H:i" }}</p>
+                        <span class="badge badge-green">{% trans "Complete" %}</span>
+                    {% else %}
+                        <p>{% trans "Waiting for payment confirmation" %}</p>
+                        <span class="badge badge-blue">{% trans "Pending" %}</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Status: In Delivery -->
+            <div class="status-item {% if order.status not in 'Received,Paid' %}completed{% endif %}{% if order.status == 'In Delivery' %}active{% endif %}">
+                <div class="status-icon">📬</div>
+                <div class="status-content">
+                    <h3>{% trans "Registration Code Sent" %}</h3>
+                    {% if order.registration_code_sent_at %}
+                        <p>{{ order.registration_code_sent_at|date:"d.m.Y H:i" }}</p>
+                        <span class="badge badge-green">{% trans "Complete" %}</span>
+                    {% else %}
+                        <p>{% trans "Code will be sent soon" %}</p>
+                        <span class="badge badge-orange">{% trans "Pending" %}</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Status: Delivered -->
+            <div class="status-item {% if order.status not in 'Received,Paid,In Delivery' %}completed{% endif %}{% if order.status == 'Delivered' %}active{% endif %}">
+                <div class="status-icon">🚚</div>
+                <div class="status-content">
+                    <h3>{% trans "Delivered" %}</h3>
+                    {% if order.delivered_at %}
+                        <p>{{ order.delivered_at|date:"d.m.Y H:i" }}</p>
+                        <span class="badge badge-green">{% trans "Complete" %}</span>
+                    {% else %}
+                        <p>{% trans "Will be delivered 30 min after code is sent" %}</p>
+                        <span class="badge badge-blue">{% trans "Pending" %}</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Status: Review Requested -->
+            <div class="status-item {% if order.review_email_sent_at %}completed{% endif %}{% if order.status == 'Delivered' and not order.review_email_sent_at %}active{% endif %}">
+                <div class="status-icon">⭐</div>
+                <div class="status-content">
+                    <h3>{% trans "Review Request" %}</h3>
+                    {% if order.review_email_sent_at %}
+                        <p>{{ order.review_email_sent_at|date:"d.m.Y H:i" }}</p>
+                        <span class="badge badge-green">{% trans "Review Email Sent" %}</span>
+                    {% elif order.review_email_scheduled_for %}
+                        <p>{% trans "Planned for" %}: {{ order.review_email_scheduled_for|date:"d.m.Y H:i" }}</p>
+                        <span class="badge badge-blue">{% trans "Scheduled" %}</span>
+                    {% else %}
+                        <p>{% trans "Will be sent after delivery" %}</p>
+                        <span class="badge badge-orange">{% trans "Pending" %}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

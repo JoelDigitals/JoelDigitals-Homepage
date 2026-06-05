@@ -1,0 +1,17 @@
+
+<hr>
+<p><strong>Deutsch</strong></p>
+<p>Vielen Dank für Ihre Bestellung bei Joel Digitals.</p>
+
+<p><strong>English</strong></p>
+<p>Thank you for your order at Joel Digitals.</p>
+
+<hr>
+<h3>Registrierungscodes / Registration Codes</h3>
+{% if registration_codes %}
+<ul>
+{% for code in registration_codes %}
+<li>{{ code }}</li>
+{% endfor %}
+</ul>
+{% endif %}

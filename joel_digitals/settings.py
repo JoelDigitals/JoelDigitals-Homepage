@@ -137,12 +137,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
+TIME_ZONE = 'Europe/Berlin'
 
-TIME_ZONE = 'UTC'
-
-LANGUAGE_CODE = "en"
+LANGUAGE_CODE = 'de'
 
 USE_I18N = True
+USE_TZ = True
 
 from django.utils.translation import gettext_lazy as _
 
@@ -150,6 +150,12 @@ LANGUAGES = [
     ("en", _("English")),
     ("de", _("Deutsch")),
 ]
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_AGE = 2419200  # 4 Wochen
+SESSION_SAVE_EVERY_REQUEST = True
 
 LOCALE_PATHS = [ BASE_DIR / "locale" ]
 
@@ -187,7 +193,7 @@ EMAIL_BACKEND = "django_mailjet.backends.MailjetBackend"
 MAILJET_API_KEY = "c3f43729e477c3cd3a4cfdd51ef6a2ba"
 MAILJET_API_SECRET = "c06b2f2787d4a1ee5bf3c9821c8745c4"
 
-DEFAULT_FROM_EMAIL = "info@joel-digitals.com"
+DEFAULT_FROM_EMAIL = "no-reply@joel-digitals.com"
 COMPANY_EMAIL_NO_REPLY = "no-reply@joel-digitals.com"
 SUPPORT_EMAIL = "support@joel-digitals.com"
 COMPANY_EMAIL = "info@joel-digitals.com"

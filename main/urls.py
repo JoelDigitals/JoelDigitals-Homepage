@@ -22,6 +22,8 @@ urlpatterns = [
     path('profile/app-permissions/', views.app_permissions, name='app_permissions'),
     path('profile/app-permissions/revoke/<int:auth_id>/', views.revoke_app_permission, name='revoke_app_permission'),
 
+    path('support/', views.support_view, name='support'),
+
     # SSO-URLs entfernt - sind jetzt in joel_digitals/urls.py
     # path('auth/sso/connect/', views.sso_connect, name='sso_connect'),
     # path('auth/sso/connect/login/', views.sso_connect_login, name='sso_connect_login'),

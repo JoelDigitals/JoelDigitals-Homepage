@@ -74,7 +74,7 @@
     position: relative;
     z-index: 1;
   }
-  
+
   .hero-icon img {
     width: 100%;
     height: 100%;
@@ -428,7 +428,11 @@
     font-size: 0.9375rem;
   }
 
-  /* Blog Grid */
+  /* ===== BLOG SECTION ===== */
+  .blog-section {
+    margin: 2rem 0;
+  }
+
   .blog-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -450,10 +454,22 @@
     transform: scale(0.98);
   }
 
-  .blog-card img {
+  /* Titelbilder immer ganz sichtbar */
+  .blog-card .featured-image {
     width: 100%;
-    height: 180px;
-    object-fit: cover;
+    height: 220px;
+    overflow: hidden;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .blog-card .featured-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: var(--surface);
   }
 
   .blog-card-body {
@@ -477,6 +493,77 @@
     line-height: 1.5;
     flex: 1;
     margin-bottom: 1rem;
+  }
+
+  /* "Weiterlesen"-Button in Blog-Karten – volle Breite */
+  .blog-read-more-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem;
+    min-height: var(--touch-target);
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: auto;
+  }
+
+  .blog-read-more-btn:hover {
+    opacity: 0.9;
+  }
+
+  .blog-read-more-btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Container für den "Alle Artikel"-Button – zentriert */
+  .blog-view-all-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+
+  /* Großer "Alle Artikel"-Button – mittig unter beiden Karten */
+  .blog-view-all-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.25rem 2rem;
+    min-height: var(--touch-target);
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    text-decoration: none;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    width: 100%;
+    max-width: 500px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .blog-view-all-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .blog-view-all-btn:active {
+    transform: scale(0.98);
+  }
+
+  .blog-view-all-btn i {
+    font-size: 1.2rem;
   }
 
   /* Action Buttons Container */
@@ -529,6 +616,11 @@
 
     .blog-grid {
       grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    .blog-card .featured-image {
+      height: 200px;
     }
 
     .alt-section {
@@ -562,7 +654,16 @@
     }
 
     .blog-grid {
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    .blog-card .featured-image {
+      height: 240px;
+    }
+
+    .blog-card h3 {
+      font-size: 1.2rem;
     }
 
     .info-card {
@@ -577,6 +678,18 @@
 
     .hero-section {
       padding: 5rem 2rem;
+    }
+
+    .blog-grid {
+      gap: 2.5rem;
+    }
+
+    .blog-card .featured-image {
+      height: 260px;
+    }
+
+    .blog-card-body {
+      padding: 1.5rem;
     }
   }
 
@@ -596,7 +709,7 @@
     </div>
     <h1 class="hero-title">Joel Digitals</h1>
     <p class="hero-subtitle">{% trans "Digital Solutions for Tomorrow – Websites • Automation • Marketing • IT Services" %}</p>
-    
+
     <div class="hero-buttons">
       <a href="/shop/" class="btn-primary">
         <i class="fas fa-shopping-cart"></i> {% trans "Visit Our Shop" %}
@@ -653,7 +766,7 @@
           <div class="product-image">
             <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
           </div>
-          
+
           <div class="product-details">
             <h3 class="product-name">{{ product.name }}</h3>
             <p class="product-description">{{ product.short_description|truncatewords:18 }}</p>
@@ -688,7 +801,7 @@
     <!-- FAQ Section -->
     <section class="info-card">
       <h2><i class="fas fa-question-circle" style="color: var(--primary);"></i> {% trans "Frequently Asked Questions" %}</h2>
-      
+
       <div style="max-width: 800px; margin: 0 auto;">
         {% for faq in faqs %}
           <div class="faq-item">
@@ -702,7 +815,7 @@
           <p style="color: #666;">{% trans "No FAQs available at the moment." %}</p>
         {% endfor %}
       </div>
-      
+
       <div style="margin-top: 1.5rem;">
         <a href="{% url 'list' %}" class="btn-primary" style="width: 100%; max-width: 300px;">
           {% trans "View all FAQs" %}
@@ -740,37 +853,39 @@
 
     <!-- Blog -->
     {% if latest_blog %}
-    <section>
+    <section class="blog-section">
       <div class="section-header">
         <h2><i class="fas fa-newspaper" style="color: var(--primary);"></i> {% trans "From Our Blog" %}</h2>
       </div>
-      
+
       <div class="blog-grid">
         {% for blog in latest_blog %}
           <div class="blog-card">
             {% if blog.get_main_image_url %}
               <div class="featured-image">
-                <img src="{{ blog.get_main_image_url }}" alt="{{ next_post.title }}" loading="lazy">
+                <img src="{{ blog.get_main_image_url }}" alt="{{ blog.title }}" loading="lazy">
               </div>
             {% elif blog.teaser_image %}
               <div class="featured-image">
-                <img src="{{ blog.teaser_image.url }}" alt="{{ blog.title }}">
+                <img src="{{ blog.teaser_image.url }}" alt="{{ blog.title }}" loading="lazy">
               </div>
             {% endif %}
             <div class="blog-card-body">
               <h3>{{ blog.title }}</h3>
               <p>{{ blog.teaser_text|truncatewords_html:25|safe }}</p>
-              <a href="{% url 'blog_detail' blog.pk %}" class="btn-buy">
+              <!-- Volle Breite wie im 1. Blog-Button -->
+              <a href="{% url 'blog_detail' blog.pk %}" class="blog-read-more-btn">
                 {% trans "Read More" %}
               </a>
             </div>
           </div>
         {% endfor %}
       </div>
-    
-      <div style="text-align: center; margin-top: 2rem;">
-        <a href="{% url 'blog_list' %}" class="btn-primary" style="width: 100%; max-width: 300px;">
-          {% trans "View All Articles" %}
+
+      <!-- Großer "Alle Artikel"-Button mittig unter beiden Karten -->
+      <div class="blog-view-all-wrapper">
+        <a href="{% url 'blog_list' %}" class="blog-view-all-btn">
+          <i class="fas fa-newspaper"></i> {% trans "View All Articles" %}
         </a>
       </div>
     </section>
