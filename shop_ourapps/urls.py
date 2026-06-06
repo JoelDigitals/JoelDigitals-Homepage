@@ -31,6 +31,7 @@ urlpatterns = [
     path('order_confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
 
     path('admin-sales/orders/', views.order_admin, name='order_admin'),
+    path('my-orders/<int:order_id>/return/', views.request_return, name='request_return'),
 
     # Bewertungen
     path('shop/<slug:slug>/review/', views.submit_review, name='submit_review'),

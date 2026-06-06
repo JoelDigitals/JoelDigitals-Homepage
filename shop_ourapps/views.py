@@ -1170,23 +1170,29 @@ class SendAccessMailForm(forms.Form):
         return apps
 
 @user_passes_test(is_Sales_Editor)
+
+@login_required
 def order_admin(request):
+    """
+    Unified Admin-View: Status ändern, E-Mails senden, Rücksendungen verwalten.
+    """
+    from .models import ReturnRequest
+
     tab = request.GET.get('tab', 'pending')
     query = request.GET.get('q', '').strip()
 
-    # Mapping Tabs -> Statuswerte
     tab_map = {
-        "pending": ["Received"],               # Ausstehend
-        "completed": ["Paid"],                 # Bezahlt
-        "returns": ["Return", "Canceled", "Back"],   # Retouren
-        "shipping": ["In Delivery", "Delivered"],    # Versand
-        "finished": ["Finished"],              # Beendet
+        "pending":   ["Received"],
+        "completed": ["Paid"],
+        "shipping":  ["In Delivery", "Delivered"],
+        "returns":   ["Return", "Canceled", "Back"],
+        "finished":  ["Finished"],
     }
 
     if tab in tab_map:
-        orders = Order.objects.filter(status__in=tab_map[tab])
+        orders = Order.objects.filter(status__in=tab_map[tab]).order_by('-created_at')
     else:
-        orders = Order.objects.all()
+        orders = Order.objects.all().order_by('-created_at')
 
     if query:
         orders = orders.filter(
@@ -1198,196 +1204,131 @@ def order_admin(request):
 
     if request.method == 'POST':
         order_id = request.POST.get('order_id')
-        action = request.POST.get('action')
-
+        action   = request.POST.get('action')
         try:
             order = Order.objects.get(id=order_id)
 
-            # Action: Registrierungscode versenden
-            if action == 'send_registration_code':
-                registration_code = request.POST.get('registration_code', '')
-                if registration_code:
-                    OrderAutomationService.mark_as_sent(order, registration_code)
-                    messages.success(
-                        request,
-                        f"Bestellung #{order.id}: Registrierungscode versendet. Status → 'In Delivery'"
-                    )
-                else:
-                    messages.error(request, "Registrierungscode erforderlich.")
-            
-            # Action: Bezahlungsstatus setzen
-            elif action == 'set_paid':
-                old_status = order.status
-                if OrderAutomationService.set_payment_status(order):
-                    messages.success(
-                        request,
-                        f"Bestellung #{order.id}: Manuell auf 'Paid' gesetzt."
-                    )
-                else:
-                    messages.warning(
-                        request,
-                        f"Bestellung #{order.id}: Wird über {order.payment_method} automatisch gesetzt."
-                    )
-            
-            # Action: Status manuell ändern
-            elif action == 'change_status':
+            # ── Status manuell ändern ──────────────────────────────────────
+            if action == 'change_status':
                 new_status = request.POST.get('new_status')
                 if new_status in dict(Order.STATUS_CHOICES):
-                    old_status = order.status
+                    old = order.status
                     order.status = new_status
                     order.save()
                     OrderAutomationService.log_event(
-                        order,
-                        'status_changed',
-                        old_status=old_status,
-                        new_status=new_status,
+                        order, 'status_changed',
+                        old_status=old, new_status=new_status,
                         note='Manuell vom Admin gesetzt'
                     )
-                    messages.success(
-                        request,
-                        f"Bestellung #{order.id}: Status geändert von '{old_status}' auf '{new_status}'."
+                    messages.success(request, f"#{order.id}: Status → '{new_status}'")
+
+            # ── Bezahlt setzen ─────────────────────────────────────────────
+            elif action == 'set_paid':
+                if OrderAutomationService.set_payment_status(order):
+                    messages.success(request, f"#{order.id}: Auf 'Paid' gesetzt.")
+                else:
+                    messages.warning(request, f"#{order.id}: Wird über {order.payment_method} auto-gesetzt.")
+
+            # ── Registrierungscode senden ──────────────────────────────────
+            elif action == 'send_registration_code':
+                code = request.POST.get('registration_code', '')
+                if code:
+                    OrderAutomationService.mark_as_sent(order, code)
+                    messages.success(request, f"#{order.id}: Code gesendet → 'In Delivery'")
+                else:
+                    messages.error(request, "Registrierungscode erforderlich.")
+
+            # ── E-Mail senden (welcome / registration / apps_info) ─────────
+            elif action == 'send_mail':
+                form = SendAccessMailForm(request.POST)
+                if form.is_valid():
+                    message_type           = form.cleaned_data["message_type"]
+                    registration_codes_raw = form.cleaned_data["registration_codes"]
+                    suggested_ids          = form.cleaned_data.get("suggested_apps", [])
+
+                    codes = {}
+                    for part in registration_codes_raw.split(','):
+                        if ':' in part:
+                            app_name, code_val = part.split(':', 1)
+                            codes[app_name.strip()] = code_val.strip()
+
+                    suggestion_map = {
+                        'JDS Management': {
+                            'title': 'JDS Management',
+                            'description': 'Manage fast, easy & smart.',
+                            'url': 'https://www.joel-digitals.de/our-apps/ManagementApp/',
+                            'btn_text': 'Jetzt entdecken',
+                        },
+                        'AuftragNetz': {
+                            'title': 'OrderNetwork',
+                            'description': 'Find Companies, Freelancer and Contracts',
+                            'url': 'https://joel-digitals.de/our-apps/auftragnetz/',
+                            'btn_text': 'Entdecken',
+                        },
+                        'weatherai': {
+                            'title': 'Weather AI',
+                            'description': 'Intelligente Wettervorhersage mit KI.',
+                            'url': 'https://joel-digitals.de/store/weatherai',
+                            'btn_text': 'Mehr erfahren',
+                        },
+                    }
+                    suggestions = [suggestion_map[sid] for sid in suggested_ids if sid in suggestion_map]
+
+                    ctx = {
+                        'order': order,
+                        'codes': codes,
+                        'apps': codes.keys(),
+                        'message_type': message_type,
+                        'suggestions': suggestions,
+                        'now': timezone.now(),
+                    }
+                    html_content = render_to_string(f'emails/{message_type}.html', ctx)
+                    subject_map = {
+                        'welcome':      'Willkommensnachricht zu Ihrer Bestellung',
+                        'registration': 'Ihre Registrierungscodes',
+                        'apps_info':    'Informationen zu Ihren Apps und Codes',
+                    }
+                    subject = subject_map.get(message_type, 'Ihre Zugangsdaten')
+                    msg = EmailMultiAlternatives(
+                        subject=subject,
+                        body="Bitte HTML-fähiges E-Mail-Programm verwenden.",
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        to=[order.email],
                     )
+                    msg.attach_alternative(html_content, "text/html")
+                    msg.send()
+                    messages.success(request, f"E-Mail '{subject}' → {order.email}")
 
-            return redirect(f"{request.path}?tab={tab}")
-
-        except Order.DoesNotExist:
-            messages.error(request, "Bestellung nicht gefunden.")
-
-    context = {
-        'orders': orders,
-        'tab': tab,
-        'query': query,
-        'STATUS_CHOICES': dict(Order.STATUS_CHOICES)
-    }
-    return render(request, 'apps/order_admin.html', context)
-
-
-# ==== AUTOMATISIERUNG - CronJob Views ====
-
-@csrf_exempt
-@require_http_methods(["GET", "POST"])
-def automation_cron(request):
-    """
-    Diese URL wird alle 10 Minuten via CronJob aufgerufen.
-    Sie führt alle ausstehenden automatischen Aufgaben aus:
-    - Status nach 30 Min auf "Delivered" setzen
-    - Review-Emails versenden
-    """
-    try:
-        # Bestellungen nach 30 Min als "Delivered" markieren
-        delivery_count = OrderAutomationService.auto_deliver_after_30_minutes()
-        
-        # Review-Emails versenden
-        review_count = OrderAutomationService.send_review_emails()
-        
-        result = {
-            'status': 'success',
-            'message': f'CronJob erfolgreich ausgeführt',
-            'orders_delivered': delivery_count,
-            'review_emails_sent': review_count,
-            'timestamp': timezone.now().isoformat(),
-        }
-        
-        return JsonResponse(result, status=200)
-    
-    except Exception as e:
-        result = {
-            'status': 'error',
-            'message': str(e),
-            'timestamp': timezone.now().isoformat(),
-        }
-        return JsonResponse(result, status=500)
-@login_required
-def order_admin(request):
-    """
-    Admin-View für Bestellungen mit Tabs und Mail-Versand.
-    """
-    tab = request.GET.get('tab', 'all')
-    orders = Order.objects.all().order_by('-created_at')
-
-    if request.method == 'POST':
-        try:
-            order_id = request.POST.get('order_id')
-            order = Order.objects.get(id=order_id)
-            tab = request.POST.get('tab', tab)
-            form = SendAccessMailForm(request.POST)
-
-            # Mail verschicken
-            if form.is_valid():
-                message_type = form.cleaned_data["message_type"]
-                registration_codes_raw = form.cleaned_data["registration_codes"]
-                suggested_ids = form.cleaned_data.get("suggested_apps", [])
-
-                codes = {}
-                for part in registration_codes_raw.split(','):
-                    if ':' in part:
-                        app, code = part.split(':', 1)
-                        codes[app.strip()] = code.strip()
-
-                suggestion_map = {
-                    'JDS Management': {
-                        'title': 'JDS Management',
-                        'description': 'Manage fast, easy & smart.',
-                        'url': 'https://www.joel-digitals.de/our-apps/ManagementApp/',
-                        'btn_text': 'Jetzt entdecken',
-                    },
-                    'AuftragNetz': {
-                        'title': 'OrderNetwork',
-                        'description': 'Find Companys, Freelancer and Contract',
-                        'url': 'https://joel-digitals.de/our-apps/auftragnetz/',
-                        'btn_text': '',
-                    },
-                    'weatherai': {
-                        'title': 'Weather AI',
-                        'description': 'Intelligente Wettervorhersage mit KI.',
-                        'url': 'https://joel-digitals.de/store/weatherai',
-                        'btn_text': 'Mehr erfahren',
-                    },
-                }
-
-                suggestions = [suggestion_map[sid] for sid in suggested_ids if sid in suggestion_map]
-
-                context = {
-                    'order': order,
-                    'codes': codes,
-                    'apps': codes.keys(),
-                    'message_type': message_type,
-                    'suggestions': suggestions,
-                    'now': timezone.now(),
-                }
-
-                html_content = render_to_string(f'emails/{message_type}.html', context)
-                subject_map = {
-                    'welcome': 'Willkommensnachricht zu Ihrer Bestellung',
-                    'registration': 'Ihre Registrierungscodes',
-                    'apps_info': 'Informationen zu Ihren Apps und Codes',
-                }
-                subject = subject_map.get(message_type, 'Ihre Zugangsdaten')
-
-                msg = EmailMultiAlternatives(
-                    subject=subject,
-                    body="Bitte verwenden Sie ein HTML-fähiges E-Mail-Programm.",
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[order.email],
-                )
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
-
-                messages.success(request, f"E-Mail '{subject}' an {order.email} gesendet.")
+            # ── Rücksendung entscheiden ────────────────────────────────────
+            elif action == 'decide_return':
+                return_id  = request.POST.get('return_id')
+                decision   = request.POST.get('decision')
+                admin_note = request.POST.get('admin_note', '')
+                try:
+                    ret = ReturnRequest.objects.get(id=return_id, order=order)
+                    if decision in ('approved', 'rejected', 'completed'):
+                        ret.status     = decision
+                        ret.admin_note = admin_note
+                        ret.save()
+                        messages.success(request, f"Rücksendung #{ret.id}: {ret.get_status_display()}")
+                except ReturnRequest.DoesNotExist:
+                    messages.error(request, "Rücksendung nicht gefunden.")
 
         except Order.DoesNotExist:
             messages.error(request, "Bestellung nicht gefunden.")
-        except Exception as e:
-            messages.error(request, f"Fehler beim Verarbeiten: {e}")
 
         return redirect(f"{request.path}?tab={tab}")
 
-    mail_form = SendAccessMailForm()
+    mail_form    = SendAccessMailForm()
+    return_requests = ReturnRequest.objects.filter(status='pending').select_related('order', 'user').order_by('-created_at')
 
     return render(request, 'apps/order_admin.html', {
-        'orders': orders,
-        'tab': tab,
-        'mail_form': mail_form,
+        'orders':          orders,
+        'tab':             tab,
+        'query':           query,
+        'STATUS_CHOICES':  dict(Order.STATUS_CHOICES),
+        'mail_form':       mail_form,
+        'return_requests': return_requests,
     })
 
 
@@ -1652,3 +1593,63 @@ def email_cron(request):
         pass  # Fehler still ignorieren, damit der Cron-Dienst nicht eskaliert
 
     return redirect('shop')
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RÜCKSENDE-ANTRAG (Kunde)
+# ─────────────────────────────────────────────────────────────────────────────
+@login_required
+def request_return(request, order_id):
+    """Kunde stellt Rücksende-/Rückerstattungsantrag für eine Bestellung."""
+    from .models import ReturnRequest
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    # Nur für bezahlte/gelieferte Bestellungen
+    if order.status not in ('Paid', 'In Delivery', 'Delivered', 'Finished'):
+        messages.error(request, "Für diese Bestellung kann kein Rücksendeantrag gestellt werden.")
+        return redirect('my_order_detail', order_id=order.id)
+
+    # Bereits ein offener Antrag?
+    existing = ReturnRequest.objects.filter(order=order, user=request.user).exclude(status='rejected').first()
+    if existing:
+        messages.warning(request, f"Es gibt bereits einen Antrag (Status: {existing.get_status_display()}).")
+        return redirect('my_order_detail', order_id=order.id)
+
+    if request.method == 'POST':
+        reason      = request.POST.get('reason', '')
+        description = request.POST.get('description', '')[:1000]
+
+        if reason not in dict(ReturnRequest.REASON_CHOICES):
+            messages.error(request, "Bitte einen gültigen Grund auswählen.")
+            return redirect('request_return', order_id=order.id)
+
+        ret = ReturnRequest.objects.create(
+            order=order,
+            user=request.user,
+            reason=reason,
+            description=description,
+        )
+        # Automatische Bewertung
+        status = ret.auto_evaluate()
+
+        if status == 'approved':
+            order.status = 'Return'
+            order.save(update_fields=['status'])
+            messages.success(request, "✅ Ihr Rücksendeantrag wurde automatisch genehmigt. Wir melden uns bei Ihnen.")
+        elif status == 'rejected':
+            messages.error(request, "❌ Ihr Rücksendeantrag konnte leider nicht genehmigt werden. Grund: Diese Apps sind nicht rückerstattbar.")
+        else:
+            messages.info(request, "📋 Ihr Rücksendeantrag wurde eingereicht und wird manuell geprüft.")
+
+        return redirect('my_order_detail', order_id=order.id)
+
+    # GET: Formular anzeigen
+    items = order.items.select_related('app')
+    any_refundable = any(item.app.refundable for item in items)
+
+    return render(request, 'apps/return_request.html', {
+        'order':          order,
+        'items':          items,
+        'reason_choices': ReturnRequest.REASON_CHOICES,
+        'any_refundable': any_refundable,
+    })

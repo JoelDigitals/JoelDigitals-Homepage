@@ -128,6 +128,81 @@
     background: rgba(255, 255, 255, 0.3);
   }
 
+  /* ── Rücksende-Button Styles (schön integriert) ── */
+  .btn-return {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+
+  .btn-return:hover {
+    background: rgba(239, 68, 68, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+  }
+
+  .return-status-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-top: 1rem;
+  }
+
+  .return-status-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .return-status-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .return-status-badge {
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .return-status-approved {
+    background: rgba(74, 222, 128, 0.12);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.25);
+  }
+
+  .return-status-rejected {
+    background: rgba(248, 113, 113, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.25);
+  }
+
+  .return-status-completed {
+    background: rgba(0, 191, 255, 0.12);
+    color: #00bfff;
+    border: 1px solid rgba(0, 191, 255, 0.25);
+  }
+
+  .return-status-pending {
+    background: rgba(251, 191, 36, 0.12);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.25);
+  }
+
+  .return-admin-note {
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
   /* Body Grid */
   .order-body {
     display: grid;
@@ -482,6 +557,11 @@
     .qty-cell, .price-cell {
       text-align: left;
     }
+
+    .return-status-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 
   @media (max-width: 480px) {
@@ -615,19 +695,19 @@
             <i class="fas fa-receipt"></i>
             {% trans "Summary" %}
           </h3>
-          
+
           <div class="summary-row">
             <span>{% trans "Subtotal" %}</span>
             <strong>{{ order.subtotal|floatformat:2 }} €</strong>
           </div>
-          
+
           {% if order.discount_amount > 0 %}
             <div class="summary-row discount">
               <span>{% trans "Discount" %}</span>
               <strong>-{{ order.discount_amount|floatformat:2 }} €</strong>
             </div>
           {% endif %}
-          
+
           <div class="summary-total">
             <span>{% trans "Total" %}</span>
             <span>{{ order.total_amount|floatformat:2 }} €</span>
@@ -658,7 +738,7 @@
             <i class="fas fa-map-marker-alt"></i>
             {% trans "Billing Details" %}
           </h3>
-          
+
           <div class="billing-address">
             <strong>{{ order.first_name }} {{ order.last_name }}</strong><br>
             {% if order.company_name %}
@@ -667,19 +747,19 @@
             {{ order.address }}<br>
             {{ order.zip_code }} {{ order.city }}<br>
             {% if order.country %}{{ order.country }}<br>{% endif %}
-            
+
             {% if order.email %}
               <a href="mailto:{{ order.email }}">
                 <i class="fas fa-envelope"></i> {{ order.email }}
               </a><br>
             {% endif %}
-            
+
             {% if order.phone %}
               <span style="color: #666;">
                 <i class="fas fa-phone"></i> {{ order.phone }}
               </span><br>
             {% endif %}
-            
+
             {% if order.vat_number %}
               <span style="font-size: 0.9rem; color: #999;">
                 VAT: {{ order.vat_number }}
@@ -687,6 +767,37 @@
             {% endif %}
           </div>
         </div>
+
+        <!-- ── Rücksende-Bereich (schön in der Sidebar integriert) ── -->
+        {% with rr=order.return_requests.first %}
+          {% if rr %}
+            <div class="return-status-card">
+              <div class="return-status-header">
+                <div>
+                  <span class="return-status-label">Rücksendeantrag eingereicht</span>
+                  <strong style="color: var(--text); margin-left: 6px; font-size: 1rem;">{{ rr.get_status_display }}</strong>
+                </div>
+                <span class="return-status-badge
+                  {% if rr.status == 'approved' %}return-status-approved
+                  {% elif rr.status == 'rejected' %}return-status-rejected
+                  {% elif rr.status == 'completed' %}return-status-completed
+                  {% else %}return-status-pending{% endif %}">
+                  {{ rr.get_status_display }}
+                </span>
+              </div>
+              {% if rr.admin_note %}
+                <div class="return-admin-note">
+                  <i class="fas fa-info-circle" style="margin-right: 6px; color: var(--primary);"></i>
+                  {{ rr.admin_note }}
+                </div>
+              {% endif %}
+            </div>
+          {% elif order.status in 'Paid,In Delivery,Delivered,Finished' %}
+            <a href="{% url 'request_return' order.id %}" class="btn btn-return" style="justify-content: center;">
+              <i class="fas fa-undo-alt"></i> Rücksendung / Rückerstattung beantragen
+            </a>
+          {% endif %}
+        {% endwith %}
       </aside>
     </div>
 
@@ -702,4 +813,5 @@
     {% endif %}
   </div>
 </div>
+
 {% endblock %}

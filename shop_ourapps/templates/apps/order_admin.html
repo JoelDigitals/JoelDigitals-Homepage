@@ -2,7 +2,61 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}{% trans "Order Management" %} – Joel Digitals{% endblock %}
+{% block title %}{% trans "Order Management" %} – Joel Digitals
+<!-- ═══════════════════════════════════ RÜCKSENDUNGEN ═════════════════════════ -->
+{% if return_requests %}
+<div style="max-width:1400px;margin:2rem auto;padding:0 1rem;">
+  <div style="background:var(--surface,#1e1e1e);border:1px solid rgba(248,113,113,0.2);border-radius:14px;overflow:hidden;">
+    <div style="background:rgba(239,68,68,0.1);padding:16px 24px;border-bottom:1px solid rgba(248,113,113,0.15);display:flex;align-items:center;gap:10px;">
+      <span style="font-size:1.2rem;">↩️</span>
+      <h3 style="margin:0;color:#f87171;font-size:15px;">Offene Rücksendeanträge ({{ return_requests|length }})</h3>
+    </div>
+    {% for rr in return_requests %}
+    <div style="padding:16px 24px;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div>
+          <p style="margin:0 0 4px;font-size:13px;color:#fff;">
+            <strong>Bestellung #{{ rr.order.id }}</strong>
+            · {{ rr.user.get_full_name|default:rr.user.username }}
+            · {{ rr.created_at|date:"d.m.Y H:i" }}
+          </p>
+          <p style="margin:0 0 6px;font-size:13px;color:rgba(255,255,255,0.5);">
+            Grund: <strong style="color:#fff;">{{ rr.get_reason_display }}</strong>
+          </p>
+          {% if rr.description %}
+          <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.4);font-style:italic;">{{ rr.description|truncatechars:120 }}</p>
+          {% endif %}
+        </div>
+        <form method="post" style="display:flex;flex-direction:column;gap:6px;min-width:220px;">
+          {% csrf_token %}
+          <input type="hidden" name="order_id" value="{{ rr.order.id }}">
+          <input type="hidden" name="return_id" value="{{ rr.id }}">
+          <input type="hidden" name="action" value="decide_return">
+          <input type="text" name="admin_note" placeholder="Interne Notiz (optional)"
+            style="padding:6px 10px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:12px;">
+          <div style="display:flex;gap:6px;">
+            <button type="submit" name="decision" value="approved"
+              style="flex:1;background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);padding:7px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
+              ✓ Genehmigen
+            </button>
+            <button type="submit" name="decision" value="rejected"
+              style="flex:1;background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);padding:7px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
+              ✗ Ablehnen
+            </button>
+          </div>
+          <button type="submit" name="decision" value="completed"
+            style="background:rgba(0,191,255,0.1);color:#00bfff;border:1px solid rgba(0,191,255,0.2);padding:6px;border-radius:6px;font-size:12px;cursor:pointer;">
+            ✓ Abschließen
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
 
 {% block content %}
 <style>
@@ -613,6 +667,8 @@
                     </div>
                     
                     <div class="form-group" style="display: flex; align-items: flex-end;">
+                      <input type="hidden" name="order_id" value="{{ order.id }}">
+                      <input type="hidden" name="action" value="send_mail">
                       <button type="submit" class="btn btn-primary" style="width: 100%;">
                         <i class="fas fa-paper-plane"></i> {% trans "Send Email" %}
                       </button>
@@ -624,9 +680,10 @@
                 <form method="post" class="status-form">
                   {% csrf_token %}
                   <input type="hidden" name="order_id" value="{{ order.id }}">
-                  
+                  <input type="hidden" name="action" value="change_status">
+
                   <select name="new_status">
-                    {% for value, label in order.STATUS_CHOICES %}
+                    {% for value, label in STATUS_CHOICES.items %}
                       <option value="{{ value }}" {% if value == order.status %}selected{% endif %}>
                         {{ label }}
                       </option>
@@ -653,4 +710,58 @@
     {% endif %}
   </div>
 </div>
+
+<!-- ═══════════════════════════════════ RÜCKSENDUNGEN ═════════════════════════ -->
+{% if return_requests %}
+<div style="max-width:1400px;margin:2rem auto;padding:0 1rem;">
+  <div style="background:var(--surface,#1e1e1e);border:1px solid rgba(248,113,113,0.2);border-radius:14px;overflow:hidden;">
+    <div style="background:rgba(239,68,68,0.1);padding:16px 24px;border-bottom:1px solid rgba(248,113,113,0.15);display:flex;align-items:center;gap:10px;">
+      <span style="font-size:1.2rem;">↩️</span>
+      <h3 style="margin:0;color:#f87171;font-size:15px;">Offene Rücksendeanträge ({{ return_requests|length }})</h3>
+    </div>
+    {% for rr in return_requests %}
+    <div style="padding:16px 24px;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div>
+          <p style="margin:0 0 4px;font-size:13px;color:#fff;">
+            <strong>Bestellung #{{ rr.order.id }}</strong>
+            · {{ rr.user.get_full_name|default:rr.user.username }}
+            · {{ rr.created_at|date:"d.m.Y H:i" }}
+          </p>
+          <p style="margin:0 0 6px;font-size:13px;color:rgba(255,255,255,0.5);">
+            Grund: <strong style="color:#fff;">{{ rr.get_reason_display }}</strong>
+          </p>
+          {% if rr.description %}
+          <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.4);font-style:italic;">{{ rr.description|truncatechars:120 }}</p>
+          {% endif %}
+        </div>
+        <form method="post" style="display:flex;flex-direction:column;gap:6px;min-width:220px;">
+          {% csrf_token %}
+          <input type="hidden" name="order_id" value="{{ rr.order.id }}">
+          <input type="hidden" name="return_id" value="{{ rr.id }}">
+          <input type="hidden" name="action" value="decide_return">
+          <input type="text" name="admin_note" placeholder="Interne Notiz (optional)"
+            style="padding:6px 10px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:12px;">
+          <div style="display:flex;gap:6px;">
+            <button type="submit" name="decision" value="approved"
+              style="flex:1;background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);padding:7px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
+              ✓ Genehmigen
+            </button>
+            <button type="submit" name="decision" value="rejected"
+              style="flex:1;background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);padding:7px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
+              ✗ Ablehnen
+            </button>
+          </div>
+          <button type="submit" name="decision" value="completed"
+            style="background:rgba(0,191,255,0.1);color:#00bfff;border:1px solid rgba(0,191,255,0.2);padding:6px;border-radius:6px;font-size:12px;cursor:pointer;">
+            ✓ Abschließen
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
 {% endblock %}

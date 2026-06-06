@@ -1,0 +1,198 @@
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Rücksendung / Rückerstattung – Bestellung #{{ order.id }}{% endblock %}
+
+{% block content %}
+<style>
+  .return-wrap { max-width: 680px; margin: 2.5rem auto; padding: 0 1rem; }
+
+  .return-header {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 1px solid rgba(255,100,100,0.2);
+    border-radius: 14px 14px 0 0;
+    padding: 28px 32px 24px;
+    text-align: center;
+  }
+  .return-header h1 { font-size: 1.5rem; color: #fff; margin: 0 0 6px; }
+  .return-header p  { color: rgba(255,255,255,0.5); font-size: 14px; margin: 0; }
+
+  .return-body {
+    background: var(--surface, #1e1e1e);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    padding: 28px 32px;
+  }
+
+  /* Order summary */
+  .order-summary {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+  }
+  .order-summary strong { color: #fff; }
+
+  /* App pills */
+  .app-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .app-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .app-pill.refundable    { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+  .app-pill.no-refund { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+
+  /* Form */
+  .form-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 6px; display: block; }
+  .form-group { margin-bottom: 20px; }
+
+  .reason-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .reason-card {
+    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all .15s;
+    background: rgba(255,255,255,0.03);
+  }
+  .reason-card input[type="radio"] { display: none; }
+  .reason-card:hover { border-color: rgba(0,191,255,0.4); }
+  .reason-card.selected { border-color: #00bfff; background: rgba(0,191,255,0.08); }
+  .reason-card-title { font-size: 13px; font-weight: 600; color: #fff; }
+  .reason-card-hint  { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+
+  .rv-textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 11px 14px;
+    color: #fff;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .rv-textarea:focus { outline: none; border-color: rgba(0,191,255,0.4); }
+
+  .info-banner {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 18px;
+    line-height: 1.6;
+  }
+  .info-warning { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); color: #fbbf24; }
+  .info-ok      { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.15); color: #4ade80; }
+
+  .submit-btn {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .back-link { display: block; text-align: center; margin-top: 14px; color: rgba(255,255,255,0.4); font-size: 13px; }
+  .back-link a { color: #00bfff; }
+
+  @media(max-width:480px){ .reason-grid { grid-template-columns: 1fr; } }
+</style>
+
+<div class="return-wrap">
+  <div class="return-header">
+    <div style="font-size:2.5rem;margin-bottom:10px;">↩️</div>
+    <h1>Rücksendung / Rückerstattung</h1>
+    <p>Bestellung #{{ order.id }} vom {{ order.created_at|date:"d.m.Y" }}</p>
+  </div>
+
+  <div class="return-body">
+
+    <!-- Bestellübersicht -->
+    <div class="order-summary">
+      <strong>Bestellte Apps:</strong>
+      <div class="app-pills">
+        {% for item in items %}
+        <span class="app-pill {% if item.app.refundable %}refundable{% else %}no-refund{% endif %}">
+          {{ item.app.name }}
+          {% if item.app.refundable %}✓ erstattbar{% else %}✗ nicht erstattbar{% endif %}
+        </span>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if not any_refundable %}
+    <div class="info-banner info-warning">
+      ⚠️ <strong>Hinweis:</strong> Keine der Apps in dieser Bestellung ist als rückerstattbar markiert.
+      Einige Rücksendeantrag-Gründe werden daher automatisch abgelehnt.
+      Bei technischen Problemen oder Fehllieferungen kannst du trotzdem einen Antrag stellen.
+    </div>
+    {% else %}
+    <div class="info-banner info-ok">
+      ✅ Mindestens eine App in dieser Bestellung ist rückerstattbar.
+    </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Grund -->
+      <div class="form-group">
+        <label class="form-label">Grund der Rücksendung *</label>
+        <div class="reason-grid">
+          {% for value, label in reason_choices %}
+          <label class="reason-card" id="card-{{ value }}">
+            <input type="radio" name="reason" value="{{ value }}" required>
+            <div class="reason-card-title">{{ label }}</div>
+            <!--<div class="reason-card-hint">
+              {% if value == "not_working" %}Wird automatisch genehmigt{% endif %}
+              {% if value == "wrong_product" %}Wird automatisch genehmigt{% endif %}
+              {% if value == "duplicate" %}Wird automatisch genehmigt{% endif %}
+              {% if value == "not_as_described" %}Manuelle Prüfung{% endif %}
+              {% if value == "technical_issue" %}Manuelle Prüfung{% endif %}
+              {% if value == "other" %}Manuelle Prüfung{% endif %}
+            </div>-->
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Beschreibung -->
+      <div class="form-group">
+        <label class="form-label">Beschreibung (optional, max. 1000 Zeichen)</label>
+        <textarea name="description" maxlength="1000" rows="4" class="rv-textarea"
+          placeholder="Bitte beschreibe das Problem so genau wie möglich…"></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn">📩 Rücksendeantrag einreichen</button>
+    </form>
+
+    <p class="back-link">
+      <a href="{% url 'order_detail' order.id %}">← Zurück zur Bestelldetailseite</a>
+    </p>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.reason-card').forEach(function(card) {
+  card.addEventListener('click', function() {
+    document.querySelectorAll('.reason-card').forEach(c => c.classList.remove('selected'));
+    this.classList.add('selected');
+    this.querySelector('input[type="radio"]').checked = true;
+  });
+});
+</script>
+{% endblock %}

@@ -180,6 +180,11 @@ class App(models.Model):
             return "Christmas Sale"
         return None
 
+    refundable = models.BooleanField(
+        default=False,
+        help_text="Kann diese App zurückerstattet werden?"
+    )
+
     def __str__(self):
         return self.name 
 
@@ -407,6 +412,54 @@ class OrderStatusLog(models.Model):
     
     class Meta:
         ordering = ['-created_at']
+
+class ReturnRequest(models.Model):
+    REASON_CHOICES = [
+        ('not_working', 'App funktioniert nicht'),
+        ('wrong_product', 'Falsches Produkt erhalten'),
+        ('duplicate', 'Versehentlich doppelt gekauft'),
+        ('not_as_described', 'Entspricht nicht der Beschreibung'),
+        ('technical_issue', 'Technisches Problem'),
+        ('other', 'Sonstiges'),
+    ]
+    STATUS_CHOICES = [
+        ('pending', 'Ausstehend'),
+        ('approved', 'Genehmigt'),
+        ('rejected', 'Abgelehnt'),
+        ('completed', 'Abgeschlossen'),
+    ]
+    # Gründe die automatisch genehmigt werden
+    AUTO_APPROVE_REASONS = ['not_working', 'wrong_product', 'duplicate']
+    # Gründe die automatisch abgelehnt werden (bei Apps ohne refundable=True)
+    AUTO_REJECT_REASONS = ['not_as_described', 'other']
+
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='return_requests')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    reason = models.CharField(max_length=50, choices=REASON_CHOICES)
+    description = models.TextField(max_length=1000, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    admin_note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def auto_evaluate(self):
+        """Wertet den Rücksendeantrag automatisch aus."""
+        # Prüfe ob alle Apps der Bestellung refundable sind
+        all_refundable = all(
+            item.app.refundable for item in self.order.items.select_related('app')
+        )
+        if self.reason in self.AUTO_APPROVE_REASONS:
+            self.status = 'approved'
+        elif self.reason in self.AUTO_REJECT_REASONS and not all_refundable:
+            self.status = 'rejected'
+        else:
+            self.status = 'pending'  # Manuelle Prüfung
+        self.save(update_fields=['status', 'updated_at'])
+        return self.status
+
+    def __str__(self):
+        return f"Rücksendung #{self.id} – Bestellung #{self.order.id} ({self.get_status_display()})"
+
 
 class AppReview(models.Model):
     """Produktbewertung für eine App. Nur eingeloggte Käufer können bewerten."""

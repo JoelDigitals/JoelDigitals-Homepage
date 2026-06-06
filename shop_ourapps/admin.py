@@ -55,3 +55,14 @@ class AppReviewAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'app__name', 'comment')
     ordering = ('-created_at',)
 
+
+
+from .models import ReturnRequest, AppReview
+
+@admin.register(ReturnRequest)
+class ReturnRequestAdmin(admin.ModelAdmin):
+    list_display  = ('id', 'order', 'user', 'reason', 'status', 'created_at')
+    list_filter   = ('status', 'reason')
+    list_editable = ('status',)
+    search_fields = ('user__username', 'order__id', 'description')
+    ordering      = ('-created_at',)
