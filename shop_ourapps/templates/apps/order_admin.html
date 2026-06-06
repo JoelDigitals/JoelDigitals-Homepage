@@ -7,50 +7,140 @@
 {% if return_requests %}
 <div style="max-width:1400px;margin:2rem auto;padding:0 1rem;">
   <div style="background:var(--surface,#1e1e1e);border:1px solid rgba(248,113,113,0.2);border-radius:14px;overflow:hidden;">
-    <div style="background:rgba(239,68,68,0.1);padding:16px 24px;border-bottom:1px solid rgba(248,113,113,0.15);display:flex;align-items:center;gap:10px;">
-      <span style="font-size:1.2rem;">↩️</span>
-      <h3 style="margin:0;color:#f87171;font-size:15px;">Offene Rücksendeanträge ({{ return_requests|length }})</h3>
+    <div style="background:rgba(239,68,68,0.1);padding:16px 24px;border-bottom:1px solid rgba(248,113,113,0.15);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.2rem;">&#8617;&#65039;</span>
+        <h3 style="margin:0;color:#f87171;font-size:15px;">Offene Rücksendeanträge ({{ return_requests|length }})</h3>
+      </div>
+      <!-- Status-Filter -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <a href="?tab={{ tab }}&rfilter=all" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;
+          {% if not request.GET.rfilter or request.GET.rfilter == 'all' %}background:rgba(248,113,113,0.2);color:#f87171;border:1px solid rgba(248,113,113,0.4);
+          {% else %}background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);{% endif %}">Alle</a>
+        <a href="?tab={{ tab }}&rfilter=pending" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;
+          {% if request.GET.rfilter == 'pending' %}background:rgba(251,191,36,0.2);color:#fbbf24;border:1px solid rgba(251,191,36,0.4);
+          {% else %}background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);{% endif %}">Ausstehend</a>
+        <a href="?tab={{ tab }}&rfilter=processing" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;
+          {% if request.GET.rfilter == 'processing' %}background:rgba(0,191,255,0.15);color:#00bfff;border:1px solid rgba(0,191,255,0.35);
+          {% else %}background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);{% endif %}">In Bearbeitung</a>
+        <a href="?tab={{ tab }}&rfilter=approved" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;
+          {% if request.GET.rfilter == 'approved' %}background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.35);
+          {% else %}background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);{% endif %}">Genehmigt</a>
+      </div>
     </div>
+
     {% for rr in return_requests %}
+    {% if not request.GET.rfilter or request.GET.rfilter == 'all' or request.GET.rfilter == rr.status %}
     <div style="padding:16px 24px;border-bottom:1px solid rgba(255,255,255,0.05);">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-        <div>
-          <p style="margin:0 0 4px;font-size:13px;color:#fff;">
-            <strong>Bestellung #{{ rr.order.id }}</strong>
-            · {{ rr.user.get_full_name|default:rr.user.username }}
-            · {{ rr.created_at|date:"d.m.Y H:i" }}
+
+        <!-- Left: Info -->
+        <div style="flex:1;min-width:240px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+            <span style="font-size:13px;color:#fff;font-weight:600;">Bestellung #{{ rr.order.id }}</span>
+            <!-- Art des Antrags -->
+            {% if rr.return_type == 'exchange' %}
+            <span style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.3);">&#8646; Umtausch</span>
+            {% else %}
+            <span style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);">&#128181; Rückerstattung</span>
+            {% endif %}
+            <!-- Status -->
+            <span style="padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700;
+              {% if rr.status == 'approved' %}background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.3);
+              {% elif rr.status == 'rejected' %}background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.3);
+              {% elif rr.status == 'processing' %}background:rgba(0,191,255,0.12);color:#00bfff;border:1px solid rgba(0,191,255,0.3);
+              {% elif rr.status == 'completed' %}background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.4);
+              {% else %}background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);{% endif %}">
+              {{ rr.get_status_display }}
+            </span>
+          </div>
+          <p style="margin:0 0 3px;font-size:12px;color:rgba(255,255,255,0.5);">
+            {{ rr.user.get_full_name|default:rr.user.username }}
+            &middot; {{ rr.order.email }}
+            &middot; {{ rr.created_at|date:"d.m.Y H:i" }}
           </p>
-          <p style="margin:0 0 6px;font-size:13px;color:rgba(255,255,255,0.5);">
+          <p style="margin:0 0 4px;font-size:12px;color:rgba(255,255,255,0.6);">
             Grund: <strong style="color:#fff;">{{ rr.get_reason_display }}</strong>
           </p>
           {% if rr.description %}
-          <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.4);font-style:italic;">{{ rr.description|truncatechars:120 }}</p>
+          <p style="margin:0 0 6px;font-size:12px;color:rgba(255,255,255,0.4);font-style:italic;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:5px;border-left:2px solid rgba(255,255,255,0.1);">{{ rr.description|truncatechars:160 }}</p>
           {% endif %}
+          {% if rr.admin_note %}
+          <p style="margin:4px 0 0;font-size:11px;color:rgba(255,193,7,0.7);">&#128172; {{ rr.admin_note }}</p>
+          {% endif %}
+          {% if rr.refund_amount %}
+          <p style="margin:4px 0 0;font-size:12px;color:#4ade80;">&#10003; Erstattung: €{{ rr.refund_amount }} via {{ rr.refund_method|default:"—" }}</p>
+          {% endif %}
+          <!-- Label-Links -->
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+            <a href="{% url 'return_label_print_admin' rr.id %}" target="_blank"
+               style="font-size:11px;color:#4ade80;padding:4px 8px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:5px;text-decoration:none;">
+              &#128438; Label drucken
+            </a>
+            {% if rr.return_label_url %}
+            <a href="{{ rr.return_label_url }}" target="_blank"
+               style="font-size:11px;color:#00bfff;padding:4px 8px;background:rgba(0,191,255,0.08);border:1px solid rgba(0,191,255,0.2);border-radius:5px;text-decoration:none;">
+              &#128196; PDF
+            </a>
+            {% endif %}
+          </div>
         </div>
-        <form method="post" style="display:flex;flex-direction:column;gap:6px;min-width:220px;">
+
+        <!-- Right: Action form (always visible) -->
+        <form method="post" style="display:flex;flex-direction:column;gap:6px;min-width:230px;max-width:260px;">
           {% csrf_token %}
           <input type="hidden" name="order_id" value="{{ rr.order.id }}">
           <input type="hidden" name="return_id" value="{{ rr.id }}">
           <input type="hidden" name="action" value="decide_return">
-          <input type="text" name="admin_note" placeholder="Interne Notiz (optional)"
-            style="padding:6px 10px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:12px;">
-          <div style="display:flex;gap:6px;">
+          <input type="text" name="admin_note" placeholder="Interne Notiz"
+            value="{{ rr.admin_note }}"
+            style="padding:6px 10px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:12px;width:100%;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+            <input type="text" name="refund_amount" placeholder="€ Betrag"
+              value="{{ rr.refund_amount|default:'' }}"
+              style="padding:5px 8px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:11px;">
+            <input type="text" name="refund_method" placeholder="Stripe/PayPal..."
+              value="{{ rr.refund_method|default:'' }}"
+              style="padding:5px 8px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:11px;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+            <select name="tracking_carrier" style="padding:5px 6px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:11px;">
+              <option value="">Carrier</option>
+              <option value="DHL" {% if rr.tracking_carrier == "DHL" %}selected{% endif %}>DHL</option>
+              <option value="UPS" {% if rr.tracking_carrier == "UPS" %}selected{% endif %}>UPS</option>
+              <option value="DPD" {% if rr.tracking_carrier == "DPD" %}selected{% endif %}>DPD</option>
+              <option value="Hermes" {% if rr.tracking_carrier == "Hermes" %}selected{% endif %}>Hermes</option>
+              <option value="GLS" {% if rr.tracking_carrier == "GLS" %}selected{% endif %}>GLS</option>
+            </select>
+            <input type="text" name="tracking_number" placeholder="Sendungsnr."
+              value="{{ rr.tracking_number|default:'' }}"
+              style="padding:5px 6px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:11px;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
             <button type="submit" name="decision" value="approved"
-              style="flex:1;background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);padding:7px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
-              ✓ Genehmigen
+              style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);padding:6px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+              &#10003; Genehmigen
             </button>
             <button type="submit" name="decision" value="rejected"
-              style="flex:1;background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);padding:7px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
-              ✗ Ablehnen
+              style="background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);padding:6px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+              &#10007; Ablehnen
             </button>
           </div>
-          <button type="submit" name="decision" value="completed"
-            style="background:rgba(0,191,255,0.1);color:#00bfff;border:1px solid rgba(0,191,255,0.2);padding:6px;border-radius:6px;font-size:12px;cursor:pointer;">
-            ✓ Abschließen
-          </button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+            <button type="submit" name="decision" value="processing"
+              style="background:rgba(0,191,255,0.1);color:#00bfff;border:1px solid rgba(0,191,255,0.2);padding:5px;border-radius:6px;font-size:11px;cursor:pointer;">
+              &#8635; In Bearb.
+            </button>
+            <button type="submit" name="decision" value="completed"
+              style="background:rgba(74,222,128,0.08);color:#4ade80;border:1px solid rgba(74,222,128,0.15);padding:5px;border-radius:6px;font-size:11px;cursor:pointer;">
+              &#10003;&#10003; Abschl.
+            </button>
+          </div>
         </form>
+
       </div>
     </div>
+    {% endif %}
     {% endfor %}
   </div>
 </div>
@@ -690,10 +780,50 @@
                     {% endfor %}
                   </select>
                   
-                  <button type="submit" name="update_status" class="btn btn-secondary">
-                    <i class="fas fa-sync-alt"></i> {% trans "Update Status" %}
+                  <button type="submit" class="btn btn-secondary" style="white-space:nowrap;">
+                    <i class="fas fa-sync-alt"></i> Status setzen
                   </button>
                 </form>
+
+                <!-- Sendungsverfolgung -->
+                <details class="form-section" style="margin-top:10px;">
+                  <summary style="cursor:pointer;font-size:13px;color:rgba(255,255,255,0.6);padding:8px 0;list-style:none;">
+                    &#128230; Sendungsverfolgung hinzufügen / bearbeiten
+                  </summary>
+                  <form method="post" action="{% url 'order_admin_set_tracking' order.id %}" style="margin-top:10px;">
+                    {% csrf_token %}
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+                      <select name="carrier" style="padding:7px 10px;border-radius:7px;background:var(--surface,#1e1e1e);border:1px solid rgba(255,255,255,0.12);color:#fff;font-size:13px;">
+                        <option value="">-- Carrier --</option>
+                        {% for v,l in shipment_carrier_choices %}
+                        <option value="{{ v }}" {% if order.shipment.carrier == v %}selected{% endif %}>{{ l }}</option>
+                        {% endfor %}
+                      </select>
+                      <input type="text" name="tracking_number" placeholder="Sendungsnummer"
+                        value="{{ order.shipment.tracking_number|default:'' }}"
+                        style="padding:7px 10px;border-radius:7px;background:var(--surface,#1e1e1e);border:1px solid rgba(255,255,255,0.12);color:#fff;font-size:13px;">
+                    </div>
+                    <input type="text" name="tracking_url" placeholder="Tracking-URL (optional – wird sonst auto-generiert)"
+                      value="{{ order.shipment.tracking_url|default:'' }}"
+                      style="width:100%;padding:7px 10px;border-radius:7px;background:var(--surface,#1e1e1e);border:1px solid rgba(255,255,255,0.12);color:#fff;font-size:13px;margin-bottom:8px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+                      <input type="date" name="estimated_delivery" value="{{ order.shipment.estimated_delivery|default:'' }}"
+                        title="Voraussichtliche Lieferung"
+                        style="padding:7px 10px;border-radius:7px;background:var(--surface,#1e1e1e);border:1px solid rgba(255,255,255,0.12);color:#fff;font-size:13px;">
+                      <input type="text" name="note" placeholder="Notiz (optional)" value="{{ order.shipment.note|default:'' }}"
+                        style="padding:7px 10px;border-radius:7px;background:var(--surface,#1e1e1e);border:1px solid rgba(255,255,255,0.12);color:#fff;font-size:13px;">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;font-size:13px;">
+                      &#128230; Sendungsverfolgung speichern
+                    </button>
+                    {% if order.shipment.resolved_tracking_url %}
+                    <a href="{{ order.shipment.resolved_tracking_url }}" target="_blank"
+                       style="display:block;text-align:center;margin-top:6px;font-size:12px;color:#00bfff;">
+                      Sendung verfolgen &#8594;
+                    </a>
+                    {% endif %}
+                  </form>
+                </details>
               </div>
             </div>
           </div>
@@ -715,50 +845,140 @@
 {% if return_requests %}
 <div style="max-width:1400px;margin:2rem auto;padding:0 1rem;">
   <div style="background:var(--surface,#1e1e1e);border:1px solid rgba(248,113,113,0.2);border-radius:14px;overflow:hidden;">
-    <div style="background:rgba(239,68,68,0.1);padding:16px 24px;border-bottom:1px solid rgba(248,113,113,0.15);display:flex;align-items:center;gap:10px;">
-      <span style="font-size:1.2rem;">↩️</span>
-      <h3 style="margin:0;color:#f87171;font-size:15px;">Offene Rücksendeanträge ({{ return_requests|length }})</h3>
+    <div style="background:rgba(239,68,68,0.1);padding:16px 24px;border-bottom:1px solid rgba(248,113,113,0.15);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.2rem;">&#8617;&#65039;</span>
+        <h3 style="margin:0;color:#f87171;font-size:15px;">Offene Rücksendeanträge ({{ return_requests|length }})</h3>
+      </div>
+      <!-- Status-Filter -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <a href="?tab={{ tab }}&rfilter=all" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;
+          {% if not request.GET.rfilter or request.GET.rfilter == 'all' %}background:rgba(248,113,113,0.2);color:#f87171;border:1px solid rgba(248,113,113,0.4);
+          {% else %}background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);{% endif %}">Alle</a>
+        <a href="?tab={{ tab }}&rfilter=pending" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;
+          {% if request.GET.rfilter == 'pending' %}background:rgba(251,191,36,0.2);color:#fbbf24;border:1px solid rgba(251,191,36,0.4);
+          {% else %}background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);{% endif %}">Ausstehend</a>
+        <a href="?tab={{ tab }}&rfilter=processing" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;
+          {% if request.GET.rfilter == 'processing' %}background:rgba(0,191,255,0.15);color:#00bfff;border:1px solid rgba(0,191,255,0.35);
+          {% else %}background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);{% endif %}">In Bearbeitung</a>
+        <a href="?tab={{ tab }}&rfilter=approved" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;
+          {% if request.GET.rfilter == 'approved' %}background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.35);
+          {% else %}background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);{% endif %}">Genehmigt</a>
+      </div>
     </div>
+
     {% for rr in return_requests %}
+    {% if not request.GET.rfilter or request.GET.rfilter == 'all' or request.GET.rfilter == rr.status %}
     <div style="padding:16px 24px;border-bottom:1px solid rgba(255,255,255,0.05);">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-        <div>
-          <p style="margin:0 0 4px;font-size:13px;color:#fff;">
-            <strong>Bestellung #{{ rr.order.id }}</strong>
-            · {{ rr.user.get_full_name|default:rr.user.username }}
-            · {{ rr.created_at|date:"d.m.Y H:i" }}
+
+        <!-- Left: Info -->
+        <div style="flex:1;min-width:240px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+            <span style="font-size:13px;color:#fff;font-weight:600;">Bestellung #{{ rr.order.id }}</span>
+            <!-- Art des Antrags -->
+            {% if rr.return_type == 'exchange' %}
+            <span style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.3);">&#8646; Umtausch</span>
+            {% else %}
+            <span style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);">&#128181; Rückerstattung</span>
+            {% endif %}
+            <!-- Status -->
+            <span style="padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700;
+              {% if rr.status == 'approved' %}background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.3);
+              {% elif rr.status == 'rejected' %}background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.3);
+              {% elif rr.status == 'processing' %}background:rgba(0,191,255,0.12);color:#00bfff;border:1px solid rgba(0,191,255,0.3);
+              {% elif rr.status == 'completed' %}background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.4);
+              {% else %}background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);{% endif %}">
+              {{ rr.get_status_display }}
+            </span>
+          </div>
+          <p style="margin:0 0 3px;font-size:12px;color:rgba(255,255,255,0.5);">
+            {{ rr.user.get_full_name|default:rr.user.username }}
+            &middot; {{ rr.order.email }}
+            &middot; {{ rr.created_at|date:"d.m.Y H:i" }}
           </p>
-          <p style="margin:0 0 6px;font-size:13px;color:rgba(255,255,255,0.5);">
+          <p style="margin:0 0 4px;font-size:12px;color:rgba(255,255,255,0.6);">
             Grund: <strong style="color:#fff;">{{ rr.get_reason_display }}</strong>
           </p>
           {% if rr.description %}
-          <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.4);font-style:italic;">{{ rr.description|truncatechars:120 }}</p>
+          <p style="margin:0 0 6px;font-size:12px;color:rgba(255,255,255,0.4);font-style:italic;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:5px;border-left:2px solid rgba(255,255,255,0.1);">{{ rr.description|truncatechars:160 }}</p>
           {% endif %}
+          {% if rr.admin_note %}
+          <p style="margin:4px 0 0;font-size:11px;color:rgba(255,193,7,0.7);">&#128172; {{ rr.admin_note }}</p>
+          {% endif %}
+          {% if rr.refund_amount %}
+          <p style="margin:4px 0 0;font-size:12px;color:#4ade80;">&#10003; Erstattung: €{{ rr.refund_amount }} via {{ rr.refund_method|default:"—" }}</p>
+          {% endif %}
+          <!-- Label-Links -->
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+            <a href="{% url 'return_label_print_admin' rr.id %}" target="_blank"
+               style="font-size:11px;color:#4ade80;padding:4px 8px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:5px;text-decoration:none;">
+              &#128438; Label drucken
+            </a>
+            {% if rr.return_label_url %}
+            <a href="{{ rr.return_label_url }}" target="_blank"
+               style="font-size:11px;color:#00bfff;padding:4px 8px;background:rgba(0,191,255,0.08);border:1px solid rgba(0,191,255,0.2);border-radius:5px;text-decoration:none;">
+              &#128196; PDF
+            </a>
+            {% endif %}
+          </div>
         </div>
-        <form method="post" style="display:flex;flex-direction:column;gap:6px;min-width:220px;">
+
+        <!-- Right: Action form (always visible) -->
+        <form method="post" style="display:flex;flex-direction:column;gap:6px;min-width:230px;max-width:260px;">
           {% csrf_token %}
           <input type="hidden" name="order_id" value="{{ rr.order.id }}">
           <input type="hidden" name="return_id" value="{{ rr.id }}">
           <input type="hidden" name="action" value="decide_return">
-          <input type="text" name="admin_note" placeholder="Interne Notiz (optional)"
-            style="padding:6px 10px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:12px;">
-          <div style="display:flex;gap:6px;">
+          <input type="text" name="admin_note" placeholder="Interne Notiz"
+            value="{{ rr.admin_note }}"
+            style="padding:6px 10px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:12px;width:100%;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+            <input type="text" name="refund_amount" placeholder="€ Betrag"
+              value="{{ rr.refund_amount|default:'' }}"
+              style="padding:5px 8px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:11px;">
+            <input type="text" name="refund_method" placeholder="Stripe/PayPal..."
+              value="{{ rr.refund_method|default:'' }}"
+              style="padding:5px 8px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:11px;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+            <select name="tracking_carrier" style="padding:5px 6px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:11px;">
+              <option value="">Carrier</option>
+              <option value="DHL" {% if rr.tracking_carrier == "DHL" %}selected{% endif %}>DHL</option>
+              <option value="UPS" {% if rr.tracking_carrier == "UPS" %}selected{% endif %}>UPS</option>
+              <option value="DPD" {% if rr.tracking_carrier == "DPD" %}selected{% endif %}>DPD</option>
+              <option value="Hermes" {% if rr.tracking_carrier == "Hermes" %}selected{% endif %}>Hermes</option>
+              <option value="GLS" {% if rr.tracking_carrier == "GLS" %}selected{% endif %}>GLS</option>
+            </select>
+            <input type="text" name="tracking_number" placeholder="Sendungsnr."
+              value="{{ rr.tracking_number|default:'' }}"
+              style="padding:5px 6px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:11px;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
             <button type="submit" name="decision" value="approved"
-              style="flex:1;background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);padding:7px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
-              ✓ Genehmigen
+              style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);padding:6px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+              &#10003; Genehmigen
             </button>
             <button type="submit" name="decision" value="rejected"
-              style="flex:1;background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);padding:7px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
-              ✗ Ablehnen
+              style="background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);padding:6px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+              &#10007; Ablehnen
             </button>
           </div>
-          <button type="submit" name="decision" value="completed"
-            style="background:rgba(0,191,255,0.1);color:#00bfff;border:1px solid rgba(0,191,255,0.2);padding:6px;border-radius:6px;font-size:12px;cursor:pointer;">
-            ✓ Abschließen
-          </button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+            <button type="submit" name="decision" value="processing"
+              style="background:rgba(0,191,255,0.1);color:#00bfff;border:1px solid rgba(0,191,255,0.2);padding:5px;border-radius:6px;font-size:11px;cursor:pointer;">
+              &#8635; In Bearb.
+            </button>
+            <button type="submit" name="decision" value="completed"
+              style="background:rgba(74,222,128,0.08);color:#4ade80;border:1px solid rgba(74,222,128,0.15);padding:5px;border-radius:6px;font-size:11px;cursor:pointer;">
+              &#10003;&#10003; Abschl.
+            </button>
+          </div>
         </form>
+
       </div>
     </div>
+    {% endif %}
     {% endfor %}
   </div>
 </div>

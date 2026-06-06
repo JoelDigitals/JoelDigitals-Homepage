@@ -1297,38 +1297,126 @@ def order_admin(request):
                     )
                     msg.attach_alternative(html_content, "text/html")
                     msg.send()
+
+                    # Wenn Registrierungscodes gesendet → Zeitstempel + Status setzen
+                    if message_type == 'registration' and codes:
+                        first_code = list(codes.values())[0]
+                        all_codes_str = ', '.join(f'{k}:{v}' for k, v in codes.items())
+                        OrderAutomationService.mark_as_sent(order, all_codes_str)
+
                     messages.success(request, f"E-Mail '{subject}' → {order.email}")
 
             # ── Rücksendung entscheiden ────────────────────────────────────
             elif action == 'decide_return':
-                return_id  = request.POST.get('return_id')
-                decision   = request.POST.get('decision')
-                admin_note = request.POST.get('admin_note', '')
+                from .services.return_label_service import ReturnLabelService
+                return_id     = request.POST.get('return_id')
+                decision      = request.POST.get('decision')
+                admin_note    = request.POST.get('admin_note', '')
+                refund_amount = request.POST.get('refund_amount', '')
+                refund_method = request.POST.get('refund_method', '')
+                tracking_nr   = request.POST.get('tracking_number', '')
+                tracking_car  = request.POST.get('tracking_carrier', '')
                 try:
                     ret = ReturnRequest.objects.get(id=return_id, order=order)
-                    if decision in ('approved', 'rejected', 'completed'):
+                    if decision in ('approved', 'rejected', 'completed', 'processing'):
                         ret.status     = decision
                         ret.admin_note = admin_note
+                        if refund_amount:
+                            from decimal import Decimal
+                            try:
+                                ret.refund_amount = Decimal(refund_amount.replace(',', '.'))
+                            except Exception:
+                                pass
+                        if refund_method:
+                            ret.refund_method = refund_method
+                        if decision == 'completed' and refund_amount and not ret.refunded_at:
+                            ret.refunded_at = timezone.now()
+                        if tracking_nr:
+                            ret.tracking_number  = tracking_nr
+                            ret.tracking_carrier = tracking_car
                         ret.save()
-                        messages.success(request, f"Rücksendung #{ret.id}: {ret.get_status_display()}")
+
+                        # Bei Genehmigung: PDF + Order-Status
+                        label_url = None
+                        if decision == 'approved':
+                            label_url = ReturnLabelService.generate_label(ret)
+                            order.status = 'Return'
+                            order.save(update_fields=['status'])
+
+                        # ── Kunde benachrichtigen ──────────────────────────
+                        try:
+                            customer_ctx = {
+                                'rr':        ret,
+                                'label_url': request.build_absolute_uri(ret.return_label_url) if ret.return_label_url else '',
+                            }
+                            customer_html = render_to_string(
+                                'emails/return_customer_notification.html', customer_ctx
+                            )
+                            subject_map = {
+                                'approved':   f'Rücksendeantrag #{ret.id} genehmigt ✅ | Return #{ret.id} approved',
+                                'rejected':   f'Rücksendeantrag #{ret.id} abgelehnt | Return #{ret.id} rejected',
+                                'processing': f'Rücksendeantrag #{ret.id} wird bearbeitet | Return #{ret.id} in progress',
+                                'completed':  f'Rücksendung #{ret.id} abgeschlossen ✅ | Return #{ret.id} completed',
+                            }
+                            subject = subject_map.get(decision, f'Rücksendeantrag #{ret.id} – Update')
+                            msg_customer = EmailMultiAlternatives(
+                                subject,
+                                f'Rücksendeantrag #{ret.id}: {ret.get_status_display()}',
+                                settings.DEFAULT_FROM_EMAIL,
+                                [ret.order.email],
+                            )
+                            msg_customer.attach_alternative(customer_html, 'text/html')
+                            msg_customer.send()
+                        except Exception as e_mail:
+                            messages.warning(request, f'Kunden-E-Mail konnte nicht gesendet werden: {e_mail}')
+
+                        # ── Admin benachrichtigen (neue Anträge) ───────────
+                        if decision in ('approved', 'rejected'):
+                            try:
+                                admin_ctx = {
+                                    'rr':        ret,
+                                    'admin_url': request.build_absolute_uri(
+                                        reverse('order_admin') + f'?tab=returns'
+                                    ),
+                                }
+                                admin_html = render_to_string(
+                                    'emails/return_admin_notification.html', admin_ctx
+                                )
+                                msg_admin = EmailMultiAlternatives(
+                                    f'[Admin] Rücksendung #{ret.id} – {ret.get_status_display()}',
+                                    f'Rücksendung #{ret.id} wurde auf {ret.status} gesetzt.',
+                                    settings.DEFAULT_FROM_EMAIL,
+                                    ['buy.joel-digitals@gmx.de'],
+                                )
+                                msg_admin.attach_alternative(admin_html, 'text/html')
+                                msg_admin.send()
+                            except Exception:
+                                pass  # Admin-Mail ist nicht kritisch
+
+                        if label_url:
+                            messages.success(request, f'Rücksendung #{ret.id} genehmigt · Retourenschein erstellt · Kunden-E-Mail gesendet.')
+                        else:
+                            messages.success(request, f'Rücksendung #{ret.id}: {ret.get_status_display()} · Kunden-E-Mail gesendet.')
                 except ReturnRequest.DoesNotExist:
-                    messages.error(request, "Rücksendung nicht gefunden.")
+                    messages.error(request, 'Rücksendung nicht gefunden.')
 
         except Order.DoesNotExist:
             messages.error(request, "Bestellung nicht gefunden.")
 
         return redirect(f"{request.path}?tab={tab}")
 
-    mail_form    = SendAccessMailForm()
-    return_requests = ReturnRequest.objects.filter(status='pending').select_related('order', 'user').order_by('-created_at')
+    from .models import ShipmentTracking
+    mail_form       = SendAccessMailForm()
+    return_requests = ReturnRequest.objects.exclude(status__in=['completed', 'rejected']).select_related('order', 'user').order_by('-created_at')
 
     return render(request, 'apps/order_admin.html', {
-        'orders':          orders,
-        'tab':             tab,
-        'query':           query,
-        'STATUS_CHOICES':  dict(Order.STATUS_CHOICES),
-        'mail_form':       mail_form,
-        'return_requests': return_requests,
+        'orders':                   orders,
+        'tab':                      tab,
+        'query':                    query,
+        'STATUS_CHOICES':           dict(Order.STATUS_CHOICES),
+        'mail_form':                mail_form,
+        'return_requests':          return_requests,
+        'shipment_carrier_choices': ShipmentTracking.CARRIER_CHOICES,
     })
 
 
@@ -1623,11 +1711,15 @@ def request_return(request, order_id):
             messages.error(request, "Bitte einen gültigen Grund auswählen.")
             return redirect('request_return', order_id=order.id)
 
+        return_type = request.POST.get('return_type', 'refund')
+        if return_type not in ('refund', 'exchange'):
+            return_type = 'refund'
         ret = ReturnRequest.objects.create(
             order=order,
             user=request.user,
             reason=reason,
             description=description,
+            return_type=return_type,
         )
         # Automatische Bewertung
         status = ret.auto_evaluate()
@@ -1641,7 +1733,46 @@ def request_return(request, order_id):
         else:
             messages.info(request, "📋 Ihr Rücksendeantrag wurde eingereicht und wird manuell geprüft.")
 
-        return redirect('my_order_detail', order_id=order.id)
+        # ── Admin benachrichtigen über neuen Antrag ────────────────────────
+        try:
+            admin_ctx = {
+                'rr':        ret,
+                'admin_url': request.build_absolute_uri(
+                    reverse('order_admin') + '?tab=returns'
+                ),
+            }
+            admin_html = render_to_string(
+                'emails/return_admin_notification.html', admin_ctx
+            )
+            msg_admin = EmailMultiAlternatives(
+                f'[Admin] Neuer Rücksendeantrag #{ret.id} – {ret.order.first_name} {ret.order.last_name}',
+                f'Neuer Rücksendeantrag #{ret.id} eingegangen (Grund: {ret.get_reason_display()})',
+                settings.DEFAULT_FROM_EMAIL,
+                ['buy@joel-digitals.com'],
+            )
+            msg_admin.attach_alternative(admin_html, 'text/html')
+            msg_admin.send()
+        except Exception:
+            pass  # Nicht kritisch
+
+        # ── Kunden-Eingangsbestätigung ─────────────────────────────────────
+        try:
+            customer_ctx = {'rr': ret, 'label_url': ''}
+            customer_html = render_to_string(
+                'emails/return_customer_notification.html', customer_ctx
+            )
+            msg_customer = EmailMultiAlternatives(
+                f'Rücksendeantrag #{ret.id} eingegangen | Return request #{ret.id} received',
+                f'Wir haben deinen Rücksendeantrag #{ret.id} erhalten.',
+                settings.DEFAULT_FROM_EMAIL,
+                [order.email],
+            )
+            msg_customer.attach_alternative(customer_html, 'text/html')
+            msg_customer.send()
+        except Exception:
+            pass
+
+        return redirect('order_detail', order_id=order.id)
 
     # GET: Formular anzeigen
     items = order.items.select_related('app')
@@ -1652,4 +1783,108 @@ def request_return(request, order_id):
         'items':          items,
         'reason_choices': ReturnRequest.REASON_CHOICES,
         'any_refundable': any_refundable,
+    })
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SENDUNGSVERFOLGUNG (Admin setzt, Kunde sieht)
+# ─────────────────────────────────────────────────────────────────────────────
+@login_required
+def order_admin_set_tracking(request, order_id):
+    """Admin setzt Sendungsverfolgung für eine Bestellung."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('order_admin')
+
+    from .models import ShipmentTracking
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == 'POST':
+        carrier         = request.POST.get('carrier', '')
+        tracking_number = request.POST.get('tracking_number', '').strip()
+        tracking_url    = request.POST.get('tracking_url', '').strip()
+        estimated       = request.POST.get('estimated_delivery', '') or None
+        note            = request.POST.get('note', '').strip()
+
+        if not tracking_number:
+            messages.error(request, "Sendungsnummer erforderlich.")
+            return redirect('/shop/admin-sales/orders/?tab=shipping')
+
+        shipment, created = ShipmentTracking.objects.update_or_create(
+            order=order,
+            defaults={
+                'carrier':            carrier,
+                'tracking_number':    tracking_number,
+                'tracking_url':       tracking_url,
+                'estimated_delivery': estimated,
+                'note':               note,
+                'dispatched_at':      timezone.now(),
+            }
+        )
+        action_txt = 'erstellt' if created else 'aktualisiert'
+        messages.success(request, f"Sendungsverfolgung {action_txt}: {carrier} {tracking_number}")
+
+    return redirect(request.META.get('HTTP_REFERER', '/shop/admin-sales/orders/?tab=shipping'))
+
+
+@login_required
+def order_tracking(request, order_id):
+    """Kunde sieht Sendungsverfolgung seiner Bestellung."""
+    from .models import ShipmentTracking, ReturnRequest
+    order    = get_object_or_404(Order, id=order_id, user=request.user)
+    shipment = ShipmentTracking.objects.filter(order=order).first()
+    returns  = ReturnRequest.objects.filter(order=order).order_by('-created_at')
+
+    return render(request, 'apps/order_tracking.html', {
+        'order':    order,
+        'shipment': shipment,
+        'returns':  returns,
+    })
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RETOURENSCHEIN DRUCKEN (Kunde)
+# ─────────────────────────────────────────────────────────────────────────────
+@login_required
+def return_label_print(request, return_id):
+    """
+    Druckbare HTML-Seite für den Retourenschein.
+    Öffnet sich in neuem Tab — Browser-Druckdialog öffnet sich automatisch.
+    """
+    from .models import ReturnRequest
+    ret = get_object_or_404(ReturnRequest, id=return_id, order__user=request.user)
+
+    company = {
+        'name':    getattr(settings, 'COMPANY_NAME',    'Joel Digitals'),
+        'address': getattr(settings, 'COMPANY_ADDRESS', 'Auf der Humes 12'),
+        'zip':     getattr(settings, 'COMPANY_ZIP',     '66606'),
+        'city':    getattr(settings, 'COMPANY_CITY',    'St. Wendel'),
+        'email':   getattr(settings, 'SUPPORT_EMAIL',   'support@joel-digitals.de'),
+        'phone':   getattr(settings, 'COMPANY_PHONE',   ''),
+    }
+    return render(request, 'apps/return_label_print.html', {
+        'rr':      ret,
+        'order':   ret.order,
+        'company': company,
+    })
+
+
+@login_required
+def return_label_print_admin(request, return_id):
+    """Admin-Version: kein User-Check."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('order_admin')
+    from .models import ReturnRequest
+    ret = get_object_or_404(ReturnRequest, id=return_id)
+    company = {
+        'name':    getattr(settings, 'COMPANY_NAME',    'Joel Digitals'),
+        'address': getattr(settings, 'COMPANY_ADDRESS', 'Auf der Humes 12'),
+        'zip':     getattr(settings, 'COMPANY_ZIP',     '66606'),
+        'city':    getattr(settings, 'COMPANY_CITY',    'St. Wendel'),
+        'email':   getattr(settings, 'SUPPORT_EMAIL',   'support@joel-digitals.de'),
+        'phone':   getattr(settings, 'COMPANY_PHONE',   ''),
+    }
+    return render(request, 'apps/return_label_print.html', {
+        'rr':      ret,
+        'order':   ret.order,
+        'company': company,
     })

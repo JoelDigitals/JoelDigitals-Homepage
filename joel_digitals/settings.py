@@ -187,6 +187,9 @@ CRON_SECRET = "jds-e-mails"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+COMPANY_ADDRESS = 'Niederwiesstraße 20'
+COMPANY_ZIP     = '66822'
+COMPANY_CITY    = 'Lebach'
 
 # SENDGRID as mail backend
 EMAIL_BACKEND = "django_mailjet.backends.MailjetBackend"

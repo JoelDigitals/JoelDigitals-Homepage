@@ -32,6 +32,10 @@ urlpatterns = [
 
     path('admin-sales/orders/', views.order_admin, name='order_admin'),
     path('my-orders/<int:order_id>/return/', views.request_return, name='request_return'),
+    path('my-orders/<int:order_id>/tracking/', views.order_tracking, name='order_tracking'),
+    path('admin-sales/orders/<int:order_id>/set-tracking/', views.order_admin_set_tracking, name='order_admin_set_tracking'),
+    path('my-orders/return/<int:return_id>/print/', views.return_label_print, name='return_label_print'),
+    path('admin-sales/return/<int:return_id>/print/', views.return_label_print_admin, name='return_label_print_admin'),
 
     # Bewertungen
     path('shop/<slug:slug>/review/', views.submit_review, name='submit_review'),

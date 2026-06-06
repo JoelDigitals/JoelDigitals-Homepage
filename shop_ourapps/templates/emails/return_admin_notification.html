@@ -1,0 +1,57 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+
+<div class="section-de">
+  <span class="lang-badge" style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25);">🔔 Rücksendung – Admin</span>
+  <p class="greeting">Neuer Rücksendeantrag #{{ rr.id }}</p>
+
+  <div class="info-box" style="border-color:rgba(239,68,68,0.25);background:rgba(239,68,68,0.05);">
+    <div class="info-row">
+      <span class="info-label">Rücksendeantrag</span>
+      <span class="info-value">#{{ rr.id }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Bestellung</span>
+      <span class="info-value">#{{ rr.order.id }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Kunde</span>
+      <span class="info-value">{{ rr.order.first_name }} {{ rr.order.last_name }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">E-Mail</span>
+      <span class="info-value">{{ rr.order.email }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Grund</span>
+      <span class="info-value">{{ rr.get_reason_display }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Status</span>
+      <span class="info-value" style="color:#fbbf24;">{{ rr.get_status_display }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Eingegangen</span>
+      <span class="info-value">{{ rr.created_at|date:"d.m.Y – H:i" }} Uhr</span>
+    </div>
+  </div>
+
+  {% if rr.description %}
+  <div class="info-box" style="border-color:rgba(255,193,7,0.2);background:rgba(255,193,7,0.04);margin-top:10px;">
+    <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0;line-height:1.6;">
+      <strong style="color:#fbbf24;">Beschreibung:</strong><br>
+      {{ rr.description }}
+    </p>
+  </div>
+  {% endif %}
+
+  <div class="cta-wrap" style="margin-top:20px;">
+    <a href="{{ admin_url }}" class="cta-button">🛠 Im Admin öffnen</a>
+  </div>
+
+  <p class="signature" style="margin-top:16px;">
+    <span style="font-size:12px;color:rgba(255,255,255,0.4);">Automatische Benachrichtigung · Joel Digitals Admin</span>
+  </p>
+</div>
+
+{% endblock %}

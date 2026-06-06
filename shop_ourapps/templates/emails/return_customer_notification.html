@@ -1,0 +1,222 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+
+<!-- ════ DEUTSCH ════ -->
+<div class="section-de">
+  <span class="lang-badge lang-de">🇩🇪 Deutsch</span>
+
+  {% if rr.status == 'approved' %}
+  <p class="greeting">Dein Rücksendeantrag wurde genehmigt ✅</p>
+  <p class="body-text">
+    Gute Neuigkeit, {{ rr.order.first_name }}! Dein Rücksendeantrag für Bestellung
+    <strong style="color:#fff;">#{{ rr.order.id }}</strong> wurde genehmigt.
+  </p>
+  <p class="body-text">
+    {% if rr.return_label_url %}
+    Den <strong style="color:#fff;">Retourenschein</strong> kannst du über den Link unten herunterladen
+    und ausdrucken. Bitte lege ihn deiner Rücksendung bei.
+    {% else %}
+    Wir werden dich in Kürze mit weiteren Informationen zur Rücksendung kontaktieren.
+    {% endif %}
+  </p>
+  {% if rr.return_label_url %}
+  <div class="cta-wrap">
+    <a href="{{ label_url }}" class="cta-button" style="background:linear-gradient(135deg,#4ade80,#22c55e);color:#000;">
+      🖨️ Retourenschein herunterladen & drucken
+    </a>
+  </div>
+  {% endif %}
+
+  {% elif rr.status == 'rejected' %}
+  <p class="greeting">Zu deinem Rücksendeantrag</p>
+  <p class="body-text">
+    Hallo {{ rr.order.first_name }}, leider konnten wir deinen Rücksendeantrag für Bestellung
+    <strong style="color:#fff;">#{{ rr.order.id }}</strong> nicht genehmigen.
+  </p>
+  {% if rr.admin_note %}
+  <div class="info-box" style="border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05);">
+    <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0;line-height:1.6;">
+      <strong style="color:#f87171;">Begründung:</strong><br>{{ rr.admin_note }}
+    </p>
+  </div>
+  {% endif %}
+  <p class="body-text">
+    Bei Fragen wende dich bitte an unseren
+    <a href="https://www.joel-digitals.de/contact" style="color:#00bfff;">Support</a>.
+  </p>
+
+  {% elif rr.status == 'processing' %}
+  <p class="greeting">Dein Rücksendeantrag wird bearbeitet ⏳</p>
+  <p class="body-text">
+    Hallo {{ rr.order.first_name }}, dein Rücksendeantrag für Bestellung
+    <strong style="color:#fff;">#{{ rr.order.id }}</strong> wird aktuell bearbeitet.
+    Wir melden uns so schnell wie möglich bei dir.
+  </p>
+
+  {% elif rr.status == 'completed' %}
+  <p class="greeting">Rücksendung abgeschlossen ✅</p>
+  <p class="body-text">
+    Hallo {{ rr.order.first_name }}, deine Rücksendung zu Bestellung
+    <strong style="color:#fff;">#{{ rr.order.id }}</strong> wurde abgeschlossen.
+  </p>
+  {% if rr.refund_amount %}
+  <div class="info-box" style="border-color:rgba(74,222,128,0.2);background:rgba(74,222,128,0.05);">
+    <div class="info-row">
+      <span class="info-label">Erstattungsbetrag</span>
+      <span class="info-value" style="color:#4ade80;font-weight:700;">€{{ rr.refund_amount }}</span>
+    </div>
+    {% if rr.refund_method %}
+    <div class="info-row">
+      <span class="info-label">Erstattungsmethode</span>
+      <span class="info-value">{{ rr.refund_method }}</span>
+    </div>
+    {% endif %}
+    {% if rr.refunded_at %}
+    <div class="info-row">
+      <span class="info-label">Erstattet am</span>
+      <span class="info-value">{{ rr.refunded_at|date:"d.m.Y" }}</span>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <p class="greeting">Dein Rücksendeantrag ist eingegangen 📋</p>
+  <p class="body-text">
+    Hallo {{ rr.order.first_name }}, wir haben deinen Rücksendeantrag für Bestellung
+    <strong style="color:#fff;">#{{ rr.order.id }}</strong> erhalten und prüfen ihn.
+    Du erhältst eine weitere E-Mail sobald wir eine Entscheidung getroffen haben.
+  </p>
+  {% endif %}
+
+  <!-- Bestellinfos -->
+  <div class="info-box" style="margin-top:16px;">
+    <div class="info-row">
+      <span class="info-label">Bestellung</span>
+      <span class="info-value">#{{ rr.order.id }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Grund</span>
+      <span class="info-value">{{ rr.get_reason_display }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Status</span>
+      <span class="info-value"
+        style="{% if rr.status == 'approved' or rr.status == 'completed' %}color:#4ade80;
+               {% elif rr.status == 'rejected' %}color:#f87171;
+               {% else %}color:#fbbf24;{% endif %}font-weight:700;">
+        {{ rr.get_status_display }}
+      </span>
+    </div>
+  </div>
+
+  <p class="signature" style="margin-top:18px;">Mit freundlichen Grüßen,<br><span class="sig-name">Ihr Joel Digitals Team</span></p>
+</div>
+
+<!-- ════ DIVIDER ════ -->
+<hr class="lang-divider" />
+
+<!-- ════ ENGLISH ════ -->
+<div class="section-en">
+  <span class="lang-badge lang-en">🇬🇧 English</span>
+
+  {% if rr.status == 'approved' %}
+  <p class="greeting">Your return request has been approved ✅</p>
+  <p class="body-text">
+    Great news, {{ rr.order.first_name }}! Your return request for order
+    <strong style="color:#fff;">#{{ rr.order.id }}</strong> has been approved.
+  </p>
+  {% if rr.return_label_url %}
+  <p class="body-text">
+    Please download and print the <strong style="color:#fff;">return label</strong> below
+    and include it with your return shipment.
+  </p>
+  <div class="cta-wrap">
+    <a href="{{ label_url }}" class="cta-button" style="background:linear-gradient(135deg,#4ade80,#22c55e);color:#000;">
+      🖨️ Download & Print Return Label
+    </a>
+  </div>
+  {% else %}
+  <p class="body-text">We will contact you shortly with further return instructions.</p>
+  {% endif %}
+
+  {% elif rr.status == 'rejected' %}
+  <p class="greeting">Regarding your return request</p>
+  <p class="body-text">
+    Hello {{ rr.order.first_name }}, unfortunately we were unable to approve your return request
+    for order <strong style="color:#fff;">#{{ rr.order.id }}</strong>.
+  </p>
+  {% if rr.admin_note %}
+  <div class="info-box" style="border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05);">
+    <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0;line-height:1.6;">
+      <strong style="color:#f87171;">Reason:</strong><br>{{ rr.admin_note }}
+    </p>
+  </div>
+  {% endif %}
+  <p class="body-text">
+    If you have questions, please contact our
+    <a href="https://www.joel-digitals.de/contact" style="color:#00bfff;">support team</a>.
+  </p>
+
+  {% elif rr.status == 'processing' %}
+  <p class="greeting">Your return request is being processed ⏳</p>
+  <p class="body-text">
+    Hello {{ rr.order.first_name }}, your return request for order
+    <strong style="color:#fff;">#{{ rr.order.id }}</strong> is currently being processed.
+    We will get back to you as soon as possible.
+  </p>
+
+  {% elif rr.status == 'completed' %}
+  <p class="greeting">Return completed ✅</p>
+  <p class="body-text">
+    Hello {{ rr.order.first_name }}, your return for order
+    <strong style="color:#fff;">#{{ rr.order.id }}</strong> has been completed.
+  </p>
+  {% if rr.refund_amount %}
+  <div class="info-box" style="border-color:rgba(74,222,128,0.2);background:rgba(74,222,128,0.05);">
+    <div class="info-row">
+      <span class="info-label">Refund Amount</span>
+      <span class="info-value" style="color:#4ade80;font-weight:700;">€{{ rr.refund_amount }}</span>
+    </div>
+    {% if rr.refund_method %}
+    <div class="info-row">
+      <span class="info-label">Refund Method</span>
+      <span class="info-value">{{ rr.refund_method }}</span>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <p class="greeting">Your return request has been received 📋</p>
+  <p class="body-text">
+    Hello {{ rr.order.first_name }}, we have received your return request for order
+    <strong style="color:#fff;">#{{ rr.order.id }}</strong> and are reviewing it.
+    You will receive another email once a decision has been made.
+  </p>
+  {% endif %}
+
+  <div class="info-box" style="margin-top:16px;">
+    <div class="info-row">
+      <span class="info-label">Order</span>
+      <span class="info-value">#{{ rr.order.id }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Reason</span>
+      <span class="info-value">{{ rr.get_reason_display }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Status</span>
+      <span class="info-value"
+        style="{% if rr.status == 'approved' or rr.status == 'completed' %}color:#4ade80;
+               {% elif rr.status == 'rejected' %}color:#f87171;
+               {% else %}color:#fbbf24;{% endif %}font-weight:700;">
+        {{ rr.get_status_display }}
+      </span>
+    </div>
+  </div>
+
+  <p class="signature" style="margin-top:18px;">Best regards,<br><span class="sig-name">The Joel Digitals Team</span></p>
+</div>
+
+{% endblock %}

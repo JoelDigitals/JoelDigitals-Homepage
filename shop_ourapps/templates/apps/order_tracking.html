@@ -1,0 +1,308 @@
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Sendungsverfolgung – Bestellung #{{ order.id }}{% endblock %}
+
+{% block content %}
+<style>
+  .track-wrap { max-width: 760px; margin: 2.5rem auto; padding: 0 1rem; }
+
+  .track-header {
+    background: linear-gradient(135deg, #0f1117, #1a1f2e);
+    border: 1px solid rgba(0,191,255,0.15);
+    border-radius: 14px 14px 0 0;
+    padding: 28px 32px;
+    text-align: center;
+  }
+  .track-header h1 { font-size: 1.5rem; color: #fff; margin: 0 0 6px; }
+  .track-header p  { color: rgba(255,255,255,0.45); font-size: 14px; margin: 0; }
+
+  .track-body {
+    background: var(--surface, #1e1e1e);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    padding: 28px 32px;
+  }
+
+  .track-section { margin-bottom: 28px; }
+  .track-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* Status timeline */
+  .timeline { position: relative; padding-left: 24px; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 4px; bottom: 4px;
+    width: 2px;
+    background: rgba(255,255,255,0.06);
+  }
+  .tl-item {
+    position: relative;
+    padding: 0 0 18px 16px;
+  }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 5px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.2);
+  }
+  .tl-item.done::before  { background: #00bfff; border-color: #00bfff; }
+  .tl-item.active::before { background: #ffc107; border-color: #ffc107; box-shadow: 0 0 8px rgba(255,193,7,0.5); }
+  .tl-label { font-size: 13px; font-weight: 600; color: #fff; }
+  .tl-sub   { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+  /* Shipment card */
+  .shipment-card {
+    background: rgba(0,191,255,0.05);
+    border: 1px solid rgba(0,191,255,0.2);
+    border-radius: 12px;
+    padding: 18px 22px;
+  }
+  .shipment-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.6);
+  }
+  .shipment-row:last-child { border-bottom: none; }
+  .shipment-label { color: rgba(255,255,255,0.35); }
+  .shipment-value { color: #fff; font-weight: 500; }
+  .tracking-btn {
+    display: inline-block;
+    margin-top: 14px;
+    background: linear-gradient(135deg, #00bfff, #0099d6);
+    color: #000;
+    padding: 10px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .no-shipment {
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    color: rgba(255,255,255,0.3);
+    font-size: 14px;
+  }
+
+  /* Return requests */
+  .return-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .status-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .sb-pending    { background:rgba(251,191,36,0.12); color:#fbbf24; border:1px solid rgba(251,191,36,0.25); }
+  .sb-approved   { background:rgba(74,222,128,0.12); color:#4ade80; border:1px solid rgba(74,222,128,0.25); }
+  .sb-rejected   { background:rgba(248,113,113,0.12); color:#f87171; border:1px solid rgba(248,113,113,0.25); }
+  .sb-processing { background:rgba(0,191,255,0.12); color:#00bfff; border:1px solid rgba(0,191,255,0.25); }
+  .sb-completed  { background:rgba(74,222,128,0.15); color:#4ade80; border:1px solid rgba(74,222,128,0.3); }
+
+  .back-link { display:block; text-align:center; margin-top:18px; font-size:13px; color:rgba(255,255,255,0.4); }
+  .back-link a { color:#00bfff; }
+</style>
+
+<div class="track-wrap">
+  <div class="track-header">
+    <div style="font-size:2.5rem;margin-bottom:10px;">📦</div>
+    <h1>Bestellung #{{ order.id }}</h1>
+    <p>{{ order.created_at|date:"d.m.Y" }} · {{ order.first_name }} {{ order.last_name }}</p>
+  </div>
+
+  <div class="track-body">
+
+    <!-- Status Timeline -->
+    <div class="track-section">
+      <p class="track-section-title">Bestellstatus</p>
+      <div class="timeline">
+        {% with s=order.status %}
+        <div class="tl-item {% if s in 'Received,Paid,In Delivery,Delivered,Finished' %}done{% endif %} {% if s == 'Received' %}active{% endif %}">
+          <div class="tl-label">📥 Bestellung eingegangen</div>
+          <div class="tl-sub">{{ order.created_at|date:"d.m.Y H:i" }}</div>
+        </div>
+        <div class="tl-item {% if s in 'Paid,In Delivery,Delivered,Finished' %}done{% endif %} {% if s == 'Paid' %}active{% endif %}">
+          <div class="tl-label">💳 Zahlung bestätigt</div>
+          {% if s in 'Paid,In Delivery,Delivered,Finished' %}
+          <div class="tl-sub">Betrag: €{{ order.total_amount }}</div>
+          {% endif %}
+        </div>
+        <div class="tl-item {% if s in 'In Delivery,Delivered,Finished' %}done{% endif %} {% if s == 'In Delivery' %}active{% endif %}">
+          <div class="tl-label">📨 Zugangsdaten / Codes versendet</div>
+          {% if order.registration_code_sent_at %}
+          <div class="tl-sub">{{ order.registration_code_sent_at|date:"d.m.Y H:i" }}</div>
+          {% endif %}
+        </div>
+        <div class="tl-item {% if s in 'Delivered,Finished' %}done{% endif %} {% if s == 'Delivered' %}active{% endif %}">
+          <div class="tl-label">✅ Zugestellt / Geliefert</div>
+          {% if order.delivered_at %}
+          <div class="tl-sub">{{ order.delivered_at|date:"d.m.Y H:i" }}</div>
+          {% endif %}
+        </div>
+        <div class="tl-item {% if s == 'Finished' %}done active{% endif %}">
+          <div class="tl-label">🎉 Abgeschlossen</div>
+        </div>
+        {% if s in 'Return,Canceled,Back' %}
+        <div class="tl-item done" style="--c:#f87171;">
+          <div class="tl-label" style="color:#f87171;">
+            {% if s == 'Return' %}↩️ Rücksendung eingeleitet
+            {% elif s == 'Canceled' %}❌ Storniert
+            {% else %}📬 Zurück bei Joel Digitals{% endif %}
+          </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- Sendungsverfolgung -->
+    <div class="track-section">
+      <p class="track-section-title">📬 Sendungsverfolgung (falls zutreffend)</p>
+      {% if shipment %}
+      <div class="shipment-card">
+        <div class="shipment-row">
+          <span class="shipment-label">Carrier</span>
+          <span class="shipment-value">{{ shipment.carrier }}</span>
+        </div>
+        <div class="shipment-row">
+          <span class="shipment-label">Sendungsnummer</span>
+          <span class="shipment-value" style="font-family:monospace;color:#00bfff;">{{ shipment.tracking_number }}</span>
+        </div>
+        {% if shipment.estimated_delivery %}
+        <div class="shipment-row">
+          <span class="shipment-label">Voraussichtliche Lieferung</span>
+          <span class="shipment-value">{{ shipment.estimated_delivery|date:"d.m.Y" }}</span>
+        </div>
+        {% endif %}
+        {% if shipment.note %}
+        <div class="shipment-row">
+          <span class="shipment-label">Notiz</span>
+          <span class="shipment-value">{{ shipment.note }}</span>
+        </div>
+        {% endif %}
+        {% if shipment.resolved_tracking_url %}
+        <a href="{{ shipment.resolved_tracking_url }}" target="_blank" class="tracking-btn">
+          🔍 Sendung verfolgen
+        </a>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="no-shipment">
+        Keine Sendungsinformationen vorhanden.<br>
+        <span style="font-size:12px;">Bei digitalen Produkten entfällt die Sendungsverfolgung.</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Rücksendeanträge -->
+    <div class="track-section">
+      <p class="track-section-title">↩️ Rücksendeanträge</p>
+      {% if returns %}
+        {% for rr in returns %}
+        <div class="return-card">
+          <div>
+            <p style="margin:0 0 4px;font-size:13px;color:#fff;font-weight:600;">{{ rr.get_reason_display }}</p>
+            {% if rr.description %}
+            <p style="margin:0 0 6px;font-size:12px;color:rgba(255,255,255,0.45);">{{ rr.description|truncatechars:100 }}</p>
+            {% endif %}
+            <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.3);">{{ rr.created_at|date:"d.m.Y H:i" }}</p>
+            {% if rr.admin_note %}
+            <p style="margin:6px 0 0;font-size:12px;color:rgba(255,193,7,0.7);padding:6px 10px;background:rgba(255,193,7,0.05);border-radius:5px;">
+              💬 {{ rr.admin_note }}
+            </p>
+            {% endif %}
+            {% if rr.tracking_info %}
+            <div style="margin-top:10px;padding:8px 12px;background:rgba(0,191,255,0.06);border-radius:7px;font-size:12px;">
+              📬 <strong style="color:#00bfff;">{{ rr.tracking_info.carrier }}</strong>
+              {{ rr.tracking_info.number }}
+              {% if rr.tracking_info.url %}
+              · <a href="{{ rr.tracking_info.url }}" target="_blank" style="color:#00bfff;">Verfolgen →</a>
+              {% endif %}
+            </div>
+            {% endif %}
+            {% if rr.status == 'completed' and rr.refund_amount %}
+            <p style="margin:8px 0 0;font-size:13px;color:#4ade80;">
+              ✅ Erstattung: €{{ rr.refund_amount }} via {{ rr.refund_method|default:"nicht angegeben" }}
+              {% if rr.refunded_at %}({{ rr.refunded_at|date:"d.m.Y" }}){% endif %}
+            </p>
+            {% endif %}
+            {% if rr.status == 'approved' or rr.status == 'completed' %}
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+              <a href="{% url 'return_label_print' rr.id %}?print=1" target="_blank"
+                 style="display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,0.1);
+                        color:#4ade80;border:1px solid rgba(74,222,128,0.25);padding:8px 14px;
+                        border-radius:7px;text-decoration:none;font-size:12px;font-weight:600;">
+                🖨️ Retourenschein drucken
+              </a>
+              {% if rr.return_label_url %}
+              <a href="{{ rr.return_label_url }}" target="_blank"
+                 style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,191,255,0.08);
+                        color:#00bfff;border:1px solid rgba(0,191,255,0.2);padding:8px 14px;
+                        border-radius:7px;text-decoration:none;font-size:12px;font-weight:600;">
+                📄 PDF herunterladen
+              </a>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+          <span class="status-badge sb-{{ rr.status }}">{{ rr.get_status_display }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-shipment">Keine Rücksendeanträge vorhanden.</div>
+      {% endif %}
+
+      {% if order.status in 'Paid,In Delivery,Delivered,Finished' %}
+      {% with has_open=order.return_requests.all %}
+      {% if not has_open or has_open.last.status == 'rejected' %}
+      <div style="text-align:right;margin-top:12px;">
+        <a href="{% url 'request_return' order.id %}"
+           style="display:inline-flex;align-items:center;gap:7px;background:rgba(239,68,68,0.1);
+                  color:#f87171;border:1px solid rgba(239,68,68,0.2);padding:9px 18px;
+                  border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;">
+          ↩️ Rücksendung beantragen
+        </a>
+      </div>
+      {% endif %}
+      {% endwith %}
+      {% endif %}
+    </div>
+
+  </div><!-- /track-body -->
+
+  <p class="back-link">
+    <a href="{% url 'order_detail' order.id %}">← Zurück zur Bestelldetailseite</a>
+  </p>
+</div>
+{% endblock %}

@@ -68,25 +68,34 @@ class OrderAutomationService:
     # ─────────────────────────────────────────────────────────────────
 
     @staticmethod
-    def mark_as_sent(order, registration_code):
+    def mark_as_sent(order, registration_code, force=False):
         """
         Wird aufgerufen wenn Admin Registrierungscode-Mail abschickt.
-        → Status: 'In Delivery', Zeitstempel setzen
+        Setzt Zeitstempel + Status 'In Delivery'. force=True erlaubt Überschreiben.
         """
-        if order.registration_code_sent_at is None:
+        now = timezone.now()
+        # Nur blockieren wenn bereits 'In Delivery' oder weiter UND nicht force
+        if not force and order.status in ('In Delivery', 'Delivered', 'Finished'):
+            # Zeitstempel updaten aber Status lassen
             order.registration_code = registration_code
-            order.registration_code_sent_at = timezone.now()
-            order.status = 'In Delivery'
-            order.save(update_fields=['registration_code', 'registration_code_sent_at', 'status'])
-
+            order.registration_code_sent_at = now
+            order.save(update_fields=['registration_code', 'registration_code_sent_at'])
             OrderAutomationService.log_event(
-                order,
-                'registration_code_sent',
-                new_status='In Delivery',
-                note=f'Registrierungscode gesendet: {registration_code}'
+                order, 'registration_code_sent',
+                note=f'Code erneut gesendet (Status beibehalten): {registration_code}'
             )
             return True
-        return False
+
+        order.registration_code = registration_code
+        order.registration_code_sent_at = now
+        order.status = 'In Delivery'
+        order.save(update_fields=['registration_code', 'registration_code_sent_at', 'status'])
+        OrderAutomationService.log_event(
+            order, 'registration_code_sent',
+            new_status='In Delivery',
+            note=f'Registrierungscode gesendet: {registration_code}'
+        )
+        return True
 
     # ─────────────────────────────────────────────────────────────────
     # 3. AUTO-DELIVERY (30 min nach Registrierungscode-Versand)

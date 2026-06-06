@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retourenschein #{{ rr.id }} – Joel Digitals</title>
+<style>
+  @media print {
+    .no-print { display: none !important; }
+    body { background: white !important; }
+    .page { box-shadow: none !important; border: none !important; margin: 0 !important; }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f5f5f5;
+    color: #111;
+    font-size: 12pt;
+  }
+
+  /* ── Print button bar ── */
+  .print-bar {
+    background: #1a1a2e;
+    color: white;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .print-bar-title { font-size: 14px; font-weight: 600; }
+  .print-bar-sub   { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .print-btn {
+    background: linear-gradient(135deg, #00bfff, #0099d6);
+    color: #000;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .back-btn {
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  /* ── Label page ── */
+  .page {
+    max-width: 794px; /* A4 width */
+    margin: 24px auto;
+    background: white;
+    padding: 32px 36px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    border: 1px solid #e0e0e0;
+  }
+
+  /* ── Header ── */
+  .label-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 16px;
+    border-bottom: 3px solid #1a1a2e;
+    margin-bottom: 20px;
+  }
+  .brand      { font-size: 22pt; font-weight: 700; color: #1a1a2e; line-height: 1; }
+  .brand-sub  { font-size: 9pt; color: #666; margin-top: 3px; }
+  .label-badge {
+    background: #1a1a2e;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 11pt;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .label-badge small { display: block; font-size: 8pt; font-weight: 400; opacity: 0.7; }
+
+  h2 {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #1a1a2e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+    margin: 18px 0 10px;
+  }
+
+  /* ── Address boxes ── */
+  .addr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .addr-box {
+    border: 2px solid #1a1a2e;
+    border-radius: 6px;
+    padding: 12px 16px;
+  }
+  .addr-label {
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #888;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .addr-content {
+    font-size: 11.5pt;
+    line-height: 1.7;
+    font-weight: 600;
+  }
+
+  /* ── Info table ── */
+  .info-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+  .info-table td { padding: 6px 8px; font-size: 10.5pt; border-bottom: 1px solid #f0f0f0; }
+  .info-table .lbl { color: #666; width: 38%; }
+  .info-table .val { font-weight: 600; }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  /* ── Status badge ── */
+  .status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 9pt;
+    font-weight: 700;
+  }
+  .s-approved   { background: #d1fae5; color: #065f46; }
+  .s-rejected   { background: #fee2e2; color: #991b1b; }
+  .s-pending    { background: #fef3c7; color: #92400e; }
+  .s-processing { background: #dbeafe; color: #1e40af; }
+  .s-completed  { background: #d1fae5; color: #065f46; }
+
+  /* ── Items table ── */
+  .items-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 10pt; }
+  .items-table th {
+    background: #1a1a2e; color: white;
+    padding: 8px 10px; text-align: left; font-weight: 600;
+  }
+  .items-table td { padding: 7px 10px; border-bottom: 1px solid #eee; }
+  .items-table tr:last-child td { border-bottom: 2px solid #1a1a2e; }
+  .items-table .total { font-weight: 700; }
+
+  /* ── Barcode placeholder ── */
+  .barcode-area {
+    border: 1.5px dashed #bbb;
+    border-radius: 4px;
+    padding: 16px;
+    text-align: center;
+    color: #aaa;
+    font-size: 9pt;
+    margin: 14px 0;
+    background: #fafafa;
+  }
+  .barcode-num {
+    font-family: 'Courier New', monospace;
+    font-size: 14pt;
+    font-weight: 700;
+    color: #333;
+    letter-spacing: 3px;
+    display: block;
+    margin-top: 6px;
+  }
+
+  /* ── Cut line ── */
+  .cut-line {
+    border-top: 2px dashed #ccc;
+    margin: 22px 0;
+    text-align: center;
+    color: #bbb;
+    font-size: 8pt;
+    padding-top: 4px;
+  }
+
+  /* ── Refund info ── */
+  .refund-box {
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+    border-radius: 5px;
+    padding: 10px 14px;
+    margin: 10px 0;
+  }
+  .refund-box .amount {
+    font-size: 16pt;
+    font-weight: 700;
+    color: #15803d;
+  }
+
+  /* ── Footer ── */
+  .label-footer {
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+    font-size: 8.5pt;
+    color: #888;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- Print bar (hidden when printing) -->
+<div class="print-bar no-print">
+  <div>
+    <div class="print-bar-title">&#128196; Retourenschein #{{ rr.id }}</div>
+    <div class="print-bar-sub">Bestellung #{{ order.id }} · {{ rr.get_reason_display }}</div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <a href="javascript:history.back()" class="back-btn">&#8592; Zurück</a>
+    <button class="print-btn" onclick="window.print()">&#128438; Drucken / Als PDF speichern</button>
+  </div>
+</div>
+
+<!-- A4 Label -->
+<div class="page">
+
+  <!-- Header -->
+  <div class="label-header">
+    <div>
+      <div class="brand">{% if company %}{{ company.name }}{% else %}Joel Digitals{% endif %}</div>
+      <div class="brand-sub">
+        {% if company %}{{ company.address }}, {{ company.zip }} {{ company.city }} · {{ company.email }}{% else %}www.joel-digitals.de · support@joel-digitals.de{% endif %}
+      </div>
+    </div>
+    <div class="label-badge">
+      <small>RETOURENSCHEIN</small>
+      #{{ rr.id|stringformat:"05d" }}
+    </div>
+  </div>
+
+  <!-- Info -->
+  <table class="info-table">
+    <tr>
+      <td class="lbl">Retourenschein-Nr.</td>
+      <td class="val">#{{ rr.id|stringformat:"05d" }}</td>
+    </tr>
+    <tr>
+      <td class="lbl">Bestellung</td>
+      <td class="val">#{{ order.id }}</td>
+    </tr>
+    <tr>
+      <td class="lbl">Datum</td>
+      <td class="val">{{ rr.created_at|date:"d.m.Y" }}</td>
+    </tr>
+    <tr>
+      <td class="lbl">Art</td>
+      <td class="val">
+        {% if rr.return_type == 'exchange' %}&#8646; Umtausch{% else %}&#128181; Rückerstattung{% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td class="lbl">Grund</td>
+      <td class="val">{{ rr.get_reason_display }}</td>
+    </tr>
+    <tr>
+      <td class="lbl">Status</td>
+      <td class="val">
+        <span class="status-badge s-{{ rr.status }}">{{ rr.get_status_display }}</span>
+      </td>
+    </tr>
+    {% if rr.admin_note %}
+    <tr>
+      <td class="lbl">Hinweis</td>
+      <td class="val" style="color:#555;">{{ rr.admin_note }}</td>
+    </tr>
+    {% endif %}
+  </table>
+
+  {% if rr.description %}
+  <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:10px 14px;margin:10px 0;font-size:10pt;color:#555;">
+    <strong>Beschreibung:</strong> {{ rr.description }}
+  </div>
+  {% endif %}
+
+  <!-- Addresses -->
+  <h2>Adressen</h2>
+  <div class="addr-grid">
+    <div class="addr-box">
+      <div class="addr-label">&#8593; Absender (Rücksender)</div>
+      <div class="addr-content">
+        {{ order.first_name }} {{ order.last_name }}<br>
+        {% if order.company_name %}{{ order.company_name }}<br>{% endif %}
+        {{ order.address }}<br>
+        {{ order.zip_code }} {{ order.city }}
+      </div>
+    </div>
+    <div class="addr-box" style="border-color:#00bfff;border-width:3px;">
+      <div class="addr-label">&#8595; Empfänger (Rücksende-Adresse)</div>
+      <div class="addr-content">
+        Joel Digitals<br>
+        Retouren-Abteilung<br>
+        Niederwiesstraße 20<br>
+        66822 Lebach<br>
+        <small style="font-size:9pt;color:#888;">support@joel-digitals.de</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barcode -->
+  <div class="barcode-area">
+    Sendungsnummer / Referenz:<br>
+    <span class="barcode-num">RET-{{ rr.id|stringformat:"05d" }}-ORD{{ order.id }}</span>
+    <br><small>Bitte bei der Rücksendung angeben</small>
+  </div>
+
+  <!-- Items -->
+  <h2>Zurückgesendete Artikel</h2>
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th>Artikel</th>
+        <th>Menge</th>
+        <th>Einzelpreis</th>
+        <th>Gesamt</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in order.items.all %}
+      <tr>
+        <td>{{ item.app.name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>€ {{ item.single_price|default:item.app.price }}</td>
+        <td>€ {% widthratio item.quantity 1 item.single_price|default:item.app.price %}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="3" class="total" style="text-align:right;">Bestellbetrag:</td>
+        <td class="total">€ {{ order.total_amount }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  {% if rr.refund_amount %}
+  <div class="refund-box">
+    <div style="font-size:9pt;color:#555;margin-bottom:4px;">Genehmigte Erstattung:</div>
+    <div class="amount">€ {{ rr.refund_amount }}</div>
+    {% if rr.refund_method %}
+    <div style="font-size:9.5pt;color:#555;margin-top:4px;">Methode: {{ rr.refund_method }}</div>
+    {% endif %}
+    {% if rr.refunded_at %}
+    <div style="font-size:9pt;color:#888;">Erstattet am: {{ rr.refunded_at|date:"d.m.Y" }}</div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="cut-line">&#9988; ── ── Bitte diesen Retourenschein der Sendung beilegen ── ── &#9988;</div>
+
+  <div class="label-footer">
+    Bitte verpacken Sie die Artikel sicher und legen Sie diesen Retourenschein bei.<br>
+    Bei Fragen: <strong>{% if company %}{{ company.email }}{% else %}support@joel-digitals.de{% endif %}</strong>
+    · Bestellung #{{ order.id }} · Retoure #{{ rr.id }}<br>
+    &copy; {% if company %}{{ company.name }}{% else %}Joel Digitals{% endif %} · www.joel-digitals.de
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// Druckdialog automatisch öffnen wenn URL-Parameter ?print=1
+if (window.location.search.includes('print=1')) {
+  window.addEventListener('load', function() {
+    setTimeout(function() { window.print(); }, 400);
+  });
+}
+</script>
+
+</body>
+</html>

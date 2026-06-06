@@ -6,193 +6,251 @@
 
 {% block content %}
 <style>
-  .return-wrap { max-width: 680px; margin: 2.5rem auto; padding: 0 1rem; }
-
+  .return-wrap { max-width: 700px; margin: 2.5rem auto; padding: 0 1rem; }
   .return-header {
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    border: 1px solid rgba(255,100,100,0.2);
+    background: linear-gradient(135deg, #1a0a0a, #2e1010);
+    border: 1px solid rgba(248,113,113,0.2);
     border-radius: 14px 14px 0 0;
-    padding: 28px 32px 24px;
-    text-align: center;
+    padding: 28px 32px; text-align: center;
   }
-  .return-header h1 { font-size: 1.5rem; color: #fff; margin: 0 0 6px; }
-  .return-header p  { color: rgba(255,255,255,0.5); font-size: 14px; margin: 0; }
-
+  .return-header h1 { font-size: 1.4rem; color: #fff; margin: 0 0 5px; }
+  .return-header p  { color: rgba(255,255,255,0.45); font-size: 13px; margin:0; }
   .return-body {
     background: var(--surface, #1e1e1e);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-top: none;
-    border-radius: 0 0 14px 14px;
-    padding: 28px 32px;
+    border: 1px solid rgba(255,255,255,0.07); border-top: none;
+    border-radius: 0 0 14px 14px; padding: 28px 32px;
   }
-
-  /* Order summary */
-  .order-summary {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 10px;
-    padding: 14px 18px;
-    margin-bottom: 24px;
-    font-size: 13px;
-    color: rgba(255,255,255,0.6);
-  }
-  .order-summary strong { color: #fff; }
-
-  /* App pills */
-  .app-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .app-pill {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-  }
-  .app-pill.refundable    { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
-  .app-pill.no-refund { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
-
-  /* Form */
-  .form-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 6px; display: block; }
-  .form-group { margin-bottom: 20px; }
-
-  .reason-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  .reason-card {
-    border: 2px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
-    padding: 12px 14px;
-    cursor: pointer;
-    transition: all .15s;
-    background: rgba(255,255,255,0.03);
-  }
-  .reason-card input[type="radio"] { display: none; }
-  .reason-card:hover { border-color: rgba(0,191,255,0.4); }
-  .reason-card.selected { border-color: #00bfff; background: rgba(0,191,255,0.08); }
-  .reason-card-title { font-size: 13px; font-weight: 600; color: #fff; }
-  .reason-card-hint  { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 3px; }
-
-  .rv-textarea {
-    width: 100%;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    padding: 11px 14px;
-    color: #fff;
-    font-size: 14px;
-    font-family: inherit;
-    resize: vertical;
-  }
-  .rv-textarea:focus { outline: none; border-color: rgba(0,191,255,0.4); }
-
-  .info-banner {
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    margin-bottom: 18px;
-    line-height: 1.6;
-  }
-  .info-warning { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); color: #fbbf24; }
-  .info-ok      { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.15); color: #4ade80; }
-
-  .submit-btn {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff;
-    border: none;
-    padding: 12px 28px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    width: 100%;
-  }
-  .back-link { display: block; text-align: center; margin-top: 14px; color: rgba(255,255,255,0.4); font-size: 13px; }
-  .back-link a { color: #00bfff; }
-
-  @media(max-width:480px){ .reason-grid { grid-template-columns: 1fr; } }
+  .order-info { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px 18px; margin-bottom:22px; font-size:13px; }
+  .app-pills  { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .app-pill   { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+  .refundable { background:rgba(74,222,128,0.1); color:#4ade80; border:1px solid rgba(74,222,128,0.2); }
+  .no-refund  { background:rgba(248,113,113,0.1); color:#f87171; border:1px solid rgba(248,113,113,0.2); }
+  .banner     { padding:11px 16px; border-radius:8px; font-size:13px; margin-bottom:18px; line-height:1.6; }
+  .banner-warn{ background:rgba(251,191,36,0.07); border:1px solid rgba(251,191,36,0.2); color:#fbbf24; }
+  .banner-ok  { background:rgba(74,222,128,0.06); border:1px solid rgba(74,222,128,0.15); color:#4ade80; }
+  .reason-cats{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+  .cat-btn    { padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.1); transition:all .15s; }
+  .cat-btn.active { background:rgba(0,191,255,0.1); color:#00bfff; border-color:rgba(0,191,255,0.35); }
+  .reason-group { display:none; }
+  .reason-group.visible { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .reason-card { border:2px solid rgba(255,255,255,0.07); border-radius:10px; padding:12px 14px; cursor:pointer; transition:all .15s; background:rgba(255,255,255,0.02); }
+  .reason-card input[type="radio"] { display:none; }
+  .reason-card:hover { border-color:rgba(0,191,255,0.35); }
+  .reason-card.picked { border-color:#00bfff; background:rgba(0,191,255,0.07); }
+  .rc-title    { font-size:13px; font-weight:600; color:#fff; }
+  .rc-hint     { font-size:11px; color:rgba(255,255,255,0.35); margin-top:3px; }
+  .rc-auto-ok  { color:rgba(74,222,128,0.8); }
+  .rc-manual   { color:rgba(251,191,36,0.7); }
+  .rc-auto-no  { color:rgba(248,113,113,0.7); }
+  .form-label  { font-size:13px; color:rgba(255,255,255,0.5); margin-bottom:6px; display:block; }
+  .form-group  { margin-bottom:18px; }
+  .rv-textarea { width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:11px 14px; color:#fff; font-size:14px; font-family:inherit; resize:vertical; }
+  .rv-textarea:focus { outline:none; border-color:rgba(0,191,255,0.4); }
+  .submit-btn  { background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; border:none; padding:12px 28px; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; width:100%; }
+  .back-link   { display:block; text-align:center; margin-top:14px; font-size:13px; color:rgba(255,255,255,0.4); }
+  .back-link a { color:#00bfff; }
+  #selected-reason-hint { padding:10px 14px; border-radius:7px; font-size:13px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.6); margin-bottom:14px; display:none; }
+  @media(max-width:500px){ .reason-group.visible { grid-template-columns:1fr; } }
 </style>
 
 <div class="return-wrap">
   <div class="return-header">
-    <div style="font-size:2.5rem;margin-bottom:10px;">↩️</div>
+    <div style="font-size:2rem;margin-bottom:8px;">&#8617;&#65039;</div>
     <h1>Rücksendung / Rückerstattung</h1>
-    <p>Bestellung #{{ order.id }} vom {{ order.created_at|date:"d.m.Y" }}</p>
+    <p>Bestellung #{{ order.id }} &middot; {{ order.created_at|date:"d.m.Y" }}</p>
   </div>
 
   <div class="return-body">
-
-    <!-- Bestellübersicht -->
-    <div class="order-summary">
-      <strong>Bestellte Apps:</strong>
+    <div class="order-info">
+      <strong style="color:#fff;">Bestellte Apps:</strong>
       <div class="app-pills">
         {% for item in items %}
         <span class="app-pill {% if item.app.refundable %}refundable{% else %}no-refund{% endif %}">
-          {{ item.app.name }}
-          {% if item.app.refundable %}✓ erstattbar{% else %}✗ nicht erstattbar{% endif %}
+          {{ item.app.name }} {% if item.app.refundable %}&#10003;{% else %}&#10007;{% endif %}
         </span>
         {% endfor %}
       </div>
     </div>
 
     {% if not any_refundable %}
-    <div class="info-banner info-warning">
-      ⚠️ <strong>Hinweis:</strong> Keine der Apps in dieser Bestellung ist als rückerstattbar markiert.
-      Einige Rücksendeantrag-Gründe werden daher automatisch abgelehnt.
-      Bei technischen Problemen oder Fehllieferungen kannst du trotzdem einen Antrag stellen.
+    <div class="banner banner-warn">
+      &#9888;&#65039; Keine App ist als rückerstattbar markiert. Bei technischen Problemen oder Fehlbestellungen kannst du trotzdem einen Antrag stellen.
     </div>
     {% else %}
-    <div class="info-banner info-ok">
-      ✅ Mindestens eine App in dieser Bestellung ist rückerstattbar.
+    <div class="banner banner-ok">
+      &#10003; Mindestens eine App ist rückerstattbar.
     </div>
     {% endif %}
 
-    <form method="post">
+    <form method="post" id="return-form">
       {% csrf_token %}
+      <input type="hidden" name="reason" id="selected-reason">
 
-      <!-- Grund -->
+      <!-- Art des Antrags -->
       <div class="form-group">
-        <label class="form-label">Grund der Rücksendung *</label>
-        <div class="reason-grid">
-          {% for value, label in reason_choices %}
-          <label class="reason-card" id="card-{{ value }}">
-            <input type="radio" name="reason" value="{{ value }}" required>
-            <div class="reason-card-title">{{ label }}</div>
-            <!--<div class="reason-card-hint">
-              {% if value == "not_working" %}Wird automatisch genehmigt{% endif %}
-              {% if value == "wrong_product" %}Wird automatisch genehmigt{% endif %}
-              {% if value == "duplicate" %}Wird automatisch genehmigt{% endif %}
-              {% if value == "not_as_described" %}Manuelle Prüfung{% endif %}
-              {% if value == "technical_issue" %}Manuelle Prüfung{% endif %}
-              {% if value == "other" %}Manuelle Prüfung{% endif %}
-            </div>-->
+        <label class="form-label">Art des Antrags:</label>
+        <div style="display:flex;gap:8px;margin-bottom:4px;">
+          <label style="flex:1;cursor:pointer;">
+            <input type="radio" name="return_type" value="refund" checked style="display:none;" id="rt-refund">
+            <div id="rt-refund-btn" onclick="selectType('refund')" style="border:2px solid rgba(0,191,255,0.35);border-radius:10px;padding:12px 14px;background:rgba(0,191,255,0.08);transition:all .15s;text-align:center;">
+              <div style="font-size:18px;margin-bottom:4px;">&#128181;</div>
+              <div style="font-size:13px;font-weight:600;color:#fff;">Rückerstattung</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">Geld zurück</div>
+            </div>
           </label>
-          {% endfor %}
+          <label style="flex:1;cursor:pointer;">
+            <input type="radio" name="return_type" value="exchange" style="display:none;" id="rt-exchange">
+            <div id="rt-exchange-btn" onclick="selectType('exchange')" style="border:2px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px;background:rgba(255,255,255,0.02);transition:all .15s;text-align:center;">
+              <div style="font-size:18px;margin-bottom:4px;">&#8646;</div>
+              <div style="font-size:13px;font-weight:600;color:#fff;">Umtausch</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">Andere Version / Produkt</div>
+            </div>
+          </label>
         </div>
       </div>
 
-      <!-- Beschreibung -->
+      <div class="form-group">
+        <label class="form-label">Kategorie wählen:</label>
+        <div class="reason-cats">
+          <button type="button" class="cat-btn active" data-cat="technical">&#128295; Technisch</button>
+          <button type="button" class="cat-btn" data-cat="order">&#128230; Bestellfehler</button>
+          <button type="button" class="cat-btn" data-cat="content">&#128203; Inhalt</button>
+          <button type="button" class="cat-btn" data-cat="other">&#128172; Sonstiges</button>
+        </div>
+
+        <div class="reason-group visible" data-group="technical">
+          <label class="reason-card" data-value="not_working"><input type="radio" name="_r" value="not_working">
+            <div class="rc-title">App startet nicht / funktioniert nicht</div>
+            <div class="rc-hint rc-auto-ok">&#10003; Wird automatisch genehmigt</div></label>
+          <label class="reason-card" data-value="technical_issue"><input type="radio" name="_r" value="technical_issue">
+            <div class="rc-title">Bug / Absturz / Fehlfunktion</div>
+            <div class="rc-hint rc-manual">&#8596; Manuelle Prüfung</div></label>
+          <label class="reason-card" data-value="install_failed"><input type="radio" name="_r" value="install_failed">
+            <div class="rc-title">Installation fehlgeschlagen</div>
+            <div class="rc-hint rc-auto-ok">&#10003; Wird automatisch genehmigt</div></label>
+        </div>
+
+        <div class="reason-group" data-group="order">
+          <label class="reason-card" data-value="wrong_product"><input type="radio" name="_r" value="wrong_product">
+            <div class="rc-title">Falsches Produkt erhalten</div>
+            <div class="rc-hint rc-auto-ok">&#10003; Wird automatisch genehmigt</div></label>
+          <label class="reason-card" data-value="duplicate"><input type="radio" name="_r" value="duplicate">
+            <div class="rc-title">Versehentlich doppelt bestellt</div>
+            <div class="rc-hint rc-manual">&#8596; Wird auf Duplikat geprüft</div></label>
+          <label class="reason-card" data-value="wrong_version"><input type="radio" name="_r" value="wrong_version">
+            <div class="rc-title">Falsche Version / Plattform</div>
+            <div class="rc-hint rc-auto-ok">&#10003; Wird automatisch genehmigt</div></label>
+        </div>
+
+        <div class="reason-group" data-group="content">
+          <label class="reason-card" data-value="not_as_described"><input type="radio" name="_r" value="not_as_described">
+            <div class="rc-title">Entspricht nicht der Beschreibung</div>
+            <div class="rc-hint rc-manual">&#8596; Manuelle Prüfung</div></label>
+          <label class="reason-card" data-value="missing_feature"><input type="radio" name="_r" value="missing_feature">
+            <div class="rc-title">Erwartete Funktion fehlt</div>
+            <div class="rc-hint rc-manual">&#8596; Manuelle Prüfung</div></label>
+          <label class="reason-card" data-value="language_issue"><input type="radio" name="_r" value="language_issue">
+            <div class="rc-title">Falsche Sprache / Sprachproblem</div>
+            <div class="rc-hint rc-manual">&#8596; Manuelle Prüfung</div></label>
+        </div>
+
+        <div class="reason-group" data-group="other">
+          <label class="reason-card" data-value="changed_mind"><input type="radio" name="_r" value="changed_mind">
+            <div class="rc-title">Meinung geändert / nicht mehr benötigt</div>
+            <div class="rc-hint rc-auto-no">&#10007; Nur bei rückerstattbaren Apps</div></label>
+          <label class="reason-card" data-value="price_issue"><input type="radio" name="_r" value="price_issue">
+            <div class="rc-title">Preisproblem / günstiger woanders</div>
+            <div class="rc-hint rc-auto-no">&#10007; Nur bei rückerstattbaren Apps</div></label>
+          <label class="reason-card" data-value="other"><input type="radio" name="_r" value="other">
+            <div class="rc-title">Sonstiges</div>
+            <div class="rc-hint rc-manual">&#8596; Manuelle Prüfung</div></label>
+        </div>
+      </div>
+
+      <div id="selected-reason-hint"></div>
+      <p id="reason-error" style="color:#f87171;font-size:12px;display:none;">Bitte einen Grund auswählen.</p>
+
       <div class="form-group">
         <label class="form-label">Beschreibung (optional, max. 1000 Zeichen)</label>
         <textarea name="description" maxlength="1000" rows="4" class="rv-textarea"
-          placeholder="Bitte beschreibe das Problem so genau wie möglich…"></textarea>
+          placeholder="Bitte beschreibe das Problem so genau wie möglich..."></textarea>
       </div>
 
-      <button type="submit" class="submit-btn">📩 Rücksendeantrag einreichen</button>
+      <button type="submit" class="submit-btn">&#128233; Rücksendeantrag einreichen</button>
     </form>
 
     <p class="back-link">
-      <a href="{% url 'order_detail' order.id %}">← Zurück zur Bestelldetailseite</a>
+      <a href="{% url 'order_detail' order.id %}">&#8592; Zurück</a> &middot;
+      <a href="{% url 'order_tracking' order.id %}">&#128230; Sendungsverfolgung</a>
     </p>
   </div>
 </div>
 
 <script>
-document.querySelectorAll('.reason-card').forEach(function(card) {
-  card.addEventListener('click', function() {
-    document.querySelectorAll('.reason-card').forEach(c => c.classList.remove('selected'));
-    this.classList.add('selected');
-    this.querySelector('input[type="radio"]').checked = true;
+(function(){
+  var catBtns = document.querySelectorAll('.cat-btn');
+  var groups  = document.querySelectorAll('.reason-group');
+  catBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      catBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      var cat = btn.dataset.cat;
+      groups.forEach(function(g){ g.classList.toggle('visible', g.dataset.group === cat); });
+    });
   });
-});
+  var hidden = document.getElementById('selected-reason');
+  var hint   = document.getElementById('selected-reason-hint');
+  var errEl  = document.getElementById('reason-error');
+  var hints  = {
+    'not_working':     'Dieser Grund wird automatisch geprueft und in der Regel genehmigt.',
+    'install_failed':  'Dieser Grund wird automatisch geprueft und in der Regel genehmigt.',
+    'wrong_product':   'Fehlbestellung - wird automatisch genehmigt.',
+    'duplicate':       'Wir pruefen automatisch ob eine Duplikat-Bestellung vorliegt.',
+    'wrong_version':   'Falsche Plattform/Version - wird automatisch genehmigt.',
+    'technical_issue': 'Technische Probleme werden manuell geprueft. Bitte beschreibe den Fehler.',
+    'not_as_described':'Wird manuell geprueft. Bitte erklaere die Abweichung.',
+    'missing_feature': 'Wird manuell geprueft.',
+    'language_issue':  'Wird manuell geprueft.',
+    'changed_mind':    'Nur genehmigt wenn die App als rueckerstattbar markiert ist.',
+    'price_issue':     'Nur genehmigt wenn die App als rueckerstattbar markiert ist.',
+    'other':           'Sonstige Gruende werden manuell geprueft.',
+  };
+  document.querySelectorAll('.reason-card').forEach(function(card){
+    card.addEventListener('click', function(){
+      document.querySelectorAll('.reason-card').forEach(function(c){ c.classList.remove('picked'); });
+      card.classList.add('picked');
+      var val = card.dataset.value;
+      hidden.value = val;
+      if(errEl) errEl.style.display = 'none';
+      hint.textContent = hints[val] || '';
+      hint.style.display = val ? 'block' : 'none';
+    });
+  });
+  document.getElementById('return-form').addEventListener('submit', function(e){
+    if(!hidden.value){
+      e.preventDefault();
+      if(errEl) errEl.style.display = 'block';
+      document.querySelector('.reason-cats').scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  });
+})();
+
+function selectType(type) {
+  var refundBtn   = document.getElementById('rt-refund-btn');
+  var exchangeBtn = document.getElementById('rt-exchange-btn');
+  document.getElementById('rt-refund').checked   = (type === 'refund');
+  document.getElementById('rt-exchange').checked = (type === 'exchange');
+  if (type === 'refund') {
+    refundBtn.style.border   = '2px solid rgba(0,191,255,0.35)';
+    refundBtn.style.background = 'rgba(0,191,255,0.08)';
+    exchangeBtn.style.border = '2px solid rgba(255,255,255,0.08)';
+    exchangeBtn.style.background = 'rgba(255,255,255,0.02)';
+  } else {
+    exchangeBtn.style.border = '2px solid rgba(168,85,247,0.35)';
+    exchangeBtn.style.background = 'rgba(168,85,247,0.08)';
+    refundBtn.style.border   = '2px solid rgba(255,255,255,0.08)';
+    refundBtn.style.background = 'rgba(255,255,255,0.02)';
+  }
+}
 </script>
 {% endblock %}

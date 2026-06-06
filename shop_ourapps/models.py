@@ -415,50 +415,182 @@ class OrderStatusLog(models.Model):
 
 class ReturnRequest(models.Model):
     REASON_CHOICES = [
-        ('not_working', 'App funktioniert nicht'),
-        ('wrong_product', 'Falsches Produkt erhalten'),
-        ('duplicate', 'Versehentlich doppelt gekauft'),
-        ('not_as_described', 'Entspricht nicht der Beschreibung'),
-        ('technical_issue', 'Technisches Problem'),
-        ('other', 'Sonstiges'),
+        # Technisch
+        ('not_working',       'App funktioniert nicht / Startet nicht'),
+        ('technical_issue',   'Technisches Problem (Bug, Absturz)'),
+        ('install_failed',    'Installation fehlgeschlagen'),
+        # Bestellfehler
+        ('wrong_product',     'Falsches Produkt erhalten'),
+        ('duplicate',         'Versehentlich doppelt bestellt'),
+        ('wrong_version',     'Falsche Version / Plattform'),
+        # Inhalt
+        ('not_as_described',  'Entspricht nicht der Beschreibung'),
+        ('missing_feature',   'Erwartete Funktion fehlt'),
+        ('language_issue',    'Sprachproblem / Falsche Sprache'),
+        # Sonstige
+        ('changed_mind',      'Meinung geändert / nicht mehr benötigt'),
+        ('price_issue',       'Preisproblem / günstiger anderswo'),
+        ('other',             'Sonstiges'),
     ]
     STATUS_CHOICES = [
-        ('pending', 'Ausstehend'),
-        ('approved', 'Genehmigt'),
-        ('rejected', 'Abgelehnt'),
-        ('completed', 'Abgeschlossen'),
+        ('pending',    'Ausstehend – Prüfung läuft'),
+        ('approved',   'Genehmigt'),
+        ('rejected',   'Abgelehnt'),
+        ('processing', 'In Bearbeitung'),
+        ('completed',  'Abgeschlossen – Erstattet'),
     ]
-    # Gründe die automatisch genehmigt werden
-    AUTO_APPROVE_REASONS = ['not_working', 'wrong_product', 'duplicate']
-    # Gründe die automatisch abgelehnt werden (bei Apps ohne refundable=True)
-    AUTO_REJECT_REASONS = ['not_as_described', 'other']
 
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='return_requests')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    reason = models.CharField(max_length=50, choices=REASON_CHOICES)
-    description = models.TextField(max_length=1000, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    admin_note = models.TextField(blank=True)
+    # Gründe: automatisch genehmigt wenn Bedingungen erfüllt
+    AUTO_APPROVE_REASONS  = ['not_working', 'wrong_product', 'duplicate', 'wrong_version', 'install_failed']
+    # Gründe: immer manuell prüfen
+    MANUAL_REVIEW_REASONS = ['technical_issue', 'not_as_described', 'missing_feature', 'language_issue']
+    # Gründe: nur genehmigt wenn App refundable
+    REFUND_ONLY_REASONS   = ['changed_mind', 'price_issue', 'other']
+
+    RETURN_TYPE_CHOICES = [
+        ('refund',   'Rückerstattung'),
+        ('exchange', 'Umtausch / Austausch'),
+    ]
+    return_type = models.CharField(
+        max_length=20, choices=RETURN_TYPE_CHOICES, default='refund',
+        verbose_name='Art des Antrags'
+    )
+    order       = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='return_requests')
+    user        = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    reason      = models.CharField(max_length=50, choices=REASON_CHOICES)
+    description = models.TextField(max_length=1000, blank=True, verbose_name='Beschreibung')
+    status      = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    admin_note  = models.TextField(blank=True, verbose_name='Admin-Notiz')
+
+    # Sendungsverfolgung (falls physische Rücksendung nötig)
+    tracking_number  = models.CharField(max_length=100, blank=True, verbose_name='Sendungsnummer')
+    tracking_carrier = models.CharField(max_length=50, blank=True, verbose_name='Carrier',
+                        help_text='z.B. DHL, UPS, DPD, Hermes')
+    tracking_url     = models.URLField(blank=True, verbose_name='Tracking-URL',
+                        help_text='Direktlink zur Sendungsverfolgung')
+    return_label_url = models.URLField(blank=True, verbose_name='Retourenschein-URL')
+
+    # Erstattung
+    refund_amount    = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
+                        verbose_name='Erstattungsbetrag (€)')
+    refund_method    = models.CharField(max_length=50, blank=True, verbose_name='Erstattungsmethode',
+                        help_text='z.B. Stripe, PayPal, Wallet, Überweisung')
+    refunded_at      = models.DateTimeField(null=True, blank=True, verbose_name='Erstattet am')
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def auto_evaluate(self):
-        """Wertet den Rücksendeantrag automatisch aus."""
-        # Prüfe ob alle Apps der Bestellung refundable sind
+        """
+        Wertet den Antrag automatisch aus. Prüft echte Bedingungen:
+        - duplicate: war diese App wirklich mehrfach bestellt?
+        - wrong_product: welches Produkt wurde erwartet?
+        - refundable: ist die App erstattbar?
+        """
+        from django.db.models import Count
+        reason = self.reason
+        order  = self.order
+
+        # Duplikat-Check: hat der User dieselbe App in einer anderen bezahlten Bestellung?
+        if reason == 'duplicate':
+            app_ids = list(order.items.values_list('app_id', flat=True))
+            duplicate_orders = Order.objects.filter(
+                user=order.user,
+                status__in=['Paid', 'In Delivery', 'Delivered', 'Finished'],
+                items__app_id__in=app_ids,
+            ).exclude(id=order.id).distinct()
+            if not duplicate_orders.exists():
+                # Kein echter Duplikat gefunden → manuelle Prüfung
+                self.status = 'pending'
+                self.admin_note = (
+                    self.admin_note +
+                    ' [Auto] Kein Duplikat gefunden – manuelle Prüfung erforderlich.'
+                ).strip()
+                self.save(update_fields=['status', 'admin_note', 'updated_at'])
+                return self.status
+
         all_refundable = all(
-            item.app.refundable for item in self.order.items.select_related('app')
+            item.app.refundable for item in order.items.select_related('app')
         )
-        if self.reason in self.AUTO_APPROVE_REASONS:
+
+        if reason in self.AUTO_APPROVE_REASONS:
             self.status = 'approved'
-        elif self.reason in self.AUTO_REJECT_REASONS and not all_refundable:
-            self.status = 'rejected'
+        elif reason in self.REFUND_ONLY_REASONS:
+            self.status = 'approved' if all_refundable else 'rejected'
+            if not all_refundable:
+                self.admin_note = (
+                    self.admin_note +
+                    ' [Auto] Abgelehnt: Apps nicht als rückerstattbar markiert.'
+                ).strip()
         else:
-            self.status = 'pending'  # Manuelle Prüfung
-        self.save(update_fields=['status', 'updated_at'])
+            # MANUAL_REVIEW_REASONS und alles andere
+            self.status = 'pending'
+
+        self.save(update_fields=['status', 'admin_note', 'updated_at'])
         return self.status
 
+    @property
+    def tracking_info(self):
+        """Gibt verfügbare Tracking-Infos zurück."""
+        if self.tracking_url:
+            return {'url': self.tracking_url, 'number': self.tracking_number, 'carrier': self.tracking_carrier}
+        if self.tracking_number and self.tracking_carrier:
+            carrier_urls = {
+                'DHL':    f'https://www.dhl.de/de/privatkunden/pakete-empfangen/verfolgen.html?piececode={self.tracking_number}',
+                'UPS':    f'https://www.ups.com/track?tracknum={self.tracking_number}',
+                'DPD':    f'https://tracking.dpd.de/status/de_DE/parcel/{self.tracking_number}',
+                'Hermes': f'https://www.myhermes.de/empfangen/sendungsverfolgung/sendungsinformation/?trackingNumber={self.tracking_number}',
+                'GLS':    f'https://gls-group.eu/track/{self.tracking_number}',
+            }
+            url = carrier_urls.get(self.tracking_carrier, '')
+            return {'url': url, 'number': self.tracking_number, 'carrier': self.tracking_carrier}
+        return None
+
     def __str__(self):
-        return f"Rücksendung #{self.id} – Bestellung #{self.order.id} ({self.get_status_display()})"
+        return f"Rücksendung #{self.id} – #{self.order.id} ({self.get_reason_display()}) [{self.get_status_display()}]"
+
+
+class ShipmentTracking(models.Model):
+    """Sendungsverfolgung für Bestellungen (Outbound Delivery)."""
+    CARRIER_CHOICES = [
+        ('DHL',     'DHL'),
+        ('UPS',     'UPS'),
+        ('DPD',     'DPD'),
+        ('Hermes',  'Hermes'),
+        ('GLS',     'GLS'),
+        ('FedEx',   'FedEx'),
+        ('PostAG',  'Österreichische Post'),
+        ('Swiss',   'Swiss Post'),
+        ('custom',  'Sonstiger Carrier'),
+    ]
+    order           = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='shipment')
+    carrier         = models.CharField(max_length=20, choices=CARRIER_CHOICES)
+    tracking_number = models.CharField(max_length=100)
+    tracking_url    = models.URLField(blank=True, help_text='Wenn leer, wird auto-generiert')
+    dispatched_at   = models.DateTimeField(null=True, blank=True)
+    estimated_delivery = models.DateField(null=True, blank=True, verbose_name='Voraussichtliche Lieferung')
+    note            = models.CharField(max_length=255, blank=True)
+    created_at      = models.DateTimeField(auto_now_add=True)
+    updated_at      = models.DateTimeField(auto_now=True)
+
+    CARRIER_URL_TEMPLATES = {
+        'DHL':    'https://www.dhl.de/de/privatkunden/pakete-empfangen/verfolgen.html?piececode={n}',
+        'UPS':    'https://www.ups.com/track?tracknum={n}',
+        'DPD':    'https://tracking.dpd.de/status/de_DE/parcel/{n}',
+        'Hermes': 'https://www.myhermes.de/empfangen/sendungsverfolgung/sendungsinformation/?trackingNumber={n}',
+        'GLS':    'https://gls-group.eu/track/{n}',
+        'FedEx':  'https://www.fedex.com/fedextrack/?trknbr={n}',
+    }
+
+    @property
+    def resolved_tracking_url(self):
+        if self.tracking_url:
+            return self.tracking_url
+        tpl = self.CARRIER_URL_TEMPLATES.get(self.carrier, '')
+        return tpl.format(n=self.tracking_number) if tpl else ''
+
+    def __str__(self):
+        return f"Sendung {self.carrier} {self.tracking_number} (Order #{self.order.id})"
 
 
 class AppReview(models.Model):
