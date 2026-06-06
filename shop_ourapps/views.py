@@ -930,6 +930,8 @@ def checkout(request):
             wallet.deduct(final_total)
             messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben.')
             cart.items.all().delete()
+            order.status = 'Paid'
+            order.save()
             return redirect('order_confirmation', order_id=order.id)
 
         # Lastschrift
