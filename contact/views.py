@@ -329,17 +329,14 @@ def contact_view(request):
     if request.method == 'POST' and form.is_valid():
         name = form.cleaned_data['name']
         message = form.cleaned_data['message']
-
         send_mail(
             subject=f"Kontaktanfrage von {name}, Email: {form.cleaned_data['email']}",
             message=message,
             from_email='support@joel-digitals.com',
             recipient_list=['info@joel-digitals.com'],
         )
-
         messages.success(request, "Deine Nachricht wurde erfolgreich gesendet.")
         return redirect('contact_form')
-
     return render(request, 'contact/contact.html', {'form': form, 'user_groups': user_groups})
 
 @login_required

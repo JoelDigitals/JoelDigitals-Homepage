@@ -246,21 +246,26 @@
     <form method="post" novalidate class="contact-form">
       {% csrf_token %}
       
+      {# Honeypot - versteckt, Bots fuellen es aus #}
+      <div style="display:none;" aria-hidden="true">{{ form.hp_url }}</div>
+
       {% for field in form %}
-      <div class="form-group">
-        {{ field.label_tag }}
-        {{ field }}
-        {% if field.help_text %}
-        <span class="helptext">{{ field.help_text }}</span>
+        {% if field.name != "hp_url" %}
+        <div class="form-group">
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.help_text %}
+          <span class="helptext">{{ field.help_text }}</span>
+          {% endif %}
+          {% if field.errors %}
+          <ul class="errorlist">
+            {% for error in field.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
         {% endif %}
-        {% if field.errors %}
-        <ul class="errorlist">
-          {% for error in field.errors %}
-          <li>{{ error }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </div>
       {% endfor %}
 
       <button type="submit" class="submit-btn">

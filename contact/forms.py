@@ -27,6 +27,14 @@ class ContactForm(forms.Form):
     email = forms.EmailField()
     message = forms.CharField(widget=forms.Textarea)
 
+    # Honeypot - unsichtbar per CSS im Template, nie per required/widget verstecken
+    hp_url = forms.CharField(required=False, widget=forms.HiddenInput())
+
+    def clean_hp_url(self):
+        if self.cleaned_data.get('hp_url'):
+            raise forms.ValidationError("Bot erkannt.")
+        return ''
+
 class SalesEntryForm(forms.ModelForm):
     class Meta:
         model = SalesEntry
