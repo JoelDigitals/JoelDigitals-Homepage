@@ -936,6 +936,11 @@ def checkout(request):
 
         # Lastschrift
         if payment_method == 'lastschrift':
+            mandate_ref = f"JD-{order.id}-{timezone.now().strftime('%Y%m%d%H%M%S')}"
+            order.sepa_mandate_ref = mandate_ref
+            order.sepa_mandate_date = timezone.now()
+            order.status = 'Received'
+            order.save(update_fields=['sepa_mandate_ref', 'sepa_mandate_date', 'status'])
             messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben. Die Lastschrift wird verarbeitet.')
             cart.items.all().delete()
             return redirect('order_confirmation', order_id=order.id)
@@ -998,6 +1003,8 @@ def checkout(request):
         'discount_amount': discount_amount,
         'wallet_balance': wallet.balance if wallet else 0,
         'now': timezone.now(),
+        'sepa_creditor_id': settings.SEPA_CREDITOR_ID,
+        'sepa_creditor_name': settings.SEPA_CREDITOR_NAME,
     }
     return render(request, 'apps/checkout.html', context)
 

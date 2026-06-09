@@ -630,7 +630,7 @@
 
             <div class="form-group full-width">
               <label>{% trans "Payment Method" %} *</label>
-              <select name="payment_method" required>
+              <select name="payment_method" id="payment-method-select" required>
                 <option value="">{% trans "-- Please choose --" %}</option>
                 <option value="wallet">
                   {% trans "Wallet" %} ({{ wallet_balance|floatformat:2 }} €)
@@ -642,7 +642,57 @@
                 <option value="bank_transfer">
                   {% trans "Bank Transfer" %}
                 </option>
+                <!--<option value="lastschrift">
+                  {% trans "SEPA Direct Debit" %}
+                </option>-->
               </select>
+            </div>
+
+            <!-- SEPA Lastschrift Felder -->
+            <div id="sepa-fields" class="form-group full-width" style="display: none;">
+              <div class="sepa-box" style="background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-top: 0.5rem;">
+                <h3 style="color: var(--text); margin: 0 0 1rem 0; font-size: 1rem;">
+                  <i class="fas fa-university"></i>
+                  {% trans "SEPA Direct Debit Details" %}
+                </h3>
+                <div class="form-grid" style="grid-template-columns: 1fr;">
+                  <div class="form-group">
+                    <label>{% trans "Account Holder" %} *</label>
+                    <input type="text" name="account_holder" placeholder="{% trans 'Max Mustermann' %}">
+                  </div>
+                  <div class="form-group">
+                    <label>IBAN *</label>
+                    <input type="text" name="iban" placeholder="DE89 3704 0044 0532 0130 00" inputmode="text" autocomplete="off">
+                  </div>
+                  <div class="form-group">
+                    <label>BIC ({% trans "optional" %})</label>
+                    <input type="text" name="bic" placeholder="COBADEFFXXX">
+                  </div>
+                  <div class="form-group">
+                    <label>{% trans "Bank Name" %} ({% trans "optional" %})</label>
+                    <input type="text" name="bank_name" placeholder="{% trans 'Commerzbank' %}">
+                  </div>
+                </div>
+                <div class="sepa-mandate" style="margin-top: 1rem; padding: 1rem; background: var(--bg); border-radius: 8px; font-size: 0.85rem; color: #ccc; line-height: 1.6;">
+                  <p>
+                    <strong>{% trans "SEPA Mandate" %}</strong>
+                  </p>
+                  <p>
+                    {% blocktrans with creditor=sepa_creditor_name creditor_id=sepa_creditor_id %}
+                    I authorise {{ creditor }} (Creditor ID: {{ creditor_id }}) to initiate direct debits from my account. I also authorise my bank to debit my account in accordance with the instructions from {{ creditor }}.
+                    {% endblocktrans %}
+                  </p>
+                  <p>
+                    {% trans "My mandate reference will be communicated to me separately. I can request a full refund from my bank within 8 weeks of the debit date. The direct debit will be processed within 5 business days of the order." %}
+                  </p>
+                  <label class="checkbox-label" style="padding: 0.5rem 0;">
+                    <input type="checkbox" name="accept_sepa" value="1">
+                    <span class="checkbox-text">
+                      {% trans "I agree to the SEPA Direct Debit Mandate and confirm that the account details above are correct." %} *
+                    </span>
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div class="checkbox-group">
@@ -696,6 +746,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const discountLine = document.getElementById("discount-line");
     const discountAmount = document.getElementById("discount-amount");
     const totalAmount = document.getElementById("total-amount");
+    const paymentSelect = document.getElementById("payment-method-select");
+    const sepaFields = document.getElementById("sepa-fields");
+    const sepaCheckbox = document.querySelector("input[name='accept_sepa']");
+    const sepaInputs = sepaFields ? sepaFields.querySelectorAll("input[type='text']") : [];
 
     let timeout = null;
 
@@ -726,6 +780,24 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }, 500);
     });
+
+    function toggleSepaFields() {
+        if (!sepaFields) return;
+        if (paymentSelect.value === "lastschrift") {
+            sepaFields.style.display = "block";
+            sepaInputs.forEach(input => input.required = true);
+            if (sepaCheckbox) sepaCheckbox.required = true;
+        } else {
+            sepaFields.style.display = "none";
+            sepaInputs.forEach(input => input.required = false);
+            if (sepaCheckbox) sepaCheckbox.required = false;
+        }
+    }
+
+    if (paymentSelect) {
+        paymentSelect.addEventListener("change", toggleSepaFields);
+        toggleSepaFields();
+    }
 });
 </script>
 {% endblock %}

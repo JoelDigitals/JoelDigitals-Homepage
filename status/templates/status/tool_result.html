@@ -1,0 +1,263 @@
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ tool_title }} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .tool-page {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .tool-header {
+    background: linear-gradient(135deg, {{ gradient_from }}, {{ gradient_to }});
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+  }
+
+  .tool-header-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255,255,255,0.3);
+  }
+
+  .tool-header h1 {
+    font-size: 2rem;
+    color: white;
+    margin: 0.5rem 0;
+  }
+
+  .tool-header p {
+    color: rgba(255,255,255,0.9);
+    margin: 0;
+  }
+
+  .tool-body {
+    background: var(--surface);
+    padding: 2.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .back-link:hover { color: var(--primary); }
+
+  .tool-form {
+    margin-bottom: 2rem;
+  }
+
+  .input-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .input-group input {
+    flex: 1;
+    min-width: 250px;
+    padding: 0.875rem 1.25rem;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  .input-group button {
+    padding: 0.875rem 1.75rem;
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .input-group button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,68,204,0.3);
+  }
+
+  .error-box {
+    background: rgba(239,68,68,0.1);
+    border: 2px solid #ef4444;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    color: #ef4444;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .result-box {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .result-box h3 {
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-table th {
+    font-weight: 600;
+    color: #888;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .result-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .result-table td.label {
+    color: #888;
+    width: 180px;
+  }
+
+  .result-table td.value {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .status-badge.valid { background: rgba(16,185,129,0.1); color: #10b981; }
+  .status-badge.invalid { background: rgba(239,68,68,0.1); color: #ef4444; }
+  .status-badge.warning { background: rgba(245,158,11,0.1); color: #f59e0b; }
+
+  .record-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .record-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+  }
+
+  .record-list li:last-child { border-bottom: none; }
+
+  @media (max-width: 600px) {
+    .input-group { flex-direction: column; }
+    .input-group input { min-width: 100%; }
+    .input-group button { width: 100%; justify-content: center; }
+    .tool-body { padding: 1.5rem; }
+  }
+</style>
+
+<div class="tool-page">
+  <div class="tool-header">
+    <div class="tool-header-icon"><i class="{{ header_icon }}"></i></div>
+    <h1>{{ tool_title }}</h1>
+    <p>{{ tool_subtitle }}</p>
+  </div>
+
+  <div class="tool-body">
+    <a href="{% url 'tools_overview' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> {% trans "Back to Tools" %}
+    </a>
+
+    <form method="get" class="tool-form">
+      <div class="input-group">
+        <input type="text" name="target" placeholder="{{ input_placeholder }}" value="{{ request.GET.target }}" required>
+        <button type="submit"><i class="fas fa-play"></i> {{ button_text }}</button>
+      </div>
+    </form>
+
+    {% if error %}
+      <div class="error-box">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>{{ error }}</span>
+      </div>
+    {% endif %}
+
+    {% if result %}
+      <div class="result-box">
+        <h3><i class="{{ result_icon }}"></i> {{ result_title }}</h3>
+        <table class="result-table">
+          {% for label, value in result %}
+            <tr>
+              <td class="label">{{ label }}</td>
+              <td class="value">{{ value|safe }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    {% endif %}
+
+    {% if records %}
+      <div class="result-box">
+        <h3><i class="fas fa-list"></i> {% trans "DNS Records" %}</h3>
+        <ul class="record-list">
+          {% for record in records %}
+            <li>{{ record }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

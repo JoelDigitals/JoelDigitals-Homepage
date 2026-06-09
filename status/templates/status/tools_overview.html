@@ -1,0 +1,227 @@
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Free Tools" %} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .tools-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .tools-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 4rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tools-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .header-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto 1.5rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .tools-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.5rem 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tools-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+  }
+
+  .tools-body {
+    background: var(--surface);
+    padding: 3rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--primary);
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .tool-card {
+    background: var(--bg);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 2px solid var(--border);
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tool-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary);
+  }
+
+  .tool-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 1.25rem;
+  }
+
+  .tool-icon.analysis { background: linear-gradient(135deg, #f093fb, #f5576c); }
+  .tool-icon.ssl { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+  .tool-icon.dns { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+  .tool-icon.ping { background: linear-gradient(135deg, #fa709a, #fee140); }
+  .tool-icon.headers { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
+
+  .tool-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .tool-desc {
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+    flex: 1;
+  }
+
+  .tool-action {
+    margin-top: 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .tool-action i {
+    transition: transform 0.3s;
+  }
+
+  .tool-card:hover .tool-action i {
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 768px) {
+    .tools-header { padding: 3rem 1.5rem; }
+    .tools-title { font-size: 2rem; }
+    .tools-body { padding: 2rem 1.5rem; }
+    .tools-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="tools-container">
+  <div class="tools-header">
+    <div class="header-icon">
+      <i class="fas fa-tools"></i>
+    </div>
+    <h1 class="tools-title">{% trans "Free Tools" %}</h1>
+    <p class="tools-subtitle">{% trans "Test your website with our free analysis tools" %}</p>
+  </div>
+
+  <div class="tools-body">
+    <a href="{% url 'status_overview' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> {% trans "Back to Status" %}
+    </a>
+
+    <div class="tools-grid">
+      <a href="{% url 'speedtest_form' %}" class="tool-card">
+        <div class="tool-icon analysis"><i class="fas fa-search"></i></div>
+        <div class="tool-name">{% trans "Website Analysis" %}</div>
+        <p class="tool-desc">{% trans "Full website check: performance, SEO, security, mobile, accessibility and more." %}</p>
+        <span class="tool-action">{% trans "Start Analysis" %} <i class="fas fa-arrow-right"></i></span>
+      </a>
+
+      <a href="{% url 'tool_ssl_check' %}" class="tool-card">
+        <div class="tool-icon ssl"><i class="fas fa-lock"></i></div>
+        <div class="tool-name">{% trans "SSL Checker" %}</div>
+        <p class="tool-desc">{% trans "Check SSL certificate validity, issuer, expiry date, and security configuration." %}</p>
+        <span class="tool-action">{% trans "Check SSL" %} <i class="fas fa-arrow-right"></i></span>
+      </a>
+
+      <a href="{% url 'tool_dns_lookup' %}" class="tool-card">
+        <div class="tool-icon dns"><i class="fas fa-globe"></i></div>
+        <div class="tool-name">{% trans "DNS Lookup" %}</div>
+        <p class="tool-desc">{% trans "Resolve DNS records: A, AAAA, MX, NS, TXT, CNAME for any domain." %}</p>
+        <span class="tool-action">{% trans "Lookup DNS" %} <i class="fas fa-arrow-right"></i></span>
+      </a>
+
+      <a href="{% url 'tool_ping' %}" class="tool-card">
+        <div class="tool-icon ping"><i class="fas fa-signal"></i></div>
+        <div class="tool-name">{% trans "Ping Test" %}</div>
+        <p class="tool-desc">{% trans "Check if a server is reachable and measure response time." %}</p>
+        <span class="tool-action">{% trans "Ping Server" %} <i class="fas fa-arrow-right"></i></span>
+      </a>
+
+      <a href="{% url 'tool_http_headers' %}" class="tool-card">
+        <div class="tool-icon headers"><i class="fas fa-code"></i></div>
+        <div class="tool-name">{% trans "HTTP Headers" %}</div>
+        <p class="tool-desc">{% trans "View all HTTP response headers including security headers like HSTS, CSP, X-Frame-Options." %}</p>
+        <span class="tool-action">{% trans "View Headers" %} <i class="fas fa-arrow-right"></i></span>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

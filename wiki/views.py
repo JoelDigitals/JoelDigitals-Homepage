@@ -68,6 +68,16 @@ def wiki_detail(request, slug):
         tag['id'] = anchor
         toc.append({'text': text, 'anchor': anchor, 'level': tag.name})
 
+    # Alle inline-Styles aus CKEditor entfernen (weiße Schrift auf weißem Grund)
+    for tag in soup.find_all(style=True):
+        del tag['style']
+
+    # Auch bgcolor- und color-Attribute entfernen
+    for tag in soup.find_all(bgcolor=True):
+        del tag['bgcolor']
+    for tag in soup.find_all(color=True):
+        del tag['color']
+
     return render(request, 'wiki/detail.html', {
         'wiki': wiki,
         'content_html': mark_safe(str(soup)),

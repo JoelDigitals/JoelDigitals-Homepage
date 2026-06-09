@@ -1,4 +1,7 @@
 from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 from .models import App, AppIssue, GlobalIssue, AppStatus
 import requests
 import time
@@ -150,13 +153,34 @@ def check_server_status(url):
     except Exception:
         return "offline", None
 
-# ⬇️ Nur globale Probleme + App-Liste ohne Prüfung
 def status_overview(request):
     apps = App.objects.filter(is_active=True)
     global_issues = GlobalIssue.objects.filter(is_resolved=False)
+
+    has_global_issues = global_issues.exists()
+
+    app_data = []
+    for app in apps:
+        latest = app.statuses.order_by('-timestamp').first()
+        has_issues = app.issues.filter(is_resolved=False).exists()
+
+        if has_issues:
+            display_status = "issue"
+        elif latest and latest.status == "offline":
+            display_status = "offline"
+        else:
+            display_status = "online"
+
+        app_data.append({
+            'app': app,
+            'status': display_status,
+            'latest': latest,
+        })
+
     return render(request, 'status/status_overview.html', {
-        'apps': apps,
-        'global_issues': global_issues
+        'app_data': app_data,
+        'global_issues': global_issues,
+        'has_global_issues': has_global_issues,
     })
 
 # ⬇️ Hier wird beim Aufruf die App live geprüft
@@ -179,4 +203,215 @@ def app_detail(request, app_id):
         'status': current_status,
         'response_time': response_time,
         'issues': unresolved_issues
+    })
+
+
+@csrf_exempt
+def check_all_statuses(request):
+    secret = getattr(settings, 'CRON_SECRET', None)
+    if secret:
+        token = request.GET.get('token', '')
+        if token != secret:
+            return HttpResponse("Unauthorized", status=401)
+
+    apps = App.objects.filter(is_active=True)
+    results = []
+    for app in apps:
+        try:
+            start = time.time()
+            response = requests.get(app.server_url, timeout=10)
+            duration = int((time.time() - start) * 1000)
+            status = "online" if response.status_code == 200 else "offline"
+        except Exception:
+            status = "offline"
+            duration = None
+
+        AppStatus.objects.create(
+            app=app,
+            status=status,
+            response_time_ms=duration,
+            message="Cron-Prüfung",
+        )
+        results.append({"app": app.name, "status": status})
+
+    return JsonResponse({"checked": len(results), "results": results})
+
+
+# ─── Free Tools ────────────────────────────────────────────────────────────────
+
+def tools_overview(request):
+    return render(request, "status/tools_overview.html")
+
+
+def tool_ssl_check(request):
+    target = request.GET.get("target", "").strip()
+    result = None
+    error = None
+
+    if target:
+        import ssl, socket
+        hostname = target.replace("https://", "").replace("http://", "").split("/")[0].split(":")[0]
+        try:
+            ctx = ssl.create_default_context()
+            with socket.create_connection((hostname, 443), timeout=10) as sock:
+                with ctx.wrap_socket(sock, server_hostname=hostname) as ssock:
+                    cert = ssock.getpeercert()
+                    issued_to = dict(cert.get("subject", []))
+                    issued_by = dict(cert.get("issuer", []))
+                    not_before = cert.get("notBefore", "")
+                    not_after = cert.get("notAfter", "")
+                    from datetime import datetime
+                    expires = datetime.strptime(not_after, "%b %d %H:%M:%S %Y %Z")
+                    remaining = (expires - datetime.now()).days
+
+                    result = [
+                        ("Domain", hostname),
+                        ("Ausgestellt für", issued_to.get("commonName", "N/A")),
+                        ("Ausgestellt von", issued_by.get("commonName", "N/A")),
+                        ("Gültig von", not_before),
+                        ("Gültig bis", not_after),
+                        ("Tage verbleibend", f'{remaining} Tage' if remaining > 0 else '<span style="color:#ef4444">ABGELAUFEN</span>'),
+                        ("SSL Version", ssock.version()),
+                        ("Cipher", ssock.cipher()[0]),
+                    ]
+        except Exception as e:
+            error = f"SSL-Fehler: {e}"
+
+    return render(request, "status/tool_result.html", {
+        "tool_title": "SSL Checker",
+        "tool_subtitle": "Prüfe SSL-Zertifikate auf Gültigkeit und Sicherheit",
+        "header_icon": "fas fa-lock",
+        "gradient_from": "#4facfe",
+        "gradient_to": "#00f2fe",
+        "input_placeholder": "z.B. joel-digitals.de",
+        "button_text": "SSL prüfen",
+        "result_icon": "fas fa-shield-alt",
+        "result_title": "Zertifikatsdetails",
+        "result": result,
+        "error": error,
+    })
+
+
+def tool_dns_lookup(request):
+    target = request.GET.get("target", "").strip()
+    records = None
+    error = None
+
+    if target:
+        import socket
+        hostname = target.replace("https://", "").replace("http://", "").split("/")[0]
+        try:
+            ips = socket.getaddrinfo(hostname, 80)
+            seen = set()
+            records = []
+            for ip in ips:
+                addr = ip[4][0]
+                if addr not in seen:
+                    seen.add(addr)
+                    records.append(f"A  {addr}")
+        except Exception as e:
+            error = f"DNS-Fehler: {e}"
+
+    return render(request, "status/tool_result.html", {
+        "tool_title": "DNS Lookup",
+        "tool_subtitle": "Ermittle IP-Adressen und DNS-Einträge",
+        "header_icon": "fas fa-globe",
+        "gradient_from": "#43e97b",
+        "gradient_to": "#38f9d7",
+        "input_placeholder": "z.B. joel-digitals.de",
+        "button_text": "DNS abfragen",
+        "result_icon": "fas fa-network-wired",
+        "result_title": "IP-Adressen (A-Records)",
+        "records": records,
+        "error": error,
+    })
+
+
+def tool_ping(request):
+    target = request.GET.get("target", "").strip()
+    result = None
+    error = None
+
+    if target:
+        import requests
+        url = target if target.startswith("http") else f"https://{target}"
+        try:
+            start = time.time()
+            r = requests.get(url, timeout=10, allow_redirects=True)
+            duration = int((time.time() - start) * 1000)
+            result = [
+                ("URL", url),
+                ("Status", f'{r.status_code} {"✅" if r.status_code == 200 else "⚠️"}'),
+                ("Antwortzeit", f"{duration} ms"),
+                ("Weiterleitungen", str(len(r.history))),
+                ("Server", r.headers.get("Server", "N/A")),
+                ("Content-Type", r.headers.get("Content-Type", "N/A")),
+            ]
+        except Exception as e:
+            error = f"Fehler: {e}"
+
+    return render(request, "status/tool_result.html", {
+        "tool_title": "Ping Test",
+        "tool_subtitle": "Prüfe Erreichbarkeit und Antwortzeit eines Servers",
+        "header_icon": "fas fa-signal",
+        "gradient_from": "#fa709a",
+        "gradient_to": "#fee140",
+        "input_placeholder": "z.B. https://joel-digitals.de",
+        "button_text": "Pingen",
+        "result_icon": "fas fa-tachometer-alt",
+        "result_title": "Antwortdetails",
+        "result": result,
+        "error": error,
+    })
+
+
+def tool_http_headers(request):
+    target = request.GET.get("target", "").strip()
+    result = None
+    error = None
+
+    if target:
+        import requests
+        url = target if target.startswith("http") else f"https://{target}"
+        try:
+            r = requests.get(url, timeout=10, allow_redirects=True)
+            security_checks = {
+                "Strict-Transport-Security": ("HSTS", "Schützt vor SSL-Stripping"),
+                "Content-Security-Policy": ("CSP", "Schützt vor XSS"),
+                "X-Content-Type-Options": ("XCTO", "Verhindert MIME-Sniffing"),
+                "X-Frame-Options": ("XFO", "Schützt vor Clickjacking"),
+                "X-XSS-Protection": ("XXSS", "XSS-Filter (veraltet)"),
+                "Referrer-Policy": ("Referrer", "Kontrolliert Referrer-Header"),
+                "Permissions-Policy": ("Permissions", "Kontrolliert Browser-APIs"),
+            }
+            rows = []
+            for h, (short, desc) in security_checks.items():
+                val = r.headers.get(h, None)
+                if val:
+                    rows.append((short, f'<span class="status-badge valid">✅ {val[:50]}</span>'))
+                else:
+                    rows.append((short, '<span class="status-badge invalid">❌ Fehlt</span>'))
+
+            result = [
+                ("HTTP Status", str(r.status_code)),
+                ("URL", url),
+                ("Server", r.headers.get("Server", "N/A")),
+            ] + rows + [
+                ("Weitere Header", f'{len(r.headers)} gesamt'),
+            ]
+        except Exception as e:
+            error = f"Fehler: {e}"
+
+    return render(request, "status/tool_result.html", {
+        "tool_title": "HTTP Headers",
+        "tool_subtitle": "Prüfe HTTP-Response-Header und Sicherheitsheader",
+        "header_icon": "fas fa-code",
+        "gradient_from": "#a18cd1",
+        "gradient_to": "#fbc2eb",
+        "input_placeholder": "z.B. https://joel-digitals.de",
+        "button_text": "Header prüfen",
+        "result_icon": "fas fa-headers",
+        "result_title": "Response Header",
+        "result": result,
+        "error": error,
     })

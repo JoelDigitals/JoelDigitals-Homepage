@@ -283,6 +283,9 @@ class Order(models.Model):
     affiliate_code = models.ForeignKey('AffiliateCode', on_delete=models.SET_NULL, null=True, blank=True)
     discount_code = models.ForeignKey('DiscountCode', on_delete=models.SET_NULL, null=True, blank=True)
 
+    sepa_mandate_ref = models.CharField(max_length=64, blank=True, null=True, help_text="SEPA-Mandatsreferenz")
+    sepa_mandate_date = models.DateTimeField(blank=True, null=True, help_text="Datum des SEPA-Mandats")
+
     account_holder = models.CharField(max_length=255, blank=True, null=True)
     iban = models.CharField(max_length=34, blank=True, null=True)
     bic = models.CharField(max_length=11, blank=True, null=True)

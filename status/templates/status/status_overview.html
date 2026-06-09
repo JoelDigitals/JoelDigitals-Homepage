@@ -280,14 +280,33 @@
 
   .app-status {
     font-size: 0.875rem;
-    color: #10b981;
     display: flex;
     align-items: center;
     gap: 0.4rem;
   }
 
+  .app-status.online {
+    color: #10b981;
+  }
+
+  .app-status.offline {
+    color: #ef4444;
+  }
+
+  .app-status.issue {
+    color: #f59e0b;
+  }
+
   .app-status i {
     font-size: 0.6rem;
+  }
+
+  .app-card.has-issues {
+    border-left: 4px solid #f59e0b;
+  }
+
+  .app-card.offline {
+    border-left: 4px solid #ef4444;
   }
 
   /* Responsive */
@@ -341,12 +360,18 @@
 
 <div class="status-page-container">
   <!-- Header -->
-  <div class="status-header">
+  <div class="status-header" style="background: {% if has_global_issues %}linear-gradient(135deg, #f44336, #c62828){% else %}linear-gradient(135deg, var(--primary), #0066ff){% endif %};">
     <div class="header-icon">
-      <i class="fas fa-server"></i>
+      <i class="fas {% if has_global_issues %}fa-exclamation-triangle{% else %}fa-server{% endif %}"></i>
     </div>
     <h1 class="status-title">{% trans "System Status" %}</h1>
-    <p class="status-subtitle">{% trans "Real-time overview of our services" %}</p>
+    <p class="status-subtitle">
+      {% if has_global_issues %}
+        {% trans "Global issues detected – some services may be affected" %}
+      {% else %}
+        {% trans "Real-time overview of our services" %}
+      {% endif %}
+    </p>
   </div>
 
   <!-- Body -->
@@ -357,8 +382,11 @@
 
     <!-- Quick Actions -->
     <div class="quick-actions">
-      <a href="{% url 'speedtest_form' %}" class="action-btn">
-        <i class="fas fa-tachometer-alt"></i> {% trans "Speedtest" %}
+      <a href="{% url 'tools_overview' %}" class="action-btn">
+        <i class="fas fa-tools"></i> {% trans "Free Tools" %}
+      </a>
+      <a href="{% url 'check_all_statuses' %}?token={{ request.GET.token }}" class="action-btn" style="background: linear-gradient(135deg, #10b981, #059669);">
+        <i class="fas fa-sync"></i> {% trans "Refresh Status" %}
       </a>
     </div>
 
@@ -401,15 +429,21 @@
       </div>
 
       <div class="apps-grid">
-        {% for app in apps %}
-          <a href="{% url 'app_detail' app.id %}" class="app-card">
+        {% for item in app_data %}
+          <a href="{% url 'app_detail' item.app.id %}" class="app-card {% if item.status == 'issue' %}has-issues{% elif item.status == 'offline' %}offline{% endif %}">
             <div class="app-icon">
               <i class="fas fa-cube"></i>
             </div>
             <div class="app-info">
-              <div class="app-name">{{ app.name }}</div>
-              <div class="app-status">
-                <i class="fas fa-circle"></i> {% trans "Operational" %}
+              <div class="app-name">{{ item.app.name }}</div>
+              <div class="app-status {{ item.status }}">
+                {% if item.status == 'online' %}
+                  <i class="fas fa-circle"></i> {% trans "Operational" %}
+                {% elif item.status == 'offline' %}
+                  <i class="fas fa-times-circle"></i> {% trans "Offline" %}
+                {% elif item.status == 'issue' %}
+                  <i class="fas fa-exclamation-triangle"></i> {% trans "Issue" %}
+                {% endif %}
               </div>
             </div>
           </a>
