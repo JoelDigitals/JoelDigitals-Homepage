@@ -26,6 +26,7 @@ urlpatterns = [
     path('auth/sso/authorize-page/', main_views.sso_authorize_page, name='sso_authorize_page'),
     path('auth/sso/authorize/', main_views.sso_authorize, name='sso_authorize'),
     path('auth/sso/validate/', main_views.validate_sso_token, name='validate_sso_token'),
+    path('api/admin/', include('admin_api.urls')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     # Optional: Sprachumschaltung soll auch ohne Sprache funktionieren
     path("i18n/", include("django.conf.urls.i18n")),

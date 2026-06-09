@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'landingpages',
     'django.contrib.sites',
     'oauth2_provider',
+    'admin_api',
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
@@ -179,6 +180,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+ADMIN_API_SECRET = os.getenv("ADMIN_API_SECRET", "admin-dev-secret-change-in-production")
 
 CRON_SECRET = "jds-e-mails"
 
