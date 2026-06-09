@@ -9,6 +9,7 @@ import socket
 import ssl
 from django.utils.translation import gettext as _
 from urllib.parse import urlparse
+from django.utils import timezone
 
 # 🔹 Erweiterte Server-Überprüfung
 def detailed_speedtest(url):
@@ -235,6 +236,69 @@ def check_all_statuses(request):
         results.append({"app": app.name, "status": status})
 
     return JsonResponse({"checked": len(results), "results": results})
+
+
+# ─── Status Hotline (TwiML / Voice) ──────────────────────────────────────────
+
+@csrf_exempt
+def status_hotline(request):
+    """
+    Gibt TwiML (Voice XML) für eine Telefon-Hotline zurück.
+    Liest den aktuellen Status aller Apps und bekannte Probleme vor.
+    """
+    apps = App.objects.filter(is_active=True)
+    global_issues = GlobalIssue.objects.filter(is_resolved=False)
+    now = timezone.now()
+
+    lines = ["Willkommen bei der Joel Digitals Status Hotline."]
+    lines.append(f"Heute ist der {now.strftime('%d. %B %Y')}, es ist {now.strftime('%H:%M')} Uhr.")
+
+    # Global issues
+    if global_issues.exists():
+        lines.append("Achtung, es liegen globale Störungen vor.")
+        for issue in global_issues:
+            lines.append(f"{issue.title}. {issue.description}")
+    else:
+        lines.append("Es liegen keine globalen Störungen vor.")
+
+    # App status
+    online_count = 0
+    offline_count = 0
+    issue_count = 0
+    status_details = []
+
+    for app in apps:
+        latest = app.statuses.order_by('-timestamp').first()
+        has_issues = app.issues.filter(is_resolved=False).exists()
+
+        if has_issues:
+            status_details.append(f"{app.name} hat bekannte Probleme.")
+            for issue in app.issues.filter(is_resolved=False):
+                status_details.append(f"{issue.title}. {issue.description}")
+            issue_count += 1
+        elif latest and latest.status == "offline":
+            status_details.append(f"{app.name} ist offline.")
+            offline_count += 1
+        else:
+            status_details.append(f"{app.name} ist online.")
+            online_count += 1
+
+    lines.append(f"Von {len(apps)} überwachten Diensten sind {online_count} online, {offline_count} offline und {issue_count} haben bekannte Probleme.")
+
+    if status_details:
+        lines.append("Im Einzelnen:")
+        lines.extend(status_details)
+
+    lines.append("Vielen Dank für Ihren Anruf. Bei Fragen erreichen Sie uns auch per E-Mail unter info@joel-digitals.de.")
+
+    text = ". ".join(lines)
+
+    twiml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Say voice="female" language="de-DE">{text}</Say>
+</Response>'''
+
+    return HttpResponse(twiml, content_type="text/xml")
 
 
 # ─── Free Tools ────────────────────────────────────────────────────────────────

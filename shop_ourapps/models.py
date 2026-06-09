@@ -185,6 +185,11 @@ class App(models.Model):
         help_text="Kann diese App zurückerstattet werden?"
     )
 
+    exchangeable = models.BooleanField(
+        default=False,
+        help_text="Kann diese App umgetauscht werden?"
+    )
+
     def __str__(self):
         return self.name 
 

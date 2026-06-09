@@ -10,5 +10,6 @@ urlpatterns = [
     path("support/tickets/", views.support_tickets, name="admin_api_support_tickets"),
     path("support/tickets/<int:pk>/", views.support_ticket_detail, name="admin_api_support_ticket_detail"),
     path("support/tickets/<int:pk>/reply/", views.support_ticket_reply, name="admin_api_support_ticket_reply"),
+    path("support/tickets/<int:pk>/resolve/", views.support_ticket_resolve, name="admin_api_support_ticket_resolve"),
     path("orders/", views.orders, name="admin_api_orders"),
 ]

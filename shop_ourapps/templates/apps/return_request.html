@@ -23,8 +23,9 @@
   .order-info { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px 18px; margin-bottom:22px; font-size:13px; }
   .app-pills  { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
   .app-pill   { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
-  .refundable { background:rgba(74,222,128,0.1); color:#4ade80; border:1px solid rgba(74,222,128,0.2); }
+   .refundable { background:rgba(74,222,128,0.1); color:#4ade80; border:1px solid rgba(74,222,128,0.2); }
   .no-refund  { background:rgba(248,113,113,0.1); color:#f87171; border:1px solid rgba(248,113,113,0.2); }
+  .exchangeable { background:rgba(168,85,247,0.1); color:#a855f7; border:1px solid rgba(168,85,247,0.2); }
   .banner     { padding:11px 16px; border-radius:8px; font-size:13px; margin-bottom:18px; line-height:1.6; }
   .banner-warn{ background:rgba(251,191,36,0.07); border:1px solid rgba(251,191,36,0.2); color:#fbbf24; }
   .banner-ok  { background:rgba(74,222,128,0.06); border:1px solid rgba(74,222,128,0.15); color:#4ade80; }
@@ -66,7 +67,9 @@
       <div class="app-pills">
         {% for item in items %}
         <span class="app-pill {% if item.app.refundable %}refundable{% else %}no-refund{% endif %}">
-          {{ item.app.name }} {% if item.app.refundable %}&#10003;{% else %}&#10007;{% endif %}
+          {{ item.app.name }}
+          {% if item.app.refundable %}&#10003;{% else %}&#10007;{% endif %}
+          {% if item.app.exchangeable %}<span class="app-pill exchangeable" style="margin-left:4px;">&#8646;</span>{% endif %}
         </span>
         {% endfor %}
       </div>

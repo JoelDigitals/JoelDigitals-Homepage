@@ -412,7 +412,15 @@
       {% for field in form %}
       <div class="form-group">
         {{ field.label_tag }}
+        {% if field.name == 'app_name' %}
+        <div class="app-search-wrapper" style="position:relative;">
+          <input type="text" id="app-search-input" placeholder="{% trans 'Search app...' %}"
+                 style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:14px;margin-bottom:6px;box-sizing:border-box;">
+          {{ field }}
+        </div>
+        {% else %}
         {{ field }}
+        {% endif %}
         {% if field.help_text %}
         <span class="helptext">{{ field.help_text }}</span>
         {% endif %}
@@ -425,6 +433,25 @@
         {% endif %}
       </div>
       {% endfor %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var searchInput = document.getElementById('app-search-input');
+  var select = document.getElementById('id_app_name');
+  if (searchInput && select) {
+    searchInput.addEventListener('input', function() {
+      var filter = this.value.toLowerCase().trim();
+      for (var i = 0; i < select.options.length; i++) {
+        var opt = select.options[i];
+        if (opt.value === '') continue;
+        var text = opt.text.toLowerCase();
+        opt.style.display = text.includes(filter) ? '' : 'none';
+      }
+    });
+    select.style.height = '150px';
+  }
+});
+</script>
 
       <button type="submit" class="submit-btn">
         <i class="fas fa-paper-plane"></i> {% trans "Submit Ticket" %}
@@ -439,6 +466,14 @@
       </h2>
 
       {% if tickets %}
+        <form method="get" class="ticket-search" style="display:flex;gap:8px;margin-bottom:16px;">
+          <input type="text" name="q" placeholder="{% trans 'Search by app, subject, or ticket number...' %}"
+                 value="{{ query|default:'' }}"
+                 style="flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:14px;">
+          <button type="submit" style="padding:10px 20px;background:linear-gradient(135deg,#f44336,#c62828);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
+            <i class="fas fa-search"></i>
+          </button>
+        </form>
         <div class="tickets-grid">
           {% for ticket in tickets %}
             <div class="ticket-card {% if ticket.is_resolved %}resolved{% endif %}">

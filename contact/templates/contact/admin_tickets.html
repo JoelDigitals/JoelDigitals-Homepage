@@ -96,6 +96,12 @@
     {% if tickets %}
         <a href="{% url 'archive_ticket' %}" class="btn">View Archived Tickets</a>
 
+        <form method="get" style="margin-bottom: 20px; display: flex; gap: 10px;">
+            <input type="text" name="q" placeholder="Search by app, subject, ticket #, email..."
+                   value="{{ query }}" style="flex: 1; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px;">
+            <button type="submit" class="btn" style="margin: 0;">Search</button>
+        </form>
+
         {% for ticket in tickets %}
             {% if user.is_superuser or "SupportAdmin" in user_groups or ticket.assigned_to == user %}
             <div class="ticket priority-{{ ticket.priority }}">

@@ -504,8 +504,24 @@ def support_tickets(request):
         messages.success(request, "Ticket erfolgreich erstellt.")
         return redirect('support_tickets')
 
-    tickets = SupportTicket.objects.filter(user=request.user).order_by('-created_at')  # hier auch "user"
-    return render(request, 'contact/support.html', {'form': form, 'tickets': tickets, 'user_groups': user_groups})
+    tickets = SupportTicket.objects.filter(user=request.user).order_by('-created_at')
+
+    q = request.GET.get('q', '').strip()
+    if q:
+        tickets = tickets.filter(
+            Q(app_name__name__icontains=q) |
+            Q(app_name__name_english__icontains=q) |
+            Q(subject__icontains=q) |
+            Q(ticket_number__icontains=q) |
+            Q(description__icontains=q)
+        )
+
+    return render(request, 'contact/support.html', {
+        'form': form,
+        'tickets': tickets,
+        'user_groups': user_groups,
+        'query': q,
+    })
 
 @login_required
 def ticket_detail(request, ticket_number):
@@ -580,6 +596,8 @@ def admin_ticket_view(request):
     if not (is_editor or is_admin):
         return redirect("support_tickets")
 
+    query = request.GET.get('q', '').strip()
+
     if is_admin:
         tickets = SupportTicket.objects.filter(is_archived=False).order_by('-priority')
         support_users_raw = User.objects.filter(groups__name__in=["Support", "Admin Support"]).distinct()
@@ -587,6 +605,16 @@ def admin_ticket_view(request):
     else:
         tickets = SupportTicket.objects.filter(is_archived=False, assigned_to=user).order_by('-priority')
         support_users = []
+
+    if query:
+        tickets = tickets.filter(
+            Q(app_name__name__icontains=query) |
+            Q(app_name__name_english__icontains=query) |
+            Q(subject__icontains=query) |
+            Q(ticket_number__icontains=query) |
+            Q(email__icontains=query) |
+            Q(name__icontains=query)
+        )
 
     for ticket in tickets:
         ticket.check_auto_archive()
@@ -640,7 +668,10 @@ def admin_ticket_view(request):
                     if note_text:
                         TicketNote.objects.create(ticket=ticket, author=user, note=note_text)
 
-            return redirect("admin_tickets")
+            redirect_url = "admin_tickets"
+            if query:
+                redirect_url += f"?q={query}"
+            return redirect(redirect_url)
 
 
     return render(request, "contact/admin_tickets.html", {
@@ -648,6 +679,7 @@ def admin_ticket_view(request):
         "is_admin": is_admin,
         "user_groups": [g.name for g in user.groups.all()],
         "support_users": support_users,
+        "query": query,
     })
 
 @user_passes_test(is_Sales_Editor)

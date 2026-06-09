@@ -6,7 +6,7 @@
   <span class="lang-badge lang-de">🇩🇪 Deutsch</span>
   <p class="greeting">Hallo {{ user_name }},</p>
   <p class="body-text">
-    vielen Dank, dass du unsere Apps gekauft hast! 🎉
+    vielen Dank, dass du bei uns gekauft hast! 🎉
     Du hattest nun Zeit, alles zu testen – wir würden uns <strong style="color:#fff;">sehr</strong> über dein Feedback freuen.
   </p>
 
@@ -29,19 +29,31 @@
 <!-- REVIEW SECTION (DE) -->
 <div class="review-section">
   <span class="stars">★★★★★</span>
-  <p class="review-title">Jetzt bewerten – Wähle deine Plattform:</p>
+  <p class="review-title">Jetzt bewerten – Deine Meinung zählt!</p>
   <p class="review-sub">Dein Feedback macht einen Unterschied. Danke! 🙏</p>
   <div class="review-buttons">
-    <a href="https://www.joel-digitals.de/meine-bestellungen/" class="review-btn review-btn-primary">
-      ⭐ Joel Digitals bewerten
+    <a href="https://www.joel-digitals.de/bewertungen/" class="review-btn review-btn-primary">
+      ⭐ Auf Joel Digitals bewerten
     </a>
-    <a href="https://www.google.com/maps/search/Joel+Digitals" class="review-btn review-btn-secondary">
-      🔍 Google Review
-    </a>
-    <a href="https://www.trustpilot.com/review/joel-digitals.de" class="review-btn review-btn-secondary">
-      ✔ Trustpilot
+    <a href="https://share.google/GedrnzFFFB5Gj1iu2" class="review-btn review-btn-secondary">
+      📍 Google Bewertung schreiben
     </a>
   </div>
+</div>
+
+<!-- ORDERED PRODUCTS (DE) -->
+<div class="section-de" style="padding-top:12px;padding-bottom:8px;">
+  <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:10px;">
+    <strong style="color:#fff;">📦 Deine bestellten Produkte</strong>
+  </p>
+  {% for item in order.items.all %}
+  <div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;">
+    <a href="https://www.joel-digitals.de/shop/{{ item.app.slug }}/" style="color:#00bfff;text-decoration:none;font-weight:500;">
+      {{ item.app.name }} ⭐ bewerten
+    </a>
+    <span style="color:rgba(255,255,255,0.35);float:right;">×{{ item.quantity }}</span>
+  </div>
+  {% endfor %}
 </div>
 
 <div class="section-de" style="padding-top:20px;padding-bottom:24px;">
@@ -82,19 +94,31 @@
 
 <!-- REVIEW SECTION (EN) -->
 <div class="review-section" style="border-top:none;padding-top:0;">
-  <p class="review-title" style="margin-top:8px;">Leave a review – Choose your platform:</p>
+  <p class="review-title" style="margin-top:8px;">Leave a review – Your opinion counts!</p>
   <p class="review-sub">Your feedback makes a difference. Thank you! 🙏</p>
   <div class="review-buttons">
-    <a href="https://www.joel-digitals.de/my-orders/" class="review-btn review-btn-primary">
+    <a href="https://www.joel-digitals.de/en/reviews/" class="review-btn review-btn-primary">
       ⭐ Rate on Joel Digitals
     </a>
-    <a href="https://www.google.com/maps/search/Joel+Digitals" class="review-btn review-btn-secondary">
-      🔍 Google Review
-    </a>
-    <a href="https://www.trustpilot.com/review/joel-digitals.de" class="review-btn review-btn-secondary">
-      ✔ Trustpilot
+    <a href="https://share.google/GedrnzFFFB5Gj1iu2" class="review-btn review-btn-secondary">
+      📍 Write a Google Review
     </a>
   </div>
+</div>
+
+<!-- ORDERED PRODUCTS (EN) -->
+<div class="section-en" style="padding-top:12px;padding-bottom:8px;">
+  <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:10px;">
+    <strong style="color:#fff;">📦 Your ordered products</strong>
+  </p>
+  {% for item in order.items.all %}
+  <div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;">
+    <a href="https://www.joel-digitals.de/en/shop/{{ item.app.slug }}/" style="color:#00bfff;text-decoration:none;font-weight:500;">
+      {{ item.app.name_english|default:item.app.name }} ⭐ Review
+    </a>
+    <span style="color:rgba(255,255,255,0.35);float:right;">×{{ item.quantity }}</span>
+  </div>
+  {% endfor %}
 </div>
 
 <div class="section-en" style="padding-top:20px;">

@@ -1784,12 +1784,14 @@ def request_return(request, order_id):
     # GET: Formular anzeigen
     items = order.items.select_related('app')
     any_refundable = any(item.app.refundable for item in items)
+    any_exchangeable = any(item.app.exchangeable for item in items)
 
     return render(request, 'apps/return_request.html', {
-        'order':          order,
-        'items':          items,
-        'reason_choices': ReturnRequest.REASON_CHOICES,
-        'any_refundable': any_refundable,
+        'order':            order,
+        'items':            items,
+        'reason_choices':   ReturnRequest.REASON_CHOICES,
+        'any_refundable':   any_refundable,
+        'any_exchangeable': any_exchangeable,
     })
 
 

@@ -277,14 +277,14 @@ def support_ticket_reply(request, pk):
         return _json_error("Nachricht darf nicht leer sein", 400)
 
     from django.contrib.auth.models import User
-    admin_user, _ = User.objects.get_or_create(
-        username="api-admin",
-        defaults={"is_staff": True},
+    jarvis_user, _ = User.objects.get_or_create(
+        username="Jarvis",
+        defaults={"is_staff": True, "email": "jarvis@joel-digitals.com"},
     )
 
     msg = TicketMessage.objects.create(
         ticket=ticket,
-        sender=admin_user,
+        sender=jarvis_user,
         message=message_text,
     )
 
@@ -293,18 +293,56 @@ def support_ticket_reply(request, pk):
     ticket.save()
 
     from django.core.mail import send_mail
+    from django.template.loader import render_to_string
+    from django.core.mail import EmailMultiAlternatives
+
     ticket_url = f"https://joel-digitals.de/de/contact/support/{ticket.ticket_number}/"
-    send_mail(
+    html_content = render_to_string("emails/ticket_message.html", {
+        "ticket": ticket,
+        "message": message_text,
+        "sender": "Jarvis (API)",
+        "ticket_url": ticket_url,
+    })
+    email = EmailMultiAlternatives(
         subject=f"Neue Nachricht zu Ticket #{ticket.ticket_number}",
-        message=f"Es gibt eine neue Antwort zu Ihrem Ticket.\n\n{ticket_url}\n\n{message_text}",
+        body=f"Es gibt eine neue Antwort zu Ihrem Ticket.\n\n{ticket_url}\n\n{message_text}",
         from_email=settings.COMPANY_EMAIL_NO_REPLY,
-        recipient_list=[ticket.email],
+        to=[ticket.email],
     )
+    email.attach_alternative(html_content, "text/html")
+    email.send()
 
     return JsonResponse({
         "status": "ok",
         "message_id": msg.id,
         "created_at": msg.created_at.isoformat(),
+        "sender": "Jarvis",
+    })
+
+
+@csrf_exempt
+@_auth_required
+def support_ticket_resolve(request, pk):
+    if request.method != "POST":
+        return _json_error("Nur POST erlaubt", 405)
+
+    try:
+        ticket = SupportTicket.objects.get(pk=pk)
+    except SupportTicket.DoesNotExist:
+        return _json_error("Ticket nicht gefunden", 404)
+
+    ticket.is_resolved = not ticket.is_resolved
+    if ticket.is_resolved:
+        ticket.resolved_at = timezone.now()
+    else:
+        ticket.resolved_at = None
+    ticket.save()
+
+    return JsonResponse({
+        "status": "ok",
+        "ticket_id": ticket.id,
+        "is_resolved": ticket.is_resolved,
+        "resolved_at": ticket.resolved_at.isoformat() if ticket.resolved_at else None,
     })
 
 
