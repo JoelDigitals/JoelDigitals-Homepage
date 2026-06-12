@@ -1,0 +1,205 @@
+{% extends "base_mobile.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "System Status – Joel Digitals" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.status-header {
+  text-align: center;
+  padding: 24px 0 32px;
+}
+.status-header h1 {
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.status-header p { color: var(--text-secondary); font-size: 0.95rem; }
+.summary-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.summary-chip {
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.summary-chip.online { background: rgba(16,185,129,0.15); color: #10b981; }
+.summary-chip.offline { background: rgba(239,68,68,0.15); color: #ef4444; }
+.summary-chip.total { background: rgba(100,116,139,0.15); color: #94a3b8; }
+.app-list { display: flex; flex-direction: column; gap: 12px; }
+.app-item {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.status-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-dot.online { background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.5); }
+.status-dot.offline { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.5); }
+.status-dot.unknown { background: #64748b; }
+.app-info { flex: 1; }
+.app-info h3 { font-size: 1rem; font-weight: 600; margin-bottom: 2px; }
+.app-info .time { font-size: 0.8rem; color: var(--text-muted); }
+.app-ms {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.issue-banner {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+.issue-banner h4 { color: #ef4444; font-size: 0.9rem; margin-bottom: 4px; }
+.issue-banner p { color: var(--text-secondary); font-size: 0.85rem; }
+.issue-banner .issue-title { font-weight: 600; color: var(--text); }
+.hotline-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 24px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="status-header">
+  <h1>{% trans "System Status" %}</h1>
+  <p>{% trans "Live status of all Joel Digitals services" %}</p>
+</div>
+
+<div class="summary-row">
+  <div class="summary-chip online">● {{ online }}/{{ total }} {% trans "Online" %}</div>
+  {% if offline > 0 %}
+  <div class="summary-chip offline">● {{ offline }} {% trans "Offline" %}</div>
+  {% endif %}
+  <div class="summary-chip total">{{ total }} {% trans "Services" %}</div>
+</div>
+
+<button class="hotline-btn" onclick="readStatus()">
+  <i class="fas fa-phone-alt"></i> {% trans "Status Hotline" %}
+</button>
+
+<script>
+function getBestVoice(voiceLang) {
+  return new Promise(function(resolve) {
+    var voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) {
+      window.speechSynthesis.onvoiceschanged = function() {
+        voices = window.speechSynthesis.getVoices();
+        resolve(selectVoice(voices, voiceLang));
+      };
+      setTimeout(function() { resolve(null); }, 2000);
+    } else {
+      resolve(selectVoice(voices, voiceLang));
+    }
+  });
+}
+
+function selectVoice(voices, voiceLang) {
+  var prefix = voiceLang === 'en' ? 'en' : 'de';
+  var scored = voices
+    .filter(function(v) { return v.lang.startsWith(prefix); })
+    .map(function(v) {
+      var score = 0;
+      if (/Google/i.test(v.name)) score += 10;
+      if (/Neural/i.test(v.name)) score += 8;
+      if (/Natural/i.test(v.name)) score += 8;
+      if (v.name.includes('Female') || v.name.includes('female')) score += 3;
+      if (/Microsoft/i.test(v.name)) score += 5;
+      if (/Zira/i.test(v.name)) score += 6;
+      if (/Hedda/i.test(v.name)) score += 6;
+      if (/Katja/i.test(v.name)) score += 6;
+      return { voice: v, score: score };
+    })
+    .sort(function(a, b) { return b.score - a.score; });
+  return scored.length > 0 ? scored[0].voice : null;
+}
+
+var bestHotlineVoice = null;
+getBestVoice(document.documentElement.lang || 'de').then(function(v) { bestHotlineVoice = v; });
+
+function readStatus() {
+  if (!window.speechSynthesis) {
+    alert("{% trans 'Speech synthesis is not supported in your browser.' %}");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  var lang = document.documentElement.lang || 'de';
+  var text = lang === 'en' ? '{{ hotline_text_en|escapejs }}' : '{{ hotline_text_de|escapejs }}';
+  var utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = lang === 'en' ? 'en-US' : 'de-DE';
+  utterance.rate = 0.85;
+  utterance.pitch = 1.0;
+  if (bestHotlineVoice) { utterance.voice = bestHotlineVoice; }
+  window.speechSynthesis.speak(utterance);
+}
+</script>
+
+{% for issue in global_issues %}
+<div class="issue-banner">
+  <h4>⚠️ {% trans "Global Issue" %}</h4>
+  <p class="issue-title">{{ issue.title }}</p>
+  <p>{{ issue.description }}</p>
+</div>
+{% endfor %}
+
+<div class="app-list">
+  {% for item in status_data %}
+  <div class="app-item">
+    {% if item.latest and item.latest.status == "online" %}
+    <div class="status-dot online"></div>
+    {% elif item.latest and item.latest.status == "offline" %}
+    <div class="status-dot offline"></div>
+    {% else %}
+    <div class="status-dot unknown"></div>
+    {% endif %}
+    <div class="app-info">
+      <h3>{{ item.app.name }}</h3>
+      {% if item.latest %}
+      <div class="time">{{ item.latest.timestamp|date:"d.m.Y H:i" }}</div>
+      {% else %}
+      <div class="time">{% trans "Not checked yet" %}</div>
+      {% endif %}
+    </div>
+    {% if item.latest and item.latest.response_time_ms %}
+    <div class="app-ms">{{ item.latest.response_time_ms }}ms</div>
+    {% endif %}
+  </div>
+  {% empty %}
+  <p style="text-align:center;color:var(--text-muted);padding:32px 0;">
+    {% trans "No applications configured." %}
+  </p>
+  {% endfor %}
+</div>
+{% endblock %}

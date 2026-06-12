@@ -1,0 +1,93 @@
+{% load static %}
+<!-- Canonical URL -->
+<link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+<!-- Meta -->
+<meta name="description" content="{{ seo_description|default:subheadline }}">
+<meta name="keywords" content="{{ seo_title|default:title }}, Joel Digitals, Digitalagentur, Webentwicklung, App Entwicklung, SEO, Marketing">
+<meta name="author" content="Joel Digitals">
+<meta name="robots" content="index, follow">
+<meta name="revisit-after" content="7 days">
+<meta name="language" content="{{ lang|default:'de' }}">
+
+<!-- Open Graph -->
+<meta property="og:title" content="{{ seo_title|default:title }} | Joel Digitals">
+<meta property="og:description" content="{{ seo_description|default:subheadline }}">
+<meta property="og:image" content="https://www.joel-digitals.de{% static 'images/office.png' %}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Joel Digitals">
+<meta property="og:locale" content="{{ lang|default:'de' }}_DE">
+<meta property="og:phone_number" content="+4915253480270">
+<meta property="og:email" content="info@joel-digitals.de">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ seo_title|default:title }} | Joel Digitals">
+<meta name="twitter:description" content="{{ seo_description|default:subheadline }}">
+<meta name="twitter:image" content="https://www.joel-digitals.de{% static 'images/office.png' %}">
+<meta name="twitter:site" content="@joeldigitals">
+<meta name="twitter:creator" content="@joeldigitals">
+
+<!-- Google Site Verification -->
+<meta name="google-site-verification" content="nYCDtmq2NV0GFiHeLJOBxrS7aoBIl6PYI_kk6RjH85k">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17401744435"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'AW-17401744435');
+</script>
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "{{ seo_title|default:title }}",
+  "description": "{{ seo_description|default:subheadline }}",
+  "url": "{{ request.build_absolute_uri }}",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Joel Digitals",
+    "url": "https://www.joel-digitals.de"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Joel Digitals",
+  "url": "https://www.joel-digitals.de",
+  "logo": "https://www.joel-digitals.de{% static 'favicon.png' %}",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+49-1525-3480270",
+    "contactType": "customer service",
+    "email": "info@joel-digitals.de",
+    "availableLanguage": ["German", "English"]
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Lebach",
+    "addressCountry": "DE"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.joel-digitals.de"},
+    {"@type": "ListItem", "position": 2, "name": "{{ seo_title|default:title }}", "item": "{{ request.build_absolute_uri }}"}
+  ]
+}
+</script>

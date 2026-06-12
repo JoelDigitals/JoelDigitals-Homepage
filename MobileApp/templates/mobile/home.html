@@ -351,6 +351,17 @@
                 {% trans "Go to Appointments" %} <span class="material-symbols-rounded">arrow_forward</span>
             </a>
         </div>
+
+        <div class="welcome-card">
+            <div class="card-icon" style="background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 4px 15px rgba(16,185,129,0.2);">
+                <span class="material-symbols-rounded">monitor_heart</span>
+            </div>
+            <h2>{% trans "System Status" %}</h2>
+            <p>{% trans "Check the status of all Joel Digitals systems and services." %}</p>
+            <a href="{% url 'status_app' %}" class="card-link" style="color:#10b981;">
+                {% trans "View Status" %} <span class="material-symbols-rounded">arrow_forward</span>
+            </a>
+        </div>
     </div>
 
     <!-- Admin Areas -->

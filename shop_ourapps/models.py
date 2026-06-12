@@ -71,14 +71,27 @@ class Wallet(models.Model):
             return True
         return False
 
-    def transfer_to_wallet(self):
-        self.balance += self.pending_earnings
-        self.pending_earnings = Decimal('0.00')
-        self.save()
+    def __str__(self):
+        return f"Wallet von {self.user.username}"
+
+
+class CustomerInfo(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='customer_info')
+    first_name = models.CharField(max_length=100, blank=True)
+    last_name = models.CharField(max_length=100, blank=True)
+    email = models.EmailField(blank=True)
+    address = models.CharField(max_length=255, blank=True)
+    zip_code = models.CharField(max_length=20, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    phone = models.CharField(max_length=50, blank=True)
+    company_name = models.CharField(max_length=200, blank=True)
+    vat_number = models.CharField(max_length=50, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user} – Balance: {self.balance} €, Pending: {self.pending_earnings} €"
-    
+        return f"{self.first_name} {self.last_name} ({self.user.username})"
+
+
 class WalletCode(models.Model):
     code = models.CharField(max_length=50, unique=True)
     value = models.DecimalField(max_digits=8, decimal_places=2)
@@ -190,6 +203,12 @@ class App(models.Model):
         help_text="Kann diese App umgetauscht werden?"
     )
 
+    is_physical = models.BooleanField(default=False, help_text="Ist dies ein physisches Produkt?")
+    requires_shipping = models.BooleanField(default=False, help_text="Benötigt dieses Produkt einen Versand?")
+    weight = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, help_text="Gewicht in kg")
+    stock = models.IntegerField(default=0, help_text="Lagerbestand (0 = nicht auf Lager)")
+    shipping_cost = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, help_text="Versandkosten (einmalig pro Bestellung)")
+
     def __str__(self):
         return self.name 
 
@@ -297,7 +316,8 @@ class Order(models.Model):
     bank_name = models.CharField(max_length=255, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
-    
+    stripe_session_id = models.CharField(max_length=255, blank=True, null=True)
+
     # Neue Felder für Automatisierung
     registration_code = models.CharField(max_length=255, blank=True, null=True, help_text="Registrierungscode für den Versand")
     registration_code_sent_at = models.DateTimeField(null=True, blank=True, help_text="Zeitpunkt, wann der Registrierungscode gesendet wurde")

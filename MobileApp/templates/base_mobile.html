@@ -407,6 +407,12 @@ footer a:hover::after {
 
     <!-- Desktop -->
     <div class="desktop-nav">
+        <a href="/mobile/" class="{% if request.path == '/mobile/' %}active{% endif %}">
+            <span class="material-symbols-rounded">home</span> {% trans "Home" %}
+        </a>
+        <a href="/mobile/status/" class="{% if request.path == '/mobile/status/' %}active{% endif %}">
+            <span class="material-symbols-rounded">monitor_heart</span> {% trans "Status" %}
+        </a>
         {% if user.is_authenticated %}
             {% if "Support" in user_groups %}
                 <a href="/mobile/admin-tickets/" class="{% if request.path == '/mobile/admin-tickets/' %}active{% endif %}">
@@ -418,9 +424,6 @@ footer a:hover::after {
                     <span class="material-symbols-rounded">storefront</span> {% trans "Sales" %}
                 </a>
             {% endif %}
-            <a href="/mobile/admin-dashboard/" class="{% if request.path == '/mobile/admin-dashboard/' %}active{% endif %}">
-                <span class="material-symbols-rounded">dashboard</span> {% trans "Dashboard" %}
-            </a>
             <form method="post" action="{% url 'logout_app' %}">
                 {% csrf_token %}
                 <button type="submit">
@@ -447,6 +450,9 @@ footer a:hover::after {
         <div class="nav-section">{% trans "Menu" %}</div>
         <a href="/mobile/" class="{% if request.path == '/mobile/' %}active{% endif %}">
             <span class="material-symbols-rounded">home</span> {% trans "Home" %}
+        </a>
+        <a href="/mobile/status/" class="{% if request.path == '/mobile/status/' %}active{% endif %}">
+            <span class="material-symbols-rounded">monitor_heart</span> {% trans "Status" %}
         </a>
         
         {% if user.is_authenticated %}

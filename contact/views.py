@@ -20,6 +20,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import make_aware
 from django.http import JsonResponse
+from django.utils.translation import gettext_lazy as _
 
 
 def generate_time_slots(start_dt, end_dt, slot_interval_minutes=10):
@@ -335,7 +336,7 @@ def contact_view(request):
             from_email='support@joel-digitals.com',
             recipient_list=['info@joel-digitals.com'],
         )
-        messages.success(request, "Deine Nachricht wurde erfolgreich gesendet.")
+        messages.success(request, _("Deine Nachricht wurde erfolgreich gesendet."))
         return redirect('contact_form')
     return render(request, 'contact/contact.html', {'form': form, 'user_groups': user_groups})
 
@@ -382,7 +383,7 @@ def sales(request):
         email_msg.attach_alternative(html_content, "text/html")
         email_msg.send()
 
-        messages.success(request, "Wünsche wurden gespeichert.")
+        messages.success(request, _("Wünsche wurden gespeichert."))
         return redirect('sales')
 
     entries = SalesEntry.objects.filter(user=request.user)\
@@ -445,10 +446,51 @@ def sales_chat(request, entry_id):
 
     messages_qs = SalesChatMessage.objects.filter(entry=entry).order_by('created_at')
 
+    # Admin: Order aus Sales-Chat erstellen
+    if request.user.is_staff and request.method == "POST" and "create_order" in request.POST:
+        from shop_ourapps.models import Order, OrderItem, AffiliateCode, Wallet
+        from decimal import Decimal
+        amount = request.POST.get("order_amount", "0")
+        aff_code = request.POST.get("affiliate_code", "").strip()
+        try:
+            amount = Decimal(amount)
+            if amount <= 0:
+                raise ValueError
+        except (ValueError, Decimal.InvalidOperation):
+            messages.error(request, "Ungültiger Betrag.")
+            return redirect('sales_chat', entry_id=entry.id)
+
+        order = Order.objects.create(
+            user=entry.user,
+            first_name=entry.name or entry.user.get_full_name() or entry.user.username,
+            email=entry.email or entry.user.email,
+            payment_method="manual",
+            subtotal=amount,
+            total_amount=amount,
+            status="Paid"
+        )
+        if aff_code:
+            try:
+                aff_obj = AffiliateCode.objects.get(code__iexact=aff_code, is_active=True)
+                order.affiliate_code = aff_obj
+                order.save(update_fields=['affiliate_code'])
+                partner_user = aff_obj.partner.user
+                commission = amount * (aff_obj.partner.commission_percent / Decimal(100))
+                wallet, _ = Wallet.objects.get_or_create(user=partner_user)
+                wallet.pending_earnings += commission
+                wallet.save()
+                messages.success(request, f"Order #{order.id} erstellt, Affiliate {aff_code} mit Provision {commission:.2f}€ gutgeschrieben.")
+            except AffiliateCode.DoesNotExist:
+                messages.warning(request, f"Order #{order.id} erstellt, aber Affiliate-Code '{aff_code}' nicht gefunden.")
+        else:
+            messages.success(request, f"Order #{order.id} erfolgreich erstellt (ohne Affiliate).")
+        return redirect('sales_chat', entry_id=entry.id)
+
     return render(request, 'contact/sales_chat.html', {
         'entry': entry,
         'messages': messages_qs,
-        'user_groups': user_groups
+        'user_groups': user_groups,
+        'translate_api_url': reverse('translate_message'),
     })
 
 @login_required
@@ -501,7 +543,7 @@ def support_tickets(request):
             from_email=settings.COMPANY_EMAIL_NO_REPLY,
             recipient_list=[ticket.email]
         )
-        messages.success(request, "Ticket erfolgreich erstellt.")
+        messages.success(request, _("Ticket erfolgreich erstellt."))
         return redirect('support_tickets')
 
     tickets = SupportTicket.objects.filter(user=request.user).order_by('-created_at')
@@ -515,6 +557,16 @@ def support_tickets(request):
             Q(ticket_number__icontains=q) |
             Q(description__icontains=q)
         )
+
+    initial_app = request.GET.get('app_name', '').strip()
+    if initial_app and request.method != 'POST':
+        from shop_ourapps.models import App as ShopApp
+        from django.db.models import Q as Qlookup
+        match = ShopApp.objects.filter(
+            Qlookup(name__iexact=initial_app) | Qlookup(name_english__iexact=initial_app)
+        ).first()
+        if match:
+            form.fields['app_name'].initial = match.pk
 
     return render(request, 'contact/support.html', {
         'form': form,
@@ -572,7 +624,7 @@ def ticket_detail(request, ticket_number):
             email.attach_alternative(html_content, "text/html")
             email.send()
 
-            messages.success(request, "Nachricht gesendet.")
+            messages.success(request, _("Nachricht gesendet."))
             return redirect('ticket_detail', ticket_number=ticket.ticket_number)
 
     else:
@@ -584,7 +636,8 @@ def ticket_detail(request, ticket_number):
         'ticket': ticket,
         'messages': messages_list,
         'form': form,
-        'user_groups': user_groups
+        'user_groups': user_groups,
+        'translate_api_url': reverse('translate_message'),
     })
 
 @login_required
@@ -785,3 +838,45 @@ def ticket_detail_view(request, ticket_number):
         'ticket': ticket,
         'user_groups': [g.name for g in request.user.groups.all()],
     })
+
+
+import json
+from urllib.request import Request, urlopen
+from urllib.parse import quote
+from urllib.error import URLError
+
+def translate_message(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Login required"}, status=403)
+    try:
+        data = json.loads(request.body)
+        text = data.get("text", "").strip()
+        target_lang = data.get("target_lang", "en")
+
+        if not text:
+            return JsonResponse({"error": "No text provided"}, status=400)
+
+        def call_api(tl):
+            u = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl={tl}&dt=t&q={quote(text)}"
+            r = urlopen(Request(u, headers={"User-Agent": "Mozilla/5.0"}), timeout=10)
+            return json.loads(r.read().decode())
+
+        def extract(res):
+            first = res[0] if isinstance(res, list) and len(res) > 0 and isinstance(res[0], list) else []
+            parts = []
+            for part in first:
+                if isinstance(part, list) and len(part) > 0 and part[0]:
+                    parts.append(part[0])
+            return "".join(parts)
+
+        detect = call_api("en")
+        lang = detect[2] if isinstance(detect, list) and len(detect) > 2 and isinstance(detect[2], str) else None
+        target = "en" if lang == "de" else "de" if lang == "en" else target_lang
+
+        res = call_api(target)
+        translated = extract(res)
+        return JsonResponse({"translated_text": translated or text})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

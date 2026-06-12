@@ -1,0 +1,61 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ lang|default:'de' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ seo_title|default:title }} | Joel Digitals</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --primary: {{ color_primary }}; --accent: {{ color_accent }}; }
+body { font-family: 'Inter', sans-serif; }
+.hero-pattern {
+  background-color: #0f172a;
+  background-image: radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+}
+.glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+.card-hover { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+.card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+@keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+.floating { animation: float 6s ease-in-out infinite; }
+.content-area h2 { font-size: 1.875rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: var(--primary); }
+.content-area p { font-size: 1.1rem; line-height: 1.8; color: #cbd5e1; margin-bottom: 1rem; }
+.content-area ul { list-style: disc; padding-left: 1.5rem; color: #cbd5e1; }
+.content-area ul li { margin-bottom: 0.5rem; }
+{{ custom_css }}
+</style>
+{% include 'landingpages/_seo_head.html' %}
+</head>
+<body class="antialiased">
+<section class="hero-pattern min-h-screen flex items-center justify-center px-6 py-20 relative overflow-hidden">
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute w-96 h-96 bg-purple-500 rounded-full opacity-10 blur-3xl -top-20 -left-20 floating"></div>
+    <div class="absolute w-96 h-96 bg-blue-500 rounded-full opacity-10 blur-3xl -bottom-20 -right-20 floating" style="animation-delay:2s"></div>
+  </div>
+  <div class="max-w-6xl w-full relative z-10 text-center">
+    <div class="inline-flex items-center gap-2 glass text-white px-4 py-2 rounded-full mb-8">
+      <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+      <span class="text-sm font-medium">{% trans "Available for new projects" %}</span>
+    </div>
+    <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">{{ title }}</h1>
+    <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">{{ subheadline }}</p>
+    <div class="text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed content-area">{{ content|safe }}</div>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      {% if cta_text %}
+      <a href="{{ cta_link }}" class="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 text-lg">{{ cta_text }}</a>
+      {% endif %}
+      <a href="https://joel-digitals.de/contact/appointment/" class="px-8 py-4 glass text-white font-semibold rounded-full hover:bg-white/10 transition-all duration-300 text-lg">{% trans "Free consultation" %}</a>
+    </div>
+  </div>
+</section>
+<footer class="bg-gray-900 text-gray-400 py-12 px-6 text-center">
+  <p class="text-white font-semibold mb-2">Joel Digitals</p>
+  <p class="text-sm mb-4">&copy; 2025-2026</p>
+  <div class="text-sm space-x-4"><a href="/imprint/" class="hover:text-white">{% trans "Imprint" %}</a><a href="/privacy/" class="hover:text-white">{% trans "Privacy Policy" %}</a><a href="/" class="hover:text-white">{% trans "Home" %}</a></div>
+</footer>
+{% include 'cookie_banner.html' %}
+</body>
+</html>

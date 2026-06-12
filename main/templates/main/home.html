@@ -823,6 +823,35 @@
       </div>
     </section>
 
+    <!-- Status Section -->
+    <section class="info-card">
+      <h2><i class="fas fa-server" style="color: var(--primary);"></i> {% trans "System Status" %}</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:1rem;">
+        {% for item in status_data %}
+        <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border);">
+          <span style="width:12px;height:12px;border-radius:50%;flex-shrink:0;
+            {% if item.status == 'online' %}background:#22c55e;box-shadow:0 0 8px #22c55e;
+            {% elif item.status == 'offline' %}background:#ef4444;box-shadow:0 0 8px #ef4444;
+            {% else %}background:#f59e0b;box-shadow:0 0 8px #f59e0b;{% endif %}">
+          </span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;font-size:14px;color:var(--text);">{{ item.app.name }}</div>
+            <div style="font-size:12px;color:#888;">
+              {% if item.status == 'online' %}{% trans "Operational" %}
+              {% elif item.status == 'offline' %}{% trans "Offline" %}
+              {% else %}{% trans "Issues Reported" %}{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div style="margin-top:1rem;">
+        <a href="{% url 'status_overview' %}" class="btn-primary" style="width:100%;max-width:300px;">
+          <i class="fas fa-chart-bar"></i> {% trans "Detailed Status" %}
+        </a>
+      </div>
+    </section>
+
     <!-- Rating Section -->
     <section class="info-card rating-section">
       <h2><i class="fas fa-star" style="color: #fbbf24;"></i> {% trans "Customer Rating" %}</h2>

@@ -23,6 +23,8 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.urls import reverse
+from django.utils.translation import gettext as _
+from status.models import App, AppStatus, GlobalIssue
 
 
 def login_view_app(request):
@@ -103,7 +105,7 @@ def sales_app(request):
         email_msg.attach_alternative(html_content, "text/html")
         email_msg.send()
 
-        messages.success(request, "Wünsche wurden gespeichert.")
+        messages.success(request, _("Wünsche wurden gespeichert."))
         return redirect('sales')
 
     entries = SalesEntry.objects.filter(user=request.user)\
@@ -169,7 +171,8 @@ def sales_chat_app(request, entry_id):
     return render(request, 'mobile/sales_chat.html', {
         'entry': entry,
         'messages': messages_qs,
-        'user_groups': user_groups
+        'user_groups': user_groups,
+        'translate_api_url': reverse('translate_message'),
     })
 
 @login_required
@@ -222,7 +225,7 @@ def support_tickets_app(request):
             from_email=settings.COMPANY_EMAIL_NO_REPLY,
             recipient_list=[ticket.email]
         )
-        messages.success(request, "Ticket erfolgreich erstellt.")
+        messages.success(request, _("Ticket erfolgreich erstellt."))
         return redirect('support_tickets_app')
 
     tickets = SupportTicket.objects.filter(user=request.user).order_by('-created_at')  # hier auch "user"
@@ -277,7 +280,7 @@ def ticket_detail_app(request, ticket_number):
             email.attach_alternative(html_content, "text/html")
             email.send()
 
-            messages.success(request, "Nachricht gesendet.")
+            messages.success(request, _("Nachricht gesendet."))
             return redirect('ticket_detail', ticket_number=ticket.ticket_number)
 
     else:
@@ -289,7 +292,8 @@ def ticket_detail_app(request, ticket_number):
         'ticket': ticket,
         'messages': messages_list,
         'form': form,
-        'user_groups': user_groups
+        'user_groups': user_groups,
+        'translate_api_url': reverse('translate_message'),
     })
 
 @login_required
@@ -530,6 +534,86 @@ Status: {appointment.get_status_display()}
 
 def appointment_success_app(request):
     return render(request, "mobile/appointment_success.html")
+
+def _build_hotline_texts(global_issues, issue_apps, total, online_count, offline_count, issue_count):
+    has_global_issues = bool(global_issues)
+
+    def build_de():
+        parts = ["Willkommen bei der Joel Digitals Status Hotline."]
+        if has_global_issues:
+            parts.append("Achtung, es liegen globale Störungen vor.")
+            for issue in global_issues:
+                parts.append(f"{issue.title}. {issue.description}.")
+        if issue_apps:
+            for app_item in issue_apps:
+                for issue in app_item['issues']:
+                    parts.append(f"Bei {app_item['app'].name} liegt folgendes Problem vor: {issue.title}. {issue.description}.")
+        if not has_global_issues and not issue_apps:
+            parts.append("Alle Systeme sind online.")
+        parts.append(f"Von {total} überwachten Diensten sind {online_count} online, {offline_count} offline, {issue_count} haben Probleme.")
+        parts.append("Vielen Dank für Ihren Anruf.")
+        return " ".join(parts)
+
+    def build_en():
+        parts = ["Welcome to the Joel Digitals Status Hotline."]
+        if has_global_issues:
+            parts.append("Attention, there are global issues.")
+            for issue in global_issues:
+                parts.append(f"{issue.title}. {issue.description}.")
+        if issue_apps:
+            for app_item in issue_apps:
+                for issue in app_item['issues']:
+                    parts.append(f"{app_item['app'].name} has the following problem: {issue.title}. {issue.description}.")
+        if not has_global_issues and not issue_apps:
+            parts.append("All systems are operational.")
+        parts.append(f"Of {total} monitored services, {online_count} are online, {offline_count} offline, {issue_count} have issues.")
+        parts.append("Thank you for calling.")
+        return " ".join(parts)
+
+    return build_de(), build_en()
+
+def status_app(request):
+    apps = App.objects.filter(is_active=True).prefetch_related('issues')
+    global_issues = GlobalIssue.objects.filter(is_resolved=False)
+
+    status_data = []
+    issue_apps  = []
+    for app in apps:
+        latest    = app.statuses.order_by('-timestamp').first()
+        unresolved = [i for i in app.issues.all() if not i.is_resolved]
+        entry = {
+            'app': app,
+            'latest': latest,
+            'issues': unresolved,
+        }
+        status_data.append(entry)
+        if unresolved:
+            issue_apps.append(entry)
+
+    online  = sum(1 for s in status_data if s['latest'] and s['latest'].status == 'online')
+    offline = sum(1 for s in status_data if s['latest'] and s['latest'].status == 'offline')
+    issues  = sum(1 for s in status_data if s['issues'])
+    total   = len(status_data)
+
+    hotline_de, hotline_en = _build_hotline_texts(
+        list(global_issues), issue_apps, total, online, offline, issues
+    )
+
+    return render(request, 'mobile/status.html', {
+        'status_data': status_data,
+        'global_issues': global_issues,
+        'online': online,
+        'offline': offline,
+        'total': total,
+        'hotline_text_de': hotline_de,
+        'hotline_text_en': hotline_en,
+        'user_groups': [g.name for g in request.user.groups.all()],
+    })
+
+def ai_support_app(request):
+    return render(request, 'mobile/ai_support.html', {
+        'user_groups': [g.name for g in request.user.groups.all()] if request.user.is_authenticated else [],
+    })
 
 
 @login_required

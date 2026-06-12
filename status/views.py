@@ -155,18 +155,21 @@ def check_server_status(url):
         return "offline", None
 
 def status_overview(request):
-    apps = App.objects.filter(is_active=True)
+    apps = App.objects.filter(is_active=True).prefetch_related('issues')
     global_issues = GlobalIssue.objects.filter(is_resolved=False)
 
     has_global_issues = global_issues.exists()
+    has_any_issues = False
 
     app_data = []
     for app in apps:
         latest = app.statuses.order_by('-timestamp').first()
-        has_issues = app.issues.filter(is_resolved=False).exists()
+        unresolved = [i for i in app.issues.all() if not i.is_resolved]
+        has_issues = len(unresolved) > 0
 
         if has_issues:
             display_status = "issue"
+            has_any_issues = True
         elif latest and latest.status == "offline":
             display_status = "offline"
         else:
@@ -176,12 +179,62 @@ def status_overview(request):
             'app': app,
             'status': display_status,
             'latest': latest,
+            'issues': unresolved,
         })
+
+    online_count = sum(1 for a in app_data if a['status'] == 'online')
+    offline_count = sum(1 for a in app_data if a['status'] == 'offline')
+    issue_count = sum(1 for a in app_data if a['status'] == 'issue')
+
+    total = len(app_data)
+
+    issue_apps = [a for a in app_data if a['status'] == 'issue']
+    all_issues = [i for a in issue_apps for i in a['issues']]
+
+    def build_hotline_de():
+        parts = ["Willkommen bei der Joel Digitals Status Hotline."]
+        if has_global_issues:
+            parts.append("Achtung, es liegen globale Störungen vor.")
+            for issue in global_issues:
+                parts.append(f"{issue.title}. {issue.description}.")
+        if issue_apps:
+            for app_item in issue_apps:
+                for issue in app_item['issues']:
+                    parts.append(f"Bei {app_item['app'].name} liegt folgendes Problem vor: {issue.title}. {issue.description}.")
+        if not has_global_issues and not issue_apps:
+            parts.append("Alle Systeme sind online.")
+        parts.append(f"Von {total} überwachten Diensten sind {online_count} online, {offline_count} offline, {issue_count} haben Probleme.")
+        parts.append("Vielen Dank für Ihren Anruf.")
+        return " ".join(parts)
+
+    def build_hotline_en():
+        parts = ["Welcome to the Joel Digitals Status Hotline."]
+        if has_global_issues:
+            parts.append("Attention, there are global issues.")
+            for issue in global_issues:
+                parts.append(f"{issue.title}. {issue.description}.")
+        if issue_apps:
+            for app_item in issue_apps:
+                for issue in app_item['issues']:
+                    parts.append(f"{app_item['app'].name} has the following problem: {issue.title}. {issue.description}.")
+        if not has_global_issues and not issue_apps:
+            parts.append("All systems are operational.")
+        parts.append(f"Of {total} monitored services, {online_count} are online, {offline_count} offline, {issue_count} have issues.")
+        parts.append("Thank you for calling.")
+        return " ".join(parts)
 
     return render(request, 'status/status_overview.html', {
         'app_data': app_data,
         'global_issues': global_issues,
         'has_global_issues': has_global_issues,
+        'has_any_issues': has_any_issues,
+        'online_count': online_count,
+        'offline_count': offline_count,
+        'issue_count': issue_count,
+        'issue_apps': issue_apps,
+        'all_issues': all_issues,
+        'hotline_text_de': build_hotline_de(),
+        'hotline_text_en': build_hotline_en(),
     })
 
 # ⬇️ Hier wird beim Aufruf die App live geprüft
@@ -246,50 +299,43 @@ def status_hotline(request):
     Gibt TwiML (Voice XML) für eine Telefon-Hotline zurück.
     Liest den aktuellen Status aller Apps und bekannte Probleme vor.
     """
-    apps = App.objects.filter(is_active=True)
+    apps = App.objects.filter(is_active=True).prefetch_related('issues', 'statuses')
     global_issues = GlobalIssue.objects.filter(is_resolved=False)
     now = timezone.now()
 
     lines = ["Willkommen bei der Joel Digitals Status Hotline."]
     lines.append(f"Heute ist der {now.strftime('%d. %B %Y')}, es ist {now.strftime('%H:%M')} Uhr.")
 
-    # Global issues
     if global_issues.exists():
         lines.append("Achtung, es liegen globale Störungen vor.")
         for issue in global_issues:
             lines.append(f"{issue.title}. {issue.description}")
-    else:
-        lines.append("Es liegen keine globalen Störungen vor.")
 
-    # App status
+    for app in apps:
+        unresolved = app.issues.filter(is_resolved=False)
+        if unresolved.exists():
+            lines.append(f"Bei {app.name} liegen folgende Probleme vor.")
+            for issue in unresolved:
+                lines.append(f"{issue.title}. {issue.description}")
+
     online_count = 0
     offline_count = 0
     issue_count = 0
-    status_details = []
-
     for app in apps:
         latest = app.statuses.order_by('-timestamp').first()
         has_issues = app.issues.filter(is_resolved=False).exists()
-
         if has_issues:
-            status_details.append(f"{app.name} hat bekannte Probleme.")
-            for issue in app.issues.filter(is_resolved=False):
-                status_details.append(f"{issue.title}. {issue.description}")
             issue_count += 1
         elif latest and latest.status == "offline":
-            status_details.append(f"{app.name} ist offline.")
             offline_count += 1
         else:
-            status_details.append(f"{app.name} ist online.")
             online_count += 1
 
-    lines.append(f"Von {len(apps)} überwachten Diensten sind {online_count} online, {offline_count} offline und {issue_count} haben bekannte Probleme.")
+    if not global_issues.exists() and issue_count == 0:
+        lines.append("Alle Systeme sind online.")
 
-    if status_details:
-        lines.append("Im Einzelnen:")
-        lines.extend(status_details)
-
-    lines.append("Vielen Dank für Ihren Anruf. Bei Fragen erreichen Sie uns auch per E-Mail unter info@joel-digitals.de.")
+    lines.append(f"Von {apps.count()} überwachten Diensten sind {online_count} online, {offline_count} offline und {issue_count} haben bekannte Probleme.")
+    lines.append("Vielen Dank für Ihren Anruf.")
 
     text = ". ".join(lines)
 

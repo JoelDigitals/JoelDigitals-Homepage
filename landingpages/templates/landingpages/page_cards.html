@@ -1,0 +1,45 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ lang|default:'de' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ seo_title|default:title }} | Joel Digitals</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --primary: {{ color_primary }}; --accent: {{ color_accent }}; }
+body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+.card-item { background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; transition: all 0.3s; }
+.card-item:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.08); transform: translateY(-6px); border-color: var(--primary); }
+.card-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; }
+.content-area h2 { font-size: 1.5rem; font-weight: 700; margin: 1.5rem 0 0.75rem; color: #0f172a; }
+.content-area p { font-size: 1rem; line-height: 1.7; color: #475569; margin-bottom: 0.75rem; }
+.content-area ul { display: grid; gap: 0.75rem; }
+.content-area ul li { background: white; padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid #f1f5f9; font-size: 0.95rem; color: #334155; }
+.section-title { font-size: 2.5rem; font-weight: 800; text-align: center; margin-bottom: 0.5rem; color: #0f172a; }
+.section-sub { text-align: center; color: #64748b; margin-bottom: 3rem; font-size: 1.1rem; }
+{{ custom_css }}
+</style>
+{% include 'landingpages/_seo_head.html' %}
+</head>
+<body>
+<section class="max-w-7xl mx-auto px-6 py-20">
+  <h1 class="section-title">{{ title }}</h1>
+  <p class="section-sub">{{ subheadline }}</p>
+  <div class="content-area">{{ content|safe }}</div>
+  {% if cta_text %}
+  <div class="text-center mt-12">
+    <a href="{{ cta_link }}" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-semibold text-lg transition-all" style="background:linear-gradient(135deg,var(--primary),var(--accent));box-shadow:0 8px 32px rgba(99,102,241,0.25)">{{ cta_text }}</a>
+  </div>
+  {% endif %}
+</section>
+<footer class="bg-white border-t border-gray-100 py-12 text-center text-sm text-gray-400">
+  <p class="mb-2">&copy; 2025-2026 Joel Digitals</p>
+  <div class="space-x-4"><a href="/imprint/" class="hover:text-gray-600">{% trans "Imprint" %}</a><a href="/privacy/" class="hover:text-gray-600">{% trans "Privacy Policy" %}</a><a href="/" class="hover:text-gray-600">{% trans "Home" %}</a></div>
+</footer>
+{% include 'cookie_banner.html' %}
+</body>
+</html>

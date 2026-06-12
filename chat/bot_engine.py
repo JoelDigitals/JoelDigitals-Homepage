@@ -27,6 +27,13 @@ LEARNED = load_json(LEARNED_FILE, {"de": {}, "en": {}})
 # Chat-Kontext speichern (letzte 10 Nachrichten)
 CHAT_HISTORY = defaultdict(list)
 
+# Web-Suche als Fallback
+try:
+    from .search_helpers import web_search
+except ImportError:
+    def web_search(q, num=3):
+        return []
+
 # ========================================
 # 🔧 HILFSFUNKTIONEN
 # ========================================
@@ -107,6 +114,14 @@ def detect_intent(text, lang):
         "help": {
             "de": ["hilfe", "helfen", "unterstützung", "problem"],
             "en": ["help", "support", "assistance", "problem"]
+        },
+        "transfer": {
+            "de": ["mitarbeiter", "mensch", "echte person", "weiterleiten", "telefonist",
+                   "persönlich", "chef", "inhaber", "joel", "verbinden", "durchstellen",
+                   "nicht geholfen", "nicht beantwortet", "echten"],
+            "en": ["human", "real person", "transfer", "agent", "operator",
+                   "manager", "owner", "connect", "not helpful", "can't help",
+                   "real human", "speak to"]
         }
     }
     
@@ -226,7 +241,18 @@ def generate_response(question, lang=None, session_id="default"):
         return f"🆘 **{name}**\n{desc}\n\n🔗 Zum Support: {url}"
     
     # ========================================
-    # 7️⃣ PRODUKT-ANFRAGEN
+    # 7️⃣ TRANSFER ZU MENSCH
+    # ========================================
+    if intent == "transfer":
+        phone = kb.get("meta", {}).get("telefon", kb.get("meta", {}).get("phone", "+49 1525 3480270"))
+        email = kb.get("meta", {}).get("email", "info@joel-digitals.de")
+        if lang == "de":
+            return f"[TRANSFER]Gerne verbinde ich dich mit einem Menschen aus unserem Team. Ruf uns an unter {phone} oder schreib eine E-Mail an {email}. Wir helfen dir persönlich weiter!"
+        else:
+            return f"[TRANSFER]Sure, let me connect you with a human. Call us at {phone} or email {email}. We will help you personally!"
+
+    # ========================================
+    # 8️⃣ PRODUKT-ANFRAGEN
     # ========================================
     detected_products = detect_products(question, kb)
     
@@ -289,14 +315,45 @@ def generate_response(question, lang=None, session_id="default"):
             return answer
     
     # ========================================
-    # 9️⃣ FALLBACK
+    # ♻️ WEB-SUCHE FALLBACK
     # ========================================
-    fallback = kb.get("hilfe", kb.get("help", [
-        "Ich habe deine Frage leider nicht verstanden. Kannst du sie anders formulieren?",
-        "Darüber habe ich leider keine Informationen. Kontaktiere uns gerne direkt!"
-    ]))
-    
-    response = random.choice(fallback) if isinstance(fallback, list) else fallback
+    # Kein passendes Wissen gefunden → Websuche versuchen
+    try:
+        search_results = web_search(question, num=3)
+        if search_results:
+            result_lines = []
+            for r in search_results[:3]:
+                snippet = r.get("snippet", "").strip()
+                title = r.get("title", "").strip()
+                link = r.get("link", "")
+                if snippet:
+                    result_lines.append(f"• {snippet}")
+            if result_lines:
+                if lang == "de":
+                    prefix = "Ich habe im Web dazu gefunden:\n"
+                else:
+                    prefix = "I found this online:\n"
+                response = prefix + "\n".join(result_lines)
+                if lang == "de":
+                    response += "\n\nKann ich dir noch weiterhelfen? Oder möchtest du mit einem Menschen sprechen?"
+                else:
+                    response += "\n\nCan I help you further, or would you like to speak with a human?"
+                add_to_history(session_id, question, response)
+                return response
+    except Exception:
+        pass
+
+    # ========================================
+    # 🚨 FALLBACK – Nicht beantwortbar
+    # ========================================
+    if lang == "de":
+        response = ("Ich konnte deine Frage leider nicht beantworten. "
+                    "Möchtest du mit einem echten Menschen aus unserem Support-Team sprechen? "
+                    "Sag einfach 'Mitarbeiter' oder 'Mensch' und ich verbinde dich!")
+    else:
+        response = ("I could not answer your question. "
+                    "Would you like to speak with a real human from our support team? "
+                    "Just say 'human' or 'agent' and I'll connect you!")
     add_to_history(session_id, question, response)
     return response
 

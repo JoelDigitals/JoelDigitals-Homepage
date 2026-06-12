@@ -1,0 +1,49 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ lang|default:'de' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ seo_title|default:title }} | Joel Digitals</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --primary: {{ color_primary }}; --accent: {{ color_accent }}; }
+body { font-family: 'Inter', sans-serif; background: #fafafa; }
+.clean-card { background: white; border-radius: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
+.content-area h2 { font-size: 1.75rem; font-weight: 700; margin-top: 2rem; margin-bottom: 0.75rem; color: #1e293b; }
+.content-area p { font-size: 1.05rem; line-height: 1.8; color: #475569; margin-bottom: 1rem; }
+.content-area ul { list-style: none; padding-left: 0; }
+.content-area ul li { padding: 0.5rem 0 0.5rem 1.5rem; position: relative; color: #334155; }
+.content-area ul li::before { content: "→"; position: absolute; left: 0; color: var(--primary); font-weight: 700; }
+.btn-primary { background: var(--primary); color: white; padding: 0.875rem 2rem; border-radius: 12px; font-weight: 600; transition: all 0.3s; display: inline-block; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.3); }
+{{ custom_css }}
+</style>
+{% include 'landingpages/_seo_head.html' %}
+</head>
+<body class="antialiased text-gray-800">
+<header class="max-w-5xl mx-auto px-6 py-8 flex items-center justify-between">
+  <a href="/" class="text-2xl font-bold" style="color:var(--primary)">Joel Digitals</a>
+  <a href="https://joel-digitals.de/contact/appointment/" class="text-sm font-medium px-5 py-2.5 rounded-full border border-gray-200 hover:border-gray-300 transition-colors">{% trans "Book a call" %}</a>
+</header>
+<main class="max-w-4xl mx-auto px-6 py-12">
+  <div class="text-center mb-16">
+    <h1 class="text-4xl md:text-6xl font-bold tracking-tight mb-4" style="color:#1e293b">{{ title }}</h1>
+    <p class="text-xl text-gray-500 max-w-2xl mx-auto">{{ subheadline }}</p>
+  </div>
+  <div class="clean-card p-10 md:p-16 content-area">{{ content|safe }}</div>
+  {% if cta_text %}
+  <div class="text-center mt-12">
+    <a href="{{ cta_link }}" class="btn-primary">{{ cta_text }}</a>
+  </div>
+  {% endif %}
+</main>
+<footer class="max-w-5xl mx-auto px-6 py-12 text-center text-sm text-gray-400">
+  <p class="mb-2">&copy; 2025-2026 Joel Digitals</p>
+  <div class="space-x-4"><a href="/imprint/" class="hover:text-gray-600">{% trans "Imprint" %}</a><a href="/privacy/" class="hover:text-gray-600">{% trans "Privacy Policy" %}</a><a href="/" class="hover:text-gray-600">{% trans "Home" %}</a></div>
+</footer>
+{% include 'cookie_banner.html' %}
+</body>
+</html>

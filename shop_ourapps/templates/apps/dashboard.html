@@ -408,6 +408,25 @@
       </div>
     </div>
 
+    <!-- Affiliate Link -->
+    <div class="code-section" style="border-color: #4CAF50; background: linear-gradient(135deg, rgba(76,175,80,0.1), rgba(46,125,50,0.1));">
+      <div class="code-label">
+        <i class="fas fa-link"></i>
+        {% trans "Your Affiliate Link" %}
+      </div>
+      <div class="code-input-group">
+        <input type="text" id="affiliateLink" class="code-input" value="{{ affiliate_url }}" readonly>
+        <button class="btn-copy" onclick="copyLink()" style="background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white;">
+          <i class="fas fa-copy"></i>
+          <span>{% trans "Copy Link" %}</span>
+        </button>
+      </div>
+      <p style="margin-top: 0.75rem; font-size: 0.85rem; color: #666;">
+        <i class="fas fa-info-circle"></i>
+        {% trans "Share this link to earn commissions. Customers who use this link will have your affiliate code automatically applied." %}
+      </p>
+    </div>
+
     <!-- Monthly Stats -->
     <div class="monthly-section">
       <h2 class="section-title">
@@ -576,6 +595,36 @@
     setTimeout(() => {
       toast.classList.remove('show');
     }, 3000);
+  }
+
+  function copyLink() {
+    const linkInput = document.getElementById("affiliateLink");
+    const btn = document.querySelector('.btn-copy:last-of-type');
+    const toast = document.getElementById('toast');
+    
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999);
+    
+    try {
+      navigator.clipboard.writeText(linkInput.value).then(() => {
+        showToast();
+      }).catch(() => {
+        document.execCommand("copy");
+        showToast();
+      });
+    } catch (err) {
+      document.execCommand("copy");
+      showToast();
+    }
+    
+    btn.classList.add('copied');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i> {% trans "Copied!" %}';
+    
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = originalText;
+    }, 2000);
   }
 </script>
 {% endblock %}

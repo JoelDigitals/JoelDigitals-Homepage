@@ -5,7 +5,6 @@
 {% block title %}{% trans "Support" %} - Joel Digitals{% endblock %}
 
 {% block extra_head %}
-<script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
 <style>
   .support-container {
     max-width: 1000px;
@@ -41,61 +40,132 @@
     border: 1px solid var(--border);
   }
 
-  .agent-section {
+  .voice-agent-section {
     text-align: center;
     padding: 1.5rem 0;
   }
 
-  .agent-section h2 {
+  .voice-agent-section h2 {
     color: var(--text);
     margin-bottom: 0.8rem;
     font-size: 1.8rem;
   }
 
-  .agent-section p {
+  .voice-agent-section p {
     color: #999;
     margin-bottom: 2rem;
     font-size: 1rem;
   }
 
-  .agent-container {
+  .voice-controls {
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 400px;
-    padding: 2rem;
-    background: linear-gradient(135deg, rgba(0, 68, 204, 0.1), rgba(0, 198, 255, 0.1));
-    border-radius: 12px;
+    gap: 1rem;
     margin: 2rem 0;
-    border: 1px solid rgba(0, 68, 204, 0.2);
+    flex-wrap: wrap;
   }
 
-  .call-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.8rem;
-    background: linear-gradient(135deg, var(--primary), #00c6ff);
-    color: white;
-    padding: 1rem 2.5rem;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(0, 68, 204, 0.4);
-    margin-top: 1.5rem;
+  .voice-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
     border: none;
     cursor: pointer;
-  }
-
-  .call-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 30px rgba(0, 68, 204, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
     color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   }
 
-  .call-button i {
-    font-size: 1.3rem;
+  .voice-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .voice-btn.listen {
+    background: linear-gradient(135deg, var(--primary), #00c6ff);
+  }
+
+  .voice-btn.listen.active {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    animation: pulse-mic 1.5s ease-in-out infinite;
+  }
+
+  .voice-btn.listen.disabled {
+    background: #555;
+    cursor: not-allowed;
+  }
+
+  .voice-btn.stop {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+  }
+
+  .voice-btn.call {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+  }
+
+  @keyframes pulse-mic {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    50% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+  }
+
+  .voice-status {
+    margin: 1rem 0;
+    min-height: 2rem;
+    font-size: 1rem;
+    color: #888;
+  }
+
+  .voice-status.listening {
+    color: #ef4444;
+    font-weight: 600;
+  }
+
+  .voice-status.speaking {
+    color: #22c55e;
+    font-weight: 600;
+  }
+
+  .voice-status.error {
+    color: #ef4444;
+  }
+
+  .conversation {
+    max-height: 300px;
+    overflow-y: auto;
+    text-align: left;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .conversation .msg {
+    margin-bottom: 0.8rem;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+  }
+
+  .conversation .msg.user {
+    background: rgba(0, 68, 204, 0.2);
+    margin-left: 2rem;
+  }
+
+  .conversation .msg.bot {
+    background: rgba(34, 197, 94, 0.15);
+    margin-right: 2rem;
+  }
+
+  .conversation .msg .label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+    opacity: 0.6;
   }
 
   .support-info {
@@ -145,22 +215,9 @@
   }
 
   @media (max-width: 768px) {
-    .support-header h1 {
-      font-size: 2rem;
-    }
-
-    .support-content {
-      padding: 1.5rem;
-    }
-
-    .agent-container {
-      min-height: 300px;
-      padding: 1rem;
-    }
-
-    .support-info {
-      grid-template-columns: 1fr;
-    }
+    .support-header h1 { font-size: 2rem; }
+    .support-content { padding: 1.5rem; }
+    .voice-btn { width: 64px; height: 64px; font-size: 1.5rem; }
   }
 </style>
 {% endblock %}
@@ -168,23 +225,27 @@
 {% block content %}
 <div class="support-container">
   <div class="support-header">
-    <h1>🎧 {% trans "Support Center" %}</h1>
-    <p>{% trans "We are here for you - around the clock" %}</p>
+    <h1>{% trans "AI Support Hotline" %}</h1>
+    <p>{% trans "Speak with our intelligent AI assistant" %}</p>
   </div>
 
   <div class="support-content">
-    <div class="agent-section">
-      <h2>{% trans "Speak with our AI Assistant" %}</h2>
-      <p>{% trans "Click the button and start a conversation with our intelligent support agent" %}</p>
-      
-      <div class="agent-container">
-        <elevenlabs-convai agent-id="agent_3201kr51114bf6tr9rqv9bwmg7vb"></elevenlabs-convai>
+    <div class="voice-agent-section">
+      <h2>{% trans "Voice Assistant" %}</h2>
+      <p>{% trans "Press the mic button and speak your question" %}</p>
+
+      <div class="voice-controls">
+        <button id="micBtn" class="voice-btn listen" title="{% trans 'Start speaking' %}">
+          <i class="fas fa-microphone"></i>
+        </button>
+        <button id="callBtn" class="voice-btn call" title="{% trans 'Call' %}">
+          <i class="fas fa-phone-alt"></i>
+        </button>
       </div>
 
-      <a href="tel:+4915253480270" class="call-button">
-        <i class="fas fa-phone-alt"></i>
-        {% trans "Call directly" %}
-      </a>
+      <div id="voiceStatus" class="voice-status">{% trans "Press the microphone to start" %}</div>
+
+      <div id="conversation" class="conversation" style="display:none;"></div>
     </div>
 
     <div class="support-info">
@@ -211,4 +272,196 @@
     </div>
   </div>
 </div>
+
+<script>
+(function() {
+  var micBtn = document.getElementById('micBtn');
+  var callBtn = document.getElementById('callBtn');
+  var voiceStatus = document.getElementById('voiceStatus');
+  var conversation = document.getElementById('conversation');
+  var lang = document.documentElement.lang || 'de';
+  var isListening = false;
+  var isSpeaking = false;
+  var recognition = null;
+
+  function fixJDS(text) {
+    return text.replace(/\bJDS\b/gi, 'Joel Digitals');
+  }
+
+  function getBestVoice(voiceLang) {
+    return new Promise(function(resolve) {
+      var voices = window.speechSynthesis.getVoices();
+      if (voices.length === 0) {
+        window.speechSynthesis.onvoiceschanged = function() {
+          voices = window.speechSynthesis.getVoices();
+          resolve(selectVoice(voices, voiceLang));
+        };
+        setTimeout(function() { resolve(null); }, 2000);
+      } else {
+        resolve(selectVoice(voices, voiceLang));
+      }
+    });
+  }
+
+  function selectVoice(voices, voiceLang) {
+    var prefix = voiceLang === 'en' ? 'en' : 'de';
+    var scored = voices
+      .filter(function(v) { return v.lang.startsWith(prefix); })
+      .map(function(v) {
+        var score = 0;
+        if (/Google/i.test(v.name)) score += 10;
+        if (/Neural/i.test(v.name)) score += 8;
+        if (/Natural/i.test(v.name)) score += 8;
+        if (v.name.includes('Female') || v.name.includes('female')) score += 3;
+        if (/Microsoft/i.test(v.name)) score += 5;
+        if (/Zira/i.test(v.name)) score += 6;
+        if (/Hedda/i.test(v.name)) score += 6;
+        if (/Katja/i.test(v.name)) score += 6;
+        return { voice: v, score: score };
+      })
+      .sort(function(a, b) { return b.score - a.score; });
+    return scored.length > 0 ? scored[0].voice : null;
+  }
+
+  function addMessage(role, text, extraHtml) {
+    conversation.style.display = 'block';
+    var div = document.createElement('div');
+    div.className = 'msg ' + role;
+    div.innerHTML = '<div class="label">' + (role === 'user' ? '{% trans "You" %}' : '{% trans "AI" %}') + '</div>' + text;
+    if (extraHtml) {
+      div.innerHTML += extraHtml;
+    }
+    conversation.appendChild(div);
+    conversation.scrollTop = conversation.scrollHeight;
+  }
+
+  var bestVoice = null;
+  getBestVoice(lang).then(function(v) { bestVoice = v; });
+
+  function speak(text) {
+    return new Promise(function(resolve) {
+      if (!window.speechSynthesis) { resolve(); return; }
+      window.speechSynthesis.cancel();
+      var utterance = new SpeechSynthesisUtterance(fixJDS(text));
+      utterance.lang = lang === 'en' ? 'en-US' : 'de-DE';
+      utterance.rate = 0.85;
+      utterance.pitch = 1.0;
+      if (bestVoice) { utterance.voice = bestVoice; }
+      isSpeaking = true;
+      voiceStatus.className = 'voice-status speaking';
+      voiceStatus.textContent = '{% trans "AI is speaking..." %}';
+      micBtn.className = 'voice-btn listen disabled';
+      micBtn.disabled = true;
+      utterance.onend = function() {
+        isSpeaking = false;
+        voiceStatus.className = 'voice-status';
+        voiceStatus.textContent = '{% trans "Press the microphone to start" %}';
+        micBtn.className = 'voice-btn listen';
+        micBtn.disabled = false;
+        resolve();
+      };
+      utterance.onerror = function() { isSpeaking = false; resolve(); };
+      window.speechSynthesis.speak(utterance);
+    });
+  }
+
+  function askAI(text) {
+    addMessage('user', text);
+    voiceStatus.className = 'voice-status';
+    voiceStatus.textContent = '{% trans "AI is thinking..." %}';
+
+    fetch('{% url "chatbot_api" %}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, lang: lang })
+    })
+    .then(function(r) { return r.json(); })
+    .then(async function(data) {
+      var reply = data.reply || '{% trans "Sorry, I could not answer." %}';
+      var transferBtn = '';
+      if (data.transfer_to_human || !data.can_help) {
+        transferBtn = '<div style="margin-top:8px;"><a href="tel:+4915253480270" style="display:inline-block;padding:8px 16px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:0.9rem;">{% trans "Call Support" %} ☎️</a></div>';
+        addMessage('bot', reply, transferBtn);
+        await speak(reply + ' ' + '{% trans "Press the call button to speak with a human." %}');
+      } else {
+        addMessage('bot', reply);
+        await speak(reply);
+      }
+    })
+    .catch(async function(err) {
+      var errMsg = '{% trans "An error occurred. Please try again." %}';
+      addMessage('bot', errMsg);
+      await speak(errMsg);
+    });
+  }
+
+  function startListening() {
+    if (isSpeaking) return;
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      voiceStatus.className = 'voice-status error';
+      voiceStatus.textContent = '{% trans "Speech recognition not supported in this browser." %}';
+      return;
+    }
+
+    if (recognition) recognition.stop();
+
+    recognition = new SpeechRecognition();
+    recognition.lang = lang === 'en' ? 'en-US' : 'de-DE';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = function() {
+      isListening = true;
+      micBtn.className = 'voice-btn listen active';
+      voiceStatus.className = 'voice-status listening';
+      voiceStatus.textContent = '{% trans "Listening... speak now" %}';
+    };
+
+    recognition.onresult = function(event) {
+      var transcript = event.results[0][0].transcript;
+      isListening = false;
+      micBtn.className = 'voice-btn listen';
+      voiceStatus.className = 'voice-status';
+      voiceStatus.textContent = '{% trans "Processing..." %}';
+      askAI(transcript);
+    };
+
+    recognition.onerror = function(event) {
+      isListening = false;
+      micBtn.className = 'voice-btn listen';
+      voiceStatus.className = 'voice-status error';
+      voiceStatus.textContent = '{% trans "Could not understand. Please try again." %}';
+    };
+
+    recognition.onend = function() {
+      isListening = false;
+      if (micBtn.classList.contains('active')) {
+        micBtn.className = 'voice-btn listen';
+      }
+    };
+
+    recognition.start();
+  }
+
+  micBtn.addEventListener('click', function() {
+    if (isListening) {
+      if (recognition) recognition.stop();
+      isListening = false;
+      micBtn.className = 'voice-btn listen';
+      voiceStatus.className = 'voice-status';
+      voiceStatus.textContent = '{% trans "Press the microphone to start" %}';
+    } else {
+      startListening();
+    }
+  });
+
+  callBtn.addEventListener('click', function() {
+    window.location.href = 'tel:+4915253480270';
+  });
+
+  addMessage('bot', '{% trans "Hello! I am your AI support assistant. Click the microphone and ask me anything about Joel Digitals services." %}');
+  speak('{% trans "Hello! I am your AI support assistant. Click the microphone and ask me anything about Joel Digitals services." %}');
+})();
+</script>
 {% endblock %}

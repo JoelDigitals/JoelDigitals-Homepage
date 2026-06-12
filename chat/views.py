@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 import json, os, datetime
 from .forms import TeachForm
-from .openai_helpers import chatbot_answer  # neue Funktion statt generate_answer
+from .bot_engine import chatbot_answer
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 KNOWLEDGE_FILE = os.path.join(BASE_DIR, "knowledge.json")
@@ -46,7 +46,19 @@ def chatbot_api(request):
             return JsonResponse({"reply": "Bitte schreibe etwas."})
 
         answer = chatbot_answer(message, lang)
-        return JsonResponse({"reply": answer})
+
+        # Prüfe ob Transfer gewünscht / nötig
+        transfer_to_human = "[TRANSFER]" in answer
+        can_help = not transfer_to_human and "konnte nicht beantworten" not in answer and "could not answer" not in answer
+
+        # Entferne Marker aus Antwort für Endnutzer
+        clean_answer = answer.replace("[TRANSFER]", "")
+
+        return JsonResponse({
+            "reply": clean_answer,
+            "transfer_to_human": transfer_to_human,
+            "can_help": can_help,
+        })
     except Exception as e:
         return JsonResponse({"reply": f"Fehler: {str(e)}"})
 

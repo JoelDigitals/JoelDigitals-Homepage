@@ -24,5 +24,6 @@ urlpatterns = [
     path('appointment/success/', views.appointment_success, name='appointment_success'),
     path('appointment/admin/', views.appointment_admin_view, name='appointment_admin'),
     path('appointment/admin/update/<int:pk>/<str:status>/', views.update_appointment_status, name='update_appointment_status'),
+    path('api/translate/', views.translate_message, name='translate_message'),
 
 ]

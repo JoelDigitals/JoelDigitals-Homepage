@@ -7,12 +7,16 @@ from django.conf.urls.static import static
 from django.urls import path, include
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib.sitemaps.views import sitemap
-from main.sitemaps import StaticViewSitemap
+from main.sitemaps import StaticViewSitemap, BlogSitemap, LandingPageSitemap, ShopAppSitemap, WikiSitemap
 from main import views as main_views  # ← WICHTIG: Import hinzufügen
 
 # --- Sitemap Definition ---
 sitemaps = {
     'static': StaticViewSitemap,
+    'blog': BlogSitemap,
+    'landingpages': LandingPageSitemap,
+    'shop': ShopAppSitemap,
+    'wiki': WikiSitemap,
 }
 
 # --- Basis-URL-Muster (nicht sprachabhängig) ---
@@ -27,7 +31,9 @@ urlpatterns = [
     path('auth/sso/authorize/', main_views.sso_authorize, name='sso_authorize'),
     path('auth/sso/validate/', main_views.validate_sso_token, name='validate_sso_token'),
     path('api/admin/', include('admin_api.urls')),
+    path('robots.txt', main_views.robots_txt),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path('sitemap.txt', main_views.sitemap_txt, name='sitemap_txt'),
     # Optional: Sprachumschaltung soll auch ohne Sprache funktionieren
     path("i18n/", include("django.conf.urls.i18n")),
     

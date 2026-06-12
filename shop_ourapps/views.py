@@ -564,6 +564,8 @@ def affiliate_dashboard(request):
         stats = calculate_affiliate_stats(request.user)
         if not stats:
             raise AffiliatePartner.DoesNotExist
+        affiliate_url = request.build_absolute_uri("/") + f"?ref={stats.get('affiliate_code', '')}"
+        stats["affiliate_url"] = affiliate_url
         return render(request, "apps/dashboard.html", stats)
     except AffiliatePartner.DoesNotExist:
         messages.error(request, "You are not yet registered as an Affiliate Partner.")
@@ -725,7 +727,7 @@ from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from .paypal import create_paypal_order, capture_paypal_order
-from .models import Cart, Order, OrderItem, DiscountCode, AffiliateCode
+from .models import Cart, Order, OrderItem, DiscountCode, AffiliateCode, CustomerInfo
 
 # --- Hilfsfunktion: E-Mails im Hintergrund ---
 def send_order_emails_async(order, request):
@@ -803,7 +805,55 @@ def checkout(request):
     final_total = subtotal
     discount_code_obj = None
     affiliate_code_obj = None
+    initial_affiliate_code = ""
     wallet = getattr(request.user, 'wallet', None)
+
+    # Affiliate-Code automatisch erkennen (URL-Param → Session → DB)
+    ref = request.GET.get("ref", "")
+    if ref:
+        request.session['affiliate_ref'] = ref
+    else:
+        ref = request.session.get('affiliate_ref', '')
+
+    if ref:
+        try:
+            if AffiliateCode.objects.filter(code__iexact=ref, is_active=True).exists():
+                initial_affiliate_code = ref
+        except Exception:
+            pass
+
+    # Matching: Affiliate-Code aus Ref → passenden Rabattcode automatisch vorschlagen
+    initial_discount_code = ""
+    if initial_affiliate_code:
+        match = DiscountCode.objects.filter(code__iexact=initial_affiliate_code).first()
+        if match and match.is_valid_now():
+            initial_discount_code = match.code
+
+    # Gespeicherte Kundendaten laden (Fallback: letzte Bestellung)
+    try:
+        customer_info = request.user.customer_info
+    except CustomerInfo.DoesNotExist:
+        customer_info = None
+        last_order = Order.objects.filter(user=request.user).order_by('-created_at').first()
+        if last_order:
+            try:
+                CustomerInfo.objects.update_or_create(
+                    user=request.user,
+                    defaults={
+                        'first_name': last_order.first_name or '',
+                        'last_name': last_order.last_name or '',
+                        'email': last_order.email or '',
+                        'address': last_order.address or '',
+                        'zip_code': last_order.zip_code or '',
+                        'city': last_order.city or '',
+                        'phone': last_order.phone or '',
+                        'company_name': last_order.company_name or '',
+                        'vat_number': last_order.vat_number or '',
+                    }
+                )
+                customer_info = request.user.customer_info
+            except Exception:
+                customer_info = None
 
     if request.method == 'POST':
         data = request.POST
@@ -880,6 +930,22 @@ def checkout(request):
             iban=iban,
             bic=bic,
             bank_name=bank_name
+        )
+
+        # Kundendaten für zukünftige Bestellungen speichern
+        CustomerInfo.objects.update_or_create(
+            user=request.user,
+            defaults={
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+                'address': address,
+                'zip_code': zip_code,
+                'city': city,
+                'phone': phone,
+                'company_name': company_name or '',
+                'vat_number': vat_number or '',
+            }
         )
 
         from django.db.models import F
@@ -1005,6 +1071,9 @@ def checkout(request):
         'now': timezone.now(),
         'sepa_creditor_id': settings.SEPA_CREDITOR_ID,
         'sepa_creditor_name': settings.SEPA_CREDITOR_NAME,
+        'customer_info': customer_info,
+        'initial_affiliate_code': initial_affiliate_code,
+        'initial_discount_code': initial_discount_code,
     }
     return render(request, 'apps/checkout.html', context)
 
@@ -1089,26 +1158,54 @@ def order_confirmation(request, order_id):
 @login_required
 def validate_codes(request):
     data = json.loads(request.body)
-    subtotal = sum(item.price * item.quantity for item in request.user.cart.items.all)
+    cart = Cart.objects.filter(user=request.user).first()
+    if not cart or not cart.items.exists():
+        return JsonResponse({"valid": False, "message": "Warenkorb ist leer."})
+    subtotal = sum(item.app.discounted_price * item.quantity for item in cart.items.all())
     discount = 0
+    discount_code_obj = None
+    affiliate_code_obj = None
 
-    try:
-        discount_code = DiscountCode.objects.get(code__iexact=data.get("discount_code", ""))
-        discount_code.update_status()
-        if discount_code.is_valid_now():
-            discount = subtotal * (discount_code.percentage / 100)
-        else:
-            return JsonResponse({"valid": False, "message": "Rabattcode ist ungültig oder abgelaufen."})
-    except DiscountCode.DoesNotExist:
-        if data.get("discount_code"):
-            return JsonResponse({"valid": False, "message": "Rabattcode nicht gefunden."})
+    discount_code_input = data.get("discount_code", "")
+    affiliate_code_input = data.get("affiliate_code", "")
+
+    if discount_code_input:
+        try:
+            discount_code_obj = DiscountCode.objects.get(code__iexact=discount_code_input)
+            discount_code_obj.update_status()
+            if discount_code_obj.is_valid_now():
+                discount = subtotal * (discount_code_obj.percentage / 100)
+            else:
+                return JsonResponse({"valid": False, "type": "discount", "message": "Rabattcode ist ungültig oder abgelaufen."})
+        except DiscountCode.DoesNotExist:
+            return JsonResponse({"valid": False, "type": "discount", "message": "Rabattcode nicht gefunden."})
+
+    if affiliate_code_input:
+        try:
+            affiliate_code_obj = AffiliateCode.objects.get(code__iexact=affiliate_code_input, is_active=True)
+        except AffiliateCode.DoesNotExist:
+            return JsonResponse({"valid": False, "type": "affiliate", "message": "Affiliate-Code nicht gefunden."})
 
     total = max(0, subtotal - discount)
-    return JsonResponse({
+    result = {
         "valid": True,
         "new_total": f"{total:.2f}",
-        "discount": f"{discount:.2f}"
-    })
+        "discount": f"{discount:.2f}",
+        "discount_percent": float(discount_code_obj.percentage) if discount_code_obj else 0,
+    }
+
+    # Matching: gleicher Code-Name in beiden Systemen → automatisch vorschlagen
+    if discount_code_input and not affiliate_code_input:
+        match = AffiliateCode.objects.filter(code__iexact=discount_code_input, is_active=True).first()
+        if match:
+            result["matched_affiliate"] = match.code
+
+    if affiliate_code_input and not discount_code_input:
+        match = DiscountCode.objects.filter(code__iexact=affiliate_code_input).first()
+        if match:
+            result["matched_discount"] = match.code
+
+    return JsonResponse(result)
 
 def more_informations(request, slug):
     lang = get_language()

@@ -1,0 +1,50 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ lang|default:'de' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ seo_title|default:title }} | Joel Digitals</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root { --primary: {{ color_primary }}; --accent: {{ color_accent }}; }
+body { font-family: 'Inter', serif; background: #fff; color: #1a1a2e; }
+h1, h2, h3 { font-family: 'Playfair Display', serif; }
+.magazine-header { border-bottom: 3px double #e2e8f0; padding-bottom: 1.5rem; margin-bottom: 3rem; }
+.article-body { max-width: 720px; margin: 0 auto; }
+.content-area h2 { font-family: 'Playfair Display', serif; font-size: 2.25rem; font-weight: 700; margin-top: 3rem; margin-bottom: 1rem; color: #0f172a; line-height: 1.3; }
+.content-area h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 0.75rem; color: #1e293b; }
+.content-area p { font-size: 1.1rem; line-height: 1.9; color: #475569; margin-bottom: 1.5rem; }
+.content-area p:first-of-type::first-letter { font-family: 'Playfair Display', serif; font-size: 4rem; font-weight: 700; float: left; line-height: 1; margin-right: 0.75rem; color: var(--primary); }
+.content-area ul { list-style: none; padding: 0; margin: 2rem 0; }
+.content-area ul li { padding: 1rem 1.25rem; margin-bottom: 0.75rem; background: #f8fafc; border-left: 4px solid var(--primary); border-radius: 0 8px 8px 0; font-size: 1rem; color: #334155; }
+.content-area blockquote { margin: 2rem 0; padding: 1.5rem 2rem; background: linear-gradient(135deg, #f1f5f9, #f8fafc); border-radius: 12px; border-left: 4px solid var(--primary); font-style: italic; color: #475569; font-size: 1.1rem; }
+.magazine-meta { display: flex; justify-content: center; gap: 2rem; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2rem; }
+{{ custom_css }}
+</style>
+{% include 'landingpages/_seo_head.html' %}
+</head>
+<body>
+<article class="max-w-4xl mx-auto px-6 py-16">
+  <div class="magazine-header text-center">
+    <div class="text-xs font-semibold tracking-widest uppercase mb-4" style="color:var(--primary)">Joel Digitals · {{ lang|upper }}</div>
+    <h1 class="text-5xl md:text-6xl font-black mb-4 leading-tight">{{ title }}</h1>
+    <p class="text-xl text-gray-500 max-w-2xl mx-auto">{{ subheadline }}</p>
+  </div>
+  <div class="article-body content-area">{{ content|safe }}</div>
+  {% if cta_text %}
+  <div class="text-center mt-16 pt-12 border-t border-gray-100">
+    <p class="text-gray-500 mb-6">{% trans "Interested? Let's talk" %}</p>
+    <a href="{{ cta_link }}" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-semibold transition-all" style="background:var(--primary)">{{ cta_text }} →</a>
+  </div>
+  {% endif %}
+</article>
+<footer class="border-t border-gray-100 py-12 text-center text-sm text-gray-400">
+  <p class="mb-2">&copy; 2025-2026 Joel Digitals</p>
+  <div class="space-x-4"><a href="/imprint/" class="hover:text-gray-600">{% trans "Imprint" %}</a><a href="/privacy/" class="hover:text-gray-600">{% trans "Privacy Policy" %}</a><a href="/" class="hover:text-gray-600">{% trans "Home" %}</a></div>
+</footer>
+{% include 'cookie_banner.html' %}
+</body>
+</html>

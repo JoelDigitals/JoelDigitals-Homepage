@@ -1,0 +1,87 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ lang|default:'de' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ seo_title|default:title }} | Joel Digitals</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --primary: {{ color_primary }}; --accent: {{ color_accent }}; }
+body { font-family: 'Inter', sans-serif; margin: 0; background: #fafafa; }
+.landing-wrap { display: flex; min-height: 100vh; }
+.landing-hero { flex: 1.2; display: flex; flex-direction: column; justify-content: center; padding: 4rem; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; position: relative; overflow: hidden; }
+.landing-hero::before { content: ''; position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%); }
+.landing-form { flex: 0.8; display: flex; flex-direction: column; justify-content: center; padding: 4rem; background: white; }
+.form-card { max-width: 400px; margin: 0 auto; width: 100%; }
+.form-card h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a; }
+.form-card p { color: #64748b; font-size: 0.95rem; margin-bottom: 2rem; }
+.form-group { margin-bottom: 1.25rem; }
+.form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 0.4rem; }
+.form-group input, .form-group textarea { width: 100%; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.95rem; transition: border-color 0.3s; outline: none; font-family: inherit; }
+.form-group input:focus, .form-group textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+.form-group textarea { resize: vertical; min-height: 100px; }
+.submit-btn { width: 100%; padding: 0.875rem; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; color: white; background: linear-gradient(135deg, var(--primary), var(--accent)); cursor: pointer; transition: all 0.3s; }
+.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.3); }
+.content-area h2 { font-size: 1.5rem; font-weight: 700; margin-top: 1.5rem; color: #f1f5f9; }
+.content-area p { font-size: 1rem; line-height: 1.7; color: #94a3b8; margin-bottom: 1rem; }
+.content-area ul li { padding: 0.4rem 0; color: #cbd5e1; }
+.hero-content { position: relative; z-index: 1; max-width: 540px; }
+.trust-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 999px; font-size: 0.8rem; color: #94a3b8; margin-bottom: 2rem; }
+@media (max-width: 768px) { .landing-wrap { flex-direction: column; } .landing-hero, .landing-form { padding: 2rem; } }
+{{ custom_css }}
+</style>
+{% include 'landingpages/_seo_head.html' %}
+</head>
+<body>
+<div class="landing-wrap">
+  <div class="landing-hero">
+    <div class="hero-content">
+      <div class="trust-badge"><span class="w-1.5 h-1.5 rounded-full" style="background:#22c55e"></span> {% trans "German quality service" %}</div>
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">{{ title }}</h1>
+      <p class="text-lg text-gray-400 mb-6">{{ subheadline }}</p>
+      <div class="content-area">{{ content|safe }}</div>
+      <div class="flex items-center gap-4 mt-10 text-sm text-gray-500">
+        <span class="flex items-center gap-1">✓ {% trans "Free consultation" %}</span>
+        <span class="flex items-center gap-1">✓ {% trans "Fast response" %}</span>
+        <span class="flex items-center gap-1">✓ {% trans "Made in Germany" %}</span>
+      </div>
+    </div>
+  </div>
+  <div class="landing-form">
+    <div class="form-card">
+      <h2>{% trans "Get started" %}</h2>
+      <p>{% trans "Leave your details and we will contact you." %}</p>
+      {% if messages %}
+        {% for message in messages %}
+          <div class="p-3 rounded-lg mb-4 text-sm font-medium {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      <form action="{% url 'landing_page' slug=page.slug %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="name">{% trans "Name" %}</label>
+          <input type="text" id="name" name="name" placeholder="{% trans 'Your name' %}" required>
+        </div>
+        <div class="form-group">
+          <label for="email">{% trans "Email" %}</label>
+          <input type="email" id="email" name="email" placeholder="{% trans 'Your email address' %}" required>
+        </div>
+        <div class="form-group">
+          <label for="message">{% trans "Message" %}</label>
+          <textarea id="message" name="message" placeholder="{% trans 'How can we help you?' %}" required></textarea>
+        </div>
+        <button type="submit" class="submit-btn">{{ cta_text|default:"Send" }}</button>
+      </form>
+    </div>
+  </div>
+</div>
+<footer class="text-center py-8 text-sm text-gray-400 bg-white border-t">
+  <p class="mb-2">&copy; 2025-2026 Joel Digitals</p>
+  <div class="space-x-4"><a href="/imprint/" class="hover:text-gray-600">{% trans "Imprint" %}</a><a href="/privacy/" class="hover:text-gray-600">{% trans "Privacy Policy" %}</a></div>
+</footer>
+{% include 'cookie_banner.html' %}
+</body>
+</html>

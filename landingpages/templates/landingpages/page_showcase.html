@@ -1,0 +1,49 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ lang|default:'de' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ seo_title|default:title }} | Joel Digitals</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --primary: {{ color_primary }}; --accent: {{ color_accent }}; }
+body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #e2e8f0; }
+.glow-card { background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; transition: all 0.4s; }
+.glow-card:hover { border-color: var(--primary); box-shadow: 0 0 40px rgba(99,102,241,0.15); transform: translateY(-4px); }
+.gradient-text { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+.content-area h2 { font-size: 1.75rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #f1f5f9; }
+.content-area p { font-size: 1.05rem; line-height: 1.8; color: #94a3b8; margin-bottom: 1rem; }
+.pill { display: inline-block; padding: 0.25rem 1rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; background: rgba(99,102,241,0.15); color: var(--primary); margin-bottom: 1rem; }
+{{ custom_css }}
+</style>
+{% include 'landingpages/_seo_head.html' %}
+</head>
+<body>
+<nav class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+  <span class="text-xl font-bold gradient-text">Joel Digitals</span>
+  <a href="https://joel-digitals.de/contact/appointment/" class="text-sm px-5 py-2 rounded-full" style="background:var(--primary);color:white;font-weight:600">{% trans "Get started" %}</a>
+</nav>
+<section class="max-w-7xl mx-auto px-6 py-20 text-center">
+  <span class="pill">{% trans "Featured" %}</span>
+  <h1 class="text-5xl md:text-7xl font-extrabold mb-6 gradient-text">{{ title }}</h1>
+  <p class="text-xl text-gray-400 max-w-3xl mx-auto mb-12">{{ subheadline }}</p>
+</section>
+<section class="max-w-7xl mx-auto px-6 pb-24 content-area">
+  {{ content|safe }}
+</section>
+{% if cta_text %}
+<section class="text-center pb-24">
+  <a href="{{ cta_link }}" class="inline-flex items-center gap-2 px-8 py-4 rounded-full text-lg font-semibold text-white transition-all" style="background:linear-gradient(135deg,var(--primary),var(--accent));box-shadow:0 8px 32px rgba(99,102,241,0.3)">{{ cta_text }} →</a>
+</section>
+{% endif %}
+<footer class="border-t border-white/10 py-12 text-center text-sm text-gray-500">
+  <p class="mb-2">&copy; 2025-2026 Joel Digitals</p>
+  <div class="space-x-4"><a href="/imprint/" class="hover:text-gray-300">{% trans "Imprint" %}</a><a href="/privacy/" class="hover:text-gray-300">{% trans "Privacy Policy" %}</a></div>
+</footer>
+{% include 'cookie_banner.html' %}
+</body>
+</html>

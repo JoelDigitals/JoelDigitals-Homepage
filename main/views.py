@@ -539,13 +539,40 @@ def home(request):
     # ⭐ Durchschnittsbewertung hinzufügen
     rating = get_average_rating()
 
+    # 📊 App-Status für Startseite
+    from status.models import App as StatusAppModel, GlobalIssue
+    status_apps = StatusAppModel.objects.filter(is_active=True)
+    status_data = []
+    online_count = 0
+    offline_count = 0
+    issue_count = 0
+    for sa in status_apps:
+        latest = sa.statuses.order_by('-timestamp').first()
+        has_issues = sa.issues.filter(is_resolved=False).exists()
+        if has_issues:
+            st = "issue"
+            issue_count += 1
+        elif latest and latest.status == "offline":
+            st = "offline"
+            offline_count += 1
+        else:
+            st = "online"
+            online_count += 1
+        status_data.append({'app': sa, 'status': st, 'latest': latest})
+    global_issues = GlobalIssue.objects.filter(is_resolved=False)
+
     return render(request, 'main/home.html', {
         'user_groups': user_groups,
         'latest_blog': latest_blog,
         'products': random_products,
         'faqs': localized_faqs,
-        'rating': rating,  # ⭐ hier!
+        'rating': rating,
         'lang': lang,
+        'status_data': status_data,
+        'global_issues': global_issues,
+        'online_count': online_count,
+        'offline_count': offline_count,
+        'issue_count': issue_count,
     })
 
 from django.shortcuts import render, redirect
@@ -1253,6 +1280,66 @@ def revoke_app_permission(request, auth_id):
     
     # Wenn kein POST, zurück zur Übersicht
     return redirect('app_permissions')
+
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Disallow: /admin/",
+        "Disallow: /accounts/",
+        "Disallow: /cart/",
+        "Disallow: /checkout/",
+        "Disallow: /profile/",
+        "Disallow: /o/",
+        "Disallow: /api/",
+        "Disallow: /auth/",
+        "Allow: /",
+        "",
+        "Sitemap: https://www.joel-digitals.de/sitemap.xml",
+        "Sitemap: https://www.joel-digitals.de/sitemap.txt",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
+
+
+def sitemap_txt(request):
+    from django.urls import reverse
+    from blog.models import BlogPost
+    from landingpages.models import LandingPage
+    from shop_ourapps.models import App as ShopApp
+    from wiki.models import Wiki as WikiArticle
+    from status.models import App as StatusApp
+
+    base_url = "https://www.joel-digitals.de"
+    lines = []
+
+    for lang in ['de', 'en']:
+        prefix = f"/{lang}"
+
+        static_pages = [
+            '', '/about/', '/services/', '/contact/contact/',
+            '/blog/', '/our-apps/', '/shop/',
+            '/downloads/', '/status/',
+            '/wiki/', '/imprint/', '/privacy/', '/terms/',
+        ]
+        for page in static_pages:
+            lines.append(f"{base_url}{prefix}{page}")
+
+        for post in BlogPost.objects.filter(is_published=True):
+            lines.append(f"{base_url}{prefix}/blog/{post.pk}/")
+
+        for lp in LandingPage.objects.filter(is_active=True):
+            lines.append(f"{base_url}{prefix}/{lp.slug}/")
+
+        for app in ShopApp.objects.filter(is_available_for_purchase=True):
+            lines.append(f"{base_url}{prefix}/shop/{app.slug}/")
+
+        for wiki in WikiArticle.objects.filter(is_published=True):
+            lines.append(f"{base_url}{prefix}/wiki/{wiki.slug}/")
+
+    for sa in StatusApp.objects.filter(is_active=True):
+        lines.append(f"{base_url}/status/app/{sa.pk}/")
+
+    return HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
+
 
 def support_view(request):
     """

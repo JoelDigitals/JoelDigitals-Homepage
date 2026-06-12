@@ -1,0 +1,54 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ lang|default:'de' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ seo_title|default:title }} | Joel Digitals</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root { --primary: {{ color_primary }}; --accent: {{ color_accent }}; }
+body { font-family: 'Inter', sans-serif; background: #09090b; color: #fafafa; }
+.hero-section { min-height: 90vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.hero-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 60%); }
+.hero-content { position: relative; z-index: 1; text-align: center; max-width: 800px; padding: 0 1.5rem; }
+.badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.375rem 1rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem; }
+.content-area { max-width: 800px; margin: 0 auto; }
+.content-area h2 { font-size: 2rem; font-weight: 700; margin-top: 3rem; margin-bottom: 1rem; background: linear-gradient(135deg, #fafafa, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.content-area p { font-size: 1.05rem; line-height: 1.9; color: #a1a1aa; margin-bottom: 1rem; }
+.content-area ul li { padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #d4d4d8; }
+.content-area ul li:last-child { border-bottom: none; }
+.glow-btn { display: inline-block; padding: 1rem 2.5rem; border-radius: 14px; font-weight: 700; font-size: 1.1rem; color: white; background: linear-gradient(135deg, var(--primary), var(--accent)); transition: all 0.3s; box-shadow: 0 0 40px rgba(99,102,241,0.2); }
+.glow-btn:hover { transform: translateY(-3px); box-shadow: 0 0 60px rgba(99,102,241,0.4); }
+.divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); margin: 4rem 0; }
+{{ custom_css }}
+</style>
+{% include 'landingpages/_seo_head.html' %}
+</head>
+<body>
+<section class="hero-section">
+  <div class="hero-content">
+    <div class="badge"><span class="w-1.5 h-1.5 rounded-full" style="background:var(--primary)"></span>Joel Digitals</div>
+    <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">{{ title }}</h1>
+    <p class="text-xl text-zinc-400 mb-10">{{ subheadline }}</p>
+    {% if cta_text %}
+    <a href="{{ cta_link }}" class="glow-btn">{{ cta_text }}</a>
+    {% endif %}
+  </div>
+</section>
+<div class="max-w-6xl mx-auto px-6 py-24">
+  <div class="content-area">{{ content|safe }}</div>
+  <div class="divider"></div>
+  <div class="text-center">
+    <a href="https://joel-digitals.de/contact/appointment/" class="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">{% trans "Book a free consultation" %} →</a>
+  </div>
+</div>
+<footer class="border-t border-white/5 py-12 text-center text-sm text-zinc-600">
+  <p class="mb-2">&copy; 2025-2026 Joel Digitals</p>
+  <div class="space-x-4"><a href="/imprint/" class="hover:text-zinc-400">{% trans "Imprint" %}</a><a href="/privacy/" class="hover:text-zinc-400">{% trans "Privacy Policy" %}</a></div>
+</footer>
+{% include 'cookie_banner.html' %}
+</body>
+</html>

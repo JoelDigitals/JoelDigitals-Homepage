@@ -411,12 +411,18 @@
 
 <div class="app-status-page-container">
   <!-- Header -->
-  <div class="app-status-header">
+  <div class="app-status-header" style="background: {% if issues %}linear-gradient(135deg, #f44336, #c62828){% else %}linear-gradient(135deg, var(--primary), #0066ff){% endif %};">
     <div class="header-icon">
-      <i class="fas fa-cube"></i>
+      <i class="fas {% if issues %}fa-exclamation-triangle{% else %}fa-cube{% endif %}"></i>
     </div>
     <h1 class="app-status-title">{{ app.name }}</h1>
-    <p class="app-status-subtitle">{% trans "Real-time Status Monitor" %}</p>
+    <p class="app-status-subtitle">
+      {% if issues %}
+        {% trans "Known issues detected – see details below" %}
+      {% else %}
+        {% trans "Real-time Status Monitor" %}
+      {% endif %}
+    </p>
   </div>
 
   <!-- Body -->
@@ -425,8 +431,35 @@
       <i class="fas fa-arrow-left"></i> {% trans "Back to Overview" %}
     </a>
 
+    <!-- Issues Section – ZUERST anzeigen bei Problemen -->
+    <div class="issues-section">
+      <div class="section-header">
+        <div class="section-icon" style="{% if issues %}background: linear-gradient(135deg, #f44336, #c62828);{% endif %}"><i class="fas fa-exclamation-triangle"></i></div>
+        <h2 class="section-title">{% trans "Known Issues" %}</h2>
+      </div>
+
+      {% if issues %}
+        <div class="issues-list">
+          {% for issue in issues %}
+            <div class="issue-card">
+              <div class="issue-title">
+                <i class="fas fa-bug"></i>
+                {{ issue.title }}
+              </div>
+              <p class="issue-desc">{{ issue.description|linebreaks }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-check-circle"></i>
+          <p class="empty-state-text">{% trans "No known issues. All systems operational!" %}</p>
+        </div>
+      {% endif %}
+    </div>
+
     <!-- Status Overview -->
-    <div class="status-overview">
+    <div class="status-overview" style="margin-top:2.5rem;">
       <!-- Status Card -->
       <div class="status-card {% if status == 'online' %}online{% else %}offline{% endif %}">
         <div class="status-icon-large">
@@ -451,37 +484,10 @@
       </div>
     </div>
 
-    <!-- Issues Section -->
-    <div class="issues-section">
-      <div class="section-header">
-        <div class="section-icon"><i class="fas fa-exclamation-triangle"></i></div>
-        <h2 class="section-title">{% trans "Known Issues" %}</h2>
-      </div>
-
-      {% if issues %}
-        <div class="issues-list">
-          {% for issue in issues %}
-            <div class="issue-card">
-              <div class="issue-title">
-                <i class="fas fa-bug"></i>
-                {{ issue.title }}
-              </div>
-              <p class="issue-desc">{{ issue.description|linebreaks }}</p>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="empty-state">
-          <i class="fas fa-check-circle"></i>
-          <p class="empty-state-text">{% trans "No known issues. All systems operational!" %}</p>
-        </div>
-      {% endif %}
-    </div>
-
     <!-- CTA -->
     <div class="cta-section">
       <p class="cta-text">{% trans "Experiencing problems with this service?" %}</p>
-      <a href="{% url 'support_tickets' %}" class="cta-button">
+      <a href="{% url 'support_tickets' %}?app_name={{ app.name|urlencode }}" class="cta-button">
         <i class="fas fa-headset"></i> {% trans "Report Issue" %}
       </a>
     </div>

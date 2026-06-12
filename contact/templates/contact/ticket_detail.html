@@ -369,6 +369,57 @@
     letter-spacing: 0.5px;
   }
 
+  /* Translate Button */
+  .translate-btn {
+    background: none;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    margin-left: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .translate-btn:hover {
+    opacity: 1;
+  }
+
+  .message-user .translate-btn {
+    color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .message-user .translate-btn:hover {
+    color: white;
+    border-color: white;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .message-admin .translate-btn {
+    color: #666;
+    border-color: #ccc;
+  }
+
+  .message-admin .translate-btn:hover {
+    color: #f44336;
+    border-color: #f44336;
+  }
+
+  .translate-btn.loading {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .translate-btn.translated {
+    background: rgba(76, 175, 80, 0.1);
+    border-color: #4CAF50;
+    color: #4CAF50;
+  }
+
   /* Responsive */
   @media (max-width: 768px) {
     .ticket-page-container {
@@ -502,6 +553,7 @@
                   {% endif %}
                 </span>
                 <span class="message-time">{{ msg.created_at|date:"d.m.Y H:i" }}</span>
+                <button class="translate-btn" onclick="translateMessage(this)" data-text="{{ msg.message|force_escape }}">{% trans "Translate" %}</button>
               </div>
               <div class="message-content">{{ msg.message|linebreaks }}</div>
             </div>
@@ -544,4 +596,51 @@
     </div>
   </div>
 </div>
+
+<script>
+  function translateMessage(btn) {
+    const contentDiv = btn.closest('.message').querySelector('.message-content');
+    const isTranslated = btn.classList.contains('translated');
+
+    if (isTranslated) {
+      contentDiv.innerHTML = contentDiv.dataset.originalHtml;
+      btn.classList.remove('translated');
+      btn.textContent = '{% trans "Translate" %}';
+      return;
+    }
+
+    contentDiv.dataset.originalHtml = contentDiv.innerHTML;
+    const rawText = btn.dataset.text;
+    const targetLang = '{{ LANGUAGE_CODE }}';
+    btn.classList.add('loading');
+    btn.textContent = '...';
+
+	    fetch('{{ translate_api_url }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ text: rawText, target_lang: targetLang })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.translated_text) {
+        contentDiv.textContent = data.translated_text;
+        btn.classList.add('translated');
+        btn.textContent = '{% trans "Original" %}';
+      } else {
+        console.error('Translation error:', data);
+        btn.textContent = data.error || '{% trans "Error" %}';
+      }
+    })
+    .catch((err) => {
+      console.error('Translation fetch failed:', err);
+      btn.textContent = err.message || '{% trans "Error" %}';
+    })
+    .finally(() => {
+      btn.classList.remove('loading');
+    });
+  }
+</script>
 {% endblock %}

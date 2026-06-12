@@ -2,7 +2,7 @@
 {% load i18n %}
 
 <!DOCTYPE html>
-<html lang="de">
+<html lang="{{ LANGUAGE_CODE|default:'de' }}">
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}Joel Digitals - Dein Digitaler Partner.{% endblock %}</title>
@@ -495,25 +495,23 @@
     }
   </style>
 
-  <!-- Grundlegende SEO-Tags -->
-  <meta name="description" content="Joel Digitals – Ihr Partner für digitale Lösungen, Webentwicklung, Marketing & IT-Services.">
-  <meta name="keywords" content="Webentwicklung, Anwendungen, Aufträge finden, Produkt Design, Management, AuftragNetz, Markendesign, JDS Appstore, Django leicht gemacht, Support, KI ChatBots, CRM, Kunden Management, E-Rechnung, DATEV, Digitalisierung, IT-Services, Joel Digitals, Marketing, Online-Shop, Logo design, Websites, Rundum Service, Germany, Saarland, Lebach">
+  <meta name="description" content="{% block meta_description %}Joel Digitals – Ihr Partner für digitale Lösungen, Webentwicklung, Marketing & IT-Services.{% endblock %}">
+  <meta name="keywords" content="{% block meta_keywords %}Webentwicklung, App Development, KI, ChatBots, Digitalisierung, IT-Services, Joel Digitals, Marketing, Online-Shop, Saarland, Lebach{% endblock %}">
   <meta name="author" content="Joel Digitals">
+  <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
 
-  <!-- Open Graph für Social Media -->
-  <meta property="og:title" content="Joel Digitals – Digitale Lösungen für Ihr Business">
-  <meta property="og:description" content="Professionelle Webentwicklung, Marketing, Design & IT-Dienstleistungen - Alles aus einer Hand.">
-  <meta property="og:image" content="{% static 'images/office.png' %}">
-  <meta property="og:url" content="https://www.joel-digitals.de/"> 
-  <meta property="og:type" content="website">
+  <meta property="og:title" content="{% block og_title %}Joel Digitals – Digitale Lösungen für Ihr Business{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Professionelle Webentwicklung, Marketing, Design & IT-Dienstleistungen - Alles aus einer Hand.{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}{% static 'images/office.png' %}?v=2{% endblock %}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:site_name" content="Joel Digitals">
 
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Joel Digitals – Digitale Lösungen für Ihr Business">
-  <meta name="twitter:description" content="Professionelle Webentwicklung, Marketing & IT-Dienstleistungen - Alles aus einer Hand.">
-  <meta name="twitter:image" content="{% static 'images/office.png' %}">
+  <meta name="twitter:title" content="{% block twitter_title %}Joel Digitals – Digitale Lösungen für Ihr Business{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Professionelle Webentwicklung, Marketing & IT-Dienstleistungen - Alles aus einer Hand.{% endblock %}">
+  <meta name="twitter:image" content="{% block twitter_image %}{% static 'images/office.png' %}?v=2{% endblock %}">
 
-  <!-- Google Ads Conversion -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17401744435"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -521,35 +519,65 @@
     gtag('js', new Date());
     gtag('config', 'AW-17401744435');
   </script>
-  <script>
-    gtag('event', 'conversion', {
-      'send_to': 'AW-17401744435/3TMiCJ6x4PoaELOY5ulA',
-      'value': 1.0,
-      'currency': 'EUR'
-    });
-  </script>
-  <script>
-    gtag('event', 'conversion', {'send_to': 'AW-17401744435/_pVCCL2CpvwaELOY5ulA'});
-  </script>
   <meta name="google-site-verification" content="nYCDtmq2NV0GFiHeLJOBxrS7aoBIl6PYI_kk6RjH85k" />
 
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Joel Digitals",
+    "url": "https://www.joel-digitals.de",
+    "logo": "https://www.joel-digitals.de{% static 'logo.png' %}",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+49-1525-3480270",
+      "contactType": "customer service",
+      "availableLanguage": ["German", "English"]
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Niederwiesstraße 20",
+      "postalCode": "66822",
+      "addressLocality": "Lebach",
+      "addressCountry": "DE"
+    }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Joel Digitals",
+    "url": "https://www.joel-digitals.de",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://www.joel-digitals.de/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  {% if rating %}
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": "Joel Digitals",
     "description": "Joel Digitals Bewertungen",
-    "price": 80,
-    "currency": "EUR",
-    "availability": "InStock",
     "aggregateRating": {
-      "ratingValue": 4.6,
-      "reviewCount": 112,
-      "bestRating": 4.8,
-      "worstRating": 3.5
+      "@type": "AggregateRating",
+      "ratingValue": "{{ rating.average }}",
+      "reviewCount": "{{ rating.count }}",
+      "bestRating": "5",
+      "worstRating": "1"
     }
   }
   </script>
+  {% endif %}
 
   {% block extra_head %}{% endblock %}
 </head>
@@ -669,11 +697,18 @@
       <button class="dropbtn">
         <img src="{% static 'flags/de.png' %}" alt="de" class="flag-icon" id="current-flag">
       </button>
+      <script>
+        (function() {
+          var lang = (document.documentElement.lang || 'de').substring(0, 2);
+          var flag = document.getElementById('current-flag');
+          if (lang === 'en') flag.src = "{% static 'flags/en.png' %}";
+        })();
+      </script>
       <div class="dropdown-content">
-        <a href="/de/" onclick="switchLanguage('de')">
+        <a href="#" onclick="switchLanguage('de'); return false;">
           <img src="{% static 'flags/de.png' %}" class="flag-icon"> Deutsch
         </a>
-        <a href="/en/" onclick="switchLanguage('en')">
+        <a href="#" onclick="switchLanguage('en'); return false;">
           <img src="{% static 'flags/en.png' %}" class="flag-icon"> English
         </a>
       </div>
@@ -682,6 +717,15 @@
 </header>
 
 <script>
+function switchLanguage(lang) {
+  var path = window.location.pathname;
+  var newPath = path.replace(/^\/[a-z]{2}\//, '/' + lang + '/');
+  if (newPath === path) {
+    newPath = '/' + lang + path;
+  }
+  window.location.href = newPath;
+}
+
 function toggleMenu() {
   const nav = document.getElementById("main-nav");
   const icon = document.getElementById("menu-icon");
@@ -724,10 +768,7 @@ document.addEventListener("click", function(event) {
   }
 });
 
-function switchLanguage(lang) {
-  // Optional: Language switching logic
-  console.log('Switching to language:', lang);
-}
+
 </script>
 
 <main>

@@ -2,7 +2,7 @@
 {% load i18n %}
 
 <!DOCTYPE html>
-<html lang="de">
+<html lang="{{ LANGUAGE_CODE|default:'de' }}">
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}Joel Digitals{% endblock %}</title>
@@ -669,11 +669,18 @@
       <button class="dropbtn">
         <img src="{% static 'flags/de.png' %}" alt="de" class="flag-icon" id="current-flag">
       </button>
+      <script>
+        (function() {
+          var lang = (document.documentElement.lang || 'de').substring(0, 2);
+          var flag = document.getElementById('current-flag');
+          if (lang === 'en') flag.src = "{% static 'flags/en.png' %}";
+        })();
+      </script>
       <div class="dropdown-content">
-        <a href="/de/" onclick="switchLanguage('de')">
+        <a href="#" onclick="switchLanguage('de'); return false;">
           <img src="{% static 'flags/de.png' %}" class="flag-icon"> Deutsch
         </a>
-        <a href="/en/" onclick="switchLanguage('en')">
+        <a href="#" onclick="switchLanguage('en'); return false;">
           <img src="{% static 'flags/en.png' %}" class="flag-icon"> English
         </a>
       </div>
@@ -682,6 +689,15 @@
 </header>
 
 <script>
+function switchLanguage(lang) {
+  var path = window.location.pathname;
+  var newPath = path.replace(/^\/[a-z]{2}\//, '/' + lang + '/');
+  if (newPath === path) {
+    newPath = '/' + lang + path;
+  }
+  window.location.href = newPath;
+}
+
 function toggleMenu() {
   const nav = document.getElementById("main-nav");
   const icon = document.getElementById("menu-icon");
@@ -723,11 +739,6 @@ document.addEventListener("click", function(event) {
     profileDropdown.classList.remove("active");
   }
 });
-
-function switchLanguage(lang) {
-  // Optional: Language switching logic
-  console.log('Switching to language:', lang);
-}
 </script>
 
 <main>

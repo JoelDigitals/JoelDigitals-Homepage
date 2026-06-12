@@ -575,57 +575,63 @@
           <div class="form-grid">
             <div class="form-group">
               <label>{% trans "First Name" %} *</label>
-              <input type="text" name="first_name" required placeholder="{% trans 'Max' %}">
+              <input type="text" name="first_name" required placeholder="{% trans 'Max' %}" value="{{ customer_info.first_name|default:'' }}">
             </div>
 
             <div class="form-group">
               <label>{% trans "Last Name" %} *</label>
-              <input type="text" name="last_name" required placeholder="{% trans 'Mustermann' %}">
+              <input type="text" name="last_name" required placeholder="{% trans 'Mustermann' %}" value="{{ customer_info.last_name|default:'' }}">
             </div>
 
             <div class="form-group">
               <label>{% trans "Company" %} ({% trans "optional" %})</label>
-              <input type="text" name="company_name" placeholder="{% trans 'Company Ltd.' %}">
+              <input type="text" name="company_name" placeholder="{% trans 'Company Ltd.' %}" value="{{ customer_info.company_name|default:'' }}">
             </div>
 
             <div class="form-group">
               <label>{% trans "VAT Number" %} ({% trans "optional" %})</label>
-              <input type="text" name="vat_number" placeholder="DE123456789">
+              <input type="text" name="vat_number" placeholder="DE123456789" value="{{ customer_info.vat_number|default:'' }}">
             </div>
 
             <div class="form-group">
               <label>{% trans "Phone" %} *</label>
-              <input type="tel" name="phone" required placeholder="+49 123 456789">
+              <input type="tel" name="phone" required placeholder="+49 123 456789" value="{{ customer_info.phone|default:'' }}">
             </div>
 
             <div class="form-group">
               <label>{% trans "Email" %} *</label>
-              <input type="email" name="email" required placeholder="max@example.com">
+              <input type="email" name="email" required placeholder="max@example.com" value="{{ customer_info.email|default:'' }}">
             </div>
 
             <div class="form-group full-width">
               <label>{% trans "Street Address" %} *</label>
-              <input type="text" name="address" required placeholder="{% trans 'Main Street 123' %}">
+              <input type="text" name="address" required placeholder="{% trans 'Main Street 123' %}" value="{{ customer_info.address|default:'' }}">
             </div>
 
             <div class="form-group">
               <label>{% trans "ZIP Code" %} *</label>
-              <input type="text" name="zip_code" required placeholder="12345">
+              <input type="text" name="zip_code" required placeholder="12345" value="{{ customer_info.zip_code|default:'' }}">
             </div>
 
             <div class="form-group">
               <label>{% trans "City" %} *</label>
-              <input type="text" name="city" required placeholder="{% trans 'Berlin' %}">
+              <input type="text" name="city" required placeholder="{% trans 'Berlin' %}" value="{{ customer_info.city|default:'' }}">
             </div>
 
             <div class="form-group">
               <label>{% trans "Affiliate Code" %}</label>
-              <input type="text" name="affiliate_code" placeholder="{% trans 'Partner2024' %}">
+              <input type="text" name="affiliate_code" id="affiliate-code-input" placeholder="{% trans 'Partner2024' %}" value="{{ initial_affiliate_code|default:'' }}" autocomplete="off">
             </div>
 
             <div class="form-group">
               <label>{% trans "Discount Code" %}</label>
-              <input type="text" name="discount_code" id="discount-code-input" placeholder="{% trans 'SAVE20' %}">
+              <div style="display:flex;gap:8px;width:100%;">
+                <input type="text" name="discount_code" id="discount-code-input" placeholder="{% trans 'SAVE20' %}" autocomplete="off" style="flex:1;" value="{{ initial_discount_code|default:'' }}">
+                <button type="button" id="redeem-btn" style="padding:0.75rem 1.25rem;background:linear-gradient(135deg,#4CAF50,#388E3C);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.3s ease;">
+                  <i class="fas fa-check"></i> {% trans "Redeem" %}
+                </button>
+              </div>
+              <div id="code-status" style="margin-top:6px;font-size:0.85rem;display:none;"></div>
             </div>
 
             <div class="form-group full-width">
@@ -743,6 +749,9 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const discountInput = document.getElementById("discount-code-input");
+    const affiliateInput = document.getElementById("affiliate-code-input");
+    const redeemBtn = document.getElementById("redeem-btn");
+    const codeStatus = document.getElementById("code-status");
     const discountLine = document.getElementById("discount-line");
     const discountAmount = document.getElementById("discount-amount");
     const totalAmount = document.getElementById("total-amount");
@@ -751,35 +760,121 @@ document.addEventListener("DOMContentLoaded", function() {
     const sepaCheckbox = document.querySelector("input[name='accept_sepa']");
     const sepaInputs = sepaFields ? sepaFields.querySelectorAll("input[type='text']") : [];
 
-    let timeout = null;
+    const originalTotal = parseFloat("{{ total|floatformat:2 }}");
+    let lastAffiliateValue = affiliateInput.value.trim();
 
-    discountInput.addEventListener("input", function() {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            fetch("{% url 'validate_codes' %}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": "{{ csrf_token }}",
-                },
-                body: JSON.stringify({
-                    discount_code: discountInput.value.trim()
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.valid) {
-                    discountLine.style.display = "flex";
-                    discountAmount.textContent = parseFloat(data.discount).toFixed(2);
-                    totalAmount.textContent = parseFloat(data.new_total).toFixed(2);
-                } else {
-                    discountLine.style.display = "none";
-                    discountAmount.textContent = "0.00";
-                    totalAmount.textContent = "{{ total|floatformat:2 }}";
+    function showStatus(message, type) {
+        codeStatus.textContent = message;
+        codeStatus.style.display = "block";
+        codeStatus.style.color = type === "success" ? "#4CAF50" : type === "info" ? "#2196F3" : "#f44336";
+    }
+
+    function hideStatus() {
+        codeStatus.style.display = "none";
+    }
+
+    function updateTotals(discount, newTotal) {
+        if (discount > 0) {
+            discountLine.style.display = "flex";
+            discountAmount.textContent = discount.toFixed(2);
+        } else {
+            discountLine.style.display = "none";
+            discountAmount.textContent = "0.00";
+        }
+        totalAmount.textContent = newTotal.toFixed(2);
+    }
+
+    function validateCodes(triggeredBy) {
+        const discount = discountInput.value.trim();
+        const affiliate = affiliateInput.value.trim();
+
+        if (!discount && !affiliate) {
+            updateTotals(0, originalTotal);
+            hideStatus();
+            return;
+        }
+
+        fetch("{% url 'validate_codes' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({
+                discount_code: discount,
+                affiliate_code: affiliate
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid) {
+                const discVal = parseFloat(data.discount || 0);
+                const totalVal = parseFloat(data.new_total || originalTotal);
+                updateTotals(discVal, totalVal);
+
+                let msg = "";
+                if (discVal > 0) msg = "✓ Rabatt von " + discVal.toFixed(2) + " € angewendet";
+                if (affiliate && data.affiliate_valid) msg += (msg ? ", " : "") + "✓ Affiliate-Code aktiv";
+                if (msg) showStatus(msg || "✓ Codes gültig", "success");
+
+                // Matching: Rabattcode → Affiliate-Code automatisch einsetzen
+                if (data.matched_affiliate && !affiliate) {
+                    affiliateInput.value = data.matched_affiliate;
+                    lastAffiliateValue = data.matched_affiliate;
+                    showStatus("✓ Rabattcode eingelöst. Affiliate-Code '" + data.matched_affiliate + "' wurde automatisch eingesetzt.", "success");
                 }
-            });
-        }, 500);
+
+                // Matching: Affiliate-Code → Rabattcode automatisch einsetzen
+                if (data.matched_discount && !discount) {
+                    discountInput.value = data.matched_discount;
+                    showStatus("✓ Affiliate-Code erkannt. Rabattcode '" + data.matched_discount + "' wurde automatisch eingesetzt.", "success");
+                    // Neu berechnen mit dem gefundenen Rabattcode
+                    validateCodes("affiliate");
+                }
+            } else {
+                const msg = data.message || "Code ungültig";
+                if (triggeredBy === "redeem" || triggeredBy === "affiliate") {
+                    showStatus("✗ " + msg, "error");
+                }
+                if (triggeredBy === "redeem" || triggeredBy !== "affiliate") {
+                    updateTotals(0, originalTotal);
+                }
+            }
+        })
+        .catch(function() {
+            showStatus("✗ Fehler bei der Prüfung", "error");
+        });
+    }
+
+    // Einlösen-Button
+    redeemBtn.addEventListener("click", function() {
+        if (!discountInput.value.trim()) {
+            showStatus("✗ Bitte einen Rabattcode eingeben", "error");
+            return;
+        }
+        validateCodes("redeem");
     });
+
+    // Affiliate-Code: bei Eingabe prüfen (nach kurzer Pause)
+    let affTimeout = null;
+    affiliateInput.addEventListener("input", function() {
+        clearTimeout(affTimeout);
+        const val = affiliateInput.value.trim();
+        if (val === lastAffiliateValue) return;
+        lastAffiliateValue = val;
+        if (!val) {
+            hideStatus();
+            return;
+        }
+        affTimeout = setTimeout(function() {
+            validateCodes("affiliate");
+        }, 400);
+    });
+
+    // Beim Laden: vorhandene Codes prüfen (aus URL-Param oder Session)
+    if (affiliateInput.value.trim() || discountInput.value.trim()) {
+        setTimeout(function() { validateCodes("affiliate"); }, 300);
+    }
 
     function toggleSepaFields() {
         if (!sepaFields) return;
