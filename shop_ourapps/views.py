@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.mail import send_mail, EmailMultiAlternatives
-from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup
+from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup, AffiliateMarketingMaterial
 from shop_ourapps.models import AffiliatePartner
 from .forms import PurchaseForm, VoucherPurchaseForm
 from .services.automation_service import OrderAutomationService
@@ -564,8 +564,9 @@ def affiliate_dashboard(request):
         stats = calculate_affiliate_stats(request.user)
         if not stats:
             raise AffiliatePartner.DoesNotExist
-        affiliate_url = request.build_absolute_uri("/") + f"?ref={stats.get('affiliate_code', '')}"
+        affiliate_url = request.build_absolute_uri("/shop/") + f"?ref={stats.get('affiliate_code', '')}"
         stats["affiliate_url"] = affiliate_url
+        stats["marketing_materials"] = AffiliateMarketingMaterial.objects.all()
         return render(request, "apps/dashboard.html", stats)
     except AffiliatePartner.DoesNotExist:
         messages.error(request, "You are not yet registered as an Affiliate Partner.")
@@ -894,6 +895,9 @@ def checkout(request):
         if affiliate_code_input:
             try:
                 affiliate_code_obj = AffiliateCode.objects.get(code__iexact=affiliate_code_input, is_active=True)
+                if affiliate_code_obj.partner.user == request.user:
+                    messages.warning(request, _('Du kannst deinen eigenen Affiliate-Code nicht verwenden.'))
+                    affiliate_code_obj = None
             except AffiliateCode.DoesNotExist:
                 messages.warning(request, 'Affiliate-Code ist ungültig.')
 
@@ -1206,6 +1210,25 @@ def validate_codes(request):
             result["matched_discount"] = match.code
 
     return JsonResponse(result)
+
+
+def validate_affiliate_code(request):
+    code = request.GET.get("code", "").strip()
+    if not code:
+        return JsonResponse({"valid": False, "exists": False})
+    exists = AffiliateCode.objects.filter(code__iexact=code, is_active=True).exists()
+    result = {"valid": exists, "exists": exists}
+    if exists and request.user.is_authenticated:
+        try:
+            partner = AffiliatePartner.objects.get(user=request.user)
+            own_codes = AffiliateCode.objects.filter(partner=partner, code__iexact=code).exists()
+            if own_codes:
+                result["own_code"] = True
+                result["valid"] = False
+        except AffiliatePartner.DoesNotExist:
+            pass
+    return JsonResponse(result)
+
 
 def more_informations(request, slug):
     lang = get_language()

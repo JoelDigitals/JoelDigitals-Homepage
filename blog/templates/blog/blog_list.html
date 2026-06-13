@@ -4,6 +4,11 @@
 
 {% block title %}Joel Digitals – {% trans "Blog" %}{% endblock %}
 
+{% block extra_head %}
+<link rel="alternate" type="application/rss+xml" title="Joel Digitals Blog (RSS)" href="{% url 'blog_rss' %}">
+<link rel="alternate" type="application/atom+xml" title="Joel Digitals Blog (Atom)" href="{% url 'blog_atom' %}">
+{% endblock %}
+
 {% block content %}
 <style>
   .blog-container {

@@ -551,6 +551,8 @@
   }
   </script>
 
+  <link rel="alternate" type="application/rss+xml" title="Joel Digitals Blog (RSS)" href="{% url 'blog_rss' %}">
+  <link rel="alternate" type="application/atom+xml" title="Joel Digitals Blog (Atom)" href="{% url 'blog_atom' %}">
   {% block extra_head %}{% endblock %}
 </head>
 
@@ -698,6 +700,28 @@ function switchLanguage(lang) {
   window.location.href = newPath;
 }
 
+(function() {
+  var lang = (document.documentElement.lang || 'de').substring(0, 2);
+  var skipPrefixes = /^\/(de|en|admin|auth|media|static|i18n|o|api|chat|sitemap|robots)(\/|\.|$)/;
+  function fixHref(a) {
+    var href = a.getAttribute('href');
+    if (!href || !href.startsWith('/') || href.startsWith('//') || href.startsWith('/#')) return;
+    if (skipPrefixes.test(href)) return;
+    a.setAttribute('href', '/' + lang + href);
+  }
+  document.querySelectorAll('a[href^="/"]').forEach(fixHref);
+  new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      m.addedNodes.forEach(function(n) {
+        if (n.nodeType === 1) {
+          if (n.tagName === 'A' && n.getAttribute('href') && n.getAttribute('href').startsWith('/')) fixHref(n);
+          if (n.querySelectorAll) n.querySelectorAll('a[href^="/"]').forEach(fixHref);
+        }
+      });
+    });
+  }).observe(document.body, { childList: true, subtree: true });
+})();
+
 function toggleMenu() {
   const nav = document.getElementById("main-nav");
   const icon = document.getElementById("menu-icon");
@@ -741,6 +765,18 @@ document.addEventListener("click", function(event) {
 });
 </script>
 
+{% if affiliate_ref_code %}
+<div style="background:{% if affiliate_ref_own %}linear-gradient(135deg,#6366f1,#8b5cf6){% elif affiliate_ref_valid %}linear-gradient(135deg,#4CAF50,#2E7D32){% else %}linear-gradient(135deg,#f59e0b,#d97706){% endif %};color:white;text-align:center;padding:0.6rem 1rem;font-size:0.9rem;">
+  {% if affiliate_ref_own %}
+    <i class="fas fa-check-circle"></i> {% trans "Affiliate-Code verifiziert" %}: <strong>{{ affiliate_ref_code }}</strong> – {% trans "Dein Code ist korrekt! Teile diesen Link mit deinem Publikum, um Provisionen zu verdienen." %}
+  {% elif affiliate_ref_valid %}
+    <i class="fas fa-check-circle"></i> {% trans "Affiliate-Code gültig" %}: <strong>{{ affiliate_ref_code }}</strong> – {% trans "Der Code wurde erfolgreich erkannt." %}
+  {% else %}
+    <i class="fas fa-exclamation-triangle"></i> {% trans "Affiliate-Code" %}: <strong>{{ affiliate_ref_code }}</strong> – {% trans "Code nicht gefunden oder inaktiv." %}
+  {% endif %}
+</div>
+{% endif %}
+
 <main>
     {% block content %}{% endblock %}
 </main>
@@ -753,6 +789,7 @@ document.addEventListener("click", function(event) {
     <a href="/privacy/">{% trans "Privacy Policy" %}</a> |
     <a href="/terms/">{% trans "Terms of Service" %}</a> |
     <a href="/affiliate/info/">{% trans "Affiliate Program" %}</a> |
+    <a href="/blog/rss/" title="RSS Feed"><i class="fas fa-rss"></i> RSS</a> |
     <a href="/">{% trans "Home" %}</a>
   </div>
 

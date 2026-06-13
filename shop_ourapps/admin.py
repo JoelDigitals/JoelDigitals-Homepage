@@ -2,7 +2,8 @@ from django.contrib import admin
 from .models import (
     Purchase, AffiliateLink, Affiliate, App, Cart, CartItem, AffiliateTransaction, 
     AffiliatePartner, Order, OrderItem, AffiliateCode, DiscountCode, Wallet, WalletCode, 
-    AppGroup, Voucher, VoucherOrder, SaleBadge, OrderStatusLog
+    AppGroup, Voucher, VoucherOrder, SaleBadge, OrderStatusLog,
+    AffiliateMarketingMaterial, AffiliateInvoice,
 )
 
 class PurchaseAdmin(admin.ModelAdmin):
@@ -66,3 +67,34 @@ class ReturnRequestAdmin(admin.ModelAdmin):
     list_editable = ('status',)
     search_fields = ('user__username', 'order__id', 'description')
     ordering      = ('-created_at',)
+
+
+@admin.register(AffiliateMarketingMaterial)
+class AffiliateMarketingMaterialAdmin(admin.ModelAdmin):
+    list_display = ('title_de', 'title_en', 'created_at')
+    search_fields = ('title_de', 'title_en')
+
+
+@admin.register(AffiliateInvoice)
+class AffiliateInvoiceAdmin(admin.ModelAdmin):
+    list_display = ('partner', 'amount', 'is_credited', 'created_at')
+    list_filter = ('is_credited', 'partner')
+    search_fields = ('partner__name', 'description')
+    actions = ['credit_to_wallet']
+
+    @admin.action(description="Betrag dem Affiliate-Wallet gutschreiben")
+    def credit_to_wallet(self, request, queryset):
+        from django.db.models import F
+        from decimal import Decimal
+        from django.utils import timezone
+        count = 0
+        for inv in queryset.filter(is_credited=False):
+            wallet, _ = Wallet.objects.get_or_create(user=inv.partner.user)
+            Wallet.objects.filter(id=wallet.id).update(
+                pending_earnings=F('pending_earnings') + inv.amount
+            )
+            inv.is_credited = True
+            inv.credited_at = timezone.now()
+            inv.save(update_fields=['is_credited', 'credited_at'])
+            count += 1
+        self.message_user(request, f"{count} Rechnung(en) gutgeschrieben.")

@@ -640,3 +640,37 @@ class AppReview(models.Model):
 
     def __str__(self):
         return f"{self.user.username} → {self.app.name}: {self.stars}★"
+
+
+class AffiliateMarketingMaterial(models.Model):
+    title_de = models.CharField(max_length=200, verbose_name="Titel (DE)")
+    title_en = models.CharField(max_length=200, verbose_name="Title (EN)")
+    file_de = models.FileField(upload_to='affiliate/marketing/', verbose_name="Werbematerial (DE) ZIP")
+    file_en = models.FileField(upload_to='affiliate/marketing/', verbose_name="Marketing Material (EN) ZIP", blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Werbematerial"
+        verbose_name_plural = "Werbematerialien"
+
+    def __str__(self):
+        return self.title_de
+
+
+class AffiliateInvoice(models.Model):
+    partner = models.ForeignKey(AffiliatePartner, on_delete=models.CASCADE, related_name='invoices')
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Betrag (€)")
+    description = models.TextField(verbose_name="Beschreibung", blank=True)
+    invoice_file = models.FileField(upload_to='affiliate/invoices/', verbose_name="Rechnungsdatei", blank=True, null=True)
+    is_credited = models.BooleanField(default=False, verbose_name="Gutgeschrieben")
+    created_at = models.DateTimeField(auto_now_add=True)
+    credited_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Affiliate-Rechnung"
+        verbose_name_plural = "Affiliate-Rechnungen"
+
+    def __str__(self):
+        return f"Rechnung {self.partner.name} – {self.amount}€"

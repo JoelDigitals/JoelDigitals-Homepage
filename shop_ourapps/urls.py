@@ -27,6 +27,7 @@ urlpatterns = [
     path("create-stripe-payment/<int:order_id>/", views.create_stripe_payment, name="create_stripe_payment"),
     path('paypal/execute/', views.paypal_execute, name='paypal_execute'),
     path("checkout/validate-codes/", views.validate_codes, name="validate_codes"),
+    path("api/validate-affiliate/", views.validate_affiliate_code, name="validate_affiliate_code"),
     path('remove_from_cart/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('order_confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
 

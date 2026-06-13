@@ -1,8 +1,11 @@
 from django.urls import path
 from . import views
+from .feeds import LatestPostsFeed, AtomLatestPostsFeed
 
 urlpatterns = [
     path("", views.blog_list, name="blog_list"),
+    path("rss/", LatestPostsFeed(), name="blog_rss"),
+    path("atom/", AtomLatestPostsFeed(), name="blog_atom"),
     path("<int:pk>/", views.blog_detail, name="blog_detail"),
     path("admin-blog/", views.admin_blog, name="admin_blog"),
     path("create/", views.blog_create, name="create"),

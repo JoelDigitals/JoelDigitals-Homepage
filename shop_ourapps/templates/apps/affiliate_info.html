@@ -477,14 +477,27 @@
       </div>
     </section>
 
-    <!-- Future Link Notice -->
-    <div class="future-notice">
-      <i class="fas fa-clock"></i>
-      <div class="future-notice-content">
-        <h3>{% trans "Affiliate-Links kommen bald!" %}</h3>
-        <p>{% trans "In Zukunft werden wir zusätzlich zu den Codes auch persönliche Tracking-Links einführen. Bestehende Codes bleiben selbstverständlich gültig." %}</p>
+    <!-- Affiliate Link Section -->
+    <section class="code-section" style="border-color:#6464FF;background:linear-gradient(135deg, rgba(100,100,255,0.1), rgba(80,80,200,0.05));">
+      <h2 class="code-title" style="color:#6464FF;">
+        <i class="fas fa-link"></i>
+        {% trans "Dein persönlicher Affiliate-Link" %}
+      </h2>
+      
+      <p style="color: #888; margin-bottom: 1rem;">
+        {% trans "Dein Affiliate-Link führt Kunden direkt in unseren Shop. Wenn jemand über diesen Link einkauft, wird dein Code automatisch hinterlegt." %}
+      </p>
+      
+      <div class="code-box" style="border-color:#6464FF;">
+        <div class="code-label">{% trans "Link-Format" %}</div>
+        <div class="code-value" style="color:#6464FF;font-size:1.3rem;">https://joel-digitals.de/shop/?ref=DEINCODE</div>
       </div>
-    </div>
+      
+      <div class="code-info">
+        <i class="fas fa-info-circle" style="color:#6464FF;margin-right:0.5rem;"></i>
+        {% trans "Ersetze DEINCODE mit deinem persönlichen Affiliate-Code. Kunden, die über diesen Link kommen, müssen nichts weiter tun – dein Code wird automatisch im Warenkorb gespeichert." %}
+      </div>
+    </section>
 
     <!-- Features -->
     <h2 class="features-title">{% trans "Deine Vorteile als Affiliate-Partner" %}</h2>

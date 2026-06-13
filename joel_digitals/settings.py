@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
+    'django.contrib.syndication',
     'ckeditor',
     'ckeditor_uploader',
     'main',
@@ -72,6 +73,8 @@ INSTALLED_APPS = [
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
+
+SITE_ID = 1
 
 GA_PROPERTY_ID = "508800547"  # z.B. "123456789"
 
@@ -101,7 +104,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
                 'main.context_processors.seo_data',
+                'shop_ourapps.context_processor.affiliate_ref_status',
             ],
         },
     },

@@ -459,6 +459,37 @@
         <canvas id="salesChart"></canvas>
       </div>
     </div>
+
+    <!-- Marketing Materials -->
+    {% if marketing_materials %}
+    <div class="code-section" style="border-color:#6366f1;background:linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.05));margin-top:2rem;">
+      <div class="code-label" style="color:#6366f1;">
+        <i class="fas fa-download"></i>
+        {% trans "Marketing Materials" %}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.75rem;max-width:500px;margin:0 auto;">
+        {% for mat in marketing_materials %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
+          <span style="font-weight:600;color:var(--text);font-size:0.95rem;">{{ mat.title_de }}</span>
+          <div style="display:flex;gap:0.5rem;">
+            <a href="{{ mat.file_de.url }}" download class="btn-copy" style="padding:0.4rem 0.75rem;font-size:0.8rem;background:linear-gradient(135deg,var(--primary),#0066ff);color:white;text-decoration:none;border-radius:6px;">
+              <i class="fas fa-download"></i> DE
+            </a>
+            {% if mat.file_en %}
+            <a href="{{ mat.file_en.url }}" download class="btn-copy" style="padding:0.4rem 0.75rem;font-size:0.8rem;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;text-decoration:none;border-radius:6px;">
+              <i class="fas fa-download"></i> EN
+            </a>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <p style="margin-top:0.75rem;font-size:0.8rem;color:#888;">
+        <i class="fas fa-info-circle"></i>
+        {% trans "Use these materials to promote Joel Digitals." %}
+      </p>
+    </div>
+    {% endif %}
   </div>
 </div>
 
