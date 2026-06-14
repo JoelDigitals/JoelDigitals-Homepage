@@ -93,6 +93,7 @@
       <div class="form-group">
         <label class="form-label">Art des Antrags:</label>
         <div style="display:flex;gap:8px;margin-bottom:4px;">
+          {% if any_refundable %}
           <label style="flex:1;cursor:pointer;">
             <input type="radio" name="return_type" value="refund" checked style="display:none;" id="rt-refund">
             <div id="rt-refund-btn" onclick="selectType('refund')" style="border:2px solid rgba(0,191,255,0.35);border-radius:10px;padding:12px 14px;background:rgba(0,191,255,0.08);transition:all .15s;text-align:center;">
@@ -101,14 +102,17 @@
               <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">Geld zurück</div>
             </div>
           </label>
+          {% endif %}
+          {% if any_exchangeable %}
           <label style="flex:1;cursor:pointer;">
-            <input type="radio" name="return_type" value="exchange" style="display:none;" id="rt-exchange">
+            <input type="radio" name="return_type" value="exchange" {% if not any_refundable %}checked{% endif %} style="display:none;" id="rt-exchange">
             <div id="rt-exchange-btn" onclick="selectType('exchange')" style="border:2px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px;background:rgba(255,255,255,0.02);transition:all .15s;text-align:center;">
               <div style="font-size:18px;margin-bottom:4px;">&#8646;</div>
               <div style="font-size:13px;font-weight:600;color:#fff;">Umtausch</div>
               <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">Andere Version / Produkt</div>
             </div>
           </label>
+          {% endif %}
         </div>
       </div>
 

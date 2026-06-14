@@ -1,16 +1,13 @@
 # blog/views.py
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import user_passes_test
-from .models import BlogPost, BlogCategory
-from .forms import BlogPostForm, BlogCategoryForm
-from django.conf import settings
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import user_passes_test, login_required
-from django.db.models import Count
-from .models import BlogPost, BlogCategory, Comment
-from .forms import BlogPostForm, BlogCategoryForm
+from django.db.models import Count, F
+from django.utils import timezone
+from django.conf import settings
 from django import forms
+from .models import BlogPost, BlogCategory, Comment, BlogViewTracking
+from .forms import BlogPostForm, BlogCategoryForm
 
 
 class CommentForm(forms.ModelForm):
@@ -28,6 +25,7 @@ def is_blog_editor(user):
 
 from django.utils import timezone
 from django.core.paginator import Paginator
+from django.db import models
 
 def blog_list(request):
     lang = request.LANGUAGE_CODE
@@ -74,6 +72,11 @@ def blog_detail(request, pk):
     post = get_object_or_404(BlogPost, pk=pk, is_published=True)
     post.views += 1
     post.save(update_fields=["views"])
+
+    today = timezone.now().date()
+    tracking, _ = BlogViewTracking.objects.get_or_create(post=post, date=today)
+    tracking.count = models.F('count') + 1
+    tracking.save(update_fields=['count'])
 
     comments = post.comments.order_by("-created_at")
     form = CommentForm()

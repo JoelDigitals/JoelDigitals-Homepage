@@ -66,3 +66,16 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.username} on {self.post.title_de}"
+
+
+class BlogViewTracking(models.Model):
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='daily_views')
+    date = models.DateField()
+    count = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('post', 'date')
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.post.title_de} – {self.date}: {self.count}"

@@ -448,7 +448,7 @@
             <div class="item-row">
               <div class="item-info">
                 <span class="item-qty">{{ item.quantity }}</span>
-                <span class="item-name">{{ item.app.name }}</span>
+                <span class="item-name">{{ item.get_name }}</span>
               </div>
               <span class="item-price">€{{ item.price|floatformat:2 }}</span>
             </div>

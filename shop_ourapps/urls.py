@@ -32,6 +32,8 @@ urlpatterns = [
     path('order_confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
 
     path('admin-sales/orders/', views.order_admin, name='order_admin'),
+    path('admin-sales/create-order/', views.admin_create_order, name='admin_create_order'),
+    path('admin-sales/search-users/', views.admin_search_users, name='admin_search_users'),
     path('my-orders/<int:order_id>/return/', views.request_return, name='request_return'),
     path('my-orders/<int:order_id>/tracking/', views.order_tracking, name='order_tracking'),
     path('admin-sales/orders/<int:order_id>/set-tracking/', views.order_admin_set_tracking, name='order_admin_set_tracking'),

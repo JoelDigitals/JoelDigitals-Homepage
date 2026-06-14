@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.mail import send_mail, EmailMultiAlternatives
-from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup, AffiliateMarketingMaterial
+from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup, AffiliateMarketingMaterial, AffiliateTransaction
 from shop_ourapps.models import AffiliatePartner
 from .forms import PurchaseForm, VoucherPurchaseForm
 from .services.automation_service import OrderAutomationService
@@ -402,11 +403,53 @@ def wallet_view(request):
                 messages.error(request, f"Gutscheincode '{code}' ist ungültig oder wurde bereits verwendet.")
             return redirect("wallet")
 
+        # Auszahlung beantragen
+        elif 'request_payout' in request.POST:
+            pay_amount = request.POST.get("payout_amount", "0").strip()
+            account_number = request.POST.get("account_number", "").strip()
+            try:
+                pay_amount = Decimal(pay_amount)
+            except ValueError:
+                messages.error(request, "Ungültiger Betrag.")
+                return redirect("wallet")
+            if pay_amount <= 0:
+                messages.error(request, "Bitte einen gültigen Betrag angeben.")
+            elif wallet.pending_earnings <= 0:
+                messages.error(request, "Keine auszahlbaren Provisionen vorhanden.")
+            elif pay_amount > wallet.pending_earnings:
+                messages.error(request, f"Maximal auszahlbar: {wallet.pending_earnings:.2f}€")
+            elif not account_number:
+                messages.error(request, "Bitte eine Kontonummer (IBAN) angeben.")
+            else:
+                from django.core.mail import send_mail
+                user_name = request.user.get_full_name() or request.user.username
+                send_mail(
+                    subject=f"Auszahlungsanfrage – {user_name} ({pay_amount:.2f}€)",
+                    message=(
+                        f"Auszahlungsanfrage von {user_name} ({request.user.email})\n\n"
+                        f"Auszahlungsbetrag: {pay_amount:.2f}€\n"
+                        f"Verfügbare Provisionen: {wallet.pending_earnings:.2f}€\n"
+                        f"Wallet-Guthaben: {wallet.balance:.2f}€\n"
+                        f"Kontonummer (IBAN): {account_number}\n"
+                        f"User-ID: {request.user.id}\n\n"
+                        f"Bitte die Auszahlung manuell bearbeiten."
+                    ),
+                    from_email=settings.COMPANY_EMAIL_NO_REPLY,
+                    recipient_list=[settings.COMPANY_EMAIL],
+                )
+                messages.success(request, f"Auszahlung über {pay_amount:.2f}€ beantragt. Wir bearbeiten sie schnellstmöglich.")
+            return redirect("wallet")
+
+    transactions = []
+    if partner:
+        transactions = AffiliateTransaction.objects.filter(partner=partner).order_by("-created_at")[:10]
+
     return render(request, 'apps/wallet.html', {
         'wallet': wallet,
         'total_monthly_earnings': total_monthly_earnings,
         'pending': wallet.pending_earnings,
-        'wallet_balance': wallet.balance if wallet else 0.00
+        'wallet_balance': wallet.balance if wallet else 0.00,
+        'transactions': transactions,
     })
 
 @login_required
@@ -567,6 +610,9 @@ def affiliate_dashboard(request):
         affiliate_url = request.build_absolute_uri("/shop/") + f"?ref={stats.get('affiliate_code', '')}"
         stats["affiliate_url"] = affiliate_url
         stats["marketing_materials"] = AffiliateMarketingMaterial.objects.all()
+        wallet = Wallet.objects.filter(user=request.user).first()
+        stats["wallet_balance"] = wallet.balance if wallet else 0.00
+        stats["pending_earnings"] = wallet.pending_earnings if wallet else 0.00
         return render(request, "apps/dashboard.html", stats)
     except AffiliatePartner.DoesNotExist:
         messages.error(request, "You are not yet registered as an Affiliate Partner.")
@@ -1296,6 +1342,152 @@ class SendAccessMailForm(forms.Form):
                 apps.append(app.strip())
         return apps
 
+@login_required
+@user_passes_test(is_Sales_Editor)
+def admin_create_order(request):
+    user_q = request.GET.get("q", "").strip()
+    customer_info = None
+    selected_user = None
+
+    user_id = request.GET.get("user_id", "")
+    if user_id:
+        sel = User.objects.filter(id=user_id).first()
+        if sel:
+            selected_user = sel
+            last = Order.objects.filter(user=sel).order_by("-created_at").first()
+            if last:
+                customer_info = {
+                    "first_name": last.first_name,
+                    "last_name": last.last_name,
+                    "email": last.email,
+                    "address": last.address,
+                    "zip_code": last.zip_code,
+                    "city": last.city,
+                    "phone": last.phone,
+                    "company_name": last.company_name or "",
+                    "vat_number": last.vat_number or "",
+                }
+
+    if request.method == "POST" and "create_order" in request.POST:
+        user_id = request.POST.get("user_id", "").strip()
+        order_user = User.objects.filter(id=user_id).first() if user_id else None
+
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        email = request.POST.get("email", "").strip()
+        address = request.POST.get("address", "").strip()
+        zip_code = request.POST.get("zip_code", "").strip()
+        city = request.POST.get("city", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        company_name = request.POST.get("company_name", "").strip()
+        vat_number = request.POST.get("vat_number", "").strip()
+
+        payment_method = request.POST.get("payment_method", "manual")
+        status = request.POST.get("status", "Paid")
+
+        aff_code = request.POST.get("affiliate_code", "").strip()
+        affiliate_code_obj = None
+        if aff_code:
+            try:
+                affiliate_code_obj = AffiliateCode.objects.get(code__iexact=aff_code, is_active=True)
+            except AffiliateCode.DoesNotExist:
+                messages.warning(request, f"Affiliate-Code '{aff_code}' nicht gefunden oder inaktiv.")
+
+        item_names = request.POST.getlist("item_name")
+        item_quantities = request.POST.getlist("item_qty")
+        item_prices = request.POST.getlist("item_price")
+        item_discounts = request.POST.getlist("item_discount")
+
+        subtotal = Decimal("0.00")
+        order_items = []
+        for i in range(len(item_names)):
+            name = item_names[i].strip() if i < len(item_names) else ""
+            if not name:
+                continue
+            qty = int(item_quantities[i]) if i < len(item_quantities) and item_quantities[i] else 1
+            price = Decimal(item_prices[i]) if i < len(item_prices) and item_prices[i] else Decimal("0.00")
+            disc = int(item_discounts[i]) if i < len(item_discounts) and item_discounts[i] else 0
+            line_total = price * qty
+            disc_amount = line_total * Decimal(disc) / Decimal("100")
+            line_total -= disc_amount
+            subtotal += line_total
+            order_items.append((name, qty, price, disc, line_total))
+
+        total_amount = subtotal
+
+        order = Order.objects.create(
+            user=order_user,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            address=address,
+            zip_code=zip_code,
+            city=city,
+            phone=phone,
+            company_name=company_name,
+            vat_number=vat_number,
+            payment_method=payment_method,
+            status=status,
+            subtotal=subtotal,
+            total_amount=total_amount,
+            affiliate_code=affiliate_code_obj,
+        )
+
+        for name, qty, price, disc, line_total in order_items:
+            OrderItem.objects.create(
+                order=order,
+                app=None,
+                name_override=name,
+                quantity=qty,
+                single_price=price,
+                discount_percent=disc,
+                discount_price=price - (price * Decimal(disc) / Decimal("100")),
+                price=line_total,
+            )
+
+        if affiliate_code_obj:
+            commission = total_amount * Decimal(affiliate_code_obj.partner.commission_percent) / Decimal("100")
+            wallet, _ = Wallet.objects.get_or_create(user=affiliate_code_obj.partner.user)
+            wallet.add_earnings(commission)
+            AffiliateTransaction.objects.create(partner=affiliate_code_obj.partner, order=order, amount=commission)
+
+        messages.success(request, f"Bestellung #{order.id} erfolgreich erstellt. Gesamt: {total_amount:.2f}€")
+        if affiliate_code_obj:
+            messages.success(request, f"Provision von {commission:.2f}€ an {affiliate_code_obj.partner.name} gutgeschrieben.")
+        return redirect("order_admin")
+
+    affiliates = AffiliatePartner.objects.filter(approved=True).order_by("name")
+    return render(request, "apps/admin_create_order.html", {
+        "customer_info": customer_info,
+        "selected_user": selected_user,
+        "affiliates": affiliates,
+        "user_q": user_q,
+    })
+
+
+@login_required
+@user_passes_test(is_Sales_Editor)
+def admin_search_users(request):
+    q = request.GET.get("q", "").strip()
+    if len(q) < 2:
+        return JsonResponse({"users": []})
+    results = User.objects.filter(
+        Q(username__icontains=q) |
+        Q(email__icontains=q) |
+        Q(first_name__icontains=q) |
+        Q(last_name__icontains=q)
+    )[:15]
+    return JsonResponse({
+        "users": [{
+            "id": u.id,
+            "username": u.username,
+            "first_name": u.first_name or "",
+            "last_name": u.last_name or "",
+            "email": u.email or "",
+        } for u in results]
+    })
+
+
 @user_passes_test(is_Sales_Editor)
 
 @login_required
@@ -1552,11 +1744,16 @@ def my_order_detail(request, order_id):
     items = OrderItem.objects.filter(order=order)
     lang = get_language()  # 👈 Sprache abrufen
 
+    has_refundable = items.filter(app__refundable=True).exists() or items.filter(app__isnull=True).exists()
+    has_exchangeable = items.filter(app__exchangeable=True).exists() or items.filter(app__isnull=True).exists()
+
     context = {
         'order': order,
         'now': timezone.now(),
         'items': items,
-        'lang': lang,  # 👈 Sprache ans Template übergeben
+        'lang': lang,
+        'has_refundable': has_refundable,
+        'has_exchangeable': has_exchangeable,
     }
     return render(request, 'apps/my_order_detail.html', context)
 TAX_PERCENT = Decimal('19.00')  # MwSt-Satz in Prozent
@@ -1903,8 +2100,8 @@ def request_return(request, order_id):
 
     # GET: Formular anzeigen
     items = order.items.select_related('app')
-    any_refundable = any(item.app.refundable for item in items)
-    any_exchangeable = any(item.app.exchangeable for item in items)
+    any_refundable = any((item.app.refundable if item.app else True) for item in items)
+    any_exchangeable = any((item.app.exchangeable if item.app else True) for item in items)
 
     return render(request, 'apps/return_request.html', {
         'order':            order,

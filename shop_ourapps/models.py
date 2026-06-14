@@ -61,6 +61,16 @@ class Wallet(models.Model):
         self.pending_earnings += Decimal(amount)
         self.save()
 
+    def add_credit(self, amount):
+        self.balance += Decimal(amount)
+        self.save()
+
+    def transfer_to_wallet(self):
+        if self.pending_earnings > 0:
+            self.balance += self.pending_earnings
+            self.pending_earnings = Decimal("0.00")
+            self.save()
+
     def has_funds(self, amount):
         return self.balance >= amount
 
@@ -363,15 +373,19 @@ class AffiliateTransaction(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    app = models.ForeignKey(App, on_delete=models.CASCADE)
+    app = models.ForeignKey(App, on_delete=models.CASCADE, null=True, blank=True)
+    name_override = models.CharField(max_length=255, blank=True, verbose_name="Produktname (manuell)")
     quantity = models.PositiveIntegerField()
     discount_percent = models.PositiveIntegerField(default=0)
     single_price = models.DecimalField(max_digits=10, decimal_places=2)
     discount_price = models.DecimalField(max_digits=10, decimal_places=2)  # Preis nach Rabatt2
     price = models.DecimalField(max_digits=10, decimal_places=2)  # Preis zum Zeitpunkt der Bestellung
 
+    def get_name(self):
+        return self.name_override or (self.app.name if self.app else f"Item #{self.id}")
+
     def __str__(self):
-        return f"{self.app.name} x {self.quantity} (Order {self.order.id})"
+        return f"{self.get_name()} x {self.quantity} (Order {self.order.id})"
 
 class AffiliateCode(models.Model):
     code = models.CharField(max_length=20, unique=True)
@@ -659,10 +673,30 @@ class AffiliateMarketingMaterial(models.Model):
 
 
 class AffiliateInvoice(models.Model):
+    INVOICE_TYPE_CHOICES = [
+        ('provision', 'Provision'),
+        ('bonus', 'Bonus'),
+        ('refund', 'Rückerstattung'),
+        ('other', 'Sonstiges'),
+    ]
     partner = models.ForeignKey(AffiliatePartner, on_delete=models.CASCADE, related_name='invoices')
+    invoice_number = models.CharField(max_length=30, unique=True, blank=True, verbose_name="Rechnungsnummer")
+    invoice_type = models.CharField(max_length=20, choices=INVOICE_TYPE_CHOICES, default='provision', verbose_name="Rechnungstyp")
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Betrag (€)")
     description = models.TextField(verbose_name="Beschreibung", blank=True)
+
+    first_name = models.CharField(max_length=100, verbose_name="Vorname", default="")
+    last_name = models.CharField(max_length=100, verbose_name="Nachname", default="")
+    email = models.EmailField(verbose_name="E-Mail", default="")
+    address = models.CharField(max_length=255, verbose_name="Adresse", default="")
+    zip_code = models.CharField(max_length=20, verbose_name="PLZ", default="")
+    city = models.CharField(max_length=100, verbose_name="Stadt", default="")
+    phone = models.CharField(max_length=50, verbose_name="Telefon", blank=True)
+    company_name = models.CharField(max_length=200, verbose_name="Firma", blank=True)
+    vat_number = models.CharField(max_length=50, verbose_name="USt-ID", blank=True)
+
     invoice_file = models.FileField(upload_to='affiliate/invoices/', verbose_name="Rechnungsdatei", blank=True, null=True)
+    pdf_generated = models.BooleanField(default=False, verbose_name="PDF erstellt")
     is_credited = models.BooleanField(default=False, verbose_name="Gutgeschrieben")
     created_at = models.DateTimeField(auto_now_add=True)
     credited_at = models.DateTimeField(null=True, blank=True)
@@ -672,5 +706,11 @@ class AffiliateInvoice(models.Model):
         verbose_name = "Affiliate-Rechnung"
         verbose_name_plural = "Affiliate-Rechnungen"
 
+    def save(self, *args, **kwargs):
+        if not self.invoice_number:
+            last = AffiliateInvoice.objects.order_by('-id').first()
+            self.invoice_number = f"AFF-{((last.id + 1) if last else 1):06d}"
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"Rechnung {self.partner.name} – {self.amount}€"
+        return f"Rechnung {self.invoice_number} – {self.partner.name} – {self.amount}€"

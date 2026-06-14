@@ -391,6 +391,14 @@
         <div class="stat-value">{{ order_count }}</div>
         <div class="stat-label">{% trans "Total Orders" %}</div>
       </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #4CAF50, #2E7D32);">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <div class="stat-value">€{{ wallet_balance|floatformat:2 }}</div>
+        <div class="stat-label">{% trans "Wallet Balance" %}</div>
+      </div>
     </div>
 
     <!-- Affiliate Code -->
@@ -425,6 +433,34 @@
         <i class="fas fa-info-circle"></i>
         {% trans "Share this link to earn commissions. Customers who use this link will have your affiliate code automatically applied." %}
       </p>
+    </div>
+
+    <!-- Wallet + Payout -->
+    <div class="code-section" style="border-color:#6366f1;background:linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.05));margin-bottom:2rem;">
+      <div class="code-label" style="color:#6366f1;">
+        <i class="fas fa-money-bill-wave"></i>
+        {% trans "Wallet & Payout" %}
+      </div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+        <div style="flex:1;min-width:150px;text-align:center;background:var(--bg);border-radius:8px;padding:1rem;border:1px solid var(--border);">
+          <span style="font-size:0.8rem;color:#888;display:block;">{% trans "Available" %}</span>
+          <span style="font-size:1.5rem;font-weight:700;color:#4CAF50;">€{{ wallet_balance|floatformat:2 }}</span>
+        </div>
+        <div style="flex:1;min-width:150px;text-align:center;background:var(--bg);border-radius:8px;padding:1rem;border:1px solid var(--border);">
+          <span style="font-size:0.8rem;color:#888;display:block;">{% trans "Pending" %}</span>
+          <span style="font-size:1.5rem;font-weight:700;color:#f59e0b;">€{{ pending_earnings|floatformat:2 }}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.75rem;margin-top:1rem;justify-content:center;flex-wrap:wrap;">
+        <a href="{% url 'wallet' %}" class="btn-copy" style="text-decoration:none;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.2rem;font-size:0.85rem;">
+          <i class="fas fa-wallet"></i> {% trans "Open Wallet" %}
+        </a>
+        {% if pending_earnings > 0 %}
+        <a href="{% url 'wallet' %}" class="btn-copy" style="text-decoration:none;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.2rem;font-size:0.85rem;">
+          <i class="fas fa-paper-plane"></i> {% trans "Auszahlung beantragen" %} (€{{ pending_earnings|floatformat:2 }})
+        </a>
+        {% endif %}
+      </div>
     </div>
 
     <!-- Monthly Stats -->

@@ -677,8 +677,8 @@
                   <td data-label="{% trans 'Product' %}">
                     <div class="product-cell">
                       <div class="product-image">
-                        {% if item.app.image %}
-                          <img src="{{ item.app.image.url }}" alt="{{ item.app.name }}">
+                        {% if item.app and item.app.image %}
+                          <img src="{{ item.app.image.url }}" alt="{{ item.get_name }}">
                         {% else %}
                           <div class="product-image-placeholder">
                             <i class="fas fa-cube"></i>
@@ -688,14 +688,14 @@
                       <div class="product-info">
                         <h4>
                           {% if "de" in lang %}
-                            {{ item.app.name }}
+                            {{ item.get_name }}
                           {% elif "en" in lang %}
-                            {{ item.app.name_english }}
+                            {{ item.app.name_english|default:item.get_name }}
                           {% else %}
-                            {{ item.app.name }}
+                            {{ item.get_name }}
                           {% endif %}
                         </h4>
-                        <div class="product-sku">{{ item.app.product_number }}</div>
+                        <div class="product-sku">{{ item.app.product_number|default:"" }}</div>
                       </div>
                     </div>
                   </td>
@@ -807,7 +807,7 @@
           </div>
         </div>
 
-        <!-- ── Tracking & Return Actions (schön in der Sidebar integriert) ── -->
+        <!-- ── Tracking & Return Actions ── -->
         {% with rr=order.return_requests.first %}
           {% if rr %}
             <!-- Return Status Card -->
@@ -832,7 +832,7 @@
                 </div>
               {% endif %}
             </div>
-          {% elif order.status in 'Paid,In Delivery,Delivered,Finished' %}
+          {% elif order.status in 'Paid,In Delivery,Delivered,Finished' and has_refundable %}
             <!-- Tracking + Return Buttons -->
             <div class="sidebar-actions">
               <a href="{% url 'order_tracking' order.id %}" class="btn-tracking">

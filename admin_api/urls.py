@@ -12,4 +12,5 @@ urlpatterns = [
     path("support/tickets/<int:pk>/reply/", views.support_ticket_reply, name="admin_api_support_ticket_reply"),
     path("support/tickets/<int:pk>/resolve/", views.support_ticket_resolve, name="admin_api_support_ticket_resolve"),
     path("orders/", views.orders, name="admin_api_orders"),
+    path("affiliate/invoice/", views.affiliate_invoice_create, name="admin_api_affiliate_invoice"),
 ]

@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal, InvalidOperation
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -8,7 +9,73 @@ from datetime import timedelta
 
 from contact.models import Appointment, AppointmentType, SupportTicket, TicketMessage
 from blog.models import BlogPost
-from shop_ourapps.models import Order
+from shop_ourapps.models import Order, AffiliatePartner, AffiliateInvoice, Wallet
+
+
+@csrf_exempt
+def affiliate_invoice_create(request):
+    auth = request.headers.get("Authorization", "")
+    if not auth.startswith("Bearer ") or auth.split("Bearer ")[1] != settings.ADMIN_API_SECRET:
+        return _json_error("Unauthorized", 401)
+
+    if request.method != "POST":
+        return _json_error("Method not allowed", 405)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return _json_error("Invalid JSON", 400)
+
+    partner_id = data.get("partner_id")
+    amount = data.get("amount")
+    if not partner_id or not amount:
+        return _json_error("partner_id and amount required", 400)
+
+    try:
+        amount = Decimal(amount)
+        if amount <= 0:
+            raise ValueError
+    except (ValueError, InvalidOperation):
+        return _json_error("Invalid amount", 400)
+
+    try:
+        partner = AffiliatePartner.objects.get(id=partner_id)
+    except AffiliatePartner.DoesNotExist:
+        return _json_error("Partner not found", 404)
+
+    invoice = AffiliateInvoice.objects.create(
+        partner=partner,
+        amount=amount,
+        invoice_type=data.get("invoice_type", "provision"),
+        description=data.get("description", ""),
+        first_name=data.get("first_name", partner.name),
+        last_name=data.get("last_name", ""),
+        email=data.get("email", partner.email),
+        address=data.get("address", ""),
+        zip_code=data.get("zip_code", ""),
+        city=data.get("city", ""),
+        phone=data.get("phone", ""),
+        company_name=data.get("company_name", ""),
+        vat_number=data.get("vat_number", ""),
+    )
+
+    wallet, _ = Wallet.objects.get_or_create(user=partner.user)
+    wallet.add_credit(amount)
+    invoice.is_credited = True
+    invoice.credited_at = timezone.now()
+    invoice.pdf_generated = True
+    invoice.save()
+
+    return JsonResponse({
+        "success": True,
+        "invoice": {
+            "id": invoice.id,
+            "invoice_number": invoice.invoice_number,
+            "partner": partner.name,
+            "amount": str(invoice.amount),
+            "credited": invoice.is_credited,
+        }
+    }, status=201)
 
 
 def _json_error(msg, status=400):

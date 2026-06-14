@@ -477,6 +477,35 @@
       </form>
     </div>
 
+    <!-- Payout Request -->
+    <div class="transfer-section" style="border-color:#6366f1;background:linear-gradient(135deg, rgba(99,102,241,0.05), rgba(139,92,246,0.05));">
+      <p class="transfer-info">
+        <i class="fas fa-paper-plane"></i>
+        {% trans "Request a payout of your pending earnings. Our team will process your request as soon as possible. Minimum payout: 50€." %}
+      </p>
+      <form method="post">
+        {% csrf_token %}
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:0.75rem;">
+          <div style="flex:1;min-width:120px;">
+            <label style="font-weight:600;font-size:0.8rem;color:var(--text);display:block;margin-bottom:3px;">{% trans "Amount (€)" %}</label>
+            <input type="number" name="payout_amount" step="0.01" min="0.01" max="{{ wallet.pending_earnings|floatformat:2 }}" required
+                   style="width:100%;padding:0.5rem;border:2px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);box-sizing:border-box;"
+                   placeholder="Max {{ wallet.pending_earnings|floatformat:2 }}€">
+          </div>
+          <div style="flex:2;min-width:200px;">
+            <label style="font-weight:600;font-size:0.8rem;color:var(--text);display:block;margin-bottom:3px;">{% trans "IBAN" %}</label>
+            <input type="text" name="account_number" required placeholder="DE..." 
+                   style="width:100%;padding:0.5rem;border:2px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);box-sizing:border-box;">
+          </div>
+        </div>
+        <button type="submit" name="request_payout" class="btn-transfer" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);" {% if wallet.pending_earnings <= 0 %}disabled{% endif %}>
+          <i class="fas fa-paper-plane"></i>
+          {% trans "Request Payout" %}
+        </button>
+        <p style="margin-top:0.5rem;font-size:0.75rem;color:#888;">{% trans "Verfügbar" %}: {{ wallet.pending_earnings|floatformat:2 }}€</p>
+      </form>
+    </div>
+
     <!-- Voucher Section -->
     <div class="voucher-section">
       <h2 class="section-title">

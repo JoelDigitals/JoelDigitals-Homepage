@@ -32,7 +32,7 @@ import random
 
 from contact.models import SupportTicket, Appointment, SalesEntry
 from shop_ourapps.models import Order, OrderItem
-from blog.models import BlogPost, BlogCategory
+from blog.models import BlogPost, BlogCategory, BlogViewTracking
 
 # Google Analytics Imports
 try:
@@ -166,20 +166,16 @@ def get_blog_analytics():
     
     print(f"Total blog views (alle Posts zusammen): {total_views}")
     
-    # Views der letzten 30 Tage
-    recent_posts = BlogPost.objects.filter(
-        published_at__gte=thirty_days_ago,
-        is_published=True
-    )
-    recent_views = recent_posts.aggregate(total=Sum('views'))['total'] or 0
-    
+    # Views der letzten 30 Tage (echte Tracking-Daten)
+    recent_views = BlogViewTracking.objects.filter(
+        date__gte=thirty_days_ago.date()
+    ).aggregate(total=Sum('count'))['total'] or 0
+
     # Views davor für Trend-Berechnung
-    older_posts = BlogPost.objects.filter(
-        published_at__gte=sixty_days_ago,
-        published_at__lt=thirty_days_ago,
-        is_published=True
-    )
-    older_views = older_posts.aggregate(total=Sum('views'))['total'] or 1
+    older_views = BlogViewTracking.objects.filter(
+        date__gte=sixty_days_ago.date(),
+        date__lt=thirty_days_ago.date()
+    ).aggregate(total=Sum('count'))['total'] or 1
     
     # Trend-Berechnung
     views_change = ((recent_views - older_views) / older_views) * 100 if older_views > 0 else 0
@@ -198,33 +194,23 @@ def get_blog_analytics():
     week_ago = now - timedelta(days=7)
     recent_posts_count = BlogPost.objects.filter(created_at__gte=week_ago).count()
     
-    # === CHART-DATEN FÜR DIE LETZTEN 30 TAGE ===
+    # === CHART-DATEN FÜR DIE LETZTEN 30 TAGE (ECHTE DATEN) ===
     chart_labels = []
     chart_data = []
     chart_visitors = []
-    
-    # Da wir keine täglichen View-Tracking haben, verteilen wir die Views
-    # gleichmäßig mit etwas Variation über die letzten 30 Tage
-    if total_views > 0:
-        daily_avg = total_views / 30
-        
-        for i in range(29, -1, -1):
-            date = (now - timedelta(days=i)).date()
-            chart_labels.append(date.strftime("%d.%m"))
-            
-            # Variation zwischen 70% und 130% des Durchschnitts
-            variation = random.uniform(0.7, 1.3)
-            daily_views = int(daily_avg * variation)
-            
-            chart_data.append(daily_views)
-            chart_visitors.append(int(daily_views * 0.6))  # ca. 60% unique visitors
-    else:
-        # Fallback wenn keine Views vorhanden
-        for i in range(29, -1, -1):
-            date = (now - timedelta(days=i)).date()
-            chart_labels.append(date.strftime("%d.%m"))
-            chart_data.append(0)
-            chart_visitors.append(0)
+
+    daily_tracking = BlogViewTracking.objects.filter(
+        date__gte=thirty_days_ago.date()
+    ).values('date').annotate(total=Sum('count')).order_by('date')
+
+    tracking_by_date = {d['date']: d['total'] for d in daily_tracking}
+
+    for i in range(29, -1, -1):
+        date = (now - timedelta(days=i)).date()
+        chart_labels.append(date.strftime("%d.%m"))
+        day_views = tracking_by_date.get(date, 0)
+        chart_data.append(int(day_views))
+        chart_visitors.append(int(day_views * 0.65))
     
     return {
         # Verschiedene Varianten des gleichen Wertes für Template-Kompatibilität
