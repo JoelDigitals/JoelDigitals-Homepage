@@ -67,9 +67,14 @@ def blog_list(request):
         "lang": lang,
     })
 
-def blog_detail(request, pk):
+def blog_detail_by_pk(request, pk):
+    post = get_object_or_404(BlogPost, pk=pk)
+    return redirect("blog_detail", slug=post.slug)
+
+
+def blog_detail(request, slug):
     lang = request.LANGUAGE_CODE
-    post = get_object_or_404(BlogPost, pk=pk, is_published=True)
+    post = get_object_or_404(BlogPost, slug=slug, is_published=True)
     post.views += 1
     post.save(update_fields=["views"])
 
@@ -88,11 +93,11 @@ def blog_detail(request, pk):
             comment.post = post
             comment.user = request.user
             comment.save()
-            return redirect("blog:blog_detail", pk=pk)
+            return redirect("blog_detail", slug=slug)
 
     related_posts = (
         BlogPost.objects.filter(is_published=True)
-        .exclude(pk=pk)
+        .exclude(pk=post.pk)
         .annotate(same_categories=Count("categories"))
         .order_by("-same_categories", "-created_at")[:3]
     )

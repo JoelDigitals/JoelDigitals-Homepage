@@ -1352,7 +1352,7 @@ def sitemap_txt(request):
             lines.append(f"{base_url}{prefix}{page}")
 
         for post in BlogPost.objects.filter(is_published=True):
-            lines.append(f"{base_url}{prefix}/blog/{post.pk}/")
+            lines.append(f"{base_url}{prefix}/blog/{post.slug}/")
 
         for lp in LandingPage.objects.filter(is_active=True):
             lines.append(f"{base_url}{prefix}/{lp.slug}/")

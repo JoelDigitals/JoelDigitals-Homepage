@@ -45,7 +45,7 @@ class LatestPostsFeed(Feed):
         return item.updated_at
 
     def item_link(self, item):
-        return reverse("blog_detail", args=[item.pk])
+        return reverse("blog_detail", args=[item.slug])
 
     def item_categories(self, item):
         return [c.name for c in item.categories.all()]
@@ -54,7 +54,7 @@ class LatestPostsFeed(Feed):
         return "Joel Digitals"
 
     def item_guid(self, item):
-        return f"blog-{item.pk}"
+        return f"blog-{item.slug}"
 
 
 class AtomLatestPostsFeed(LatestPostsFeed):

@@ -32,7 +32,7 @@ class BlogSitemap(Sitemap):
         return obj.updated_at
 
     def location(self, obj):
-        return reverse('blog_detail', args=[obj.pk])
+        return reverse('blog_detail', args=[obj.slug])
 
 
 class LandingPageSitemap(Sitemap):

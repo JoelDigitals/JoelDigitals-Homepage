@@ -443,7 +443,7 @@
                 <span></span>
               {% endif %}
 
-              <a href="{% url 'blog_detail' post.pk %}" class="btn-read">
+              <a href="{% url 'blog_detail' post.slug %}" class="btn-read">
                 {% trans "Read more" %}
                 <i class="fas fa-arrow-right"></i>
               </a>

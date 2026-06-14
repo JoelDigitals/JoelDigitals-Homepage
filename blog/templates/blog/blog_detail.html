@@ -646,7 +646,7 @@
               <div class="related-content">
                 <h3 class="related-title">{{ next_post.title }}</h3>
                 <p class="related-teaser">{{ next_post.teaser_text|striptags|safe }}</p>
-                <a href="{% url 'blog_detail' next_post.pk %}" class="btn-read">
+                <a href="{% url 'blog_detail' next_post.slug %}" class="btn-read">
                   {% trans "Read" %} <i class="fas fa-arrow-right"></i>
                 </a>
               </div>
