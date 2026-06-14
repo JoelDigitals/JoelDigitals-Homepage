@@ -2891,3 +2891,67 @@ msgstr "Unique Visitors"
 
 msgid "estimated"
 msgstr "estimated"
+# === Homepage new sections ===
+
+msgid "Web Development"
+msgstr "Web Development"
+
+msgid "Custom websites and web applications"
+msgstr "Custom websites and web applications"
+
+msgid "Automation"
+msgstr "Automation"
+
+msgid "Smart process automation"
+msgstr "Smart process automation"
+
+msgid "SEO & digital strategies"
+msgstr "SEO & digital strategies"
+
+msgid "Cloud & IT"
+msgstr "Cloud & IT"
+
+msgid "Hosting & infrastructure"
+msgstr "Hosting & infrastructure"
+
+msgid "Why Choose Us?"
+msgstr "Why Choose Us?"
+
+msgid "Fast & Reliable"
+msgstr "Fast & Reliable"
+
+msgid "Quick delivery with dependable results"
+msgstr "Quick delivery with dependable results"
+
+msgid "Made in Germany"
+msgstr "Made in Germany"
+
+msgid "GDPR compliant, highest standards"
+msgstr "GDPR compliant, highest standards"
+
+msgid "Fair Prices"
+msgstr "Fair Prices"
+
+msgid "Transparent, no hidden fees"
+msgstr "Transparent, no hidden fees"
+
+msgid "Tailored Solutions"
+msgstr "Tailored Solutions"
+
+msgid "Custom-fit for your needs"
+msgstr "Custom-fit for your needs"
+
+msgid "Guides & tutorials"
+msgstr "Guides & tutorials"
+
+msgid "Free tools & assets"
+msgstr "Free tools & assets"
+
+msgid "News & insights"
+msgstr "News & insights"
+
+msgid "Technologies"
+msgstr "Technologies"
+
+msgid "Resources"
+msgstr "Resources"

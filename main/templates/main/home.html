@@ -7,10 +7,8 @@
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Disable AOS on mobile for better performance
-    const isMobile = window.matchMedia('(pointer: coarse)').matches;
-    if (!isMobile) {
-      AOS.init({ duration: 800, once: true, mirror: false });
+    if (typeof AOS !== 'undefined') {
+      AOS.init({ duration: 700, once: true, offset: 60 });
     }
   });
 </script>
@@ -248,11 +246,14 @@
     background: var(--surface);
   }
 
-  .product-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+   .product-image img {
+     width: 100%;
+     height: 100%;
+     object-fit: contain;
+     background: var(--surface);
+     padding: 0.5rem;
+     box-sizing: border-box;
+   }
 
   .product-details {
     padding: 1.25rem;
@@ -693,6 +694,11 @@
     }
   }
 
+  @keyframes pulse-btn {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,68,204,0.4); }
+    50% { box-shadow: 0 0 0 12px rgba(0,68,204,0); }
+  }
+
   /* Safe Area Support for Notch Devices */
   @supports (padding-top: env(safe-area-inset-top)) {
     .hero-section {
@@ -723,7 +729,7 @@
   <!-- Content Body -->
   <div class="content-body">
     <!-- About / Team -->
-    <section class="alt-section">
+    <section class="alt-section" data-aos="fade-up">
       <img src="{% static 'images/team1.png' %}" alt="{% trans 'Our Team' %}" loading="lazy">
       <div class="text">
         <h2 class="section-title">
@@ -739,7 +745,7 @@
     </section>
 
     <!-- Mission -->
-    <section class="alt-section">
+    <section class="alt-section" data-aos="fade-up">
       <img src="{% static 'images/office.png' %}" alt="{% trans 'Our Mission' %}" loading="lazy">
       <div class="text">
         <h2 class="section-title">
@@ -755,7 +761,7 @@
     </section>
 
     <!-- Shop -->
-    <section class="shop-section">
+    <section class="shop-section" data-aos="fade-up">
       <div class="section-header">
         <h2><i class="fas fa-fire" style="color: #f44336;"></i> {% trans "Our Shop" %}</h2>
       </div>
@@ -846,9 +852,9 @@
         {% endfor %}
       </div>
       <div style="margin-top:1rem;">
-        <a href="{% url 'status_overview' %}" class="btn-primary" style="width:100%;max-width:300px;">
-          <i class="fas fa-chart-bar"></i> {% trans "Detailed Status" %}
-        </a>
+          <a href="{% url 'status_overview' %}" class="btn-primary" style="width:auto;max-width:none;display:inline-flex;align-items:center;gap:0.5rem;">
+            <i class="fas fa-chart-bar"></i> {{ T.detailed_status }}
+          </a>
       </div>
     </section>
 
@@ -903,7 +909,7 @@
               <h3>{{ blog.title }}</h3>
               <p>{{ blog.teaser_text|truncatewords_html:25|safe }}</p>
               <!-- Volle Breite wie im 1. Blog-Button -->
-              <a href="{% url 'blog_detail' blog.pk %}" class="blog-read-more-btn">
+              <a href="{% url 'blog_detail' blog.slug %}" class="blog-read-more-btn">
                 {% trans "Read More" %}
               </a>
             </div>
@@ -927,6 +933,114 @@
       <a href="https://jds-management.de/jobs/1/" target="_blank" class="btn-primary" style="background: linear-gradient(135deg, #4CAF50, #2E7D32); width: 100%; max-width: 300px;">
         <i class="fas fa-external-link-alt"></i> {% trans "View Current Jobs" %}
       </a>
+    </section>
+
+    <!-- Services -->
+    <section class="info-card" data-aos="fade-up">
+      <h2><i class="fas fa-cogs" style="color: var(--primary);"></i> {{ T.services }}</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:1rem;">
+        <div style="background:var(--bg);border-radius:12px;padding:1.5rem;text-align:center;border:1px solid var(--border);">
+          <i class="fas fa-globe" style="font-size:2rem;color:var(--primary);margin-bottom:0.75rem;"></i>
+          <h3 style="margin:0 0 0.5rem;font-size:1rem;">{{ T.web_dev }}</h3>
+          <p style="color:#888;font-size:0.85rem;margin:0;">{{ T.web_dev_desc }}</p>
+        </div>
+        <div style="background:var(--bg);border-radius:12px;padding:1.5rem;text-align:center;border:1px solid var(--border);">
+          <i class="fas fa-robot" style="font-size:2rem;color:#6366f1;margin-bottom:0.75rem;"></i>
+          <h3 style="margin:0 0 0.5rem;font-size:1rem;">{{ T.automation }}</h3>
+          <p style="color:#888;font-size:0.85rem;margin:0;">{{ T.automation_desc }}</p>
+        </div>
+        <div style="background:var(--bg);border-radius:12px;padding:1.5rem;text-align:center;border:1px solid var(--border);">
+          <i class="fas fa-bullhorn" style="font-size:2rem;color:#f59e0b;margin-bottom:0.75rem;"></i>
+          <h3 style="margin:0 0 0.5rem;font-size:1rem;">{{ T.marketing }}</h3>
+          <p style="color:#888;font-size:0.85rem;margin:0;">{{ T.marketing_desc }}</p>
+        </div>
+        <div style="background:var(--bg);border-radius:12px;padding:1.5rem;text-align:center;border:1px solid var(--border);">
+          <i class="fas fa-cloud" style="font-size:2rem;color:#10b981;margin-bottom:0.75rem;"></i>
+          <h3 style="margin:0 0 0.5rem;font-size:1rem;">{{ T.cloud }}</h3>
+          <p style="color:#888;font-size:0.85rem;margin:0;">{{ T.cloud_desc }}</p>
+        </div>
+        <div style="text-align:center;margin-top:1.5rem;">
+          <a href="/services/" style="display:inline-flex;align-items:center;gap:0.5rem;background:linear-gradient(135deg,var(--primary),#0066ff);color:white;text-decoration:none;padding:0.85rem 2rem;border-radius:12px;font-weight:600;font-size:1rem;animation:pulse-btn 2s infinite;width:auto;">
+            {{ T.view_all }} <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Us -->
+    <section class="info-card" data-aos="fade-up">
+      <h2><i class="fas fa-star" style="color: #fbbf24;"></i> {{ T.why_us }}</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;">
+        <div style="background:var(--bg);border-radius:12px;padding:1.25rem;border:1px solid var(--border);text-align:left;">
+          <span style="font-size:1.5rem;">⚡</span>
+          <h3 style="margin:0.25rem 0;font-size:0.95rem;">{{ T.fast }}</h3>
+          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.fast_desc }}</p>
+        </div>
+        <div style="background:var(--bg);border-radius:12px;padding:1.25rem;border:1px solid var(--border);text-align:left;">
+          <span style="font-size:1.5rem;">🇩🇪</span>
+          <h3 style="margin:0.25rem 0;font-size:0.95rem;">{{ T.german }}</h3>
+          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.german_desc }}</p>
+        </div>
+        <div style="background:var(--bg);border-radius:12px;padding:1.25rem;border:1px solid var(--border);text-align:left;">
+          <span style="font-size:1.5rem;">💰</span>
+          <h3 style="margin:0.25rem 0;font-size:0.95rem;">{{ T.fair }}</h3>
+          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.fair_desc }}</p>
+        </div>
+        <div style="background:var(--bg);border-radius:12px;padding:1.25rem;border:1px solid var(--border);text-align:left;">
+          <span style="font-size:1.5rem;">🎯</span>
+          <h3 style="margin:0.25rem 0;font-size:0.95rem;">{{ T.tailored }}</h3>
+          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.tailored_desc }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Wiki & Downloads -->
+    <section class="info-card" data-aos="fade-up">
+      <h2><i class="fas fa-book" style="color: var(--primary);"></i> {{ T.resources }}</h2>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-top:1rem;">
+        <a href="/wiki/" style="flex:1;min-width:200px;padding:1.5rem;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);text-align:center;">
+          <i class="fas fa-book-open" style="font-size:2rem;color:var(--primary);display:block;margin-bottom:0.5rem;"></i>
+          <strong>{{ T.wiki }}</strong>
+          <p style="color:#888;font-size:0.8rem;margin:0.25rem 0 0;">{{ T.wiki_desc }}</p>
+        </a>
+        <a href="/downloads/" style="flex:1;min-width:200px;padding:1.5rem;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);text-align:center;">
+          <i class="fas fa-download" style="font-size:2rem;color:#6366f1;display:block;margin-bottom:0.5rem;"></i>
+          <strong>{{ T.downloads }}</strong>
+          <p style="color:#888;font-size:0.8rem;margin:0.25rem 0 0;">{{ T.downloads_desc }}</p>
+        </a>
+        <a href="/blog/" style="flex:1;min-width:200px;padding:1.5rem;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);text-align:center;">
+          <i class="fas fa-newspaper" style="font-size:2rem;color:#f59e0b;display:block;margin-bottom:0.5rem;"></i>
+          <strong>{{ T.blog_res }}</strong>
+          <p style="color:#888;font-size:0.8rem;margin:0.25rem 0 0;">{{ T.blog_res_desc }}</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- How We Work -->
+    <section class="info-card" data-aos="fade-up">
+      <h2><i class="fas fa-diagram-project" style="color: var(--primary);"></i> {{ T.how_we_work }}</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:1rem;">
+        <div style="text-align:center;padding:1.5rem;">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#0066ff);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;color:white;font-size:1.3rem;"><i class="fas fa-comments"></i></div>
+          <strong style="display:block;margin-bottom:0.25rem;">{{ T.consultation }}</strong>
+          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.consultation_desc }}</p>
+        </div>
+        <div style="text-align:center;padding:1.5rem;">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;color:white;font-size:1.3rem;"><i class="fas fa-pencil-ruler"></i></div>
+          <strong style="display:block;margin-bottom:0.25rem;">{{ T.planning }}</strong>
+          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.planning_desc }}</p>
+        </div>
+        <div style="text-align:center;padding:1.5rem;">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;color:white;font-size:1.3rem;"><i class="fas fa-code"></i></div>
+          <strong style="display:block;margin-bottom:0.25rem;">{{ T.development }}</strong>
+          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.development_desc }}</p>
+        </div>
+        <div style="text-align:center;padding:1.5rem;">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;color:white;font-size:1.3rem;"><i class="fas fa-rocket"></i></div>
+          <strong style="display:block;margin-bottom:0.25rem;">{{ T.launch }}</strong>
+          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.launch_desc }}</p>
+        </div>
+      </div>
     </section>
 
     <!-- Opening Hours -->

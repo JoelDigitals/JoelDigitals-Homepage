@@ -589,6 +589,7 @@ def home(request):
         status_data.append({'app': sa, 'status': st, 'latest': latest})
     global_issues = GlobalIssue.objects.filter(is_resolved=False)
 
+    is_en = lang == 'en'
     return render(request, 'main/home.html', {
         'user_groups': user_groups,
         'latest_blog': latest_blog,
@@ -601,6 +602,44 @@ def home(request):
         'online_count': online_count,
         'offline_count': offline_count,
         'issue_count': issue_count,
+        'T': {
+            'services': 'Our Services' if is_en else 'Unsere Services',
+            'web_dev': 'Web Development' if is_en else 'Webentwicklung',
+            'web_dev_desc': 'Custom websites and web applications' if is_en else 'Maßgeschneiderte Websites',
+            'automation': 'Automation' if is_en else 'Automatisierung',
+            'automation_desc': 'Smart process automation' if is_en else 'Intelligente Prozessautomatisierung',
+            'marketing': 'Marketing' if is_en else 'Marketing',
+            'marketing_desc': 'SEO & digital strategies' if is_en else 'SEO & digitale Strategien',
+            'cloud': 'Cloud & IT' if is_en else 'Cloud & IT',
+            'cloud_desc': 'Hosting & infrastructure' if is_en else 'Hosting & Infrastruktur',
+            'why_us': 'Why Choose Us?' if is_en else 'Warum wir?',
+            'fast': 'Fast & Reliable' if is_en else 'Schnell & Zuverlässig',
+            'fast_desc': 'Quick delivery with dependable results' if is_en else 'Schnelle Lieferung mit Ergebnissen',
+            'german': 'Made in Germany' if is_en else 'Made in Germany',
+            'german_desc': 'GDPR compliant, highest standards' if is_en else 'DSGVO-konform, höchste Standards',
+            'fair': 'Fair Prices' if is_en else 'Faire Preise',
+            'fair_desc': 'Transparent, no hidden fees' if is_en else 'Transparent, keine versteckten Gebühren',
+            'tailored': 'Tailored Solutions' if is_en else 'Maßgeschneiderte Lösungen',
+            'tailored_desc': 'Custom-fit for your needs' if is_en else 'Auf Ihre Bedürfnisse zugeschnitten',
+            'resources': 'Resources' if is_en else 'Ressourcen',
+            'wiki': 'Wiki' if is_en else 'Wiki',
+            'wiki_desc': 'Guides & tutorials' if is_en else 'Anleitungen & Tutorials',
+            'downloads': 'Downloads' if is_en else 'Downloads',
+            'downloads_desc': 'Free tools & assets' if is_en else 'Kostenlose Tools & Assets',
+            'blog_res': 'Blog' if is_en else 'Blog',
+            'blog_res_desc': 'News & insights' if is_en else 'News & Einblicke',
+            'how_we_work': 'How We Work' if is_en else 'Wie wir arbeiten',
+            'consultation': 'Consultation' if is_en else 'Beratung',
+            'consultation_desc': 'We listen and understand your needs' if is_en else 'Wir hören zu und verstehen',
+            'planning': 'Planning' if is_en else 'Planung',
+            'planning_desc': 'We design the perfect solution' if is_en else 'Wir entwerfen die perfekte Lösung',
+            'development': 'Development' if is_en else 'Entwicklung',
+            'development_desc': 'We build with quality and speed' if is_en else 'Qualität und Tempo',
+            'launch': 'Launch & Support' if is_en else 'Launch & Support',
+            'launch_desc': 'We deliver and keep improving' if is_en else 'Wir liefern und verbessern',
+            'detailed_status': 'To Status Page' if is_en else 'Zur Statusseite',
+            'view_all': 'Our Services' if is_en else 'Unsere Services',
+        },
     })
 
 from django.shortcuts import render, redirect
