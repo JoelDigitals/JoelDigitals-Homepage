@@ -6,957 +6,213 @@
 
 {% block content %}
 <style>
-  .admin-container {
-    max-width: 1400px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    box-sizing: border-box;
-  }
-
-  .admin-header {
-    background: linear-gradient(135deg, var(--primary), #0066ff);
-    padding: 3rem 2rem;
-    border-radius: 16px 16px 0 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 2rem;
-  }
-
-  .admin-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: pulse 15s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.1); opacity: 0.8; }
-  }
-
-  .header-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: white;
-    margin: 0 auto 1rem;
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    position: relative;
-    z-index: 1;
-  }
-
-  .admin-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: white;
-    margin: 0.5rem 0;
-    position: relative;
-    z-index: 1;
-  }
-
-  .admin-subtitle {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.9);
-    position: relative;
-    z-index: 1;
-  }
-
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-top: 1rem;
-    position: relative;
-    z-index: 1;
-    backdrop-filter: blur(10px);
-  }
-
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    background: #10b981;
-    border-radius: 50%;
-    animation: statusPulse 2s infinite;
-  }
-
-  @keyframes statusPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    padding: 1.5rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    border: 2px solid var(--border);
-  }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary), #0066ff);
-  }
-
-  .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 68, 204, 0.15);
-  }
-
-  .stat-card.green::before { background: linear-gradient(90deg, #10b981, #059669); }
-  .stat-card.orange::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
-  .stat-card.red::before { background: linear-gradient(90deg, #ef4444, #dc2626); }
-  .stat-card.purple::before { background: linear-gradient(90deg, #8b5cf6, #7c3aed); }
-
-  .stat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-  }
-
-  .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    background: linear-gradient(135deg, var(--primary), #0066ff);
-    color: white;
-  }
-
-  .stat-card.green .stat-icon { background: linear-gradient(135deg, #10b981, #059669); }
-  .stat-card.orange .stat-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }
-  .stat-card.red .stat-icon { background: linear-gradient(135deg, #ef4444, #dc2626); }
-  .stat-card.purple .stat-icon { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-
-  .stat-trend {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .stat-trend.up { background: #ecfdf5; color: #059669; }
-  .stat-trend.down { background: #fef2f2; color: #dc2626; }
-
-  .stat-label {
-    color: #666;
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-  }
-
-  .stat-value {
-    font-size: 2.25rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 0.5rem;
-  }
-
-  .stat-detail {
-    font-size: 0.875rem;
-    color: #666;
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .stat-detail span {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .charts-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .chart-card {
-    background: var(--surface);
-    padding: 1.5rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border: 2px solid var(--border);
-  }
-
-  .chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .chart-header h3 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .chart-header h3 i {
-    color: var(--primary);
-  }
-
-  .chart-period {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .period-btn {
-    padding: 0.375rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .period-btn.active {
-    background: linear-gradient(135deg, var(--primary), #0066ff);
-    color: white;
-  }
-
-  .period-btn:not(.active) {
-    background: var(--bg);
-    color: #666;
-    border: 1px solid var(--border);
-  }
-
-  .chart-container {
-    position: relative;
-    height: 250px;
-  }
-
-  .traffic-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-
-  .traffic-stat {
-    text-align: center;
-    padding: 1rem;
-    background: var(--bg);
-    border-radius: 12px;
-    border: 1px solid var(--border);
-  }
-
-  .traffic-stat-value {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 0.25rem;
-  }
-
-  .traffic-stat-label {
-    font-size: 0.6875rem;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .admin-sections {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .admin-section {
-    background: var(--surface);
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    border: 2px solid var(--border);
-  }
-
-  .admin-section:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 68, 204, 0.15);
-  }
-
-  .section-header {
-    padding: 1.5rem;
-    border-bottom: 2px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .section-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.25rem;
-    flex-shrink: 0;
-  }
-
-  .section-icon.marketing { background: linear-gradient(135deg, #f97316, #ea580c); }
-  .section-icon.selling { background: linear-gradient(135deg, #10b981, #059669); }
-  .section-icon.support { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-
-  .section-title { flex: 1; min-width: 0; }
-
-  .section-title h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 0.25rem;
-  }
-
-  .section-title p {
-    font-size: 0.875rem;
-    color: #666;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .section-badge {
-    background: var(--bg);
-    color: #666;
-    padding: 0.375rem 0.875rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    flex-shrink: 0;
-    border: 1px solid var(--border);
-  }
-
-  .section-badge.urgent {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: white;
-    border: none;
-    animation: urgentPulse 2s infinite;
-  }
-
-  @keyframes urgentPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-    50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-  }
-
-  .admin-links { padding: 0.75rem; }
-
-  .admin-link {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    border-radius: 12px;
-    text-decoration: none;
-    color: var(--text);
-    transition: all 0.3s;
-    margin-bottom: 0.5rem;
-    border: 1px solid transparent;
-  }
-
-  .admin-link:last-child { margin-bottom: 0; }
-  
-  .admin-link:hover { 
-    background: var(--bg); 
-    transform: translateX(4px);
-    border-color: var(--border);
-  }
-
-  .admin-link-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 1rem;
-    color: #666;
-    transition: all 0.3s;
-    flex-shrink: 0;
-    border: 1px solid var(--border);
-  }
-
-  .admin-link:hover .admin-link-icon {
-    background: linear-gradient(135deg, var(--primary), #0066ff);
-    color: white;
-    border-color: transparent;
-  }
-
-  .admin-link-content { flex: 1; min-width: 0; }
-
-  .admin-link-content h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 0.125rem;
-  }
-
-  .admin-link-content p {
-    font-size: 0.875rem;
-    color: #666;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .admin-link-arrow {
-    color: #666;
-    margin-left: 0.75rem;
-    transition: all 0.3s;
-    flex-shrink: 0;
-  }
-
-  .admin-link:hover .admin-link-arrow {
-    color: var(--primary);
-    transform: translateX(4px);
-  }
-
-  .admin-link-badge {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: white;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.625rem;
-    border-radius: 9999px;
-    margin-right: 0.5rem;
-    font-weight: 600;
-    flex-shrink: 0;
-  }
-
-  .bottom-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .quick-actions, .recent-activity {
-    background: var(--surface);
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border: 2px solid var(--border);
-  }
-
-  .quick-actions h3, .recent-activity h3 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .quick-actions h3 i { color: #f59e0b; }
-  .recent-activity h3 i { color: #8b5cf6; }
-
-  .quick-actions-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-
-  .quick-action-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    border-radius: 12px;
-    background: var(--bg);
-    border: 2px solid var(--border);
-    text-decoration: none;
-    color: var(--text);
-    transition: all 0.3s;
-  }
-
-  .quick-action-btn:hover {
-    background: linear-gradient(135deg, var(--primary), #0066ff);
-    color: white;
-    border-color: transparent;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 68, 204, 0.3);
-  }
-
-  .quick-action-btn i { font-size: 1.25rem; }
-  .quick-action-btn span { font-size: 0.875rem; font-weight: 500; }
-
-  .activity-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-height: 300px;
-    overflow-y: auto;
-  }
-
-  .activity-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.875rem;
-    padding: 0.875rem;
-    border-radius: 10px;
-    transition: all 0.3s;
-    border: 1px solid transparent;
-  }
-
-  .activity-item:hover { 
-    background: var(--bg); 
-    border-color: var(--border);
-  }
-
-  .activity-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.875rem;
-    flex-shrink: 0;
-  }
-
-  .activity-icon.order { background: #ecfdf5; color: #059669; }
-  .activity-icon.ticket { background: #eff6ff; color: #3b82f6; }
-  .activity-icon.appointment { background: #f5f3ff; color: #8b5cf6; }
-  .activity-icon.blog { background: #fef3c7; color: #d97706; }
-  .activity-icon.user { background: var(--bg); color: #666; }
-
-  .activity-content { flex: 1; min-width: 0; }
-
-  .activity-content p {
-    font-size: 0.875rem;
-    color: var(--text);
-    margin-bottom: 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .activity-content span { font-size: 0.75rem; color: #666; }
-
-  @media (max-width: 768px) {
-    .admin-container { padding: 1rem; }
-    
-    .admin-header { 
-      padding: 2rem 1.5rem; 
-      border-radius: 12px;
-    }
-    
-    .header-icon {
-      width: 60px;
-      height: 60px;
-      font-size: 1.5rem;
-    }
-    
-    .admin-title { font-size: 1.5rem; }
-    
-    .stats-grid, .charts-section, .admin-sections { 
-      grid-template-columns: 1fr; 
-    }
-    
-    .chart-container { height: 200px; }
-    .traffic-stats { grid-template-columns: repeat(2, 1fr); }
-    
-    .quick-actions-grid { grid-template-columns: 1fr; }
-  }
-
-  @media (max-width: 480px) {
-    .admin-title { font-size: 1.3rem; }
-    .stat-value { font-size: 1.75rem; }
+  .adm-wrap { max-width:1400px; margin:1.5rem auto; padding:0 1rem; }
+  .adm-hdr { background:linear-gradient(135deg,var(--primary),#0066ff); border-radius:16px; padding:2rem; text-align:center; color:white; margin-bottom:1.5rem; position:relative; overflow:hidden; }
+  .adm-hdr::before { content:''; position:absolute; top:-50%; right:-50%; width:200%; height:200%; background:radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); animation:pulse 12s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.1);opacity:.8} }
+  .adm-hdr h1 { margin:0; font-size:1.8rem; position:relative; z-index:1; }
+  .adm-hdr p { margin:.3rem 0 0; opacity:.85; position:relative; z-index:1; font-size:.9rem; }
+  .badge-online { display:inline-flex; align-items:center; gap:.5rem; background:rgba(255,255,255,.15); padding:.4rem 1rem; border-radius:99px; font-size:.8rem; margin-top:.75rem; position:relative; z-index:1; }
+  .badge-dot { width:8px; height:8px; background:#4ade80; border-radius:50%; animation:dotPulse 2s infinite; }
+  @keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-bottom:1.5rem; }
+  .kpi { background:var(--surface); border-radius:14px; padding:1.25rem; border:2px solid var(--border); position:relative; overflow:hidden; }
+  .kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+  .kpi.c1::before { background:linear-gradient(90deg,#8b5cf6,#6366f1); }
+  .kpi.c2::before { background:linear-gradient(90deg,#4CAF50,#2E7D32); }
+  .kpi.c3::before { background:linear-gradient(90deg,#f59e0b,#d97706); }
+  .kpi.c4::before { background:linear-gradient(90deg,#6366f1,#8b5cf6); }
+  .kpi.c5::before { background:linear-gradient(90deg,#f59e0b,#eab308); }
+  .kpi.c6::before { background:linear-gradient(90deg,#ef4444,#dc2626); }
+  .kpi-icon { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:white; margin-bottom:.75rem; }
+  .kpi.c1 .kpi-icon { background:linear-gradient(135deg,#8b5cf6,#6366f1); }
+  .kpi.c2 .kpi-icon { background:linear-gradient(135deg,#4CAF50,#2E7D32); }
+  .kpi.c3 .kpi-icon { background:linear-gradient(135deg,#f59e0b,#d97706); }
+  .kpi.c4 .kpi-icon { background:linear-gradient(135deg,#6366f1,#8b5cf6); }
+  .kpi.c5 .kpi-icon { background:linear-gradient(135deg,#f59e0b,#eab308); }
+  .kpi.c6 .kpi-icon { background:linear-gradient(135deg,#ef4444,#dc2626); }
+  .kpi-val { font-size:1.8rem; font-weight:700; color:var(--text); }
+  .kpi-lbl { font-size:.8rem; color:#888; margin-bottom:.25rem; }
+  .kpi-sub { font-size:.72rem; color:#999; margin-top:.25rem; display:flex; gap:.75rem; }
+
+  .dash-layout { display:grid; grid-template-columns:1fr 320px; gap:1.5rem; }
+  .panel { background:var(--surface); border-radius:14px; padding:1.25rem; border:2px solid var(--border); margin-bottom:1.5rem; }
+  .panel h3 { margin:0 0 1rem; font-size:1rem; display:flex; align-items:center; gap:.5rem; }
+  .act-row { display:flex; align-items:center; gap:.75rem; padding:.5rem 0; border-bottom:1px solid var(--border); font-size:.8rem; }
+  .act-row:last-child { border-bottom:none; }
+  .act-icon { width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:.75rem; color:white; flex-shrink:0; }
+  .act-icon.blog { background:#6366f1; } .act-icon.order { background:#4CAF50; } .act-icon.ticket { background:#f59e0b; } .act-icon.apt { background:#ef4444; }
+  .act-txt { flex:1; }
+  .act-time { color:#888; font-size:.7rem; }
+
+  .quick-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:.5rem; }
+  .quick-btn { display:flex; align-items:center; gap:.5rem; padding:.65rem .9rem; background:var(--bg); border:1px solid var(--border); border-radius:10px; text-decoration:none; color:var(--text); font-size:.85rem; font-weight:500; transition:all .2s; }
+  .quick-btn:hover { border-color:var(--primary); background:rgba(0,68,204,.05); }
+  .quick-btn i { color:var(--primary); width:18px; text-align:center; }
+  .quick-btn.new { background:rgba(76,175,80,.08); border-color:rgba(76,175,80,.3); }
+  .quick-btn.new i { color:#4CAF50; }
+
+  .top-row { display:flex; justify-content:space-between; align-items:center; padding:.35rem 0; border-bottom:1px solid var(--border); font-size:.82rem; }
+  .top-row:last-child { border-bottom:none; }
+  .top-val { color:var(--primary); font-weight:600; }
+
+  .chart-wrap { height:200px; }
+  .chart-mini-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem; margin-top:.75rem; text-align:center; }
+  .chart-mini { background:var(--bg); border-radius:8px; padding:.5rem; }
+  .chart-mini strong { display:block; font-size:1rem; }
+  .chart-mini span { font-size:.65rem; color:#888; }
+
+  @media (max-width:900px) {
+    .dash-layout { grid-template-columns:1fr; }
+    .kpi-grid { grid-template-columns:repeat(3, 1fr); }
+  }
+  @media (max-width:600px) {
+    .kpi-grid { grid-template-columns:1fr 1fr; }
+    .kpi-val { font-size:1.3rem; }
+    .adm-hdr { padding:1.5rem; }
+    .adm-hdr h1 { font-size:1.3rem; }
   }
 </style>
 
-<div class="admin-container">
-  <!-- Header -->
-  <div class="admin-header">
-    <div class="header-icon">
-      <i class="fas fa-cog"></i>
+<div class="adm-wrap">
+  <div class="adm-hdr">
+    <h1><i class="fas fa-tachometer-alt"></i> {% trans "Admin Dashboard" %}</h1>
+    <p>{{ request.user.get_full_name|default:request.user.username }} • {{ now|date:"l, d. F Y" }}</p>
+    <div class="badge-online"><span class="badge-dot"></span> {% trans "System Online" %}</div>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="kpi-grid">
+    <div class="kpi c1">
+      <div class="kpi-icon"><i class="fas fa-eye"></i></div>
+      <div class="kpi-lbl">{% trans "Blog Views" %}</div>
+      <div class="kpi-val">{{ total_blog_views_formatted }}</div>
+      <div class="kpi-sub"><span>{{ total_posts }} {% trans "Posts" %}</span><span>{{ published_posts }} live</span></div>
     </div>
-    <h1 class="admin-title">{% trans "Admin Dashboard" %}</h1>
-    <p class="admin-subtitle">
-      {% trans "Welcome back" %}, {{ request.user.get_full_name|default:request.user.username }} • {{ now|date:"l, d. F Y" }}
-    </p>
-    <div class="status-badge">
-      <span class="status-dot"></span>
-      {% trans "System Online" %}
+    <div class="kpi c2">
+      <div class="kpi-icon"><i class="fas fa-shopping-cart"></i></div>
+      <div class="kpi-lbl">{% trans "Orders" %}</div>
+      <div class="kpi-val">{{ total_orders }}</div>
+      <div class="kpi-sub"><span>{{ total_revenue|floatformat:0 }}€</span><span>{{ new_orders_count }} {% trans "new" %}</span></div>
+    </div>
+    <div class="kpi c3">
+      <div class="kpi-icon"><i class="fas fa-ticket-alt"></i></div>
+      <div class="kpi-lbl">{% trans "Tickets" %}</div>
+      <div class="kpi-val">{{ open_tickets }}</div>
+      <div class="kpi-sub"><span>{% if urgent_tickets %}{{ urgent_tickets }} ⚠{% else %}✓ OK{% endif %}</span><span>Ø {{ avg_response_time|floatformat:1 }}h</span></div>
+    </div>
+    <div class="kpi c4">
+      <div class="kpi-icon"><i class="fas fa-users"></i></div>
+      <div class="kpi-lbl">{% trans "Users" %}</div>
+      <div class="kpi-val">{{ total_users }}</div>
+      <div class="kpi-sub"><span>+{{ new_users_week }} Woche</span><span>+{{ new_users_month }} Monat</span></div>
+    </div>
+    <div class="kpi c5">
+      <div class="kpi-icon"><i class="fas fa-handshake"></i></div>
+      <div class="kpi-lbl">{% trans "Affiliates" %}</div>
+      <div class="kpi-val">{{ affiliate_count }}</div>
+      <div class="kpi-sub"><span>{{ affiliate_commission|floatformat:0 }}€</span></div>
+    </div>
+    <div class="kpi c6">
+      <div class="kpi-icon"><i class="fas fa-calendar-check"></i></div>
+      <div class="kpi-lbl">{% trans "Appointments" %}</div>
+      <div class="kpi-val">{{ today_appointments }}</div>
+      <div class="kpi-sub"><span>{{ pending_appointments }} offen</span><span>{{ upcoming_appointments }} Woche</span></div>
     </div>
   </div>
 
-  <!-- Stats Overview -->
-  <div class="stats-grid">
-    <!-- Blog Views -->
-    <div class="stat-card purple">
-      <div class="stat-header">
-        <div class="stat-icon">
-          <i class="fas fa-eye"></i>
-        </div>
-        {% if blog_views_change >= 0 %}
-        <span class="stat-trend up">
-          <i class="fas fa-arrow-up"></i> {{ blog_views_change|floatformat:1 }}%
-        </span>
-        {% else %}
-        <span class="stat-trend down">
-          <i class="fas fa-arrow-down"></i> {{ blog_views_change|floatformat:1 }}%
-        </span>
-        {% endif %}
+  <!-- Dashboard Layout -->
+  <div class="dash-layout">
+    <!-- LEFT -->
+    <div>
+      {% if rev_labels and rev_data %}
+      <div class="panel">
+        <h3><i class="fas fa-chart-bar" style="color:#4CAF50;"></i> {% trans "Revenue (30 days)" %}</h3>
+        <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
       </div>
-      <div class="stat-label">{% trans "Blog Views" %} ({% trans "Total" %})</div>
-      <div class="stat-value">{{ total_blog_views_formatted }}</div>
-      <div class="stat-detail">
-        <span><i class="fas fa-file-alt"></i> {{ total_posts }} {% trans "Articles" %}</span>
-        <span><i class="fas fa-fire"></i> {{ popular_post_views_formatted }} {% trans "Top" %}</span>
-      </div>
-    </div>
+      <script>
+      new Chart(document.getElementById('revenueChart').getContext('2d'),{
+        type:'bar',data:{labels:{{ rev_labels|safe }},datasets:[{label:'€',data:{{ rev_data|safe }},backgroundColor:'rgba(76,175,80,.45)',borderColor:'#4CAF50',borderWidth:2,borderRadius:4}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:function(v){return v+'€'}}}}}
+      });
+      </script>
+      {% endif %}
 
-    <!-- Orders -->
-    <div class="stat-card green">
-      <div class="stat-header">
-        <div class="stat-icon">
-          <i class="fas fa-shopping-bag"></i>
+      <div class="panel">
+        <h3><i class="fas fa-blog" style="color:var(--primary);"></i> {% trans "Blog Performance" %}</h3>
+        <div style="display:flex;gap:4px;margin-bottom:.75rem;">
+          <button onclick="updateBlogChart(7)" class="period-btn" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.25rem .6rem;cursor:pointer;font-size:.75rem;color:var(--text);">7T</button>
+          <button onclick="updateBlogChart(30)" class="period-btn active" style="background:var(--primary);color:white;border:none;border-radius:6px;padding:.25rem .6rem;cursor:pointer;font-size:.75rem;">30T</button>
+          <button onclick="updateBlogChart(90)" class="period-btn" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.25rem .6rem;cursor:pointer;font-size:.75rem;color:var(--text);">90T</button>
         </div>
-        <span class="stat-trend up">
-          <i class="fas fa-arrow-up"></i> {{ orders_change|floatformat:1 }}%
-        </span>
+        <div class="chart-wrap"><canvas id="blogChart"></canvas></div>
+        <div class="chart-mini-grid">
+          <div class="chart-mini"><strong>{{ total_blog_views_formatted }}</strong><span>{% trans "Views" %}</span></div>
+          <div class="chart-mini"><strong>{{ avg_views_per_post|floatformat:0 }}</strong><span>Ø/{% trans "Post" %}</span></div>
+          <div class="chart-mini"><strong>{{ most_viewed_post_views_formatted|default:"0" }}</strong><span>{% trans "Top" %}</span></div>
+          <div class="chart-mini"><strong>{{ published_posts }}</strong><span>{% trans "Live" %}</span></div>
+        </div>
       </div>
-      <div class="stat-label">{% trans "Orders" %}</div>
-      <div class="stat-value">{{ total_orders }}</div>
-      <div class="stat-detail">
-        <span class="highlight">{{ new_orders_count }} {% trans "new" %}</span>
-        <span>{{ pending_orders }} {% trans "pending" %}</span>
-      </div>
-    </div>
 
-    <!-- Revenue -->
-    <div class="stat-card green">
-      <div class="stat-header">
-        <div class="stat-icon">
-          <i class="fas fa-euro-sign"></i>
-        </div>
-        <span class="stat-trend up">
-          <i class="fas fa-arrow-up"></i> {{ revenue_change|floatformat:1 }}%
-        </span>
-      </div>
-      <div class="stat-label">{% trans "Revenue" %}</div>
-      <div class="stat-value">{{ total_revenue|floatformat:0 }}€</div>
-      <div class="stat-detail">
-        <span class="highlight">{% trans "This Month" %}: {{ monthly_revenue|floatformat:0 }}€</span>
-      </div>
-    </div>
-
-    <!-- Tickets -->
-    <div class="stat-card orange">
-      <div class="stat-header">
-        <div class="stat-icon">
-          <i class="fas fa-ticket-alt"></i>
-        </div>
-        {% if urgent_tickets > 0 %}
-        <span class="stat-trend down">
-          <i class="fas fa-exclamation"></i> {{ urgent_tickets }} {% trans "urgent" %}
-        </span>
-        {% else %}
-        <span class="stat-trend up">
-          <i class="fas fa-check"></i> OK
-        </span>
-        {% endif %}
-      </div>
-      <div class="stat-label">{% trans "Support Tickets" %}</div>
-      <div class="stat-value">{{ open_tickets }}</div>
-      <div class="stat-detail">
-        {% if urgent_tickets > 0 %}
-        <span class="warning">{{ urgent_tickets }} {% trans "high" %}</span>
-        {% else %}
-        <span class="highlight">{{ resolved_today }} {% trans "today" %}</span>
-        {% endif %}
-        <span>{{ avg_response_time|floatformat:1 }}h Ø</span>
-      </div>
-    </div>
-
-    <!-- Appointments -->
-    <div class="stat-card red">
-      <div class="stat-header">
-        <div class="stat-icon">
-          <i class="fas fa-calendar-check"></i>
-        </div>
-        <span class="stat-trend up">
-          <i class="fas fa-calendar"></i> {% trans "Today" %}
-        </span>
-      </div>
-      <div class="stat-label">{% trans "Appointments" %}</div>
-      <div class="stat-value">{{ today_appointments }}</div>
-      <div class="stat-detail">
-        <span class="highlight">{{ pending_appointments }} {% trans "pending" %}</span>
-        <span>{{ upcoming_appointments }} {% trans "this week" %}</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Charts Section -->
-  <div class="charts-section">
-    <div class="chart-card">
-      <div class="chart-header">
-        <h3><i class="fas fa-blog"></i>{% trans "Blog Performance" %}</h3>
-        <div class="chart-period">
-          <button class="period-btn" onclick="updateBlogChart(7)">7T</button>
-          <button class="period-btn active" onclick="updateBlogChart(30)">30T</button>
-          <button class="period-btn" onclick="updateBlogChart(90)">90T</button>
-        </div>
-      </div>
-      <div class="chart-container">
-        <canvas id="blogChart"></canvas>
-      </div>
-      <div class="traffic-stats">
-        <div class="traffic-stat">
-          <div class="traffic-stat-value">{{ total_blog_views_formatted }}</div>
-          <div class="traffic-stat-label">{% trans "Total Views" %}</div>
-        </div>
-        <div class="traffic-stat">
-          <div class="traffic-stat-value">{{ avg_views_per_post|floatformat:0 }}</div>
-          <div class="traffic-stat-label">Ø / {% trans "Post" %}</div>
-        </div>
-        <div class="traffic-stat">
-          <div class="traffic-stat-value">{{ most_viewed_post_views_formatted|default:"0" }}</div>
-          <div class="traffic-stat-label">{% trans "Top Post" %}</div>
-        </div>
-        <div class="traffic-stat">
-          <div class="traffic-stat-value">{{ published_posts }}</div>
-          <div class="traffic-stat-label">{% trans "Published" %}</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Admin Sections -->
-  <div class="admin-sections">
-    {% if "Marketing" in user_groups %}
-    <div class="admin-section">
-      <div class="section-header">
-        <div class="section-icon marketing">
-          <i class="fas fa-bullhorn"></i>
-        </div>
-        <div class="section-title">
-          <h2>{% trans "Marketing" %}</h2>
-          <p>{{ total_posts }} {% trans "Posts" %} • {{ total_blog_views_formatted }} {% trans "Views" %} • {{ unpublished_posts }} {% trans "Drafts" %}</p>
-        </div>
-        <span class="section-badge">{{ recent_posts }} {% trans "new" %}</span>
-      </div>
-      <div class="admin-links">
-        <a href="/blog/admin-blog/" class="admin-link">
-          <div class="admin-link-icon">
-            <i class="fas fa-blog"></i>
-          </div>
-          <div class="admin-link-content">
-            <h3>{% trans "Admin: Blog" %}</h3>
-            <p>{% trans "Manage posts" %} • {% trans "Top" %}: {{ most_viewed_post.title_de|truncatechars:25|default:"-" }}</p>
-          </div>
-          <i class="fas fa-chevron-right admin-link-arrow"></i>
-        </a>
-      </div>
-    </div>
-    {% endif %}
-
-    {% if "Selling" in user_groups %}
-    <div class="admin-section">
-      <div class="section-header">
-        <div class="section-icon selling">
-          <i class="fas fa-store"></i>
-        </div>
-        <div class="section-title">
-          <h2>{% trans "Sales" %}</h2>
-          <p>{{ pending_orders }} {% trans "open" %} • {{ processing_orders }} {% trans "processing" %}</p>
-        </div>
-      </div>
-      <div class="admin-links">
-        <a href="/contact/admin-sales/" class="admin-link">
-          <div class="admin-link-icon">
-            <i class="fas fa-chart-line"></i>
-          </div>
-          <div class="admin-link-content">
-            <h3>{% trans "Admin: Sales" %}</h3>
-            <p>{% trans "Sales inquiries and customer chat" %}</p>
-          </div>
-          <i class="fas fa-chevron-right admin-link-arrow"></i>
-        </a>
-        <a href="/admin-sales/orders/" class="admin-link">
-          <div class="admin-link-icon">
-            <i class="fas fa-box"></i>
-          </div>
-          <div class="admin-link-content">
-            <h3>{% trans "Admin: Orders" %}</h3>
-            <p>{% trans "Manage orders" %}</p>
-          </div>
-          {% if new_orders_count > 0 %}
-            <span class="admin-link-badge">{{ new_orders_count }}</span>
-          {% endif %}
-          <i class="fas fa-chevron-right admin-link-arrow"></i>
-        </a>
-        <a href="/admin-sales/create-order/" class="admin-link">
-          <div class="admin-link-icon" style="background:linear-gradient(135deg,#4CAF50,#2E7D32);">
-            <i class="fas fa-plus-circle"></i>
-          </div>
-          <div class="admin-link-content">
-            <h3>{% trans "Create Order" %}</h3>
-            <p>{% trans "Manually create a new order" %}</p>
-          </div>
-          <i class="fas fa-chevron-right admin-link-arrow"></i>
-        </a>
-        <a href="/contact/appointment/admin/" class="admin-link">
-          <div class="admin-link-icon">
-            <i class="fas fa-calendar-check"></i>
-          </div>
-          <div class="admin-link-content">
-            <h3>{% trans "Admin: Appointments" %}</h3>
-            <p>{% trans "Manage appointments" %}</p>
-          </div>
-          {% if pending_appointments > 0 %}
-            <span class="admin-link-badge">{{ pending_appointments }}</span>
-          {% endif %}
-          <i class="fas fa-chevron-right admin-link-arrow"></i>
-        </a>
-      </div>
-    </div>
-    {% endif %}
-
-    {% if "Support" in user_groups %}
-    <div class="admin-section">
-      <div class="section-header">
-        <div class="section-icon support">
-          <i class="fas fa-headset"></i>
-        </div>
-        <div class="section-title">
-          <h2>{% trans "Support" %}</h2>
-          <p>{{ open_tickets }} {% trans "open" %} • Ø {{ avg_response_time|floatformat:1 }}h {% trans "response time" %}</p>
-        </div>
-        {% if urgent_tickets > 0 %}
-          <span class="section-badge urgent">{{ urgent_tickets }} {% trans "urgent" %}</span>
-        {% endif %}
-      </div>
-      <div class="admin-links">
-        <a href="/contact/admin-tickets/" class="admin-link">
-          <div class="admin-link-icon">
-            <i class="fas fa-ticket-alt"></i>
-          </div>
-          <div class="admin-link-content">
-            <h3>{% trans "Admin: Tickets" %}</h3>
-            <p>{% trans "Process support tickets" %}</p>
-          </div>
-          {% if high_priority_tickets > 0 %}
-            <span class="admin-link-badge">{{ high_priority_tickets }}</span>
-          {% endif %}
-          <i class="fas fa-chevron-right admin-link-arrow"></i>
-        </a>
-      </div>
-    </div>
-    {% endif %}
-  </div>
-
-  <!-- Bottom Section -->
-  <div class="bottom-section">
-    <div class="quick-actions">
-      <h3><i class="fas fa-bolt"></i>{% trans "Quick Access" %}</h3>
-      <div class="quick-actions-grid">
+      <!-- Quick Actions -->
+      <div class="panel">
+        <h3><i class="fas fa-bolt" style="color:#f59e0b;"></i> {% trans "Quick Actions" %}</h3>
         {% if "Marketing" in user_groups %}
-        <a href="/blog/create/" class="quick-action-btn">
-          <i class="fas fa-plus-circle"></i>
-          <span>{% trans "New Blogpost" %}</span>
-        </a>
+        <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;margin-top:.75rem;">{% trans "Marketing" %}</div>
+        <div class="quick-grid">
+          <a href="/blog/admin-blog/" class="quick-btn"><i class="fas fa-blog"></i> {% trans "Blog" %}</a>
+          <a href="/blog/create/" class="quick-btn"><i class="fas fa-plus"></i> {% trans "New Post" %}</a>
+        </div>
         {% endif %}
         {% if "Selling" in user_groups %}
-        <a href="/admin-sales/orders/?tab=pending" class="quick-action-btn">
-          <i class="fas fa-shopping-cart"></i>
-          <span>{% trans "Orders" %}</span>
-        </a>
-        <a href="/contact/appointment/admin/" class="quick-action-btn">
-          <i class="fas fa-calendar-plus"></i>
-          <span>{% trans "Appointments" %}</span>
-        </a>
+        <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;margin-top:.75rem;">{% trans "Sales" %}</div>
+        <div class="quick-grid">
+          <a href="/admin-sales/orders/" class="quick-btn"><i class="fas fa-box"></i> {% trans "Orders" %}</a>
+          <a href="/admin-sales/create-order/" class="quick-btn new"><i class="fas fa-plus-circle"></i> {% trans "New Order" %}</a>
+          <a href="/contact/admin-sales/" class="quick-btn"><i class="fas fa-comments"></i> {% trans "Chat" %}</a>
+        </div>
         {% endif %}
         {% if "Support" in user_groups %}
-        <a href="/contact/admin-tickets/" class="quick-action-btn">
-          <i class="fas fa-headset"></i>
-          <span>{% trans "Tickets" %}</span>
-        </a>
+        <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;margin-top:.75rem;">{% trans "Support" %}</div>
+        <div class="quick-grid">
+          <a href="/contact/admin-tickets/" class="quick-btn"><i class="fas fa-headset"></i> {% trans "Tickets" %}</a>
+          <a href="/contact/appointment/admin/" class="quick-btn"><i class="fas fa-calendar-plus"></i> {% trans "Appointments" %}</a>
+        </div>
         {% endif %}
-        <a href="{% url 'home' %}" class="quick-action-btn">
-          <i class="fas fa-home"></i>
-          <span>{% trans "To Website" %}</span>
-        </a>
+        <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;margin-top:.75rem;">{% trans "System" %}</div>
+        <div class="quick-grid">
+          <a href="/admin/" class="quick-btn"><i class="fas fa-cog"></i> Django Admin</a>
+          <a href="/status/tools/" class="quick-btn"><i class="fas fa-tools"></i> {% trans "Tools" %}</a>
+        </div>
       </div>
     </div>
 
-    <div class="recent-activity">
-      <h3><i class="fas fa-history"></i>{% trans "Recent Activity" %}</h3>
-      <div class="activity-list">
-        {% for activity in recent_activities|slice:":6" %}
-        <div class="activity-item">
-          <div class="activity-icon {{ activity.type }}">
-            <i class="fas 
-              {% if activity.type == 'order' %}fa-shopping-bag
-              {% elif activity.type == 'ticket' %}fa-ticket-alt
-              {% elif activity.type == 'appointment' %}fa-calendar
-              {% elif activity.type == 'blog' %}fa-blog
-              {% else %}fa-user{% endif %}">
-            </i>
+    <!-- RIGHT Sidebar -->
+    <div>
+      {% if top_items %}
+      <div class="panel">
+        <h3><i class="fas fa-trophy" style="color:#f59e0b;"></i> {% trans "Top Products" %}</h3>
+        {% for item in top_items %}
+        <div class="top-row"><span>{{ item.app__name }}</span><span class="top-val">{{ item.total_qty }}× {{ item.total_rev|floatformat:0 }}€</span></div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="panel">
+        <h3><i class="fas fa-clock" style="color:var(--primary);"></i> {% trans "Recent Activity" %}</h3>
+        {% for activity in recent_activities|slice:":10" %}
+        <div class="act-row">
+          <div class="act-icon {% if activity.type == 'blog' %}blog{% elif activity.type == 'order' %}order{% elif activity.type == 'ticket' %}ticket{% else %}apt{% endif %}">
+            <i class="fas {% if activity.type == 'blog' %}fa-blog{% elif activity.type == 'order' %}fa-shopping-cart{% elif activity.type == 'ticket' %}fa-ticket-alt{% else %}fa-calendar{% endif %}"></i>
           </div>
-          <div class="activity-content">
-            <p>{{ activity.title }}</p>
-            <span>{{ activity.time|timesince }} {% trans "ago" %}</span>
+          <div class="act-txt">
+            <div style="color:var(--text);">{{ activity.title|truncatechars:55 }}</div>
+            <div class="act-time">{{ activity.time|date:"d.m. H:i" }}</div>
           </div>
         </div>
         {% empty %}
-        <div class="activity-item">
-          <div class="activity-icon user">
-            <i class="fas fa-info"></i>
-          </div>
-          <div class="activity-content">
-            <p>{% trans "No recent activities" %}</p>
-            <span>{% trans "Now" %}</span>
-          </div>
-        </div>
+        <div style="text-align:center;color:#888;padding:1.5rem;">{% trans "No activity yet" %}</div>
         {% endfor %}
       </div>
     </div>
@@ -965,86 +221,35 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // Blog Views Chart
-  const blogCtx = document.getElementById('blogChart').getContext('2d');
-  const blogChart = new Chart(blogCtx, {
-    type: 'line',
-    data: {
-      labels: {{ blog_chart_labels|safe }},
-      datasets: [{
-        label: '{% trans "Blog Views" %}',
-        data: {{ blog_chart_data|safe }},
-        borderColor: '#f97316',
-        backgroundColor: 'rgba(249, 115, 22, 0.1)',
-        tension: 0.4,
-        fill: true,
-        borderWidth: 2
-      }, {
-        label: '{% trans "Unique Visitors" %} ({% trans "estimated" %})',
-        data: {{ blog_chart_visitors|safe }},
-        borderColor: '#8b5cf6',
-        backgroundColor: 'rgba(139, 92, 246, 0.1)',
-        tension: 0.4,
-        fill: true,
-        borderWidth: 2
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { 
-          position: 'bottom', 
-          labels: { 
-            usePointStyle: true, 
-            padding: 20,
-            color: '#666'
-          } 
-        }
-      },
-      scales: {
-        y: { 
-          beginAtZero: true, 
-          grid: { color: 'rgba(0,0,0,0.05)' },
-          ticks: { color: '#666' }
-        },
-        x: { 
-          grid: { display: false },
-          ticks: { color: '#666' }
-        }
-      }
-    }
-  });
+Chart.defaults.color = '#888';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
 
-  function updateBlogChart(days) {
-    document.querySelectorAll('.chart-period .period-btn').forEach(btn => {
-      btn.classList.remove('active');
-    });
-    event.target.classList.add('active');
-    // Hier würde normalerweise ein AJAX-Call stehen
+var blogCtx = document.getElementById('blogChart').getContext('2d');
+var blogChartData = {
+  labels: {{ chart_labels|safe }},
+  datasets: [{
+    label: 'Views', data: {{ chart_data|safe }},
+    borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)',
+    fill: true, tension: 0.4, pointRadius: 2, pointHoverRadius: 5,
+  }]
+};
+var blogChart = new Chart(blogCtx, {
+  type: 'line', data: blogChartData,
+  options: { responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true, ticks: { callback: function(v){ return v >= 1000 ? (v/1000)+'k' : v; } } } }
   }
+});
 
-  // Animate numbers
-  document.addEventListener('DOMContentLoaded', function() {
-    const counters = document.querySelectorAll('.stat-value');
-    counters.forEach(counter => {
-      const text = counter.innerText.replace(/\./g, '').replace(/,/g, '');
-      const num = parseFloat(text.replace(/[^0-9.,]/g, '').replace(',', '.'));
-      if (!isNaN(num) && !text.includes('%') && !text.includes(':')) {
-        let current = 0;
-        const increment = num / 30;
-        const suffix = text.replace(/[0-9.,]/g, '');
-        const timer = setInterval(() => {
-          current += increment;
-          if (current >= num) {
-            counter.innerText = Math.floor(num).toLocaleString('{{ LANGUAGE_CODE|default:"de" }}-DE') + suffix;
-            clearInterval(timer);
-          } else {
-            counter.innerText = Math.floor(current).toLocaleString('{{ LANGUAGE_CODE|default:"de" }}-DE') + suffix;
-          }
-        }, 30);
-      }
-    });
-  });
+function updateBlogChart(days) {
+  document.querySelectorAll('.period-btn').forEach(function(b){ b.classList.remove('active'); b.style.background='var(--bg)'; b.style.color='var(--text)'; b.style.border='1px solid var(--border)'; });
+  var btn = event.target;
+  btn.classList.add('active'); btn.style.background='var(--primary)'; btn.style.color='white'; btn.style.border='none';
+  var labels = {{ chart_labels|safe }};
+  var data = {{ chart_data|safe }};
+  blogChart.data.labels = labels.slice(-days);
+  blogChart.data.datasets[0].data = data.slice(-days);
+  blogChart.update();
+}
 </script>
 {% endblock %}

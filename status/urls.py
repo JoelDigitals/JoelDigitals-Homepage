@@ -13,4 +13,5 @@ urlpatterns = [
     path('tools/dns-lookup/', views.tool_dns_lookup, name='tool_dns_lookup'),
     path('tools/ping/', views.tool_ping, name='tool_ping'),
     path('tools/http-headers/', views.tool_http_headers, name='tool_http_headers'),
+    path('tools/qr-code/', views.tool_qr_code, name='tool_qr_code'),
 ]

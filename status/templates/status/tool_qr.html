@@ -1,0 +1,88 @@
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}QR-Code Generator – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .tool-wrap { max-width:800px; margin:2rem auto; padding:0 1rem; }
+  .tool-header { background:linear-gradient(135deg,#1a1a2e,#16213e); padding:2.5rem 2rem; border-radius:16px 16px 0 0; text-align:center; color:white; }
+  .tool-header h1 { margin:0; font-size:2rem; }
+  .tool-header p { margin:0.5rem 0 0; opacity:0.8; }
+  .tool-body { background:var(--surface); padding:2rem; border-radius:0 0 16px 16px; box-shadow:0 4px 12px rgba(0,0,0,0.3); }
+  .form-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:1.5rem; }
+  .field label { font-weight:600; font-size:0.85rem; color:var(--text); display:block; margin-bottom:4px; }
+  .field input, .field select { width:100%; padding:0.6rem; border:2px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text); box-sizing:border-box; }
+  .field input[type="color"] { height:42px; padding:4px; cursor:pointer; }
+  .btn-gen { background:linear-gradient(135deg,#1a1a2e,#16213e); color:white; border:none; padding:0.75rem 2.5rem; border-radius:10px; font-weight:600; font-size:1.05rem; cursor:pointer; width:100%; }
+  .btn-gen:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.3); }
+  .btn-dl { background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; border:none; padding:0.6rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem; }
+  .preview { text-align:center; margin-top:1.5rem; }
+  .preview img { max-width:300px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+  .error-box { background:rgba(244,67,54,0.1); border:1px solid rgba(244,67,54,0.3); border-radius:8px; padding:1rem; color:#f44336; margin-bottom:1rem; }
+</style>
+
+<div class="tool-wrap">
+  <div class="tool-header">
+    <h1><i class="fas fa-qrcode"></i> QR-Code Generator</h1>
+    <p>Erstelle individuelle QR-Codes mit Logo und eigenem Design</p>
+  </div>
+  <div class="tool-body">
+    <a href="{% url 'tools_overview' %}" style="color:var(--primary);text-decoration:none;display:inline-block;margin-bottom:1.5rem;"><i class="fas fa-arrow-left"></i> Zurück zu Tools</a>
+
+    {% if error %}
+    <div class="error-box"><i class="fas fa-exclamation-circle"></i> {{ error }}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="field" style="grid-column:1/-1;">
+          <label>URL oder Text *</label>
+          <input type="text" name="data" value="{{ form_data.data|default:'' }}" placeholder="https://joel-digitals.de" required>
+        </div>
+        <div class="field">
+          <label>Größe (px)</label>
+          <input type="number" name="size" value="{{ form_data.size|default:300 }}" min="100" max="1000" step="50">
+        </div>
+        <div class="field">
+          <label>Stil</label>
+          <select name="style">
+            <option value="square" {% if form_data.style == 'square' %}selected{% endif %}>Quadratisch</option>
+            <option value="gapped" {% if form_data.style == 'gapped' %}selected{% endif %}>Lücken</option>
+            <option value="rounded" {% if form_data.style == 'rounded' %}selected{% endif %}>Abgerundet</option>
+            <option value="dots" {% if form_data.style == 'dots' %}selected{% endif %}>Gepunktet</option>
+            <option value="vbars" {% if form_data.style == 'vbars' %}selected{% endif %}>Vertikale Balken</option>
+            <option value="hbars" {% if form_data.style == 'hbars' %}selected{% endif %}>Horizontale Balken</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Vordergrund</label>
+          <input type="color" name="fg" value="{{ form_data.fg|default:'#000000' }}">
+        </div>
+        <div class="field">
+          <label>Hintergrund</label>
+          <input type="color" name="bg" value="{{ form_data.bg|default:'#ffffff' }}">
+        </div>
+        <div class="field">
+          <label>Logo (optional)</label>
+          <input type="file" name="logo" accept="image/*" style="padding:0.4rem;">
+        </div>
+      </div>
+      <button type="submit" class="btn-gen"><i class="fas fa-qrcode"></i> QR-Code generieren</button>
+    </form>
+
+    {% if result_b64 %}
+    <div class="preview">
+      <img src="data:image/png;base64,{{ result_b64 }}" alt="QR Code">
+      <div style="margin-top:1rem;">
+        <a href="data:image/png;base64,{{ result_b64 }}" download="qrcode.png" class="btn-dl">
+          <i class="fas fa-download"></i> PNG herunterladen
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

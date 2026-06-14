@@ -31,7 +31,8 @@ import os
 import random
 
 from contact.models import SupportTicket, Appointment, SalesEntry
-from shop_ourapps.models import Order, OrderItem
+from shop_ourapps.models import Order, OrderItem, AffiliatePartner
+from django.contrib.auth.models import User
 from blog.models import BlogPost, BlogCategory, BlogViewTracking
 
 # Google Analytics Imports
@@ -408,8 +409,40 @@ def admin_dashboard(request):
         })
     
     recent_activities.sort(key=lambda x: x['time'], reverse=True)
-    
-    # === KONTEXT ZUSAMMENSTELLEN ===
+
+    # === ERWEITERTE STATISTIKEN ===
+    from decimal import Decimal
+    from django.db.models.functions import TruncMonth as TrM
+    monthly_revenue_data = Order.objects.filter(
+        status__in=['Paid', 'Finished', 'Delivered'],
+        created_at__gte=month_ago
+    ).annotate(m=TrM('created_at')).values('m').annotate(total=Sum('total_amount')).order_by('m')
+    rev_labels = []
+    rev_data = []
+    for entry in monthly_revenue_data:
+        rev_labels.append(entry['m'].strftime('%d.%m'))
+        rev_data.append(float(entry['total'] or 0))
+
+    top_items = OrderItem.objects.filter(
+        order__status__in=['Paid', 'Finished', 'Delivered']
+    ).exclude(app__isnull=True).values('app__name').annotate(
+        total_qty=Sum('quantity'), total_rev=Sum('price')
+    ).order_by('-total_rev')[:5]
+
+    affiliate_count = AffiliatePartner.objects.filter(approved=True).count()
+    affiliate_commission = Decimal('0.00')
+    for p in AffiliatePartner.objects.filter(approved=True):
+        aff_orders = Order.objects.filter(
+            affiliate_code__partner=p,
+            status__in=['Paid', 'Finished', 'Delivered']
+        )
+        for o in aff_orders:
+            affiliate_commission += o.total_amount * Decimal(p.commission_percent) / Decimal('100')
+
+    new_users_week = User.objects.filter(date_joined__gte=week_ago).count()
+    new_users_month = User.objects.filter(date_joined__gte=month_ago).count()
+    total_users = User.objects.count()
+
     context.update({
         'total_orders': total_orders,
         'new_orders_count': new_orders_count,
@@ -431,6 +464,15 @@ def admin_dashboard(request):
         'upcoming_appointments': upcoming_appointments,
         
         'recent_activities': recent_activities,
+
+        'rev_labels': json.dumps(rev_labels),
+        'rev_data': json.dumps(rev_data),
+        'top_items': list(top_items),
+        'affiliate_count': affiliate_count,
+        'affiliate_commission': affiliate_commission,
+        'new_users_week': new_users_week,
+        'new_users_month': new_users_month,
+        'total_users': total_users,
     })
     
     # Debug-Ausgabe

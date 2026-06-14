@@ -221,6 +221,12 @@
         <p class="tool-desc">{% trans "View all HTTP response headers including security headers like HSTS, CSP, X-Frame-Options." %}</p>
         <span class="tool-action">{% trans "View Headers" %} <i class="fas fa-arrow-right"></i></span>
       </a>
+      <a href="{% url 'tool_qr_code' %}" class="tool-card">
+        <div class="tool-icon" style="background:linear-gradient(135deg,#1a1a2e,#16213e);"><i class="fas fa-qrcode"></i></div>
+        <div class="tool-name">QR-Code Generator</div>
+        <p class="tool-desc">{% trans "Generate custom QR codes with logo, colors, and unique styles (dots, rounded, bars)." %}</p>
+        <span class="tool-action">{% trans "Create QR" %} <i class="fas fa-arrow-right"></i></span>
+      </a>
     </div>
   </div>
 </div>

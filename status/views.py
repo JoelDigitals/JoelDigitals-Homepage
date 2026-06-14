@@ -475,6 +475,101 @@ def tool_ping(request):
     })
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# QR-CODE GENERATOR
+# ══════════════════════════════════════════════════════════════════════════════
+
+def tool_qr_code(request):
+    result_b64 = None
+    error = None
+    form_data = {}
+
+    if request.method == "POST":
+        data = request.POST.get("data", "").strip()
+        size = int(request.POST.get("size", 300))
+        fg = request.POST.get("fg", "#000000")
+        bg = request.POST.get("bg", "#ffffff")
+        style = request.POST.get("style", "square")
+
+        form_data = {"data": data, "size": size, "fg": fg, "bg": bg, "style": style}
+
+        if not data:
+            error = "Bitte gib eine URL oder Text ein."
+        elif size < 100 or size > 1000:
+            error = "Größe zwischen 100 und 1000 px."
+        else:
+            try:
+                import qrcode
+                from qrcode.image.styledpil import StyledPilImage
+                from qrcode.image.styles.moduledrawers.pil import (
+                    SquareModuleDrawer, GappedSquareModuleDrawer,
+                    CircleModuleDrawer, RoundedModuleDrawer,
+                    VerticalBarsDrawer, HorizontalBarsDrawer,
+                )
+                from PIL import Image
+                from io import BytesIO
+                import base64
+
+                style_map = {
+                    "square": SquareModuleDrawer,
+                    "gapped": GappedSquareModuleDrawer,
+                    "circle": CircleModuleDrawer,
+                    "rounded": RoundedModuleDrawer,
+                    "dots": CircleModuleDrawer,
+                    "vbars": VerticalBarsDrawer,
+                    "hbars": HorizontalBarsDrawer,
+                }
+                drawer = style_map.get(style, SquareModuleDrawer)()
+
+                qr = qrcode.QRCode(
+                    version=None,
+                    error_correction=qrcode.constants.ERROR_CORRECT_H,
+                    box_size=10,
+                    border=4,
+                )
+                qr.add_data(data)
+                qr.make(fit=True)
+
+                img = qr.make_image(
+                    image_factory=StyledPilImage,
+                    module_drawer=drawer,
+                    fill_color=fg,
+                    back_color=bg,
+                ).convert("RGBA")
+
+                logo_file = request.FILES.get("logo")
+                if logo_file:
+                    logo = Image.open(logo_file).convert("RGBA")
+                    qr_w, qr_h = img.size
+                    logo_size = qr_w // 5
+                    logo = logo.resize((logo_size, logo_size), Image.LANCZOS)
+                    pos = ((qr_w - logo_size) // 2, (qr_h - logo_size) // 2)
+                    border = 4
+                    border_box = [
+                        pos[0] - border, pos[1] - border,
+                        pos[0] + logo_size + border, pos[1] + logo_size + border,
+                    ]
+                    white_bg = Image.new("RGBA", (logo_size + border * 2, logo_size + border * 2), "white")
+                    img.paste(white_bg, (border_box[0], border_box[1]), white_bg)
+                    img.paste(logo, pos, logo)
+
+                final_size = (size, size)
+                img = img.resize(final_size, Image.LANCZOS)
+
+                buf = BytesIO()
+                img.save(buf, format="PNG")
+                result_b64 = base64.b64encode(buf.getvalue()).decode()
+
+            except Exception as e:
+                error = f"Fehler: {e}"
+
+    return render(request, "status/tool_qr.html", {
+        "result_b64": result_b64,
+        "error": error,
+        "form_data": form_data,
+    })
+
+
 def tool_http_headers(request):
     target = request.GET.get("target", "").strip()
     result = None
