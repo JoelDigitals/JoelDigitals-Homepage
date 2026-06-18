@@ -1,0 +1,65 @@
+{% extends "base_home.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Paid Downloads" %} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .pd-wrap { max-width:600px; margin:3rem auto; padding:0 1rem; }
+  .pd-card { background:var(--surface); border-radius:16px; padding:2.5rem; text-align:center; border:2px solid var(--border); }
+  .pd-card h2 { margin:0 0 .5rem; font-size:1.5rem; }
+  .pd-card p { color:#888; margin:0 0 2rem; }
+  .pd-input { width:100%; padding:0.85rem; border:2px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); font-size:1.1rem; text-align:center; letter-spacing:3px; text-transform:uppercase; box-sizing:border-box; margin-bottom:1rem; }
+  .pd-input:focus { border-color:var(--primary); outline:none; }
+  .pd-btn { width:100%; padding:0.85rem; background:linear-gradient(135deg,var(--primary),#0066ff); color:white; border:none; border-radius:10px; font-weight:700; font-size:1.1rem; cursor:pointer; }
+  .pd-error { background:rgba(244,67,54,.1); border:1px solid rgba(244,67,54,.3); border-radius:8px; padding:0.75rem; color:#f44336; margin-bottom:1rem; font-size:.9rem; }
+  .pd-legal { margin-top:2rem; padding:1rem; background:rgba(244,67,54,.05); border:1px solid rgba(244,67,54,.15); border-radius:8px; font-size:.8rem; color:#888; line-height:1.5; }
+  .pd-legal strong { color:#f44336; }
+  .pd-packages { margin-top:2rem; }
+  .pd-pkg { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:1.25rem; margin-bottom:.75rem; display:flex; justify-content:space-between; align-items:center; }
+  .pd-pkg strong { font-size:1.05rem; }
+  .pd-pkg span { color:var(--primary); font-weight:700; }
+</style>
+
+<div class="pd-wrap">
+  <div class="pd-card">
+    <h2>🔐 {% trans "Access Code Required" %}</h2>
+    <p>{% trans "Enter your access code to unlock your downloads." %}</p>
+
+    {% if error == 'invalid' %}
+    <div class="pd-error">{% trans "Invalid code. Please check and try again." %}</div>
+    {% elif error == 'expired' %}
+    <div class="pd-error">{% trans "This code has expired or reached its usage limit." %}</div>
+    {% elif error == 'suspended' %}
+    <div class="pd-error">{% trans "Access temporarily restricted. Please contact support." %}</div>
+    {% endif %}
+
+    <form method="post" action="{% url 'paid_redeem' %}">
+      {% csrf_token %}
+      <input type="text" name="code" class="pd-input" placeholder="XXXX-XXXX-XXXX" required autocomplete="off">
+      <button type="submit" class="pd-btn">{% trans "Unlock Downloads" %}</button>
+    </form>
+
+    <div class="pd-legal">
+      <strong>⚖ {% trans "Legal Notice" %}</strong><br>
+      {% trans "The download access is strictly personal. Sharing your access code or downloaded files with third parties is prohibited and may result in legal consequences." %}<br><br>
+      {% trans "Your IP address and device information are recorded with each download. We reserve the right to restrict access in case of suspicious activity." %}
+    </div>
+  </div>
+
+  {% if packages %}
+  <div class="pd-packages">
+    <h3 style="margin-bottom:1rem;">{% trans "Available Packages" %}</h3>
+    {% for pkg in packages %}
+    <div class="pd-pkg">
+      <div>
+        <strong>{{ pkg.name }}</strong>
+        <p style="color:#888;font-size:.85rem;margin:.25rem 0 0;">{{ pkg.description|truncatewords:15 }}</p>
+      </div>
+      <span>€{{ pkg.price }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

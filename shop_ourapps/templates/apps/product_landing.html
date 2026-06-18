@@ -1,0 +1,99 @@
+{% extends "base_shop.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ product_name }} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .pl-wrap { max-width:800px; margin:0 auto; }
+  .pl-hero { background:linear-gradient(135deg,#0f0f23,#1a1a3e); padding:3rem 2rem; text-align:center; color:white; position:relative; overflow:hidden; }
+  .pl-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 30%, rgba(99,102,241,.2), transparent 70%); }
+  .pl-hero * { position:relative; z-index:1; }
+  .pl-hero h1 { font-size:clamp(1.6rem,4vw,2.2rem); margin:0 0 .5rem; }
+  .pl-hero .sub { opacity:.7; font-size:1rem; max-width:500px; margin:0 auto; }
+  .pl-body { background:var(--surface); padding:2rem; }
+  .pl-card { background:var(--bg); border:1px solid var(--border); border-radius:20px; padding:2rem; max-width:650px; margin:0 auto; }
+  .pl-card img { width:100%; max-height:300px; object-fit:contain; border-radius:12px; background:var(--surface); padding:1rem; box-sizing:border-box; margin-bottom:1.5rem; }
+  .pl-card h2 { font-size:1.6rem; margin:0 0 .75rem; color:var(--text); text-align:center; }
+  .pl-card .desc { color:#888; line-height:1.7; text-align:center; margin-bottom:1.5rem; font-size:.95rem; }
+  .pl-price-block { text-align:center; margin-bottom:1.5rem; }
+  .pl-price-block .price { font-size:2.5rem; font-weight:800; color:var(--primary); }
+  .pl-price-block .old { text-decoration:line-through; color:#999; font-size:1.2rem; margin-right:.5rem; }
+  .pl-badge { display:inline-block; background:linear-gradient(135deg,#ef4444,#dc2626); color:white; padding:.3rem .8rem; border-radius:99px; font-size:.8rem; font-weight:600; margin-bottom:.5rem; }
+  .pl-buy { display:flex; align-items:center; justify-content:center; gap:.5rem; background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; text-decoration:none; padding:1rem 2rem; border-radius:12px; font-weight:700; font-size:1.15rem; width:100%; max-width:350px; margin:0 auto; transition:transform .2s; box-sizing:border-box; }
+  .pl-buy:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(76,175,80,.3); }
+  .pl-features { max-width:650px; margin:2rem auto 0; display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .pl-feat { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:1rem; text-align:center; }
+  .pl-feat i { font-size:1.3rem; color:var(--primary); margin-bottom:.5rem; display:block; }
+  .pl-feat strong { display:block; font-size:.9rem; margin-bottom:.25rem; }
+  .pl-feat span { font-size:.8rem; color:#888; }
+  .pl-cta { text-align:center; margin-top:2rem; padding:2rem; background:linear-gradient(135deg,var(--primary),#0066ff); border-radius:20px; color:white; }
+  .pl-cta h3 { margin:0 0 .5rem; font-size:1.3rem; }
+  .pl-cta p { opacity:.85; margin:0 0 1rem; }
+  .pl-cta .pl-buy { background:white; color:var(--primary); }
+  @media (max-width:600px) {
+    .pl-features { grid-template-columns:1fr; }
+    .pl-hero { padding:2rem 1rem; }
+  }
+</style>
+
+<div class="pl-wrap">
+  <div class="pl-hero">
+    <h1>{{ product_name }}</h1>
+    <p class="sub">{% trans "Discover what makes this product the right choice for you." %}</p>
+  </div>
+  <div class="pl-body">
+    <div class="pl-card">
+      {% if product.image %}
+      <img src="{{ product.image.url }}" alt="{{ product_name }}" loading="lazy">
+      {% endif %}
+      <h2>{{ product_name }}</h2>
+      <p class="desc">{{ product.short_description }}</p>
+      <div class="pl-price-block">
+        {% if product.discount_is_active %}
+        <span class="pl-badge">🔥 -{{ product.discount_percent }}%</span><br>
+        <span class="old">€{{ product.price }}</span>
+        <span class="price">€{{ product.discounted_price|floatformat:2 }}</span>
+        {% else %}
+        <span class="price">€{{ product.price }}</span>
+        {% endif %}
+      </div>
+      <a href="{% url 'app_detail' product.slug %}" class="pl-buy">
+        <i class="fas fa-shopping-cart"></i> {% trans "Buy Now" %}
+      </a>
+    </div>
+
+    <div class="pl-features">
+      <div class="pl-feat">
+        <i class="fas fa-shield-alt"></i>
+        <strong>{% trans "Secure Payment" %}</strong>
+        <span>{% trans "Stripe & PayPal" %}</span>
+      </div>
+      <div class="pl-feat">
+        <i class="fas fa-headset"></i>
+        <strong>{% trans "Support Included" %}</strong>
+        <span>{% trans "We're here to help" %}</span>
+      </div>
+      <div class="pl-feat">
+        <i class="fas fa-sync-alt"></i>
+        <strong>{% trans "Regular Updates" %}</strong>
+        <span>{% trans "Always improving" %}</span>
+      </div>
+      <div class="pl-feat">
+        <i class="fas fa-download"></i>
+        <strong>{% trans "Instant Access" %}</strong>
+        <span>{% trans "Download immediately" %}</span>
+      </div>
+    </div>
+
+    <div class="pl-cta">
+      <h3>{% trans "Ready to get started?" %}</h3>
+      <p>{% trans "Join thousands of satisfied customers." %}</p>
+      <a href="{% url 'app_detail' product.slug %}" class="pl-buy">
+        <i class="fas fa-shopping-cart"></i> {% trans "Buy Now" %}
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base_shop.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ product_name }} – {{ affiliate_user.username }} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .lp-wrap { max-width:900px; margin:2rem auto; padding:0 1rem; }
+  .lp-hero { background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:20px; padding:3rem 2rem; text-align:center; color:white; position:relative; overflow:hidden; }
+  .lp-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 30% 50%, rgba(99,102,241,.15), transparent 60%); }
+  .lp-hero * { position:relative; z-index:1; }
+  .lp-avatar { width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,var(--primary),#0066ff); display:flex; align-items:center; justify-content:center; font-size:2rem; color:white; margin:0 auto 1rem; border:3px solid rgba(255,255,255,.2); }
+  .lp-hero h1 { font-size:clamp(1.5rem,4vw,2rem); margin:0 0 .5rem; }
+  .lp-hero .by { opacity:.7; font-size:.9rem; }
+  .lp-body { background:var(--surface); border-radius:0 0 20px 20px; padding:2rem; margin-top:-10px; }
+  .lp-product { background:var(--bg); border:1px solid var(--border); border-radius:16px; padding:2rem; text-align:center; }
+  .lp-product img { max-width:100%; max-height:250px; object-fit:contain; border-radius:12px; margin-bottom:1rem; }
+  .lp-product h2 { font-size:1.5rem; margin:0 0 .5rem; color:var(--text); }
+  .lp-product .desc { color:#888; line-height:1.6; margin-bottom:1.5rem; }
+  .lp-price { font-size:2rem; font-weight:800; color:var(--primary); margin-bottom:1rem; }
+  .lp-price .old { text-decoration:line-through; color:#999; font-size:1.2rem; margin-right:.5rem; }
+  .lp-buy { display:inline-flex; align-items:center; gap:.5rem; background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; text-decoration:none; padding:1rem 2.5rem; border-radius:12px; font-weight:700; font-size:1.1rem; transition:transform .2s; }
+  .lp-buy:hover { transform:translateY(-2px); }
+  .lp-info { text-align:center; margin-top:1.5rem; color:#888; font-size:.85rem; }
+  .lp-info strong { color:var(--primary); }
+</style>
+
+<div class="lp-wrap">
+  <div class="lp-hero">
+    <div class="lp-avatar">{{ affiliate_user.first_name|first|default:affiliate_user.username|first|upper }}</div>
+    <h1>{{ product_name }}</h1>
+    <p class="by">{% trans "Recommended by" %} <strong>{{ affiliate_user.first_name|default:affiliate_user.username }}</strong></p>
+    {% if partner %}<p style="opacity:.6;font-size:.8rem;">{% trans "Affiliate Partner" %}</p>{% endif %}
+  </div>
+
+  <div class="lp-body">
+    <div class="lp-product">
+      {% if product.image %}
+      <img src="{{ product.image.url }}" alt="{{ product_name }}">
+      {% endif %}
+      <h2>{{ product_name }}</h2>
+      <p class="desc">{{ product.short_description }}</p>
+      <div class="lp-price">
+        {% if product.discount_is_active %}
+        <span class="old">€{{ product.price }}</span>€{{ product.discounted_price|floatformat:2 }}
+        {% else %}
+        €{{ product.price }}
+        {% endif %}
+      </div>
+      <a href="{% url 'app_detail' product.slug %}" class="lp-buy">
+        <i class="fas fa-shopping-cart"></i> {% trans "Buy Now" %}
+      </a>
+    </div>
+    <div class="lp-info">
+      {% if affiliate_code %}
+      <i class="fas fa-check-circle" style="color:#4CAF50;"></i> {% trans "Affiliate code" %} <strong>{{ affiliate_code.code }}</strong> {% trans "automatically applied at checkout" %}
+      {% else %}
+      {% trans "This user is not yet an approved affiliate partner." %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

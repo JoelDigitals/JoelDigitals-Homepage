@@ -525,6 +525,24 @@
       </a>
       
       <h1 class="article-title">{{ post.title }}</h1>
+
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;justify-content:center;margin-bottom:0.5rem;">
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener"
+           style="background:rgba(255,255,255,0.15);color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:0.9rem;transition:all 0.2s;"
+           title="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ post.title|urlencode }}" target="_blank" rel="noopener"
+           style="background:rgba(255,255,255,0.15);color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:0.9rem;"
+           title="X"><i class="fab fa-x-twitter"></i></a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener"
+           style="background:rgba(255,255,255,0.15);color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:0.9rem;"
+           title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        <a href="https://wa.me/?text={{ post.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener"
+           style="background:rgba(255,255,255,0.15);color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:0.9rem;"
+           title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        <button onclick="copyUrl()"
+           style="background:rgba(255,255,255,0.15);color:white;border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;cursor:pointer;"
+           title="{% trans 'Copy Link' %}"><i class="fas fa-copy"></i></button>
+      </div>
       
       <div class="article-meta">
         <span class="meta-item">
@@ -622,6 +640,33 @@
       {% endif %}
     </section>
 
+    <!-- Share -->
+    <section class="share-section" style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:1.25rem;text-align:center;margin-bottom:2rem;">
+      <h3 style="margin:0 0 0.75rem;font-size:1rem;color:var(--text);"><i class="fas fa-share-alt"></i> {% trans "Share this article" %}</h3>
+      <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:#1877f2;color:white;border-radius:8px;text-decoration:none;font-size:0.85rem;font-weight:600;">
+          <i class="fab fa-facebook-f"></i> Facebook
+        </a>
+        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ post.title|urlencode }}" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:#000;color:white;border-radius:8px;text-decoration:none;font-size:0.85rem;font-weight:600;">
+          <i class="fab fa-x-twitter"></i> X
+        </a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:#0a66c2;color:white;border-radius:8px;text-decoration:none;font-size:0.85rem;font-weight:600;">
+          <i class="fab fa-linkedin-in"></i> LinkedIn
+        </a>
+        <a href="https://wa.me/?text={{ post.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:#25d366;color:white;border-radius:8px;text-decoration:none;font-size:0.85rem;font-weight:600;">
+          <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+        <button onclick="copyUrl()"
+           style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;">
+          <i class="fas fa-copy"></i> {% trans "Copy Link" %}
+        </button>
+      </div>
+    </section>
+
     <!-- Related Posts -->
     {% if related_posts %}
       <section class="related-section">
@@ -671,5 +716,11 @@
       });
     }
   });
+
+  function copyUrl() {
+    navigator.clipboard.writeText(window.location.href).then(function() {
+      alert('{% trans "Link copied!" %}');
+    });
+  }
 </script>
 {% endblock %}

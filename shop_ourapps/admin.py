@@ -1,9 +1,9 @@
-from django.contrib import admin
+﻿from django.contrib import admin
 from .models import (
     Purchase, AffiliateLink, Affiliate, App, Cart, CartItem, AffiliateTransaction, 
     AffiliatePartner, Order, OrderItem, AffiliateCode, DiscountCode, Wallet, WalletCode, 
     AppGroup, Voucher, VoucherOrder, SaleBadge, OrderStatusLog,
-    AffiliateMarketingMaterial, AffiliateInvoice,
+    AffiliateMarketingMaterial, AffiliateInvoice, CustomLandingPage,
 )
 
 class PurchaseAdmin(admin.ModelAdmin):
@@ -98,3 +98,11 @@ class AffiliateInvoiceAdmin(admin.ModelAdmin):
             inv.save(update_fields=['is_credited', 'credited_at'])
             count += 1
         self.message_user(request, f"{count} Rechnung(en) gutgeschrieben.")
+
+
+@admin.register(CustomLandingPage)
+class CustomLandingPageAdmin(admin.ModelAdmin):
+    list_display = ('slug', 'greeting_name', 'headline', 'product', 'is_active')
+    list_editable = ('is_active',)
+    prepopulated_fields = {'slug': ('greeting_name',)}
+    search_fields = ('slug', 'greeting_name', 'headline')

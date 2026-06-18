@@ -26,7 +26,8 @@ class BlogSitemap(Sitemap):
     priority = 0.7
 
     def items(self):
-        return BlogPost.objects.filter(is_published=True)
+        from django.utils import timezone
+        return BlogPost.objects.filter(is_published=True, published_at__lte=timezone.now())
 
     def lastmod(self, obj):
         return obj.updated_at

@@ -141,6 +141,7 @@ class App(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    release_date = models.DateField(null=True, blank=True, verbose_name="Release-Datum")
 
     # Neue App-Store Links
     android_link = models.URLField(blank=True, null=True)
@@ -612,8 +613,8 @@ class ShipmentTracking(models.Model):
     dispatched_at   = models.DateTimeField(null=True, blank=True)
     estimated_delivery = models.DateField(null=True, blank=True, verbose_name='Voraussichtliche Lieferung')
     note            = models.CharField(max_length=255, blank=True)
-    created_at      = models.DateTimeField(auto_now_add=True)
-    updated_at      = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     CARRIER_URL_TEMPLATES = {
         'DHL':    'https://www.dhl.de/de/privatkunden/pakete-empfangen/verfolgen.html?piececode={n}',
@@ -714,3 +715,21 @@ class AffiliateInvoice(models.Model):
 
     def __str__(self):
         return f"Rechnung {self.invoice_number} – {self.partner.name} – {self.amount}€"
+
+
+class CustomLandingPage(models.Model):
+    slug = models.SlugField(max_length=100, unique=True, verbose_name="URL-Pfad")
+    greeting_name = models.CharField(max_length=100, verbose_name="Anrede-Name", help_text="z.B. Max, Anna, Chef")
+    headline = models.CharField(max_length=200, verbose_name="Überschrift")
+    subtitle = models.TextField(verbose_name="Unterüberschrift", blank=True)
+    product = models.ForeignKey(App, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Produkt")
+    cta_text = models.CharField(max_length=100, default="Jetzt kaufen", verbose_name="Button-Text")
+    is_active = models.BooleanField(default=True, verbose_name="Aktiv")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Custom Landing Page"
+        verbose_name_plural = "Custom Landing Pages"
+
+    def __str__(self):
+        return f"/go/{self.slug}/ – {self.greeting_name}"

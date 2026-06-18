@@ -1,9 +1,9 @@
-from django.shortcuts import render, get_object_or_404, redirect
+﻿from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.mail import send_mail, EmailMultiAlternatives
-from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup, AffiliateMarketingMaterial, AffiliateTransaction
+from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup, AffiliateMarketingMaterial, AffiliateTransaction, CustomLandingPage
 from shop_ourapps.models import AffiliatePartner
 from .forms import PurchaseForm, VoucherPurchaseForm
 from .services.automation_service import OrderAutomationService
@@ -613,6 +613,12 @@ def affiliate_dashboard(request):
         wallet = Wallet.objects.filter(user=request.user).first()
         stats["wallet_balance"] = wallet.balance if wallet else 0.00
         stats["pending_earnings"] = wallet.pending_earnings if wallet else 0.00
+        products = App.objects.filter(is_available_for_purchase=True)[:8]
+        stats["lp_products"] = [{
+            "name": p.name,
+            "slug": p.slug,
+            "lp_url": request.build_absolute_uri(f"/lp/{request.user.username}/{p.slug}/"),
+        } for p in products]
         return render(request, "apps/dashboard.html", stats)
     except AffiliatePartner.DoesNotExist:
         messages.error(request, "You are not yet registered as an Affiliate Partner.")
@@ -2214,3 +2220,67 @@ def return_label_print_admin(request, return_id):
         'order':   ret.order,
         'company': company,
     })
+
+
+
+def personalized_landing(request, username, product_slug):
+    affiliate_user = get_object_or_404(User, username=username)
+    product = get_object_or_404(App, slug=product_slug, is_available_for_purchase=True)
+
+    affiliate_code = None
+    partner = None
+    try:
+        partner = AffiliatePartner.objects.get(user=affiliate_user, approved=True)
+        affiliate_code = AffiliateCode.objects.filter(partner=partner, is_active=True).first()
+    except AffiliatePartner.DoesNotExist:
+        pass
+
+    if affiliate_code:
+        request.session["affiliate_ref"] = affiliate_code.code
+
+    lang = request.LANGUAGE_CODE or "de"
+    is_en = lang == "en"
+    product_name = product.name_english if (is_en and product.name_english) else product.name
+
+    return render(request, "apps/personalized_landing.html", {
+        "product": product,
+        "product_name": product_name,
+        "affiliate_user": affiliate_user,
+        "affiliate_code": affiliate_code,
+        "partner": partner,
+        "lang": lang,
+    })
+
+
+def product_landing(request, product_slug):
+    product = get_object_or_404(App, slug=product_slug, is_available_for_purchase=True)
+    lang = request.LANGUAGE_CODE or 'de'
+    is_en = lang == 'en'
+    product_name = product.name_english if (is_en and product.name_english) else product.name
+    price = product.discounted_price if product.discount_is_active else product.price
+    old_price = product.price if product.discount_is_active else None
+    return render(request, 'apps/product_landing.html', {
+        'product': product,
+        'product_name': product_name,
+        'price': price,
+        'old_price': old_price,
+        'lang': lang,
+    })
+
+
+def custom_landing(request, slug):
+    page = get_object_or_404(CustomLandingPage, slug=slug, is_active=True)
+    product = page.product
+    lang = request.LANGUAGE_CODE or 'de'
+    is_en = lang == 'en'
+    ctx = {
+        'page': page,
+        'product': product,
+        'lang': lang,
+        'is_en': is_en,
+    }
+    if product:
+        ctx['product_name'] = product.name_english if (is_en and product.name_english) else product.name
+        ctx['product_desc'] = product.description_english if (is_en and product.description_english) else product.description
+        ctx['product_price'] = product.discounted_price if product.discount_is_active else product.price
+    return render(request, 'apps/custom_landing.html', ctx)

@@ -52,6 +52,7 @@ urlpatterns += i18n_patterns(
     path('wiki/', include('wiki.urls')),
     path('status/', include('status.urls')),
     path('downloads/', include('download.urls')),
+    path('paid-downloads/', include('download.paid_urls')),
     path('mobile/', include('MobileApp.urls')),
     path('chat/', include('chat.urls')),
     path("reviews/", include("reviews.urls")),

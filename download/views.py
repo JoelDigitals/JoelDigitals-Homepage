@@ -9,9 +9,8 @@ def app_list(request):
 def app_detail(request, app_id):
     app = get_object_or_404(App, pk=app_id)
 
-    today = localdate()  # aktuelles Datum ohne Uhrzeit
+    today = localdate()
 
-    # Filter nach Release-Datum <= heute und sortieren
     downloads = app.downloads.select_related('operating_system') \
         .filter(release_date__lte=today) \
         .order_by('-release_date', '-id')

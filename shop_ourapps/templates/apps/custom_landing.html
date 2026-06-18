@@ -1,0 +1,130 @@
+{% extends "base_shop.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ page.headline }} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .s-wrap { max-width:800px; margin:0 auto; }
+  .s-hero { background:linear-gradient(135deg,#0f0f23,#1a1a3e); padding:4rem 2rem; text-align:center; color:white; position:relative; overflow:hidden; }
+  .s-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%, rgba(99,102,241,.2), transparent 60%); }
+  .s-hero * { position:relative; z-index:1; }
+  .s-hero .greet { font-size:1.2rem; opacity:.85; margin-bottom:.5rem; }
+  .s-hero .greet strong { color:#a5b4fc; }
+  .s-hero h1 { font-size:clamp(1.8rem,5vw,2.5rem); margin:.5rem 0; font-weight:800; }
+  .s-hero .sub { opacity:.7; font-size:1rem; max-width:450px; margin:0 auto; }
+  .s-body { background:var(--surface); padding:2rem; }
+  .s-section { max-width:650px; margin:0 auto 2rem; }
+  .s-section h2 { font-size:1.4rem; font-weight:700; color:var(--text); margin:0 0 1rem; display:flex; align-items:center; gap:.5rem; }
+  .s-section p { color:#888; line-height:1.7; margin:0 0 1rem; }
+  .s-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .s-grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+  .s-card { background:var(--bg); border:1px solid var(--border); border-radius:14px; padding:1.5rem; text-align:center; }
+  .s-card i { font-size:1.6rem; color:var(--primary); margin-bottom:.75rem; display:block; }
+  .s-card h4 { font-size:.95rem; font-weight:700; margin:0 0 .3rem; }
+  .s-card p { font-size:.8rem; color:#888; margin:0; }
+  .s-product { background:var(--bg); border:1px solid var(--border); border-radius:20px; padding:2.5rem; text-align:center; }
+  .s-product img { width:100%; max-height:260px; object-fit:contain; border-radius:12px; margin-bottom:1.5rem; }
+  .s-product h3 { font-size:1.5rem; margin:0 0 .5rem; }
+  .s-price { margin:1rem 0; }
+  .s-price .cur { font-size:2.2rem; font-weight:800; color:var(--primary); }
+  .s-price .old { text-decoration:line-through; color:#999; font-size:1rem; margin-right:.5rem; }
+  .s-badge { display:inline-block; background:#ef4444; color:white; padding:.25rem .7rem; border-radius:99px; font-size:.75rem; font-weight:600; margin-bottom:.5rem; }
+  .s-btn { display:inline-flex; align-items:center; gap:.5rem; background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; text-decoration:none; padding:1rem 2.5rem; border-radius:12px; font-weight:700; font-size:1.1rem; transition:transform .2s; animation:s-pulse 2s infinite; }
+  .s-btn:hover { transform:translateY(-2px); }
+  @keyframes s-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(76,175,80,.4)} 50%{box-shadow:0 0 0 14px rgba(76,175,80,0)} }
+  .s-testi { background:var(--bg); border:1px solid var(--border); border-radius:14px; padding:1.5rem; text-align:center; font-style:italic; }
+  .s-testi .q { color:var(--text); font-size:1.05rem; margin-bottom:.5rem; }
+  .s-testi .a { color:#888; font-size:.85rem; }
+  @media (max-width:600px) { .s-grid3 { grid-template-columns:1fr; } .s-grid2 { grid-template-columns:1fr; } .s-hero { padding:2.5rem 1rem; } }
+</style>
+
+<div class="s-wrap">
+  <div class="s-hero">
+    <p class="greet">{% if is_en %}Hey{% else %}Hey{% endif %} <strong>{{ page.greeting_name }}</strong>! 👋</p>
+    <h1>{{ page.headline }}</h1>
+    {% if page.subtitle %}<p class="sub">{{ page.subtitle }}</p>{% endif %}
+  </div>
+
+  <div class="s-body">
+    {% if product %}
+    <!-- Was du bekommst -->
+    <div class="s-section">
+      <h2><i class="fas fa-gift" style="color:var(--primary);"></i> {% if is_en %}What you get{% else %}Was du bekommst{% endif %}</h2>
+      <div class="s-grid2">
+        <div class="s-card">
+          <i class="fas fa-infinity"></i>
+          <h4>{% if is_en %}Lifetime Access{% else %}Lebenslanger Zugriff{% endif %}</h4>
+          <p>{% if is_en %}Pay once, use forever{% else %}Einmal zahlen, immer nutzen{% endif %}</p>
+        </div>
+        <div class="s-card">
+          <i class="fas fa-sync-alt"></i>
+          <h4>{% if is_en %}Free Updates{% else %}Kostenlose Updates{% endif %}</h4>
+          <p>{% if is_en %}Always the latest version{% else %}Immer die neuste Version{% endif %}</p>
+        </div>
+        <div class="s-card">
+          <i class="fas fa-headset"></i>
+          <h4>{% if is_en %}Priority Support{% else %}Prioritäts-Support{% endif %}</h4>
+          <p>{% if is_en %}We're here to help{% else %}Wir sind für dich da{% endif %}</p>
+        </div>
+        <div class="s-card">
+          <i class="fas fa-shield-alt"></i>
+          <h4>{% if is_en %}Secure & Safe{% else %}Sicher & Geschützt{% endif %}</h4>
+          <p>{% if is_en %}GDPR compliant{% else %}DSGVO-konform{% endif %}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Das Produkt -->
+    <div class="s-section">
+      <div class="s-product">
+        {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product_name }}" loading="lazy">{% endif %}
+        <h3>{{ product_name }}</h3>
+        <p style="color:#888;line-height:1.6;">{{ product.short_description }}</p>
+        <div class="s-price">
+          {% if product.discount_is_active %}
+          <span class="s-badge">🔥 -{{ product.discount_percent }}%</span><br>
+          <span class="old">€{{ product.price }}</span>
+          <span class="cur">€{{ product.discounted_price|floatformat:2 }}</span>
+          {% else %}
+          <span class="cur">€{{ product.price }}</span>
+          {% endif %}
+        </div>
+        <a href="{% url 'app_detail' product.slug %}" class="s-btn">
+          <i class="fas fa-shopping-cart"></i> {{ page.cta_text }}
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Garantie -->
+    <div class="s-section">
+      <div class="s-testi">
+        <p class="q">"{% if is_en %}Super easy to use, exactly what I needed.{% else %}Super einfach zu bedienen, genau was ich brauchte.{% endif %}"</p>
+        <p class="a">– {% if is_en %}Happy Customer{% else %}Zufriedener Kunde{% endif %}</p>
+      </div>
+    </div>
+
+    <!-- FAQ kurz -->
+    <div class="s-section">
+      <h2><i class="fas fa-question-circle" style="color:#f59e0b;"></i> {% if is_en %}Questions?{% else %}Fragen?{% endif %}</h2>
+      <div class="s-card" style="text-align:left;">
+        <p style="font-weight:600;margin:0 0 .3rem;">{% if is_en %}How does it work?{% else %}Wie funktioniert es?{% endif %}</p>
+        <p style="font-size:.85rem;margin:0;">{% if is_en %}After purchase you get instant access to download and use the product.{% else %}Nach dem Kauf erhältst du sofort Zugriff zum Download und zur Nutzung.{% endif %}</p>
+      </div>
+    </div>
+
+    <!-- Final CTA -->
+    <div style="text-align:center;padding:2rem;background:linear-gradient(135deg,var(--primary),#0066ff);border-radius:20px;color:white;margin-top:2rem;">
+      <h3 style="margin:0 0 .5rem;font-size:1.3rem;">{{ page.headline }}</h3>
+      <p style="opacity:.85;margin:0 0 1rem;">{% if is_en %}Don't miss out. Get it now!{% else %}Nicht verpassen. Jetzt zugreifen!{% endif %}</p>
+      {% if product %}
+      <a href="{% url 'app_detail' product.slug %}" class="s-btn" style="background:white;color:var(--primary);animation:none;">
+        <i class="fas fa-shopping-cart"></i> {{ page.cta_text }}
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

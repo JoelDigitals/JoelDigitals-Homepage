@@ -6,6 +6,8 @@ from django.utils.html import strip_tags
 from .models import BlogPost
 
 
+from django.utils import timezone
+
 class LatestPostsFeed(Feed):
     title = "Joel Digitals Blog"
     description = "Digitale Lösungen, Softwareentwicklung, IT-Services und mehr"
@@ -18,7 +20,9 @@ class LatestPostsFeed(Feed):
 
     def items(self):
         return BlogPost.objects.filter(
-            is_published=True, published_at__isnull=False
+            is_published=True,
+            published_at__isnull=False,
+            published_at__lte=timezone.now(),
         ).order_by("-published_at")[:50]
 
     def item_title(self, item):

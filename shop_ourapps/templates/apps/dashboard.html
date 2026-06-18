@@ -435,6 +435,29 @@
       </p>
     </div>
 
+    <!-- Personalized Landing Pages -->
+    {% if lp_products %}
+    <div class="code-section" style="border-color:#8b5cf6;background:linear-gradient(135deg, rgba(139,92,246,0.08), rgba(124,58,237,0.04));margin-bottom:2rem;">
+      <div class="code-label" style="color:#8b5cf6;">
+        <i class="fas fa-pager"></i>
+        {% trans "Your Product Landing Pages" %}
+      </div>
+      <p style="font-size:0.85rem;color:#888;margin-bottom:0.75rem;text-align:center;">
+        {% trans "Personalized landing pages for each product — share these links with your audience." %}
+      </p>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:500px;margin:0 auto;">
+        {% for p in lp_products %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.75rem;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
+          <span style="font-size:0.85rem;font-weight:600;color:var(--text);">{{ p.name }}</span>
+          <a href="{{ p.lp_url }}" target="_blank" style="font-size:0.8rem;color:#8b5cf6;text-decoration:none;display:flex;align-items:center;gap:0.25rem;">
+            <i class="fas fa-external-link-alt"></i> {% trans "Open" %}
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
     <!-- Wallet + Payout -->
     <div class="code-section" style="border-color:#6366f1;background:linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.05));margin-bottom:2rem;">
       <div class="code-label" style="color:#6366f1;">

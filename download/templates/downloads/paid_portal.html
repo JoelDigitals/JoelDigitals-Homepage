@@ -1,0 +1,67 @@
+{% extends "base_home.html" %}
+{% load i18n %}
+
+{% block title %}{{ package.name }} – {% trans "Downloads" %} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .dp-wrap { max-width:700px; margin:2rem auto; padding:0 1rem; }
+  .dp-header { background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:16px 16px 0 0; padding:2.5rem 2rem; text-align:center; color:white; }
+  .dp-header h1 { margin:0; font-size:1.6rem; }
+  .dp-header p { opacity:.7; margin:.5rem 0 0; font-size:.9rem; }
+  .dp-body { background:var(--surface); border-radius:0 0 16px 16px; padding:2rem; }
+  .dp-app { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:1.25rem; margin-bottom:.75rem; display:flex; align-items:center; gap:1rem; }
+  .dp-app img { width:48px; height:48px; object-fit:contain; border-radius:8px; }
+  .dp-app-info { flex:1; }
+  .dp-app-info strong { display:block; margin-bottom:.2rem; }
+  .dp-app-info span { font-size:.8rem; color:#888; }
+  .dp-dl-btn { padding:0.6rem 1.2rem; background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer; text-decoration:none; font-size:.85rem; display:inline-flex; align-items:center; gap:.4rem; white-space:nowrap; }
+  .dp-dl-btn:hover { transform:translateY(-1px); }
+  .dp-legal { margin-top:2rem; padding:1rem; background:rgba(244,67,54,.05); border:1px solid rgba(244,67,54,.15); border-radius:8px; font-size:.75rem; color:#888; line-height:1.5; }
+  .dp-legal strong { color:#f44336; }
+  .dp-no-access { text-align:center; padding:3rem 1rem; color:#888; }
+  @media (max-width:500px) { .dp-app { flex-direction:column; text-align:center; } }
+</style>
+
+<div class="dp-wrap">
+  <div class="dp-header">
+    <h1>{{ package.name }}</h1>
+    <p>{{ package.description }}</p>
+  </div>
+  <div class="dp-body">
+    {% if has_access %}
+      {% if package_apps %}
+        {% for pa in package_apps %}
+        <div class="dp-app">
+          {% if pa.app.logo %}<img src="{{ pa.app.logo.url }}" alt="{{ pa.app.name }}">{% endif %}
+          <div class="dp-app-info">
+            <strong>{{ pa.app.name }}</strong>
+            <span>{{ pa.os.name }}{% if pa.download.version %} – v{{ pa.download.version }}{% endif %}</span>
+          </div>
+          {% if pa.get_link %}
+          <a href="{% url 'paid_download' pa.id %}" class="dp-dl-btn">
+            <i class="fas fa-download"></i> {% trans "Download" %}
+          </a>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="dp-no-access">
+          <p>{% trans "No downloads available for this package yet." %}</p>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="dp-no-access">
+        <p>{% trans "No valid access. Please redeem your code first." %}</p>
+        <a href="{% url 'paid_home' %}" style="color:var(--primary);">{% trans "Back to code entry" %}</a>
+      </div>
+    {% endif %}
+
+    <div class="dp-legal">
+      <strong>⚖ {% trans "Legal Notice" %}</strong><br>
+      {% trans "These downloads are for personal use only. Redistribution or sharing is prohibited. Your IP address (recorded) and device information are logged. Violations will be prosecuted." %}<br><br>
+      <strong>{% trans "Auto-Suspension" %}:</strong> {% trans "If our system detects unusual download patterns, your access may be automatically restricted." %}
+    </div>
+  </div>
+</div>
+{% endblock %}

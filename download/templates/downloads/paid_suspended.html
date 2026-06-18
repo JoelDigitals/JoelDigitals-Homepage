@@ -1,0 +1,19 @@
+{% extends "base_home.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Access Restricted" %} – Joel Digitals{% endblock %}
+
+{% block content %}
+<div style="max-width:500px;margin:4rem auto;text-align:center;padding:2rem;">
+  <div style="font-size:4rem;margin-bottom:1rem;">🚫</div>
+  <h1 style="margin:0 0 1rem;">{% trans "Access Restricted" %}</h1>
+  <p style="color:#888;line-height:1.6;margin-bottom:2rem;">
+    {% trans "Your access has been temporarily restricted due to unusual activity." %}<br>
+    {% trans "This may be caused by too many code redemptions or downloads from your IP address." %}<br><br>
+    {% trans "Please contact our support team if you believe this is an error." %}
+  </p>
+  <a href="mailto:support@joel-digitals.com" style="display:inline-block;padding:0.8rem 2rem;background:var(--primary);color:white;text-decoration:none;border-radius:10px;font-weight:600;">
+    {% trans "Contact Support" %}
+  </a>
+</div>
+{% endblock %}

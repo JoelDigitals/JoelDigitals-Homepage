@@ -50,4 +50,7 @@ urlpatterns = [
     # Fast-Cron Endpoint — alle 5 Min aufrufen
     # Optional: ?token=CRON_SECRET in settings.py absichern
     path('shop/status/emails/corn/', views.email_cron, name='email_cron'),
+    path('lp/<str:username>/<slug:product_slug>/', views.personalized_landing, name='personalized_landing'),
+    path('lp/<slug:product_slug>/', views.product_landing, name='product_landing'),
+    path('go/<slug:slug>/', views.custom_landing, name='custom_landing'),
 ]
