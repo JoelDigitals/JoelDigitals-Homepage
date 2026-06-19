@@ -33,6 +33,9 @@ DEBUG = True
 ALLOWED_HOSTS = ['joel-digitals.de', 'www.joel-digitals.de', 'joel-digitals.onrender.com',
     '127.0.0.1', 
     'localhost',
+    'download.joel-digitals.de',
+    'blog.joel-digitals.de',
+    'shop.joel-digitals.de',
     ]
 
 OAUTH2_PROVIDER = {
@@ -90,6 +93,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django.middleware.locale.LocaleMiddleware",
     "shop_ourapps.middleware.AffiliateRefMiddleware",
+    "main.subdomain_middleware.SubdomainRedirectMiddleware",
 ]
 
 ROOT_URLCONF = 'joel_digitals.urls'
