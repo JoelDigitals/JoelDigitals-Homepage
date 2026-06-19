@@ -2955,3 +2955,39 @@ msgstr "Technologien"
 
 msgid "Resources"
 msgstr "Ressourcen"
+
+msgid "Withdrawal"
+msgstr "Widerruf"
+
+msgid "Withdrawal Form"
+msgstr "Widerrufsformular"
+
+msgid "Order Number"
+msgstr "Bestellnummer"
+
+msgid "First Name"
+msgstr "Vorname"
+
+msgid "Last Name"
+msgstr "Nachname"
+
+msgid "Submit Withdrawal"
+msgstr "Widerruf einreichen"
+
+msgid "for refund"
+msgstr "fur Ruckerstattung"
+
+msgid "B2B Notice"
+msgstr "B2B-Hinweis"
+
+msgid "For business customers (B2B), the 14-day right of withdrawal does not apply if the purchase was made for commercial or self-employed purposes."
+msgstr "Fur Geschaftskunden (B2B) gilt das 14-tagige Widerrufsrecht nicht, wenn der Kauf zu gewerblichen oder selbstandigen Zwecken erfolgte."
+
+msgid "Approve"
+msgstr "Genehmigen"
+
+msgid "Reject"
+msgstr "Ablehnen"
+
+msgid "Withdrawals"
+msgstr "Widerrufe"

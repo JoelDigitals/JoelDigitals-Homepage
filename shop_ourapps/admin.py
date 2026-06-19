@@ -3,7 +3,7 @@ from .models import (
     Purchase, AffiliateLink, Affiliate, App, Cart, CartItem, AffiliateTransaction, 
     AffiliatePartner, Order, OrderItem, AffiliateCode, DiscountCode, Wallet, WalletCode, 
     AppGroup, Voucher, VoucherOrder, SaleBadge, OrderStatusLog,
-    AffiliateMarketingMaterial, AffiliateInvoice, CustomLandingPage,
+    AffiliateMarketingMaterial, AffiliateInvoice, CustomLandingPage, WithdrawalRequest,
 )
 
 class PurchaseAdmin(admin.ModelAdmin):
@@ -46,7 +46,7 @@ admin.site.register(SaleBadge)
 admin.site.register(AppGroup)
 admin.site.register(Voucher)
 admin.site.register(VoucherOrder)
-from .models import AppReview
+from .models import WithdrawalRequest, AppReview
 
 @admin.register(AppReview)
 class AppReviewAdmin(admin.ModelAdmin):
@@ -58,7 +58,7 @@ class AppReviewAdmin(admin.ModelAdmin):
 
 
 
-from .models import ReturnRequest, AppReview
+from .models import WithdrawalRequest, ReturnRequest, AppReview
 
 @admin.register(ReturnRequest)
 class ReturnRequestAdmin(admin.ModelAdmin):
@@ -106,3 +106,13 @@ class CustomLandingPageAdmin(admin.ModelAdmin):
     list_editable = ('is_active',)
     prepopulated_fields = {'slug': ('greeting_name',)}
     search_fields = ('slug', 'greeting_name', 'headline')
+
+
+@admin.register(WithdrawalRequest)
+class WithdrawalRequestAdmin(admin.ModelAdmin):
+    list_display = ('order_number', 'first_name', 'last_name', 'email', 'status', 'created_at')
+    list_filter = ('status',)
+    list_editable = ('status',)
+    search_fields = ('order_number', 'first_name', 'last_name', 'email')
+    readonly_fields = ('created_at',)
+    fieldsets = ((None, {'fields': ('order_number','first_name','last_name','email','company_name','reason')}), ('Status', {'fields': ('status','admin_note','processed_at')}))

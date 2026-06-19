@@ -1,0 +1,14 @@
+<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;">
+  <div style="background:#ef4444;padding:24px;text-align:center;"><h2 style="color:white;margin:0;">🔔 Neuer Widerruf</h2></div>
+  <div style="padding:24px;color:#333;line-height:1.6;">
+    <p>Ein neuer Widerruf ist eingegangen:</p>
+    <div style="background:#fff5f5;padding:16px;border-radius:8px;border:1px solid #fecaca;margin:16px 0;">
+      <strong>Bestellnummer:</strong> #{{ wr.order_number }}<br>
+      <strong>Name:</strong> {{ wr.first_name }} {{ wr.last_name }}<br>
+      <strong>E-Mail:</strong> {{ wr.email }}<br>
+      {% if wr.company_name %}<strong>Firma:</strong> {{ wr.company_name }}<br>{% endif %}
+      {% if wr.reason %}<strong>Grund:</strong> {{ wr.reason }}<br>{% endif %}
+    </div>
+    <a href="https://joel-digitals.de/admin/shop_ourapps/withdrawalrequest/{{ wr.id }}/change/" style="display:inline-block;padding:12px 24px;background:#1a1a2e;color:white;text-decoration:none;border-radius:8px;font-weight:600;">Widerruf im Admin bearbeiten</a>
+  </div>
+</div>

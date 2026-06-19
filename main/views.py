@@ -410,6 +410,33 @@ def admin_dashboard(request):
     
     recent_activities.sort(key=lambda x: x['time'], reverse=True)
 
+    # === WIDERRUFE ===
+    from shop_ourapps.models import WithdrawalRequest
+    from django.utils import timezone as tz
+    pending_withdrawals = WithdrawalRequest.objects.filter(status='pending').order_by('-created_at')[:5]
+    withdrawal_count = WithdrawalRequest.objects.filter(status='pending').count()
+
+    if request.method == "POST" and "withdrawal_action" in request.POST:
+        wr_id = request.POST.get("wr_id")
+        action = request.POST.get("action")
+        note = request.POST.get("note", "")
+        wr = get_object_or_404(WithdrawalRequest, id=wr_id)
+        if action == "approve":
+            wr.status = "approved"
+            wr.admin_note = note
+            wr.processed_at = tz.now()
+            wr.save()
+            messages.success(request, f"Widerruf #{wr.order_number} genehmigt.")
+            _send_withdrawal_email(wr, 'approved')
+        elif action == "reject":
+            wr.status = "rejected"
+            wr.admin_note = note
+            wr.processed_at = tz.now()
+            wr.save()
+            messages.success(request, f"Widerruf #{wr.order_number} abgelehnt.")
+            _send_withdrawal_email(wr, 'rejected')
+        return redirect("admin_dashboard")
+
     # === ERWEITERTE STATISTIKEN ===
     from decimal import Decimal
     from django.db.models.functions import TruncMonth as TrM
@@ -473,6 +500,8 @@ def admin_dashboard(request):
         'new_users_week': new_users_week,
         'new_users_month': new_users_month,
         'total_users': total_users,
+        'pending_withdrawals': pending_withdrawals,
+        'withdrawal_count': withdrawal_count,
     })
     
     # Debug-Ausgabe
@@ -536,6 +565,18 @@ def terms_view(request):
     return render(request, 'legal/terms.html', {'user_groups': user_groups})
 
 from reviews.utils import get_average_rating
+
+def _send_withdrawal_email(wr, status):
+    from django.core.mail import EmailMultiAlternatives
+    from django.template.loader import render_to_string
+    subj_de = f'Widerruf #{wr.order_number}: {"genehmigt" if status=="approved" else "abgelehnt"}'
+    subj_en = f'Withdrawal #{wr.order_number}: {"approved" if status=="approved" else "rejected"}'
+    ctx = {'wr': wr, 'status': status}
+    html = render_to_string('emails/withdrawal_status.html', ctx)
+    msg = EmailMultiAlternatives(subj_de, '', settings.COMPANY_EMAIL_NO_REPLY, [wr.email])
+    msg.attach_alternative(html, 'text/html')
+    msg.send()
+
 
 def home(request):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []

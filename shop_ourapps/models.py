@@ -733,3 +733,26 @@ class CustomLandingPage(models.Model):
 
     def __str__(self):
         return f"/go/{self.slug}/ – {self.greeting_name}"
+
+
+class WithdrawalRequest(models.Model):
+    STATUS = [('pending', 'Offen'), ('approved', 'Genehmigt'), ('rejected', 'Abgelehnt')]
+    order_number = models.CharField(max_length=100, verbose_name="Bestellnummer")
+    first_name = models.CharField(max_length=100, verbose_name="Vorname")
+    last_name = models.CharField(max_length=100, verbose_name="Nachname")
+    email = models.EmailField(verbose_name="E-Mail")
+    company_name = models.CharField(max_length=200, blank=True, verbose_name="Firma")
+    reason = models.TextField(verbose_name="Grund", blank=True)
+    iban = models.CharField(max_length=50, blank=True, verbose_name="IBAN")
+    status = models.CharField(max_length=20, choices=STATUS, default='pending')
+    admin_note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Widerruf"
+        verbose_name_plural = "Widerrufe"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Widerruf #{self.order_number} – {self.first_name} {self.last_name}"

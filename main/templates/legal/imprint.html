@@ -379,9 +379,14 @@
     <div class="cta-section">
       <h2 class="cta-title">{% trans "Contact Us" %}</h2>
       <p class="cta-text">{% trans "If you would like to get in touch, please visit our contact page." %}</p>
-      <a href="{% url 'contactz_home' %}" class="cta-button">
-        <i class="fas fa-paper-plane"></i> {% trans "Contact Form" %}
-      </a>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <a href="{% url 'contactz_home' %}" class="cta-button">
+          <i class="fas fa-paper-plane"></i> {% trans "Contact Form" %}
+        </a>
+        <a href="/withdrawal/" class="cta-button" style="background:#ef4444;">
+          <i class="fas fa-undo-alt"></i> {% trans "Withdrawal" %}
+        </a>
+      </div>
     </div>
   </div>
 </div>

@@ -1,0 +1,42 @@
+{% extends "base_shop.html" %}
+
+{% block title %}{{ T.title }} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .wf-wrap { max-width:600px; margin:3rem auto; padding:0 1rem; }
+  .wf-card { background:var(--surface); border-radius:16px; padding:2.5rem; border:2px solid var(--border); }
+  .wf-card h2 { margin:0 0 1.5rem; }
+  .wf-row { margin-bottom:1rem; }
+  .wf-row label { display:block; font-weight:600; font-size:.85rem; margin-bottom:4px; }
+  .wf-row input, .wf-row textarea { width:100%; padding:.7rem; border:2px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); box-sizing:border-box; }
+  .wf-row textarea { min-height:80px; resize:vertical; }
+  .wf-btn { width:100%; padding:.85rem; background:#1a1a2e; color:white; border:none; border-radius:10px; font-weight:700; font-size:1.05rem; cursor:pointer; }
+  .wf-btn:hover { opacity:.9; }
+  .wf-info { font-size:.8rem; color:#888; margin-top:1rem; line-height:1.5; }
+</style>
+<div class="wf-wrap">
+  <div class="wf-card">
+    <h2>📝 {{ T.title }}</h2>
+    {% if messages %}
+      {% for m in messages %}<div style="background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.3);border-radius:8px;padding:.75rem;color:#4CAF50;margin-bottom:1rem;">{{ m }}</div>{% endfor %}
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <div class="wf-row"><label>{{ T.order_number }} *</label><input type="text" name="order_number" required></div>
+      <div class="wf-row"><label>{{ T.first_name }} *</label><input type="text" name="first_name" required></div>
+      <div class="wf-row"><label>{{ T.last_name }} *</label><input type="text" name="last_name" required></div>
+      <div class="wf-row"><label>{{ T.email }} *</label><input type="email" name="email" required></div>
+      <div class="wf-row"><label>{{ T.company }} <span style="font-weight:400;color:#888;">({{ T.optional }})</span></label><input type="text" name="company_name"></div>
+      <div class="wf-row"><label>{{ T.iban }} <span style="font-weight:400;color:#888;">({{ T.iban_hint }})</span></label><input type="text" name="iban" placeholder="DE..."></div>
+      <div class="wf-row"><label>{{ T.reason }}</label><textarea name="reason"></textarea></div>
+      <button type="submit" class="wf-btn">{{ T.submit }}</button>
+    </form>
+    <div class="wf-info">
+      {{ T.confirm }}
+      <br><br>
+      <strong style="color:#ef4444;">⚠ {{ T.b2b_title }}:</strong> {{ T.b2b_text }}
+    </div>
+  </div>
+</div>
+{% endblock %}

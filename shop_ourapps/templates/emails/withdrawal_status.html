@@ -1,0 +1,26 @@
+<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;">
+  <div style="background:{% if status == 'approved' %}#4CAF50{% else %}#ef4444{% endif %};padding:24px;text-align:center;">
+    <h2 style="color:white;margin:0;">{% if status == 'approved' %}Widerruf genehmigt{% else %}Widerruf abgelehnt{% endif %}</h2>
+  </div>
+  <div style="padding:24px;color:#333;line-height:1.6;">
+    <p>Hallo {{ wr.first_name }},</p>
+    <p>dein Widerruf für <strong>Bestellung #{{ wr.order_number }}</strong> wurde <strong>{% if status == 'approved' %}genehmigt{% else %}abgelehnt{% endif %}</strong>.</p>
+    {% if status == 'approved' %}
+    <div style="background:#f0fdf4;padding:16px;border-radius:8px;border:1px solid #bbf7d0;margin:16px 0;">
+      <strong>Bitte sende die Rücksendung an:</strong><br>
+      Joel Digitals<br>
+      Joel Nicolay<br>
+      IBAN: DE35 2022 0800 0056 4323 94<br>
+      BIC: HYVEDEMM454<br>
+      <br>
+      <small>Bitte gib deine Bestellnummer #{{ wr.order_number }} als Verwendungszweck an.</small>
+    </div>
+    {% else %}
+    <div style="background:#fef2f2;padding:16px;border-radius:8px;border:1px solid #fecaca;margin:16px 0;">
+      {% if wr.admin_note %}<strong>Begründung:</strong> {{ wr.admin_note }}{% else %}Der Widerruf konnte nicht genehmigt werden.{% endif %}
+    </div>
+    {% endif %}
+    <p style="color:#888;font-size:13px;">Bei Fragen antworte einfach auf diese E-Mail.</p>
+  </div>
+  <div style="background:#f9f9f9;padding:16px;text-align:center;font-size:12px;color:#999;">Joel Digitals</div>
+</div>

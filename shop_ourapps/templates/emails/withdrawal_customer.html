@@ -1,0 +1,18 @@
+<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;">
+  <div style="background:#1a1a2e;padding:24px;text-align:center;"><h2 style="color:white;margin:0;">Widerruf eingegangen</h2></div>
+  <div style="padding:24px;color:#333;line-height:1.6;">
+    <p>Hallo {{ wr.first_name }},</p>
+    <p>dein Widerruf für <strong>Bestellung #{{ wr.order_number }}</strong> ist bei uns eingegangen.</p>
+    <p>Wir bearbeiten deinen Widerruf schnellstmöglich. Du erhältst eine weitere Nachricht, sobald der Widerruf bearbeitet wurde.</p>
+    <div style="background:#f5f5f5;padding:16px;border-radius:8px;margin:16px 0;">
+      <strong>Deine Daten:</strong><br>
+      Bestellnummer: #{{ wr.order_number }}<br>
+      Name: {{ wr.first_name }} {{ wr.last_name }}<br>
+      {% if wr.company_name %}Firma: {{ wr.company_name }}<br>{% endif %}
+    </div>
+    <p style="color:#888;font-size:13px;">Bei Fragen antworte einfach auf diese E-Mail.</p>
+  </div>
+  <div style="background:#f9f9f9;padding:16px;text-align:center;font-size:12px;color:#999;">
+    Joel Digitals – Digital Solutions for Tomorrow
+  </div>
+</div>

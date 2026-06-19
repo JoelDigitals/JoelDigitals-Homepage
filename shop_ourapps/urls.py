@@ -53,4 +53,5 @@ urlpatterns = [
     path('lp/<str:username>/<slug:product_slug>/', views.personalized_landing, name='personalized_landing'),
     path('lp/<slug:product_slug>/', views.product_landing, name='product_landing'),
     path('go/<slug:slug>/', views.custom_landing, name='custom_landing'),
+    path('withdrawal/', views.withdrawal_form, name='withdrawal_form'),
 ]

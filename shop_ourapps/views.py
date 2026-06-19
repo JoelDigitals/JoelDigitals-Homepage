@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.mail import send_mail, EmailMultiAlternatives
-from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup, AffiliateMarketingMaterial, AffiliateTransaction, CustomLandingPage
+from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup, AffiliateMarketingMaterial, AffiliateTransaction, CustomLandingPage, WithdrawalRequest
 from shop_ourapps.models import AffiliatePartner
 from .forms import PurchaseForm, VoucherPurchaseForm
 from .services.automation_service import OrderAutomationService
@@ -2284,3 +2284,56 @@ def custom_landing(request, slug):
         ctx['product_desc'] = product.description_english if (is_en and product.description_english) else product.description
         ctx['product_price'] = product.discounted_price if product.discount_is_active else product.price
     return render(request, 'apps/custom_landing.html', ctx)
+
+def withdrawal_form(request):
+    if request.method == 'POST':
+        wr = WithdrawalRequest.objects.create(
+            order_number=request.POST.get('order_number',''),
+            first_name=request.POST.get('first_name',''),
+            last_name=request.POST.get('last_name',''),
+            email=request.POST.get('email',''),
+            company_name=request.POST.get('company_name',''),
+            reason=request.POST.get('reason',''),
+            iban=request.POST.get('iban',''),
+        )
+        from django.core.mail import EmailMultiAlternatives
+        from django.template.loader import render_to_string
+        ctx = {'wr': wr}
+        customer_html = render_to_string('emails/withdrawal_customer.html', ctx)
+        msg = EmailMultiAlternatives(
+            "Widerruf eingegangen: #" + str(wr.order_number),
+            "Hallo " + wr.first_name + ",\n\nDein Widerruf fur Bestellung #" + str(wr.order_number) + " ist eingegangen.",
+            settings.COMPANY_EMAIL_NO_REPLY, [wr.email]
+        )
+        msg.attach_alternative(customer_html, 'text/html')
+        msg.send()
+        admin_html = render_to_string('emails/withdrawal_admin.html', ctx)
+        msg2 = EmailMultiAlternatives(
+            "[Admin] Neuer Widerruf #" + str(wr.order_number) + " - " + wr.first_name + " " + wr.last_name,
+            "Widerruf " + str(wr.order_number) + " von " + wr.first_name + " " + wr.last_name,
+            settings.COMPANY_EMAIL_NO_REPLY, [settings.COMPANY_EMAIL]
+        )
+        msg2.attach_alternative(admin_html, 'text/html')
+        msg2.send()
+        from django.contrib import messages
+        messages.success(request, 'Dein Widerruf ist eingegangen.')
+        return redirect('withdrawal_form')
+    lang = request.LANGUAGE_CODE or 'de'
+    is_en = lang == 'en'
+    return render(request, 'apps/withdrawal.html', {
+        'T': {'title':'Withdrawal Form' if is_en else 'Widerrufsformular',
+              'order_number':'Order Number' if is_en else 'Bestellnummer',
+              'first_name':'First Name' if is_en else 'Vorname',
+              'last_name':'Last Name' if is_en else 'Nachname',
+              'email':'Email' if is_en else 'E-Mail',
+              'company':'Company' if is_en else 'Firma',
+              'optional':'optional',
+              'iban':'IBAN',
+              'iban_hint':'for refund' if is_en else 'fur Ruckerstattung',
+              'reason':'Reason' if is_en else 'Grund',
+              'submit':'Submit Withdrawal' if is_en else 'Widerruf einreichen',
+              'confirm':'After submission you will receive a confirmation.' if is_en else 'Nach dem Absenden erhaltst du eine Bestatigung.',
+              'b2b_title':'B2B Notice' if is_en else 'B2B-Hinweis',
+              'b2b_text':'For business customers, the 14-day right of withdrawal does not apply.' if is_en else 'Fur Geschaftskunden gilt das 14-tagige Widerrufsrecht nicht.',
+        },
+    })
