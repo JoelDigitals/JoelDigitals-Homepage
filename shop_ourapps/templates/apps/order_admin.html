@@ -725,7 +725,7 @@
                 <div class="items-list">
                   {% for item in order.items.all %}
                     <div class="item">
-                      <span class="item-name">{{ item.app }}</span>
+                      <span class="item-name">{{ item.get_name }}</span>
                       <span class="item-meta">{{ item.quantity }}× @ {{ item.price }} €</span>
                     </div>
                   {% empty %}

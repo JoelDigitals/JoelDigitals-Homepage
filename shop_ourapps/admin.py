@@ -4,6 +4,7 @@ from .models import (
     AffiliatePartner, Order, OrderItem, AffiliateCode, DiscountCode, Wallet, WalletCode, 
     AppGroup, Voucher, VoucherOrder, SaleBadge, OrderStatusLog,
     AffiliateMarketingMaterial, AffiliateInvoice, CustomLandingPage, WithdrawalRequest,
+    WatchlistEntry, Package, PackageApp,
 )
 
 class PurchaseAdmin(admin.ModelAdmin):
@@ -29,7 +30,59 @@ class OrderAdmin(admin.ModelAdmin):
 admin.site.register(AffiliateLink, AffiliateAdmin)
 admin.site.register(Purchase, PurchaseAdmin)
 admin.site.register(Affiliate)
-admin.site.register(App)
+class AppAdmin(admin.ModelAdmin):
+    list_display = ['name', 'is_active', 'is_available_for_purchase', 'release_date', 'preorder_date', 'stock']
+    list_editable = ['is_active', 'is_available_for_purchase']
+    list_filter = ['is_active', 'is_available_for_purchase']
+    search_fields = ['name', 'slug']
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'name_english', 'slug', 'description', 'description_english', 'image')
+        }),
+        ('Produktdetails', {
+            'fields': ('product_number', 'version', 'group')
+        }),
+        ('Verfügbarkeit', {
+            'fields': ('is_active', 'is_available_for_purchase', 'release_date', 'preorder_date', 'stock', 'requires_shipping', 'is_physical', 'delivery_time', 'shipping_cost')
+        }),
+        ('Preis & Rabatt', {
+            'fields': ('price', 'discount_percent', 'discount_start', 'discount_end', 'sale_badge', 'is_black_week', 'is_cyber_monday', 'is_christmas_sale')
+        }),
+        ('Links', {
+            'fields': ('link', 'android_link', 'ios_link', 'windows_link', 'macos_link', 'linux_link')
+        }),
+        ('Rückgabe', {
+            'fields': ('refundable', 'exchangeable')
+        }),
+    )
+
+
+class PackageAppInline(admin.TabularInline):
+    model = PackageApp
+    extra = 1
+
+
+@admin.register(Package)
+class PackageAdmin(admin.ModelAdmin):
+    list_display = ['name', 'price', 'is_available_for_purchase', 'is_active', 'release_date', 'preorder_date']
+    list_filter = ['is_active', 'is_available_for_purchase']
+    search_fields = ['name', 'slug']
+    prepopulated_fields = {'slug': ('name',)}
+    inlines = [PackageAppInline]
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'name_english', 'slug', 'description', 'description_english', 'image')
+        }),
+        ('Verfügbarkeit', {
+            'fields': ('is_active', 'is_available_for_purchase', 'release_date', 'preorder_date')
+        }),
+        ('Preis & Rabatt', {
+            'fields': ('price', 'discount_percent', 'discount_start', 'discount_end', 'sale_badge')
+        }),
+    )
+
+
+admin.site.register(App, AppAdmin)
 admin.site.register(Cart)
 admin.site.register(CartItem)
 

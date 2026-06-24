@@ -127,22 +127,20 @@
 
   .item-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
     padding: 0.75rem;
     background: rgba(0, 68, 204, 0.03);
     border-radius: 8px;
     border: 1px solid var(--border);
-    gap: 0.75rem;
-    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
   .item-info {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    flex: 1;
-    min-width: 0; /* Wichtig für Text-Overflow */
+    width: 100%;
+    min-width: 0;
   }
 
   .item-qty {
@@ -531,26 +529,64 @@
               <div class="item-info">
                 <span class="item-qty">{{ item.quantity }}</span>
                 <span class="item-name">
-                  {% if "de" in lang %}{{ item.app.name|default:item.name_override }}{% else %}{{ item.app.name_english|default:item.name_override }}{% endif %}
+                  {% if item.package %}
+                    {{ item.package.name }}
+                  {% elif "de" in lang %}
+                    {{ item.app.name }}
+                  {% else %}
+                    {{ item.app.name_english|default:item.app.name }}
+                  {% endif %}
                 </span>
               </div>
-              <div class="item-pricing">
-                {% if item.app.discount_is_active %}
+              <div class="item-pricing" style="width:100%;justify-content:flex-start;padding-left:2.5rem;">
+                {% if item.package %}
+                  {% if item.package.discount_is_active %}
+                    <span class="price-strike">€{{ item.package.price|floatformat:2 }}</span>
+                    <span class="price-final">€{{ item.package.discounted_price|floatformat:2 }}</span>
+                    <span class="discount-badge-small">-{{ item.package.discount_percent }}%</span>
+                  {% else %}
+                    <span class="price-regular">€{{ item.package.price|floatformat:2 }}</span>
+                  {% endif %}
+                {% elif item.app.discount_is_active %}
                   <span class="price-strike">€{{ item.app.price|floatformat:2 }}</span>
                   <span class="price-final">€{{ item.app.discounted_price|floatformat:2 }}</span>
                   <span class="discount-badge-small">-{{ item.app.discount_percent }}%</span>
                 {% else %}
                   <span class="price-regular">€{{ item.app.price|floatformat:2 }}</span>
                 {% endif %}
+                {% if item.app and item.app.stock_level != "none" %}
+                  <span style="font-size:0.75rem;margin-left:0.5rem;color:{{ item.app.stock_display_color }};">
+                    {% if item.app.stock_level == "full" %}
+                      {% trans "In stock" %}
+                    {% elif item.app.stock_level == "low" %}
+                      {% blocktrans with count=item.app.stock %}{{ count }} in stock{% endblocktrans %}
+                    {% elif item.app.stock_level == "critical" %}
+                      {% blocktrans with count=item.app.stock %}Only {{ count }} left in stock{% endblocktrans %}
+                    {% endif %}
+                  </span>
+                {% endif %}
+              </div>
             </div>
           {% endfor %}
         </div>
+        {% if has_physical %}
+        <div style="padding:0.75rem 0;font-size:0.85rem;color:#aaa;border-bottom:1px solid var(--border);margin-bottom:0.75rem;">
+          <i class="fas fa-truck"></i> {% trans "Delivery time" %}: {{ delivery_time }}
+          {% if has_backorder %}<span style="color:#ff9800;">({% trans "Backorder" %})</span>{% endif %}
+        </div>
+        {% endif %}
 
         <div class="totals-box">
           <div class="total-row">
             <span class="total-label">{% trans "Subtotal" %}</span>
             <span class="total-value">€{{ subtotal|floatformat:2 }}</span>
           </div>
+          {% if has_physical %}
+          <div class="total-row">
+            <span class="total-label">{% trans "Shipping" %}</span>
+            <span class="total-value">€{{ shipping_cost|floatformat:2 }}</span>
+          </div>
+          {% endif %}
           <div class="total-row discount-line" id="discount-line" style="display: {% if discount_amount > 0 %}flex{% else %}none{% endif %};">
             <span class="total-label">{% trans "Discount" %}</span>
             <span class="total-value" style="color: #4CAF50;">-€<span id="discount-amount">{{ discount_amount|floatformat:2 }}</span></span>

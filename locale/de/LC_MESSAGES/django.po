@@ -2991,3 +2991,116 @@ msgstr "Ablehnen"
 
 msgid "Withdrawals"
 msgstr "Widerrufe"
+
+# ---- Shop translations ----
+
+msgid "In stock"
+msgstr "Auf Lager"
+
+msgid "%(count)s in stock"
+msgstr "%(count)s auf Lager"
+
+msgid "Only %(count)s left in stock"
+msgstr "Nur noch %(count)s auf Lager"
+
+msgid "+€%(cost)s Shipping"
+msgstr "+€%(cost)s Versand"
+
+msgid "Delivery"
+msgstr "Lieferung"
+
+msgid "Backorder"
+msgstr "Vormerkung"
+
+msgid "Refundable"
+msgstr "Erstattungsfähig"
+
+msgid "Exchangeable"
+msgstr "Umtauschbar"
+
+msgid "Notify me when available"
+msgstr "Benachrichtige mich wenn verfügbar"
+
+msgid "This product is currently out of stock"
+msgstr "Dieses Produkt ist aktuell nicht auf Lager"
+
+msgid "Please log in to purchase this app"
+msgstr "Bitte melde dich an um dieses Produkt zu kaufen"
+
+msgid "Watchlist"
+msgstr "Merkliste"
+
+msgid "My Watchlist"
+msgstr "Meine Merkliste"
+
+msgid "Products you want to be notified about"
+msgstr "Produkte über die du benachrichtigt werden möchtest"
+
+msgid "View"
+msgstr "Ansehen"
+
+msgid "Remove from watchlist"
+msgstr "Von der Merkliste entfernen"
+
+msgid "Your watchlist is empty"
+msgstr "Deine Merkliste ist leer"
+
+msgid "Browse Shop"
+msgstr "Shop durchstöbern"
+
+msgid "Out of stock"
+msgstr "Ausverkauft"
+
+msgid "Solutions"
+msgstr "Lösungen"
+
+msgid "Merchant"
+msgstr "Händler"
+
+msgid "Pre-order now"
+msgstr "Jetzt vorbestellen"
+
+msgid "Pre-order"
+msgstr "Vorbestellung"
+
+msgid "Release date"
+msgstr "Veröffentlichung"
+
+msgid "Release"
+msgstr "Release"
+
+msgid "Packages"
+msgstr "Pakete"
+
+msgid "Save with bundles"
+msgstr "Sparen mit Paketen"
+
+msgid "View Package"
+msgstr "Paket ansehen"
+
+msgid "Buy Package"
+msgstr "Paket kaufen"
+
+msgid "Buy"
+msgstr "Kaufen"
+
+msgid "Included Apps"
+msgstr "Enthaltene Apps"
+
+msgid "%(count)s apps included"
+msgstr "%(count)s Apps enthalten"
+
+msgid "Price"
+msgstr "Preis"
+
+msgid "Log in to purchase"
+msgstr "Anmelden zum Kaufen"
+
+msgid "Package is already in your cart."
+msgstr "Paket ist bereits im Warenkorb."
+
+msgid "savings"
+msgstr "Ersparnis"
+
+msgid "No packages available yet."
+msgstr "Noch keine Pakete verfügbar."

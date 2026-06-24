@@ -589,7 +589,11 @@ def home(request):
         post.teaser_text = (post.content_en if lang == "en" else post.content_de)[:200]
 
     # 3 zufällige Produkte
-    products = list(App.objects.filter(is_available_for_purchase=True))
+    products = list(App.objects.filter(is_available_for_purchase=True).filter(
+        Q(preorder_date__isnull=False, preorder_date__lte=date.today()) |
+        Q(preorder_date__isnull=True, release_date__isnull=True) |
+        Q(preorder_date__isnull=True, release_date__lte=date.today())
+    ))
     random_products = random.sample(products, min(len(products), 3))
     for product in random_products:
         product.name = product.name if lang == 'de' else product.name_english

@@ -677,7 +677,9 @@
                   <td data-label="{% trans 'Product' %}">
                     <div class="product-cell">
                       <div class="product-image">
-                        {% if item.app and item.app.image %}
+                        {% if item.package and item.package.image %}
+                          <img src="{{ item.package.image.url }}" alt="{{ item.get_name }}">
+                        {% elif item.app and item.app.image %}
                           <img src="{{ item.app.image.url }}" alt="{{ item.get_name }}">
                         {% else %}
                           <div class="product-image-placeholder">
@@ -687,15 +689,9 @@
                       </div>
                       <div class="product-info">
                         <h4>
-                          {% if "de" in lang %}
-                            {{ item.get_name }}
-                          {% elif "en" in lang %}
-                            {{ item.app.name_english|default:item.get_name }}
-                          {% else %}
-                            {{ item.get_name }}
-                          {% endif %}
+                          {{ item.get_name }}
                         </h4>
-                        <div class="product-sku">{{ item.app.product_number|default:"" }}</div>
+                        <div class="product-sku">{% if item.app %}{{ item.app.product_number|default:"" }}{% endif %}</div>
                       </div>
                     </div>
                   </td>

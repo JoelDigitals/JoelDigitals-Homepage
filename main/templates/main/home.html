@@ -24,6 +24,7 @@
     margin: 0 auto;
     padding: 0;
     box-sizing: border-box;
+    overflow-x: hidden;
   }
 
   /* Hero Section - Mobile First */
@@ -582,6 +583,50 @@
     min-width: 140px;
   }
 
+  /* Small phones */
+  @media (max-width: 480px) {
+    .hero-section {
+      padding: 2rem 1rem;
+      min-height: 60vh;
+    }
+
+    .hero-icon {
+      width: 72px;
+      height: 72px;
+      font-size: 1.8rem;
+    }
+
+    .content-body {
+      padding: 1rem 0.75rem;
+    }
+
+    .info-card {
+      padding: 1.25rem 0.75rem;
+    }
+
+    .info-card h2 {
+      font-size: 1.1rem;
+    }
+
+    .product-details {
+      padding: 0.75rem;
+    }
+
+    .product-image {
+      height: 150px;
+    }
+
+    .blog-card .featured-image {
+      height: 160px;
+    }
+
+    /* Why Us: 1 Spalte auf kleinen Screens */
+    .info-card div[style*="grid-template-columns:1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+      gap: 0.75rem;
+    }
+  }
+
   /* Tablet & Desktop Breakpoints */
   @media (min-width: 640px) {
     .hero-section {
@@ -789,6 +834,22 @@
               </div>
             {% endif %}
 
+            {% if product.is_preorder %}
+              <div class="stock-badge" style="color:#7c3aed;font-size:0.85rem;margin:0.5rem 0;text-align:center;">
+                <i class="fas fa-rocket"></i> {% trans "Pre-order" %}
+              </div>
+            {% elif product.stock_level != "full" %}
+              <div class="stock-badge" style="color:{{ product.stock_display_color }};font-size:0.85rem;margin:0.5rem 0;text-align:center;">
+                {% if product.stock_level == "low" %}
+                  {% blocktrans with count=product.stock %}{{ count }} in stock{% endblocktrans %}
+                {% elif product.stock_level == "critical" %}
+                  {% blocktrans with count=product.stock %}Only {{ count }} left in stock{% endblocktrans %}
+                {% elif product.stock_level == "none" %}
+                  {% trans "Out of stock" %}
+                {% endif %}
+              </div>
+            {% endif %}
+
             <a href="{% url 'app_detail' slug=product.slug %}" class="btn-buy">
               <i class="fas fa-shopping-cart"></i> {% trans "Buy Now" %}
             </a>
@@ -960,7 +1021,7 @@
           <p style="color:#888;font-size:0.85rem;margin:0;">{{ T.cloud_desc }}</p>
         </div>
         <div style="text-align:center;margin-top:1.5rem;">
-          <a href="/services/" style="display:inline-flex;align-items:center;gap:0.5rem;background:linear-gradient(135deg,var(--primary),#0066ff);color:white;text-decoration:none;padding:0.85rem 2rem;border-radius:12px;font-weight:600;font-size:1rem;animation:pulse-btn 2s infinite;width:auto;">
+          <a href="/services/" class="btn-primary" style="background:linear-gradient(135deg,var(--primary),#0066ff);color:white;animation:pulse-btn 2s infinite;width:100%;max-width:300px;">
             {{ T.view_all }} <i class="fas fa-arrow-right"></i>
           </a>
         </div>

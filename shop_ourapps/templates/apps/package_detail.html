@@ -1,0 +1,240 @@
+{% extends "base_shop.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ package.name }} - Joel Digitals{% endblock %}
+
+{% block shop_content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+  .package-hero {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    padding: 3rem 1.5rem;
+    border-radius: 20px;
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .package-hero h1 {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 800;
+    color: white;
+    margin: 0 0 0.5rem;
+  }
+
+  .package-hero .price-display {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 700;
+    color: rgba(255,255,255,0.95);
+    margin: 1rem 0;
+  }
+
+  .package-hero .price-display .old-price {
+    text-decoration: line-through;
+    color: rgba(255,255,255,0.5);
+    margin-right: 0.75rem;
+    font-size: 0.85em;
+  }
+
+  .savings-badge {
+    display: inline-block;
+    background: #22c55e;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .package-description {
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.9);
+    font-size: 1.05rem;
+  }
+
+  .included-apps {
+    margin: 2rem 0;
+  }
+
+  .included-apps h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .app-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .app-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s;
+  }
+
+  .app-card:active {
+    transform: scale(0.98);
+  }
+
+  .app-card img {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .app-card .app-icon-placeholder {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  .app-card .app-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .app-card .app-info h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+  }
+
+  .app-card .app-info p {
+    font-size: 0.85rem;
+    color: #888;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .package-cta {
+    text-align: center;
+    margin: 2.5rem 0;
+  }
+
+  .btn-package-buy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.25rem 3rem;
+    min-height: 56px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(34,197,94,0.3);
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .btn-package-buy:active {
+    transform: scale(0.97);
+  }
+
+  .btn-package-buy i {
+    font-size: 1.3rem;
+  }
+
+  @media (max-width: 480px) {
+    .package-hero { padding: 2rem 1rem; }
+    .app-card { flex-direction: column; text-align: center; }
+    .app-card .app-info p { -webkit-line-clamp: 3; }
+  }
+</style>
+
+<div class="package-hero">
+  {% if package.is_preorder %}
+    <div style="margin-bottom:1rem;">
+      <span style="display:inline-block;background:rgba(124,58,237,0.3);color:#c084fc;padding:0.3rem 1rem;border-radius:20px;font-weight:600;font-size:0.85rem;">
+        <i class="fas fa-rocket"></i> {% trans "Pre-order" %} – {% trans "Release" %} {{ package.release_date|date:"d.m.Y" }}
+      </span>
+    </div>
+  {% endif %}
+
+  {% if package.discount_is_active %}
+    <div class="savings-badge">
+      <i class="fas fa-tag"></i> {{ package.discount_percent }}% {% trans "savings" %}
+    </div>
+  {% endif %}
+
+  <h1>{{ package.name }}</h1>
+  <p class="package-description">{{ package.description }}</p>
+
+  <div class="price-display">
+    {% if package.discount_is_active %}
+      <span class="old-price">€{{ package.price }}</span>
+      <span>€{{ package.discounted_price|floatformat:2 }}</span>
+    {% else %}
+      <span>€{{ package.price }}</span>
+    {% endif %}
+  </div>
+</div>
+
+{% if package_apps %}
+<section class="included-apps">
+  <h2><i class="fas fa-cubes" style="color:var(--primary);"></i> {% trans "Included Apps" %}</h2>
+  <div class="app-list">
+    {% for pa in package_apps %}
+    <div class="app-card">
+      {% if pa.app.image %}
+        <img src="{{ pa.app.image.url }}" alt="{{ pa.app.name }}">
+      {% else %}
+        <div class="app-icon-placeholder"><i class="fas fa-cube"></i></div>
+      {% endif %}
+      <div class="app-info">
+        <h3>{{ pa.app.name }}</h3>
+        <p>{{ pa.app.description|truncatechars:80 }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<div class="package-cta">
+  {% if user.is_authenticated %}
+    <form method="post" action="{% url 'add_package_to_cart' package.id %}">
+      {% csrf_token %}
+      <button type="submit" class="btn-package-buy">
+        <i class="fas fa-shopping-cart"></i> {% trans "Buy Package" %}
+      </button>
+    </form>
+  {% else %}
+    <a href="{% url 'login' %}?next={{ request.path }}" class="btn-package-buy" style="background:linear-gradient(135deg,var(--primary),#0066ff);box-shadow:0 6px 20px rgba(0,68,204,0.3);">
+      <i class="fas fa-lock"></i> {% trans "Log in to purchase" %}
+    </a>
+  {% endif %}
+</div>
+{% endblock %}

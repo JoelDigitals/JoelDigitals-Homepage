@@ -1,16 +1,17 @@
+{% load i18n %}
 <div class="shop-card"
      data-name="{{ app.display_name|lower }}"
      data-desc="{{ app.display_description|default_if_none:''|lower }}"
      data-price="{{ app.discounted_price|floatformat:2 }}"
      data-discount="{{ app.discount_percent|default:0 }}">
 
-  {% if app.discount_is_active and app.active_sale_name %}
+  {% if app.discount_is_active and app.sale_badge %}
     <div class="sale-banner-overlay">
-        {% if app.sale_badge %}
-            <img src="{{ app.sale_badge.image.url }}" alt="{{ app.active_sale_name }}">
-        {% else %}
-            <span class="sale-banner-text">{{ app.active_sale_name }}</span>
-        {% endif %}
+        <img src="{{ app.sale_badge.image.url }}" alt="{{ app.active_sale_name|default:'' }}">
+    </div>
+  {% elif app.discount_is_active and app.active_sale_name %}
+    <div class="sale-banner-overlay">
+        <span class="sale-banner-text">{{ app.active_sale_name }}</span>
     </div>
   {% endif %}
 
@@ -66,6 +67,22 @@
         </div>
       {% endif %}
     </div>
+
+    {% if app.is_preorder %}
+      <div class="stock-badge" style="color:#7c3aed;">
+        <i class="fas fa-rocket"></i> {% trans "Pre-order" %}
+      </div>
+    {% elif app.stock_level != "full" %}
+      <div class="stock-badge" style="color:{{ app.stock_display_color }};">
+        {% if app.stock_level == "low" %}
+          {% blocktrans with count=app.stock %}{{ count }} in stock{% endblocktrans %}
+        {% elif app.stock_level == "critical" %}
+          {% blocktrans with count=app.stock %}Only {{ count }} left in stock{% endblocktrans %}
+        {% elif app.stock_level == "none" %}
+          {% trans "Out of stock" %}
+        {% endif %}
+      </div>
+    {% endif %}
   </div>
 
   <div class="btn-row">
@@ -111,8 +128,8 @@
 }
 
 .sale-banner-overlay img {
-  max-width: 100px;
-  max-height: 40px;
+  max-width: 180px;
+  max-height: 70px;
   object-fit: contain;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
@@ -257,6 +274,15 @@
 .price-regular {
   color: var(--text);
   font-size: 1.2rem;
+}
+
+/* Stock Badge */
+.stock-badge {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0;
+  margin-top: 0.5rem;
 }
 
 /* Button Row - immer am unteren Rand der Card */

@@ -162,7 +162,7 @@
   }
 
   .sale-badge-img {
-    max-width: 300px;
+    max-width: 500px;
     width: 100%;
     object-fit: contain;
     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
@@ -468,11 +468,11 @@
     </div>
 
     <!-- Sale Banner -->
-    {% if app.discount_is_active and app.active_sale_name %}
+    {% if app.discount_is_active %}
       <div class="sale-banner-section">
         {% if app.sale_badge %}
-          <img src="{{ app.sale_badge.image.url }}" alt="{{ app.active_sale_name }}" class="sale-badge-img">
-        {% else %}
+          <img src="{{ app.sale_badge.image.url }}" alt="{{ app.active_sale_name|default:'' }}" class="sale-badge-img">
+        {% elif app.active_sale_name %}
           <span class="sale-badge-text">{{ app.active_sale_name }}</span>
         {% endif %}
       </div>
@@ -505,8 +505,36 @@
       {% endif %}
     </div>
 
-    <!-- Rückgabe / Umtausch Badges -->
+    <!-- Lagerbestand / Versand / Lieferzeit Badges -->
     <div style="display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0;">
+      {% if app.is_preorder %}
+        <span style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #7c3aed; border: 1px solid #7c3aed;">
+          <i class="fas fa-rocket"></i> {% trans "Pre-order" %} – {% trans "Release" %} {{ app.release_date|date:"d.m.Y" }}
+        </span>
+      {% endif %}
+      {% if app.stock_level != "none" %}
+        <span style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; color: {{ app.stock_display_color }}; border: 1px solid {{ app.stock_display_color }};">
+          <i class="fas fa-box"></i>
+          {% if app.stock_level == "full" %}
+            {% trans "In stock" %}
+          {% elif app.stock_level == "low" %}
+            {% blocktrans with count=app.stock %}{{ count }} in stock{% endblocktrans %}
+          {% elif app.stock_level == "critical" %}
+            {% blocktrans with count=app.stock %}Only {{ count }} left in stock{% endblocktrans %}
+          {% endif %}
+        </span>
+      {% endif %}
+      {% if app.requires_shipping and app.shipping_cost %}
+        <span style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2);">
+          <i class="fas fa-truck"></i> {% blocktrans with cost=app.shipping_cost|floatformat:2 %}+€{{ cost }} Shipping{% endblocktrans %}
+        </span>
+      {% endif %}
+      {% if app.requires_shipping and app.effective_delivery_time %}
+        <span style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2);">
+          <i class="fas fa-clock"></i> {% trans "Delivery" %}: {{ app.effective_delivery_time }}
+          {% if app.is_backorder %}<span style="color:#ff9800;">({% trans "Backorder" %})</span>{% endif %}
+        </span>
+      {% endif %}
       {% if app.refundable %}
         <span style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2);">
           &#10003; {% trans "Refundable" %}
@@ -519,26 +547,79 @@
       {% endif %}
     </div>
 
-    <!-- Cart -->
+    <!-- Cart / Watchlist -->
     {% if user.is_authenticated %}
       <div class="cart-section">
-        <form method="post" action="{% url 'add_to_cart' app.id %}">
-          {% csrf_token %}
-          <div class="quantity-control">
-            <button type="button" class="qty-btn" onclick="changeQuantity(-1)">
-              <i class="fas fa-minus"></i>
-            </button>
-            <input type="number" id="quantity" name="quantity" value="1" min="1" class="qty-input">
-            <button type="button" class="qty-btn" onclick="changeQuantity(1)">
-              <i class="fas fa-plus"></i>
-            </button>
+        {% if app.is_preorder %}
+          {# Pre-Order #}
+          <div style="padding:1rem;background:rgba(124,58,237,0.1);border-radius:10px;margin-bottom:1rem;">
+            <p style="color:#7c3aed;font-weight:700;margin:0 0 4px;">
+              <i class="fas fa-rocket"></i> {% trans "Pre-order now" %}
+            </p>
+            <p style="color:var(--text);margin:0;font-size:0.9rem;">
+              {% trans "Release date" %}: {{ app.release_date|date:"d.m.Y" }}
+            </p>
           </div>
-          <br>
-          <button type="submit" class="btn-add-cart">
-            <i class="fas fa-shopping-cart"></i>
-            {% trans "Add to Cart" %}
-          </button>
-        </form>
+          <form method="post" action="{% url 'add_to_cart' app.id %}">
+            {% csrf_token %}
+            <div class="quantity-control">
+              <button type="button" class="qty-btn" onclick="changeQuantity(-1)">
+                <i class="fas fa-minus"></i>
+              </button>
+              <input type="number" id="quantity" name="quantity" value="1" min="1" class="qty-input">
+              <button type="button" class="qty-btn" onclick="changeQuantity(1)">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+            <br>
+            <button type="submit" class="btn-add-cart" style="background:linear-gradient(135deg,#7c3aed,#6366f1);border:none;">
+              <i class="fas fa-shopping-cart"></i> {% trans "Pre-order now" %}
+            </button>
+          </form>
+          <form method="post" action="{% url 'watchlist_add' app.id %}" style="margin-top:0.5rem;">
+            {% csrf_token %}
+            <button type="submit" style="width:100%;padding:0.75rem;background:none;border:2px solid var(--border);border-radius:8px;color:var(--text);font-weight:600;cursor:pointer;transition:all 0.3s ease;">
+              <i class="far fa-heart"></i> {% trans "Add to Watchlist" %}
+            </button>
+          </form>
+        {% elif app.requires_shipping and app.stock_level == "none" %}
+          {# Out of stock - nur Watchlist #}
+          <div style="padding:1rem;background:rgba(244,67,54,0.08);border-radius:10px;margin-bottom:1rem;">
+            <p style="color:#f44336;font-weight:600;margin:0;">
+              <i class="fas fa-exclamation-triangle"></i> {% trans "This product is currently out of stock" %}
+            </p>
+          </div>
+          <form method="post" action="{% url 'watchlist_add' app.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-add-cart" style="background:linear-gradient(135deg,#7c3aed,#6366f1);border:none;">
+              <i class="far fa-bell"></i> {% trans "Notify me when available" %}
+            </button>
+          </form>
+        {% else %}
+          <form method="post" action="{% url 'add_to_cart' app.id %}">
+            {% csrf_token %}
+            <div class="quantity-control">
+              <button type="button" class="qty-btn" onclick="changeQuantity(-1)">
+                <i class="fas fa-minus"></i>
+              </button>
+              <input type="number" id="quantity" name="quantity" value="1" min="1" class="qty-input">
+              <button type="button" class="qty-btn" onclick="changeQuantity(1)">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+            <br>
+            <button type="submit" class="btn-add-cart">
+              <i class="fas fa-shopping-cart"></i>
+              {% trans "Add to Cart" %}
+            </button>
+          </form>
+          <form method="post" action="{% url 'watchlist_add' app.id %}" style="margin-top:0.5rem;">
+            {% csrf_token %}
+            <button type="submit" style="width:100%;padding:0.75rem;background:none;border:2px solid var(--border);border-radius:8px;color:var(--text);font-weight:600;cursor:pointer;transition:all 0.3s ease;">
+              <i class="far fa-heart"></i> {% trans "Add to Watchlist" %}
+            </button>
+          </form>
+        {% endif %}
       </div>
     {% else %}
       <div class="login-prompt">

@@ -46,9 +46,9 @@
     <tbody>
       {% for item in order.items.all %}
       <tr>
-        <td>{{ item.app.name }}</td>
+        <td>{{ item.get_name }}</td>
         <td>{{ item.quantity }}</td>
-        <td>€{{ item.single_price|default:item.app.price }}</td>
+        <td>€{{ item.single_price }}</td>
       </tr>
       {% endfor %}
     </tbody>

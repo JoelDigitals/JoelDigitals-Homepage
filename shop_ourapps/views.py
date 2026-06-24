@@ -1,9 +1,11 @@
-﻿from django.shortcuts import render, get_object_or_404, redirect
+﻿from datetime import date
+
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.mail import send_mail, EmailMultiAlternatives
-from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup, AffiliateMarketingMaterial, AffiliateTransaction, CustomLandingPage, WithdrawalRequest
+from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup, AffiliateMarketingMaterial, AffiliateTransaction, CustomLandingPage, WithdrawalRequest, WatchlistEntry, Package, PackageApp
 from shop_ourapps.models import AffiliatePartner
 from .forms import PurchaseForm, VoucherPurchaseForm
 from .services.automation_service import OrderAutomationService
@@ -43,7 +45,7 @@ from django import forms
 from contact.views import is_Sales_Editor
 from django.db.models import Q
 from django.template import TemplateDoesNotExist
-from django.utils.translation import get_language
+from django.utils.translation import get_language, gettext as _
 
 
 @login_required
@@ -193,7 +195,11 @@ def redeem_voucher(code, user):
 
 def our_apps(request):
     lang = get_language()  # 'de' oder 'en'
-    apps = App.objects.filter(is_active=True)
+    apps = App.objects.filter(is_active=True).filter(
+        Q(preorder_date__isnull=False, preorder_date__lte=date.today()) |
+        Q(preorder_date__isnull=True, release_date__isnull=True) |
+        Q(preorder_date__isnull=True, release_date__lte=date.today())
+    )
     user_groups = request.user.groups.values_list('name', flat=True) if request.user.is_authenticated else []
 
     for app in apps:
@@ -206,6 +212,47 @@ def our_apps(request):
         'lang': lang
     })
     
+def package_list(request):
+    lang = get_language()
+    packages = Package.objects.filter(is_active=True, is_available_for_purchase=True).filter(
+        Q(preorder_date__isnull=False, preorder_date__lte=date.today()) |
+        Q(preorder_date__isnull=True, release_date__isnull=True) |
+        Q(preorder_date__isnull=True, release_date__lte=date.today())
+    )
+    return render(request, 'apps/package_list.html', {
+        'packages': packages,
+        'lang': lang,
+    })
+
+
+def package_detail(request, slug):
+    lang = get_language()
+    package = get_object_or_404(Package, slug=slug, is_active=True)
+    package_apps = PackageApp.objects.filter(package=package).select_related('app')
+    return render(request, 'apps/package_detail.html', {
+        'package': package,
+        'package_apps': package_apps,
+        'lang': lang,
+    })
+
+
+@require_POST
+@login_required
+def add_package_to_cart(request, package_id):
+    package = get_object_or_404(Package, id=package_id, is_active=True, is_available_for_purchase=True)
+    cart = get_user_cart(request.user)
+    price_to_use = package.discounted_price
+    cart_item, created = CartItem.objects.get_or_create(
+        user=request.user,
+        cart=cart,
+        package=package,
+        defaults={'price': price_to_use, 'quantity': 1}
+    )
+    if not created:
+        messages.info(request, _('Package is already in your cart.'))
+    return redirect('cart_view')
+
+
 def shop(request):
     lang = get_language()
 
@@ -217,8 +264,12 @@ def shop(request):
     price_max = request.GET.get("max", "")
     only_discount = request.GET.get("discount", "")
 
-    # --- Basis: nur kaufbare Apps ---
-    apps = App.objects.filter(is_available_for_purchase=True)
+    # --- Basis: nur kaufbare Apps (inkl. Pre-Order) ---
+    apps = App.objects.filter(is_available_for_purchase=True).filter(
+        Q(preorder_date__isnull=False, preorder_date__lte=date.today()) |
+        Q(preorder_date__isnull=True, release_date__isnull=True) |
+        Q(preorder_date__isnull=True, release_date__lte=date.today())
+    )
 
     # --- Sprachlogik ---
     if lang == 'en':
@@ -286,8 +337,16 @@ def shop(request):
         wallet = Wallet.objects.filter(user=request.user).first()
         wallet_balance = wallet.balance if wallet else 0.00
 
+    # --- Pakete ---
+    packages = Package.objects.filter(is_active=True, is_available_for_purchase=True).filter(
+        Q(preorder_date__isnull=False, preorder_date__lte=date.today()) |
+        Q(preorder_date__isnull=True, release_date__isnull=True) |
+        Q(preorder_date__isnull=True, release_date__lte=date.today())
+    )
+
     context = {
         "apps": apps,
+        "packages": packages,
         "groups": groups,
         "active_group": group,
         "query": query,
@@ -719,6 +778,10 @@ def add_to_cart(request, app_id):
     app = get_object_or_404(App, id=app_id)
     cart = get_user_cart(request.user)
 
+    if app.requires_shipping and app.stock <= 0 and not app.is_preorder:
+        messages.error(request, _('This product is currently out of stock and cannot be ordered.'))
+        return redirect('app_detail', slug=app.slug)
+
     try:
         quantity = int(request.POST.get('quantity', 1))
         if quantity < 1:
@@ -726,7 +789,10 @@ def add_to_cart(request, app_id):
     except ValueError:
         quantity = 1
 
-    # Verwende den rabattierten Preis, falls vorhanden
+    if app.requires_shipping and app.stock > 0 and quantity > app.stock:
+        messages.warning(request, _('Only %(count)s item(s) in stock. Quantity adjusted.') % {'count': app.stock})
+        quantity = app.stock
+
     price_to_use = app.discounted_price
 
     cart_item, created = CartItem.objects.get_or_create(
@@ -737,7 +803,8 @@ def add_to_cart(request, app_id):
     )
 
     if not created:
-        cart_item.quantity += quantity
+        max_qty = app.stock if app.requires_shipping and app.stock > 0 and not app.is_preorder else 999
+        cart_item.quantity = min(cart_item.quantity + quantity, max_qty)
         cart_item.save()
 
     return redirect('cart_view')
@@ -852,7 +919,24 @@ def send_order_emails(order, request):
 def checkout(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
     items = cart.items.all()
-    subtotal = sum(item.app.discounted_price * item.quantity for item in items)
+    subtotal = sum(
+        (item.package.price if item.package else item.app.discounted_price) * item.quantity
+        for item in items
+    )
+
+    shipping_costs = [
+        item.app.shipping_cost for item in items
+        if item.app and item.app.requires_shipping and item.app.shipping_cost
+    ]
+    shipping_cost = max(shipping_costs) if shipping_costs else Decimal('0.00')
+
+    has_physical = any(item.app.requires_shipping for item in items)
+    has_backorder = any(item.app.is_backorder for item in items)
+    delivery_times = [
+        item.app.effective_delivery_time for item in items
+        if item.app.requires_shipping and item.app.effective_delivery_time
+    ]
+    delivery_time = max(delivery_times, key=lambda t: len(t)) if delivery_times else ""
 
     discount_amount = 0
     final_total = subtotal
@@ -953,6 +1037,16 @@ def checkout(request):
             except AffiliateCode.DoesNotExist:
                 messages.warning(request, 'Affiliate-Code ist ungültig.')
 
+        # Lagerbestand prüfen (Pre-Order erlaubt leeren Bestand)
+        for item in items:
+            if item.app.requires_shipping and item.app.stock <= 0 and not item.app.is_preorder:
+                messages.error(request, _('"%(name)s" is currently out of stock and cannot be ordered.') % {'name': item.app.name})
+                return redirect('checkout')
+            if item.app.requires_shipping and item.app.stock > 0 and item.quantity > item.app.stock:
+                messages.warning(request, _('Only %(count)s of "%(name)s" in stock. Quantity adjusted.') % {'count': item.app.stock, 'name': item.app.name})
+                item.quantity = item.app.stock
+                item.save()
+
         # Wallet prüfen
         if payment_method == 'wallet':
             if not wallet or not wallet.has_funds(final_total):
@@ -979,7 +1073,7 @@ def checkout(request):
             payment_method=payment_method,
             subtotal=subtotal,
             discount_amount=discount_amount,
-            total_amount=final_total,
+            total_amount=final_total + shipping_cost,
             affiliate_code=affiliate_code_obj,
             discount_code=discount_code_obj,
             account_holder=account_holder,
@@ -1027,15 +1121,26 @@ def checkout(request):
             )
         
         for item in items:
-            OrderItem.objects.create(
-                order=order,
-                app=item.app,
-                quantity=item.quantity,
-                single_price=item.app.price,
-                discount_percent=item.app.discount_percent,
-                discount_price=item.app.discounted_price,
-                price=item.quantity * item.app.discounted_price
-            )
+            if item.package:
+                OrderItem.objects.create(
+                    order=order,
+                    package=item.package,
+                    quantity=item.quantity,
+                    single_price=item.package.price,
+                    discount_percent=item.package.discount_percent,
+                    discount_price=item.package.discounted_price,
+                    price=item.quantity * item.package.discounted_price
+                )
+            else:
+                OrderItem.objects.create(
+                    order=order,
+                    app=item.app,
+                    quantity=item.quantity,
+                    single_price=item.app.price,
+                    discount_percent=item.app.discount_percent,
+                    discount_price=item.app.discounted_price,
+                    price=item.quantity * item.app.discounted_price
+                )
 
         if discount_code_obj:
             discount_code_obj.times_used += 1
@@ -1118,10 +1223,15 @@ def checkout(request):
             return redirect(approval_url)
 
     # GET-Request / Anzeige Checkout
+    total_with_shipping = final_total + shipping_cost
     context = {
         'items': items,
         'subtotal': subtotal,
-        'total': final_total,
+        'shipping_cost': shipping_cost,
+        'delivery_time': delivery_time,
+        'has_physical': has_physical,
+        'has_backorder': has_backorder,
+        'total': final_total + shipping_cost,
         'discount_amount': discount_amount,
         'wallet_balance': wallet.balance if wallet else 0,
         'now': timezone.now(),
@@ -1242,11 +1352,18 @@ def validate_codes(request):
         except AffiliateCode.DoesNotExist:
             return JsonResponse({"valid": False, "type": "affiliate", "message": "Affiliate-Code nicht gefunden."})
 
-    total = max(0, subtotal - discount)
+    shipping_costs = [
+        item.app.shipping_cost for item in cart.items.all()
+        if item.app.requires_shipping and item.app.shipping_cost
+    ]
+    shipping_cost = max(shipping_costs) if shipping_costs else Decimal('0.00')
+
+    total = max(0, subtotal - discount) + shipping_cost
     result = {
         "valid": True,
         "new_total": f"{total:.2f}",
         "discount": f"{discount:.2f}",
+        "shipping_cost": f"{shipping_cost:.2f}",
         "discount_percent": float(discount_code_obj.percentage) if discount_code_obj else 0,
     }
 
@@ -1983,6 +2100,16 @@ def delete_review(request, slug):
 # In settings.py: CRON_SECRET = "dein-geheimes-token"
 # ─────────────────────────────────────────────────────────────────────────────
 @csrf_exempt
+def sync_stock_cron(request):
+    try:
+        from .services.jds_api import sync_stock
+        updated = sync_stock()
+        return JsonResponse({'status': 'ok', 'updated': updated})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
 def email_cron(request):
     """
     Fast-Cron / externer Cronjob Endpoint.
@@ -2284,6 +2411,30 @@ def custom_landing(request, slug):
         ctx['product_desc'] = product.description_english if (is_en and product.description_english) else product.description
         ctx['product_price'] = product.discounted_price if product.discount_is_active else product.price
     return render(request, 'apps/custom_landing.html', ctx)
+
+@login_required
+def watchlist_view(request):
+    entries = WatchlistEntry.objects.filter(user=request.user).select_related('app')
+    return render(request, 'apps/watchlist.html', {'entries': entries})
+
+
+@login_required
+@require_POST
+def watchlist_add(request, app_id):
+    app = get_object_or_404(App, id=app_id)
+    WatchlistEntry.objects.get_or_create(user=request.user, app=app)
+    messages.success(request, _('%(name)s added to your watchlist.') % {'name': app.name})
+    return redirect('app_detail', slug=app.slug)
+
+
+@login_required
+@require_POST
+def watchlist_remove(request, app_id):
+    app = get_object_or_404(App, id=app_id)
+    WatchlistEntry.objects.filter(user=request.user, app=app).delete()
+    messages.success(request, _('%(name)s removed from your watchlist.') % {'name': app.name})
+    return redirect('app_detail', slug=app.slug)
+
 
 def withdrawal_form(request):
     if request.method == 'POST':

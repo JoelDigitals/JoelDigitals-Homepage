@@ -142,6 +142,7 @@ class App(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     release_date = models.DateField(null=True, blank=True, verbose_name="Release-Datum")
+    preorder_date = models.DateField(null=True, blank=True, verbose_name="Vorbestellungsbeginn")
 
     # Neue App-Store Links
     android_link = models.URLField(blank=True, null=True)
@@ -219,9 +220,113 @@ class App(models.Model):
     weight = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, help_text="Gewicht in kg")
     stock = models.IntegerField(default=0, help_text="Lagerbestand (0 = nicht auf Lager)")
     shipping_cost = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, help_text="Versandkosten (einmalig pro Bestellung)")
+    delivery_time = models.CharField(max_length=100, blank=True, default="", help_text="z.B. 2-3 Werktage")
+
+    @property
+    def stock_level(self):
+        if self.stock <= 0:
+            return "none"
+        if self.stock < 15:
+            return "critical"
+        if self.stock < 50:
+            return "low"
+        return "full"
+
+    @property
+    def stock_display_color(self):
+        return {"none": "", "critical": "#f44336", "low": "#ff9800", "full": "#4ade80"}.get(self.stock_level, "")
+
+    @property
+    def is_backorder(self):
+        return self.stock <= 0 and self.requires_shipping
+
+    @property
+    def is_preorder(self):
+        from datetime import date
+        today = date.today()
+        if not self.preorder_date:
+            return False
+        if self.preorder_date > today:
+            return False
+        if self.release_date and self.release_date <= today:
+            return False
+        return True
+
+    @property
+    def effective_delivery_time(self):
+        return self.delivery_time or "2-5 Werktage"
 
     def __str__(self):
-        return self.name 
+        return self.name
+
+
+class Package(models.Model):
+    name = models.CharField(max_length=255)
+    name_english = models.CharField(max_length=255, blank=True, null=True)
+    slug = models.SlugField(unique=True)
+    description = models.TextField()
+    description_english = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='package_images/', null=True, blank=True)
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+    is_available_for_purchase = models.BooleanField(default=False)
+    release_date = models.DateField(null=True, blank=True, verbose_name="Release-Datum")
+    preorder_date = models.DateField(null=True, blank=True, verbose_name="Vorbestellungsbeginn")
+    apps = models.ManyToManyField(App, through='PackageApp', blank=True)
+    sale_badge = models.ForeignKey(SaleBadge, null=True, blank=True, on_delete=models.SET_NULL)
+    discount_start = models.DateTimeField(blank=True, null=True)
+    discount_end = models.DateTimeField(blank=True, null=True)
+    discount_percent = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def discount_is_active(self):
+        from django.utils import timezone
+        now = timezone.now()
+        if self.discount_percent <= 0:
+            return False
+        if self.discount_start and now < self.discount_start:
+            return False
+        if self.discount_end and now > self.discount_end:
+            return False
+        return True
+
+    @property
+    def discounted_price(self):
+        from decimal import Decimal
+        if self.price and self.discount_is_active:
+            discount_multiplier = Decimal(1) - (Decimal(self.discount_percent) / Decimal(100))
+            return self.price * discount_multiplier
+        return self.price
+
+    @property
+    def is_preorder(self):
+        from datetime import date
+        today = date.today()
+        if not self.preorder_date:
+            return False
+        if self.preorder_date > today:
+            return False
+        if self.release_date and self.release_date <= today:
+            return False
+        return True
+
+    def __str__(self):
+        return self.name
+
+
+class PackageApp(models.Model):
+    package = models.ForeignKey(Package, on_delete=models.CASCADE)
+    app = models.ForeignKey(App, on_delete=models.CASCADE)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['sort_order']
+        unique_together = ['package', 'app']
+
+    def __str__(self):
+        return f"{self.package.name} → {self.app.name}"
 
 
 class AffiliateLink(models.Model):
@@ -235,7 +340,8 @@ class AffiliateLink(models.Model):
 
 class Purchase(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    app = models.ForeignKey(App, on_delete=models.CASCADE)
+    app = models.ForeignKey(App, null=True, blank=True, on_delete=models.CASCADE)
+    package = models.ForeignKey(Package, null=True, blank=True, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     affiliate = models.ForeignKey(AffiliateLink, null=True, blank=True, on_delete=models.SET_NULL)
 
@@ -247,6 +353,8 @@ class Purchase(models.Model):
     country = models.CharField(max_length=100)
 
     def __str__(self):
+        if self.package:
+            return f"{self.full_name} - {self.package.name}"
         return f"{self.full_name} - {self.app.name}"
 
 class Affiliate(models.Model):
@@ -375,6 +483,7 @@ class AffiliateTransaction(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     app = models.ForeignKey(App, on_delete=models.CASCADE, null=True, blank=True)
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)
     name_override = models.CharField(max_length=255, blank=True, verbose_name="Produktname (manuell)")
     quantity = models.PositiveIntegerField()
     discount_percent = models.PositiveIntegerField(default=0)
@@ -383,6 +492,8 @@ class OrderItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)  # Preis zum Zeitpunkt der Bestellung
 
     def get_name(self):
+        if self.package:
+            return self.package.name
         return self.name_override or (self.app.name if self.app else f"Item #{self.id}")
 
     def __str__(self):
@@ -756,3 +867,19 @@ class WithdrawalRequest(models.Model):
 
     def __str__(self):
         return f"Widerruf #{self.order_number} – {self.first_name} {self.last_name}"
+
+
+class WatchlistEntry(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='watchlist_entries')
+    app = models.ForeignKey(App, on_delete=models.CASCADE, related_name='watchlist_entries')
+    created_at = models.DateTimeField(auto_now_add=True)
+    notified_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Merkliste Eintrag"
+        verbose_name_plural = "Merkliste Einträge"
+        unique_together = ['user', 'app']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} – {self.app.name}"

@@ -456,7 +456,7 @@
                   <div class="item-row">
                     <span class="item-qty">{{ item.quantity }}</span>
                     <span class="item-name">
-                      {% if "de" in lang %}{{ item.app.name|default:item.name_override }}{% else %}{{ item.app.name_english|default:item.name_override }}{% endif %}
+                      {{ item.get_name }}
                     </span>
                   </div>
                 {% endfor %}

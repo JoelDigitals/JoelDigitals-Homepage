@@ -1,0 +1,278 @@
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Watchlist" %} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .watchlist-page {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  .watchlist-hero {
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
+    padding: 2.5rem 2rem;
+    border-radius: 20px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .watchlist-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.3;
+  }
+  .watchlist-hero h1 {
+    color: white;
+    margin: 0;
+    font-size: 2rem;
+    position: relative;
+  }
+  .watchlist-hero h1 i { margin-right: 0.5rem; }
+  .watchlist-hero p {
+    color: rgba(255,255,255,0.8);
+    margin: 0.5rem 0 0;
+    position: relative;
+  }
+  .watchlist-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .watchlist-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    transition: all 0.3s ease;
+  }
+  .watchlist-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .watchlist-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--bg);
+  }
+  .watchlist-img-placeholder {
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--border);
+  }
+  .watchlist-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .watchlist-info h3 {
+    margin: 0 0 0.25rem;
+    font-size: 1.1rem;
+  }
+  .watchlist-info h3 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .watchlist-info h3 a:hover {
+    color: var(--primary);
+  }
+  .watchlist-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .stock-badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .stock-badge.in-stock {
+    background: rgba(74,222,128,0.12);
+    color: #4ade80;
+    border: 1px solid rgba(74,222,128,0.25);
+  }
+  .stock-badge.low-stock {
+    background: rgba(255,152,0,0.12);
+    color: #ff9800;
+    border: 1px solid rgba(255,152,0,0.25);
+  }
+  .stock-badge.critical {
+    background: rgba(244,67,54,0.12);
+    color: #f44336;
+    border: 1px solid rgba(244,67,54,0.25);
+  }
+  .stock-badge.out-of-stock {
+    background: rgba(158,158,158,0.12);
+    color: #9e9e9e;
+    border: 1px solid rgba(158,158,158,0.25);
+  }
+  .price-tag {
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .watchlist-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+  .btn-watchlist-remove {
+    padding: 0.5rem 0.75rem;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+  }
+  .btn-watchlist-remove:hover {
+    border-color: #f44336;
+    color: #f44336;
+    background: rgba(244,67,54,0.06);
+  }
+  .btn-goto {
+    padding: 0.5rem 1rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-goto:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+  }
+  .empty-state {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 20px;
+    padding: 4rem 2rem;
+    text-align: center;
+  }
+  .empty-state .icon {
+    font-size: 4rem;
+    color: var(--border);
+    margin-bottom: 1rem;
+  }
+  .empty-state h2 {
+    color: var(--text);
+    margin: 0 0 0.5rem;
+  }
+  .empty-state p {
+    color: #666;
+    margin: 0 0 1.5rem;
+  }
+  .empty-state .btn-shop {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem;
+    background: linear-gradient(135deg, var(--primary), #6366f1);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+  .empty-state .btn-shop:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,68,204,0.3);
+  }
+  @media (max-width: 600px) {
+    .watchlist-card {
+      flex-wrap: wrap;
+    }
+    .watchlist-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+</style>
+
+<div class="watchlist-page">
+  <div class="watchlist-hero">
+    <h1><i class="fas fa-heart"></i> {% trans "My Watchlist" %}</h1>
+    <p>{% trans "Products you want to be notified about" %}</p>
+  </div>
+
+  {% if entries %}
+    <div class="watchlist-grid">
+      {% for entry in entries %}
+        <div class="watchlist-card">
+          {% if entry.app.image %}
+            <img src="{{ entry.app.image.url }}" alt="{{ entry.app.name }}" class="watchlist-img">
+          {% else %}
+            <div class="watchlist-img-placeholder"><i class="fas fa-cube"></i></div>
+          {% endif %}
+
+          <div class="watchlist-info">
+            <h3><a href="{% url 'app_detail' slug=entry.app.slug %}">{{ entry.app.name }}</a></h3>
+            <div class="watchlist-meta">
+              {% if entry.app.stock_level == "full" %}
+                <span class="stock-badge in-stock"><i class="fas fa-check-circle"></i> {% trans "In stock" %}</span>
+              {% elif entry.app.stock_level == "low" %}
+                <span class="stock-badge low-stock"><i class="fas fa-box"></i> {% blocktrans with count=entry.app.stock %}{{ count }} in stock{% endblocktrans %}</span>
+              {% elif entry.app.stock_level == "critical" %}
+                <span class="stock-badge critical"><i class="fas fa-exclamation-triangle"></i> {% blocktrans with count=entry.app.stock %}Only {{ count }} left{% endblocktrans %}</span>
+              {% elif entry.app.stock_level == "none" %}
+                <span class="stock-badge out-of-stock"><i class="fas fa-times-circle"></i> {% trans "Out of stock" %}</span>
+              {% endif %}
+              <span class="price-tag">€{{ entry.app.discounted_price|floatformat:2 }}</span>
+            </div>
+          </div>
+
+          <div class="watchlist-actions">
+            <a href="{% url 'app_detail' slug=entry.app.slug %}" class="btn-goto">
+              <i class="fas fa-eye"></i> {% trans "View" %}
+            </a>
+            <form method="post" action="{% url 'watchlist_remove' entry.app.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn-watchlist-remove" title="{% trans 'Remove from watchlist' %}">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="icon"><i class="fas fa-heart-broken"></i></div>
+      <h2>{% trans "Your watchlist is empty" %}</h2>
+      <p>{% trans "Add products to be notified when they are back in stock" %}</p>
+      <a href="{% url 'shop' %}" class="btn-shop">
+        <i class="fas fa-shopping-bag"></i> {% trans "Browse Shop" %}
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

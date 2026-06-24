@@ -563,7 +563,9 @@
             {% for item in items %}
             <tr>
               <td>
-                {% if lang == "de" or lang|slice:":2" == "de" %}
+                {% if item.package %}
+                  {{ item.package.name }}
+                {% elif lang == "de" or lang|slice:":2" == "de" %}
                   {{ item.app.name }}
                 {% elif lang == "en" or lang|slice:":2" == "en" %}
                   {{ item.app.name_english }}
@@ -571,7 +573,7 @@
                   {{ item.app.name }}
                 {% endif %}
               </td>
-              <td>{{ item.app.product_number }}</td>
+              <td>{% if item.package %}--{% else %}{{ item.app.product_number }}{% endif %}</td>
               <td style="text-align: center;">{{ item.quantity }}</td>
               <td class="numeric">{{ item.single_price|floatformat:2 }} €</td>
               <td class="numeric discount-cell">{{ item.discount_percent }}%</td>

@@ -13,7 +13,7 @@ from django.conf import settings
 from decimal import Decimal
 from datetime import timedelta
 import random
-from shop_ourapps.models import Order, OrderStatusLog
+from shop_ourapps.models import Order, OrderStatusLog, Purchase, PackageApp
 
 
 class OrderAutomationService:
@@ -39,6 +39,7 @@ class OrderAutomationService:
         """
         Setzt Bestellstatus auf 'Paid'.
         Wird von Stripe/PayPal-Callbacks aufgerufen.
+        Erstellt Purchase-Einträge für alle gekauften Apps/Pakete.
         """
         if order.status not in ('Paid', 'In Delivery', 'Delivered', 'Finished'):
             old_status = order.status
@@ -51,6 +52,46 @@ class OrderAutomationService:
                 new_status='Paid',
                 note=f'Automatisch auf bezahlt gesetzt via {order.payment_method}'
             )
+
+            # Purchase-Einträge für alle Artikel erstellen
+            from shop_ourapps.models import Purchase, PackageApp
+            for item in order.items.all():
+                if item.package:
+                    # Paket selbst verbuchen
+                    Purchase.objects.create(
+                        user=order.user,
+                        package=item.package,
+                        full_name=f"{order.first_name} {order.last_name}",
+                        email=order.email,
+                        address=order.address or "",
+                        zip_code=order.zip_code or "",
+                        city=order.city or "",
+                        country="Deutschland",
+                    )
+                    # Jede enthaltene App einzeln verbuchen
+                    for pa in PackageApp.objects.filter(package=item.package).select_related('app'):
+                        Purchase.objects.create(
+                            user=order.user,
+                            app=pa.app,
+                            full_name=f"{order.first_name} {order.last_name}",
+                            email=order.email,
+                            address=order.address or "",
+                            zip_code=order.zip_code or "",
+                            city=order.city or "",
+                            country="Deutschland",
+                        )
+                elif item.app:
+                    Purchase.objects.create(
+                        user=order.user,
+                        app=item.app,
+                        full_name=f"{order.first_name} {order.last_name}",
+                        email=order.email,
+                        address=order.address or "",
+                        zip_code=order.zip_code or "",
+                        city=order.city or "",
+                        country="Deutschland",
+                    )
+
             return True
         return False
 

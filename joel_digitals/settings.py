@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'oauth2_provider',
     'admin_api',
+    'autoupdate',
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
@@ -249,6 +250,11 @@ AUTHENTICATION_BACKENDS = (
 
 # Shared Secret für SSO
 SSO_SHARED_SECRET = "Iay01SJILCeOtgo99wjdEf3b6kBULkYMD6e5mfiqZHGIdAUUs9uOvOcgF9utVRVp7oVL9bIDH9MdYLWMIuUk3ECmhFd7hXtfRiPDL0Eu2DffIjrIYD1bJkZgzzbBv9C5E9Fosg6aBu1mEliHcG39wYTbbdRk7YzyEEW7uvjRdDkWSeAtXuKHkm"
+
+# JDS Management API
+JDS_API_BASE_URL = os.getenv("JDS_API_BASE_URL", "https://jds-management.de")
+JDS_TEAM_CODE = os.getenv("JDS_TEAM_CODE", "")
+JDS_API_TOKEN = os.getenv("JDS_API_TOKEN", "")
 
 # Cache aktivieren (falls noch nicht)
 CACHES = {

@@ -50,8 +50,20 @@ urlpatterns = [
     # Fast-Cron Endpoint — alle 5 Min aufrufen
     # Optional: ?token=CRON_SECRET in settings.py absichern
     path('shop/status/emails/corn/', views.email_cron, name='email_cron'),
+    path('shop/stock/sync/', views.sync_stock_cron, name='sync_stock_cron'),
+
     path('lp/<str:username>/<slug:product_slug>/', views.personalized_landing, name='personalized_landing'),
     path('lp/<slug:product_slug>/', views.product_landing, name='product_landing'),
     path('go/<slug:slug>/', views.custom_landing, name='custom_landing'),
     path('withdrawal/', views.withdrawal_form, name='withdrawal_form'),
+
+    # Pakete
+    path('packages/', views.package_list, name='package_list'),
+    path('packages/<slug:slug>/', views.package_detail, name='package_detail'),
+    path('cart/add-package/<int:package_id>/', views.add_package_to_cart, name='add_package_to_cart'),
+
+    # Merkliste / Watchlist
+    path('watchlist/', views.watchlist_view, name='watchlist_view'),
+    path('watchlist/add/<int:app_id>/', views.watchlist_add, name='watchlist_add'),
+    path('watchlist/remove/<int:app_id>/', views.watchlist_remove, name='watchlist_remove'),
 ]

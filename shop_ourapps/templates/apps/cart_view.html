@@ -462,10 +462,18 @@
     {% if items %}
       <div class="cart-items-list">
         {% for item in items %}
-          <div class="cart-item">
+            <div class="cart-item">
             <!-- 1:1 Image -->
             <div class="item-image">
-              {% if item.app.image %}
+              {% if item.package %}
+                {% if item.package.image %}
+                  <img src="{{ item.package.image.url }}" alt="{{ item.package.name }}">
+                {% else %}
+                  <div class="item-image-placeholder">
+                    <i class="fas fa-gift"></i>
+                  </div>
+                {% endif %}
+              {% elif item.app.image %}
                 <img src="{{ item.app.image.url }}" alt="{{ item.app.name }}">
               {% else %}
                 <div class="item-image-placeholder">
@@ -475,26 +483,40 @@
             </div>
 
             <div class="item-details">
-              <h2 class="item-name">{{ item.app.name }}</h2>
-              
-              <div class="item-pricing">
-                {% if item.app.discount_is_active %}
-  <div class="price-line">
-    <span class="qty-badge">{{ item.quantity }}x</span>
-    <span class="price-original">€{{ item.app.price }}</span>
-    <span class="price-discounted">€{{ item.price }}</span>
-    <span class="discount-tag">
-      <i class="fas fa-tag"></i>
-      {{ item.app.discount_percent }}%
-    </span>
-  </div>
-{% else %}
-  <div class="price-line">
-    <span class="qty-badge">{{ item.quantity }}x</span>
-    <span class="price-regular">€{{ item.price }}</span>
-  </div>
-{% endif %}
-              </div>
+              {% if item.package %}
+                <h2 class="item-name">{{ item.package.name }}</h2>
+                <div class="item-pricing">
+                  <div class="price-line">
+                    <span class="qty-badge">{{ item.quantity }}x</span>
+                    {% if item.package.discount_is_active %}
+                      <span class="price-original">€{{ item.package.price }}</span>
+                      <span class="price-discounted">€{{ item.price }}</span>
+                    {% else %}
+                      <span class="price-regular">€{{ item.price }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              {% else %}
+                <h2 class="item-name">{{ item.app.name }}</h2>
+                <div class="item-pricing">
+                  {% if item.app.discount_is_active %}
+                    <div class="price-line">
+                      <span class="qty-badge">{{ item.quantity }}x</span>
+                      <span class="price-original">€{{ item.app.price }}</span>
+                      <span class="price-discounted">€{{ item.price }}</span>
+                      <span class="discount-tag">
+                        <i class="fas fa-tag"></i>
+                        {{ item.app.discount_percent }}%
+                      </span>
+                    </div>
+                  {% else %}
+                    <div class="price-line">
+                      <span class="qty-badge">{{ item.quantity }}x</span>
+                      <span class="price-regular">€{{ item.price }}</span>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endif %}
 
               <div class="item-total">
                 {% trans "Total" %}: €{{ item.total_price }}
