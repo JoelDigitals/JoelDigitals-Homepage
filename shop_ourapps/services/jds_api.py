@@ -35,7 +35,8 @@ def fetch_products():
 
 
 def sync_stock():
-    from ..models import App
+    from ..models import App, Package, PackageApp
+    from django.db.models import Min
 
     products = fetch_products()
     if not products:
@@ -67,5 +68,11 @@ def sync_stock():
                     updated += 1
                 except (App.DoesNotExist, App.MultipleObjectsReturned):
                     pass
+
+    # Package.stock aus dem Minimum der enthaltenen Apps aktualisieren
+    for pkg in Package.objects.filter(packageapp__isnull=False).distinct():
+        min_stock = PackageApp.objects.filter(package=pkg).aggregate(Min('app__stock'))['app__stock__min']
+        pkg.stock = min_stock or 0
+        pkg.save(update_fields=["stock"])
 
     return updated

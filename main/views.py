@@ -598,6 +598,15 @@ def home(request):
     for product in random_products:
         product.name = product.name if lang == 'de' else product.name_english
 
+    # Pakete für Startseite
+    from shop_ourapps.models import Package
+    packages = list(Package.objects.filter(is_active=True, is_available_for_purchase=True).filter(
+        Q(preorder_date__isnull=False, preorder_date__lte=date.today()) |
+        Q(preorder_date__isnull=True, release_date__isnull=True) |
+        Q(preorder_date__isnull=True, release_date__lte=date.today())
+    ))
+    random_packages = random.sample(packages, min(len(packages), 3))
+
     # FAQs – max. 5, Sprache abhängig
     faqs = FAQ.objects.all()[:5]
     localized_faqs = []
@@ -639,6 +648,7 @@ def home(request):
         'user_groups': user_groups,
         'latest_blog': latest_blog,
         'products': random_products,
+        'packages': random_packages,
         'faqs': localized_faqs,
         'rating': rating,
         'lang': lang,

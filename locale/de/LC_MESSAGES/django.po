@@ -3104,3 +3104,21 @@ msgstr "Ersparnis"
 
 msgid "No packages available yet."
 msgstr "Noch keine Pakete verfügbar."
+
+msgid "This product is currently out of stock."
+msgstr "Dieses Produkt ist derzeit nicht auf Lager."
+
+msgid "Only %(count)s of \"%(name)s\" in stock. Quantity adjusted."
+msgstr "Nur %(count)s von \"%(name)s\" auf Lager. Menge angepasst."
+
+msgid "Low stock"
+msgstr "Niedriger Lagerbestand"
+
+msgid "Limited availability"
+msgstr "Begrenzte Verfügbarkeit"
+
+msgid "Save %(pct)s%%"
+msgstr "%(pct)s%% sparen"
+
+msgid "Save €%(amount)s (%(pct)s%%) compared to single purchase"
+msgstr "€%(amount)s (%(pct)s%%) sparen im Vergleich zum Einzelkauf"

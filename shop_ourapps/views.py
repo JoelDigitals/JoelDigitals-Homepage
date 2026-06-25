@@ -206,8 +206,15 @@ def our_apps(request):
         app.display_name = app.name_english if lang == 'en' and app.name_english else app.name
         app.display_description = app.description_english if lang == 'en' and app.description_english else app.description
 
+    packages = Package.objects.filter(is_active=True, is_available_for_purchase=True).filter(
+        Q(preorder_date__isnull=False, preorder_date__lte=date.today()) |
+        Q(preorder_date__isnull=True, release_date__isnull=True) |
+        Q(preorder_date__isnull=True, release_date__lte=date.today())
+    )
+
     return render(request, 'apps/our_apps.html', {
         'apps': apps,
+        'packages': packages,
         'user_groups': user_groups,
         'lang': lang
     })
@@ -236,12 +243,16 @@ def package_detail(request, slug):
     })
 
 
-@require_POST
 @login_required
+@require_POST
 def add_package_to_cart(request, package_id):
     package = get_object_or_404(Package, id=package_id, is_active=True, is_available_for_purchase=True)
+    if package.is_backorder and not package.is_preorder:
+        messages.error(request, _("This product is currently out of stock."))
+        return redirect('package_detail', slug=package.slug)
     cart = get_user_cart(request.user)
     price_to_use = package.discounted_price
+
     cart_item, created = CartItem.objects.get_or_create(
         user=request.user,
         cart=cart,
@@ -373,10 +384,13 @@ def shop(request):
     return render(request, "apps/shop.html", context)
 
 def app_detail(request, slug):
-    from .models import AppReview
+    from .models import AppReview, Package
     from django.db.models import Avg, Count
     lang = get_language()
-    app = get_object_or_404(App, slug=slug)
+    try:
+        app = App.objects.get(slug=slug)
+    except App.DoesNotExist:
+        return package_detail(request, slug)
 
     app.display_name = app.name_english if lang == 'en' and app.name_english else app.name
     app.display_description = app.description_english if lang == 'en' and app.description_english else app.description
@@ -772,8 +786,8 @@ def get_user_cart(user):
     return cart
 
 
-@require_POST
 @login_required
+@require_POST
 def add_to_cart(request, app_id):
     app = get_object_or_404(App, id=app_id)
     cart = get_user_cart(request.user)
@@ -1039,13 +1053,18 @@ def checkout(request):
 
         # Lagerbestand prüfen (Pre-Order erlaubt leeren Bestand)
         for item in items:
-            if item.app.requires_shipping and item.app.stock <= 0 and not item.app.is_preorder:
-                messages.error(request, _('"%(name)s" is currently out of stock and cannot be ordered.') % {'name': item.app.name})
-                return redirect('checkout')
-            if item.app.requires_shipping and item.app.stock > 0 and item.quantity > item.app.stock:
-                messages.warning(request, _('Only %(count)s of "%(name)s" in stock. Quantity adjusted.') % {'count': item.app.stock, 'name': item.app.name})
-                item.quantity = item.app.stock
-                item.save()
+            if item.package:
+                if item.package.is_backorder and not item.package.is_preorder:
+                    messages.error(request, _('"%(name)s" is currently out of stock and cannot be ordered.') % {'name': item.package.name})
+                    return redirect('checkout')
+            elif item.app:
+                if item.app.requires_shipping and item.app.stock <= 0 and not item.app.is_preorder:
+                    messages.error(request, _('"%(name)s" is currently out of stock and cannot be ordered.') % {'name': item.app.name})
+                    return redirect('checkout')
+                if item.app.requires_shipping and item.app.stock > 0 and item.quantity > item.app.stock:
+                    messages.warning(request, _('Only %(count)s of "%(name)s" in stock. Quantity adjusted.') % {'count': item.app.stock, 'name': item.app.name})
+                    item.quantity = item.app.stock
+                    item.save()
 
         # Wallet prüfen
         if payment_method == 'wallet':

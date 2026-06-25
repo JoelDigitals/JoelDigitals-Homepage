@@ -274,6 +274,7 @@ class Package(models.Model):
     preorder_date = models.DateField(null=True, blank=True, verbose_name="Vorbestellungsbeginn")
     apps = models.ManyToManyField(App, through='PackageApp', blank=True)
     sale_badge = models.ForeignKey(SaleBadge, null=True, blank=True, on_delete=models.SET_NULL)
+    stock = models.IntegerField(default=0, help_text="Lagerbestand (0 = nicht auf Lager)")
     discount_start = models.DateTimeField(blank=True, null=True)
     discount_end = models.DateTimeField(blank=True, null=True)
     discount_percent = models.PositiveIntegerField(default=0)
@@ -301,6 +302,31 @@ class Package(models.Model):
         return self.price
 
     @property
+    def active_sale_name(self):
+        if self.discount_is_active and self.sale_badge:
+            return self.sale_badge.name
+        return None
+
+    @property
+    def total_apps_price(self):
+        from decimal import Decimal
+        from django.db.models import Sum
+        total = PackageApp.objects.filter(package=self).aggregate(total=Sum('app__price'))['total']
+        return total or Decimal('0')
+
+    @property
+    def savings_amount(self):
+        amt = self.total_apps_price - self.discounted_price
+        return max(amt, 0)
+
+    @property
+    def savings_percent(self):
+        total = self.total_apps_price
+        if total > 0:
+            return int((self.savings_amount / total) * 100)
+        return 0
+
+    @property
     def is_preorder(self):
         from datetime import date
         today = date.today()
@@ -314,6 +340,30 @@ class Package(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def stock_level(self):
+        from django.db.models import Min
+        min_stock = PackageApp.objects.filter(package=self).aggregate(Min('app__stock'))['app__stock__min']
+        if min_stock is None or min_stock <= 0:
+            return "none"
+        if min_stock < 15:
+            return "critical"
+        if min_stock < 50:
+            return "low"
+        return "full"
+
+    @property
+    def stock_display_color(self):
+        return {"none": "", "critical": "#f44336", "low": "#ff9800", "full": "#4ade80"}.get(self.stock_level, "")
+
+    @property
+    def is_backorder(self):
+        from django.db.models import Min
+        min_stock = PackageApp.objects.filter(package=self).aggregate(Min('app__stock'))['app__stock__min']
+        if min_stock is None:
+            return False  # keine Apps zugewiesen → nicht als "out of stock" blockieren
+        return min_stock <= 0
 
 
 class PackageApp(models.Model):
@@ -382,7 +432,8 @@ class Cart(models.Model):
 class CartItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
-    app = models.ForeignKey(App, on_delete=models.CASCADE)
+    app = models.ForeignKey(App, on_delete=models.CASCADE, null=True, blank=True)
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 

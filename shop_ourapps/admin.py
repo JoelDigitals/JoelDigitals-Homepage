@@ -74,7 +74,7 @@ class PackageAdmin(admin.ModelAdmin):
             'fields': ('name', 'name_english', 'slug', 'description', 'description_english', 'image')
         }),
         ('Verfügbarkeit', {
-            'fields': ('is_active', 'is_available_for_purchase', 'release_date', 'preorder_date')
+            'fields': ('is_active', 'is_available_for_purchase', 'release_date', 'preorder_date', 'stock')
         }),
         ('Preis & Rabatt', {
             'fields': ('price', 'discount_percent', 'discount_start', 'discount_end', 'sale_badge')
