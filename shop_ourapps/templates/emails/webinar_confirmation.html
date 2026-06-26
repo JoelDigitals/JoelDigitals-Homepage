@@ -1,0 +1,75 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+
+<!-- ════ DEUTSCH ════ -->
+<div class="section-de">
+  <span class="lang-badge lang-de">🇩🇪 Deutsch</span>
+  <p class="greeting">Hallo {{ user.first_name }},</p>
+  <p class="body-text">
+    deine Anmeldung für das Webinar <strong style="color:#00bfff;">{{ webinar.title }}</strong> ist eingegangen!
+  </p>
+
+  <div class="info-box">
+    <div class="info-row">
+      <span class="info-label">Webinar</span>
+      <span class="info-value">{{ webinar.title }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Termin</span>
+      <span class="info-value">{{ webinar.date_time|date:"d.m.Y" }} um {{ webinar.date_time|date:"H:i" }} Uhr</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Dauer</span>
+      <span class="info-value">ca. {{ webinar.duration_minutes }} Minuten</span>
+    </div>
+  </div>
+
+  <p class="body-text">
+    Der Zugangslink wird dir <strong style="color:#fff;">rechtzeitig vor dem Webinar</strong> per E-Mail zugesandt.
+    Bitte überprüfe auch deinen Spam-Ordner.
+  </p>
+
+  <p class="body-text" style="margin-top:16px;">
+    Bei Fragen kannst du jederzeit auf diese E-Mail antworten.
+  </p>
+  <p class="signature">Viele Grüße,<br><span class="sig-name">Dein Joel Digitals Team</span></p>
+</div>
+
+<!-- ════ DIVIDER ════ -->
+<hr class="lang-divider" />
+
+<!-- ════ ENGLISH ════ -->
+<div class="section-en">
+  <span class="lang-badge lang-en">🇬🇧 English</span>
+  <p class="greeting">Hello {{ user.first_name }},</p>
+  <p class="body-text">
+    your registration for the webinar <strong style="color:#00bfff;">{{ webinar.title }}</strong> has been confirmed!
+  </p>
+
+  <div class="info-box">
+    <div class="info-row">
+      <span class="info-label">Webinar</span>
+      <span class="info-value">{{ webinar.title }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Date & Time</span>
+      <span class="info-value">{{ webinar.date_time|date:"Y-m-d" }} at {{ webinar.date_time|date:"H:i" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Duration</span>
+      <span class="info-value">{{ webinar.duration_minutes }} minutes</span>
+    </div>
+  </div>
+
+  <p class="body-text">
+    The access link will be sent to you <strong style="color:#fff;">in good time before the webinar</strong>.
+    Please also check your spam folder.
+  </p>
+
+  <p class="body-text" style="margin-top:16px;">
+    If you have any questions, feel free to reply to this email.
+  </p>
+  <p class="signature">Best regards,<br><span class="sig-name">The Joel Digitals Team</span></p>
+</div>
+
+{% endblock %}

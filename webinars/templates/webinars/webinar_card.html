@@ -1,0 +1,54 @@
+{% load i18n %}
+<div class="webinar-card">
+  {% if webinar.image %}
+    <img src="{{ webinar.image.url }}" alt="{{ webinar.title }}" class="webinar-image">
+  {% else %}
+    <div class="webinar-image-placeholder" style="background:linear-gradient(135deg,#7c3aed,#6366f1);">
+      <i class="fas fa-video"></i>
+    </div>
+  {% endif %}
+
+  <div class="webinar-body">
+    <h3 class="webinar-title">{{ webinar.title }}</h3>
+
+    <div class="webinar-meta">
+      <span class="webinar-meta-item">
+        <i class="fas fa-calendar"></i> {{ webinar.date_time|date:"d.m.Y" }}
+      </span>
+      <span class="webinar-meta-item">
+        <i class="fas fa-clock"></i> {{ webinar.date_time|date:"H:i" }} {% trans "Uhr" %}
+      </span>
+      <span class="webinar-meta-item">
+        <i class="fas fa-hourglass-half"></i> {{ webinar.duration_minutes }} {% trans "min" %}
+      </span>
+    </div>
+
+    <div class="webinar-description">
+      {{ webinar.description|truncatewords:25 }}
+    </div>
+
+    <div class="webinar-footer">
+      {% if webinar.is_upcoming %}
+        {% if webinar.is_full %}
+          <span class="spots-badge spots-full"><i class="fas fa-times-circle"></i> {% trans "Fully booked" %}</span>
+        {% else %}
+          <span class="spots-badge spots-available">
+            <i class="fas fa-users"></i> {{ webinar.spots_remaining }}/{{ webinar.max_participants }} {% trans "spots available" %}
+          </span>
+        {% endif %}
+      {% elif webinar.recording_url %}
+        <span class="spots-badge" style="background:rgba(0,191,255,0.15);color:#00bfff;">
+          <i class="fas fa-play-circle"></i> {% trans "Recording available" %}
+        </span>
+      {% else %}
+        <span class="spots-badge" style="background:rgba(255,255,255,0.1);color:#999;">
+          <i class="fas fa-check"></i> {% trans "Ended" %}
+        </span>
+      {% endif %}
+
+      <a href="{% url 'webinars:webinar_detail' slug=webinar.slug %}" class="btn-webinar btn-webinar-primary">
+        <i class="fas fa-info-circle"></i> {% trans "Details" %}
+      </a>
+    </div>
+  </div>
+</div>

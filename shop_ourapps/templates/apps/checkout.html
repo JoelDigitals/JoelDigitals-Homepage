@@ -569,9 +569,9 @@
             </div>
           {% endfor %}
         </div>
-        {% if has_physical %}
+        {% if delivery_time %}
         <div style="padding:0.75rem 0;font-size:0.85rem;color:#aaa;border-bottom:1px solid var(--border);margin-bottom:0.75rem;">
-          <i class="fas fa-truck"></i> {% trans "Delivery time" %}: {{ delivery_time }}
+          <i class="fas fa-clock"></i> {% trans "Delivery time" %}: {{ delivery_time }}
           {% if has_backorder %}<span style="color:#ff9800;">({% trans "Backorder" %})</span>{% endif %}
         </div>
         {% endif %}

@@ -1,0 +1,83 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+
+<!-- ════ DEUTSCH ════ -->
+<div class="section-de">
+  <span class="lang-badge lang-de">🇩🇪 Deutsch</span>
+  <p class="greeting">Hallo {{ user.first_name }},</p>
+  <p class="body-text">
+    das Webinar <strong style="color:#00bfff;">{{ webinar.title }}</strong> beginnt bald!
+  </p>
+
+  {% if webinar.meeting_url %}
+  <div class="cta-wrap" style="margin:20px 0;">
+    <a href="{{ webinar.meeting_url }}" class="cta-button" style="background:linear-gradient(135deg,#7c3aed,#6366f1);">
+      🔗 Jetzt am Webinar teilnehmen
+    </a>
+  </div>
+  {% endif %}
+
+  <div class="info-box">
+    <div class="info-row">
+      <span class="info-label">Webinar</span>
+      <span class="info-value">{{ webinar.title }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Termin</span>
+      <span class="info-value">{{ webinar.date_time|date:"d.m.Y" }} um {{ webinar.date_time|date:"H:i" }} Uhr</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Dauer</span>
+      <span class="info-value">ca. {{ webinar.duration_minutes }} Minuten</span>
+    </div>
+  </div>
+
+  <p class="body-text" style="font-size:13px;color:rgba(255,255,255,0.6);">
+    💡 Tipp: Tritt 5 Minuten vor Beginn bei, um technische Probleme zu vermeiden.
+  </p>
+
+  <p class="signature">Viele Grüße,<br><span class="sig-name">Dein Joel Digitals Team</span></p>
+</div>
+
+<!-- ════ DIVIDER ════ -->
+<hr class="lang-divider" />
+
+<!-- ════ ENGLISH ════ -->
+<div class="section-en">
+  <span class="lang-badge lang-en">🇬🇧 English</span>
+  <p class="greeting">Hello {{ user.first_name }},</p>
+  <p class="body-text">
+    the webinar <strong style="color:#00bfff;">{{ webinar.title }}</strong> is starting soon!
+  </p>
+
+  {% if webinar.meeting_url %}
+  <div class="cta-wrap" style="margin:20px 0;">
+    <a href="{{ webinar.meeting_url }}" class="cta-button" style="background:linear-gradient(135deg,#7c3aed,#6366f1);">
+      🔗 Join the webinar now
+    </a>
+  </div>
+  {% endif %}
+
+  <div class="info-box">
+    <div class="info-row">
+      <span class="info-label">Webinar</span>
+      <span class="info-value">{{ webinar.title }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Date & Time</span>
+      <span class="info-value">{{ webinar.date_time|date:"Y-m-d" }} at {{ webinar.date_time|date:"H:i" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Duration</span>
+      <span class="info-value">{{ webinar.duration_minutes }} minutes</span>
+    </div>
+  </div>
+
+  <p class="body-text" style="font-size:13px;color:rgba(255,255,255,0.6);">
+    💡 Tip: Join 5 minutes early to avoid technical issues.
+  </p>
+
+  <p class="signature">Best regards,<br><span class="sig-name">The Joel Digitals Team</span></p>
+</div>
+
+{% endblock %}

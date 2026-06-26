@@ -1,0 +1,42 @@
+{% load i18n %}
+<tr>
+  <td data-label="{% trans 'Product' %}">
+    <div class="product-cell">
+      <div class="product-image">
+        {% if item.package and item.package.image %}
+          <img src="{{ item.package.image.url }}" alt="{{ item.get_name }}">
+        {% elif item.app and item.app.image %}
+          <img src="{{ item.app.image.url }}" alt="{{ item.get_name }}">
+        {% else %}
+          <div class="product-image-placeholder">
+            <i class="fas fa-cube"></i>
+          </div>
+        {% endif %}
+      </div>
+      <div class="product-info">
+        <h4>
+          {{ item.get_name }}
+          {% if item.app and item.app.requires_shipping or item.package and item.package.requires_shipping %}
+            <span style="display:inline-block;font-size:0.65rem;padding:2px 6px;border-radius:4px;background:rgba(249,115,22,0.15);color:#f97316;margin-left:6px;vertical-align:middle;font-weight:600;">{% trans "Physical" %}</span>
+          {% else %}
+            <span style="display:inline-block;font-size:0.65rem;padding:2px 6px;border-radius:4px;background:rgba(34,197,94,0.15);color:#22c55e;margin-left:6px;vertical-align:middle;font-weight:600;">{% trans "Digital" %}</span>
+          {% endif %}
+        </h4>
+        <div class="product-sku">{% if item.app %}{{ item.app.product_number|default:"" }}{% endif %}</div>
+      </div>
+    </div>
+  </td>
+  <td data-label="{% trans 'Qty' %}" class="qty-cell">
+    {{ item.quantity }}
+  </td>
+  <td data-label="{% trans 'Price' %}" class="price-cell">
+    {% if item.discount_percent > 0 %}
+      <div class="price-original">{{ item.single_price|floatformat:2 }} €</div>
+      <div class="price-discount">{{ item.discount_price|floatformat:2 }} €</div>
+      <div class="discount-tag">-{{ item.discount_percent }}%</div>
+    {% else %}
+      <div class="price-regular">{{ item.single_price|floatformat:2 }} €</div>
+    {% endif %}
+    <span class="price-total">{% trans "Total" %}: {{ item.price|floatformat:2 }} €</span>
+  </td>
+</tr>

@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
+from django.db.models import Min
 from decimal import Decimal
 from datetime import timedelta
 import random
@@ -53,8 +54,9 @@ class OrderAutomationService:
                 note=f'Automatisch auf bezahlt gesetzt via {order.payment_method}'
             )
 
-            # Purchase-Einträge für alle Artikel erstellen
+            # Purchase-Einträge für alle Artikel erstellen + Lagerbestand reduzieren
             from shop_ourapps.models import Purchase, PackageApp
+            from shop_ourapps.services.jds_api import update_product_stock
             for item in order.items.all():
                 if item.package:
                     # Paket selbst verbuchen
@@ -80,6 +82,17 @@ class OrderAutomationService:
                             city=order.city or "",
                             country="Deutschland",
                         )
+                        # Lagerbestand der enthaltenen Apps reduzieren + an JDS API melden
+                        if pa.app.requires_shipping:
+                            new_stock = max(0, pa.app.stock - item.quantity)
+                            App_model = pa.app._meta.model
+                            App_model.objects.filter(id=pa.app.id).update(stock=new_stock)
+                            if pa.app.product_number:
+                                update_product_stock(pa.app.product_number, new_stock)
+                    # Package.stock aus dem Minimum der enthaltenen Apps aktualisieren
+                    min_stock = PackageApp.objects.filter(package=item.package).aggregate(Min('app__stock'))['app__stock__min']
+                    Package_model = item.package._meta.model
+                    Package_model.objects.filter(id=item.package.id).update(stock=min_stock or 0)
                 elif item.app:
                     Purchase.objects.create(
                         user=order.user,
@@ -91,6 +104,13 @@ class OrderAutomationService:
                         city=order.city or "",
                         country="Deutschland",
                     )
+                    # Lagerbestand reduzieren + an JDS API melden (nur bei physischen Produkten)
+                    if item.app.requires_shipping:
+                        new_stock = max(0, item.app.stock - item.quantity)
+                        App_model = item.app._meta.model
+                        App_model.objects.filter(id=item.app.id).update(stock=new_stock)
+                        if item.app.product_number:
+                            update_product_stock(item.app.product_number, new_stock)
 
             return True
         return False
@@ -216,6 +236,7 @@ class OrderAutomationService:
             'order': order,
             'user_name': order.first_name,
             'order_id': order.id,
+            'suggestions': OrderAutomationService.get_app_suggestions(),
         }
 
         html_message = render_to_string('emails/review_request.html', context)
@@ -242,6 +263,80 @@ class OrderAutomationService:
             new_status='Finished',
             note=f'Review-Email versendet an {order.email} → Status: Finished'
         )
+
+    # ─────────────────────────────────────────────────────────────────
+    # 5. EINZELNE REVIEW-EMAIL MANUELL SENDEN
+    # ─────────────────────────────────────────────────────────────────
+
+    @staticmethod
+    def send_single_review_email(order):
+        """Versendet die Review-Email für eine einzelne Bestellung (z.B. manuell via Admin).
+        Setzt die Bestellung danach auf 'Finished', falls sie noch 'Delivered' ist."""
+        if order.review_email_sent_at:
+            return False  # Bereits gesendet
+        if order.status not in ('Delivered', 'Finished'):
+            return False  # Nur für gelieferte Bestellungen
+        OrderAutomationService._send_review_email(order)
+        return True
+
+    # ─────────────────────────────────────────────────────────────────
+    # 6. VERSAND-BENACHRICHTIGUNG SENDEN
+    # ─────────────────────────────────────────────────────────────────
+
+    @staticmethod
+    def send_shipping_notification(order, shipment=None):
+        """Versendet die Versandbenachrichtigung für eine Bestellung.
+        Kann manuell via Admin oder automatisch getriggert werden."""
+        from shop_ourapps.models import ShipmentTracking
+        if shipment is None:
+            shipment = ShipmentTracking.objects.filter(order=order).first()
+
+        context = {
+            'order': order,
+            'shipment': shipment,
+            'suggestions': OrderAutomationService.get_app_suggestions(),
+        }
+
+        html_message = render_to_string('emails/shipping.html', context)
+        subject = "📦 Deine Bestellung ist unterwegs! | Your order is on the way!"
+
+        email = EmailMultiAlternatives(
+            subject,
+            f"Versandbestätigung für Bestellung #{order.id}",
+            settings.DEFAULT_FROM_EMAIL,
+            [order.email]
+        )
+        email.attach_alternative(html_message, "text/html")
+        email.send()
+
+        OrderAutomationService.log_event(
+            order,
+            'shipping_notification_sent',
+            new_status=order.status,
+            note=f'Versandbenachrichtigung gesendet an {order.email}'
+        )
+        return True
+
+    # ─────────────────────────────────────────────────────────────────
+    # 7. APP-EMPFEHLUNGEN FÜR E-MAILS
+    # ─────────────────────────────────────────────────────────────────
+
+    @staticmethod
+    def get_app_suggestions(limit=4):
+        """Holt aktive Apps für E-Mail-Empfehlungen mit Infos und Links."""
+        from shop_ourapps.models import App
+        apps = App.objects.filter(is_active=True, is_available_for_purchase=True)[:limit]
+        suggestions = []
+        for app in apps:
+            url = app.link or f"https://joel-digitals.de/our-apps/{app.slug}/"
+            suggestions.append({
+                'title': app.name,
+                'description': app.description[:120] if app.description else "",
+                'url': url,
+                'btn_text': 'Mehr erfahren',
+                'image_url': app.image.url if app.image else None,
+            })
+        return suggestions
 
     # ─────────────────────────────────────────────────────────────────
     # STATS

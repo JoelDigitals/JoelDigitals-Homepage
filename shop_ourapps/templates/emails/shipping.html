@@ -1,5 +1,116 @@
+{% load i18n %}
 {% extends 'emails/base.html' %}
 {% block content %}
-<h3>Your order is on the way</h3>
-<p>Hello {{ order.first_name }}, your order #{{ order.id }} has been shipped.</p>
+
+<div style="margin-bottom:24px;">
+  <h2 style="color:#e0e0e0;margin:0 0 12px 0;">Deine Bestellung ist unterwegs!</h2>
+  <p style="color:#aaa;margin:0 0 16px 0;">Hallo {{ order.first_name }},<br> wir haben deine Bestellung #{{ order.id }} auf den Weg gebracht.</p>
+</div>
+
+{% if shipment %}
+<div style="background:rgba(0,191,255,0.08);border:1px solid rgba(0,191,255,0.2);border-radius:10px;padding:16px;margin-bottom:20px;">
+  <h3 style="color:#00bfff;margin:0 0 10px 0;"><i class="fas fa-shipping-fast" style="margin-right:6px;"></i> Sendungsverfolgung | Tracking</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:14px;">
+    <tr>
+      <td style="padding:6px 0;color:#999;width:120px;">Carrier:</td>
+      <td style="padding:6px 0;color:#e0e0e0;font-weight:600;">{{ shipment.carrier }}</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 0;color:#999;">Sendungsnr.:</td>
+      <td style="padding:6px 0;color:#e0e0e0;font-weight:600;">{{ shipment.tracking_number }}</td>
+    </tr>
+    {% if shipment.resolved_tracking_url %}
+    <tr>
+      <td style="padding:6px 0;color:#999;"></td>
+      <td style="padding:6px 0;">
+        <a href="{{ shipment.resolved_tracking_url }}" target="_blank"
+           style="display:inline-block;padding:8px 16px;background:linear-gradient(135deg,#00bfff,#0099cc);color:#fff;border-radius:6px;text-decoration:none;font-weight:600;font-size:13px;">
+          🔗 Sendung verfolgen
+        </a>
+      </td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+{% endif %}
+
+{% if suggestions %}
+<div class="suggestions-wrap" style="margin-top:20px;">
+  <p style="font-size:13px;font-weight:600;color:#00bfff;margin-bottom:10px;">💡 Entdecken Sie auch unsere anderen Apps:</p>
+  {% for item in suggestions %}
+  <div class="suggestion-box">
+    <p class="suggestion-title">{{ item.title }}</p>
+    <p class="suggestion-desc">{{ item.description }}</p>
+    <div class="suggestion-links">
+      <a href="{{ item.url }}" class="sug-btn">{{ item.btn_text }}</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div style="margin-bottom:16px;">
+  <h3 style="color:#e0e0e0;margin:0 0 10px 0;">Bestellübersicht | Order Summary</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;">
+    {% for item in order.items.all %}
+    <tr>
+      <td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:#ccc;">{{ item.get_name }} × {{ item.quantity }}</td>
+      <td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:#e0e0e0;text-align:right;">€{{ item.price|floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <div style="padding:10px 0 0;text-align:right;font-size:16px;font-weight:700;color:#e0e0e0;">
+    {% trans "Total" %}: €{{ order.total_amount|floatformat:2 }}
+  </div>
+</div>
+
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:20px 0;">
+
+<div style="margin-bottom:24px;">
+  <h2 style="color:#e0e0e0;margin:0 0 12px 0;">Your order is on the way!</h2>
+  <p style="color:#aaa;margin:0 0 16px 0;">Hello {{ order.first_name }},<br> your order #{{ order.id }} has been shipped.</p>
+</div>
+
+{% if shipment %}
+<div style="background:rgba(0,191,255,0.08);border:1px solid rgba(0,191,255,0.2);border-radius:10px;padding:16px;">
+  <h3 style="color:#00bfff;margin:0 0 10px 0;">📦 Tracking Information</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:14px;">
+    <tr>
+      <td style="padding:6px 0;color:#999;width:120px;">Carrier:</td>
+      <td style="padding:6px 0;color:#e0e0e0;font-weight:600;">{{ shipment.carrier }}</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 0;color:#999;">Tracking #:</td>
+      <td style="padding:6px 0;color:#e0e0e0;font-weight:600;">{{ shipment.tracking_number }}</td>
+    </tr>
+    {% if shipment.resolved_tracking_url %}
+    <tr>
+      <td style="padding:6px 0;color:#999;"></td>
+      <td style="padding:6px 0;">
+        <a href="{{ shipment.resolved_tracking_url }}" target="_blank"
+           style="display:inline-block;padding:8px 16px;background:linear-gradient(135deg,#00bfff,#0099cc);color:#fff;border-radius:6px;text-decoration:none;font-weight:600;font-size:13px;">
+          🔗 Track package
+        </a>
+      </td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+{% endif %}
+
+{% if suggestions %}
+<div class="suggestions-wrap" style="margin-top:20px;">
+  <p style="font-size:13px;font-weight:600;color:#00bfff;margin-bottom:10px;">💡 Discover our other apps:</p>
+  {% for item in suggestions %}
+  <div class="suggestion-box">
+    <p class="suggestion-title">{{ item.title }}</p>
+    <p class="suggestion-desc">{{ item.description }}</p>
+    <div class="suggestion-links">
+      <a href="{{ item.url }}" class="sug-btn">{{ item.btn_text }}</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
 {% endblock %}

@@ -56,6 +56,7 @@ urlpatterns += i18n_patterns(
     path('mobile/', include('MobileApp.urls')),
     path('chat/', include('chat.urls')),
     path("reviews/", include("reviews.urls")),
+    path('webinars/', include('webinars.urls')),
     path('api/autoupdate/', include('autoupdate.urls')),
     path('', include('landingpages.urls')),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),

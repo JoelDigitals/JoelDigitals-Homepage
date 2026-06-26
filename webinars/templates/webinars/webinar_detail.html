@@ -1,0 +1,371 @@
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ webinar.title }} – {% trans "Webinar" %} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .webinar-detail-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .webinar-detail-card {
+    background: var(--surface);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+  }
+
+  .webinar-hero {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .webinar-hero img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .webinar-hero-placeholder {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: rgba(255,255,255,0.2);
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
+  }
+
+  .webinar-hero-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    padding: 2rem;
+    color: white;
+  }
+
+  .webinar-hero-overlay h1 {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+
+  .webinar-detail-body {
+    padding: 2rem;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .info-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .info-item i {
+    font-size: 1.5rem;
+    color: #7c3aed;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-item .label {
+    font-size: 0.8rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .info-item .value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-top: 0.25rem;
+  }
+
+  .description-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    line-height: 1.8;
+    color: #ccc;
+    margin-bottom: 2rem;
+  }
+
+  .action-box {
+    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(99,102,241,0.1));
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .action-box h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text);
+  }
+
+  .action-box p {
+    color: #999;
+    margin: 0 0 1rem 0;
+  }
+
+  .btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-register {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+  }
+
+  .btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34,197,94,0.3);
+  }
+
+  .btn-cancel {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+  }
+
+  .btn-cancel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239,68,68,0.3);
+  }
+
+  .btn-recording {
+    background: linear-gradient(135deg, #00bfff, #0099cc);
+    color: white;
+  }
+
+  .btn-login {
+    background: linear-gradient(135deg, var(--primary), #0066ff);
+    color: white;
+  }
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #999;
+    text-decoration: none;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-back:hover {
+    color: var(--text);
+  }
+
+  .registered-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(34,197,94,0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34,197,94,0.3);
+    border-radius: 8px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .meeting-link-box {
+    background: rgba(0,191,255,0.08);
+    border: 1px solid rgba(0,191,255,0.2);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-top: 1rem;
+    text-align: center;
+  }
+
+  .meeting-link-box a {
+    color: #00bfff;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1.1rem;
+  }
+
+  .meeting-link-box a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 768px) {
+    .webinar-hero img,
+    .webinar-hero-placeholder {
+      height: 200px;
+    }
+
+    .webinar-hero-overlay h1 {
+      font-size: 1.3rem;
+    }
+
+    .webinar-detail-body {
+      padding: 1.25rem;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
+
+<div class="webinar-detail-container">
+  <a href="{% url 'webinars:webinar_list' %}" class="btn-back">
+    <i class="fas fa-arrow-left"></i> {% trans "Back to webinars" %}
+  </a>
+
+  <div class="webinar-detail-card">
+    <div class="webinar-hero">
+      {% if webinar.image %}
+        <img src="{{ webinar.image.url }}" alt="{{ webinar.title }}">
+      {% else %}
+        <div class="webinar-hero-placeholder">
+          <i class="fas fa-video"></i>
+        </div>
+      {% endif %}
+      <div class="webinar-hero-overlay">
+        <h1>{{ webinar.title }}</h1>
+      </div>
+    </div>
+
+    <div class="webinar-detail-body">
+      <div class="info-grid">
+        <div class="info-item">
+          <i class="fas fa-calendar"></i>
+          <div class="label">{% trans "Date" %}</div>
+          <div class="value">{{ webinar.date_time|date:"d.m.Y" }}</div>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-clock"></i>
+          <div class="label">{% trans "Time" %}</div>
+          <div class="value">{{ webinar.date_time|date:"H:i" }} {% trans "Uhr" %}</div>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-hourglass-half"></i>
+          <div class="label">{% trans "Duration" %}</div>
+          <div class="value">{{ webinar.duration_minutes }} {% trans "min" %}</div>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-users"></i>
+          <div class="label">{% trans "Spots" %}</div>
+          <div class="value">
+            {% if webinar.is_full %}
+              <span style="color:#f87171;">{% trans "Full" %}</span>
+            {% else %}
+              {{ webinar.spots_remaining }}/{{ webinar.max_participants }}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="description-box">
+        {{ webinar.description|linebreaks }}
+      </div>
+
+      {% if webinar.is_upcoming %}
+        <div class="action-box">
+          {% if user_registration %}
+            {% if user_registration.status == 'registered' %}
+              <div class="registered-badge">
+                <i class="fas fa-check-circle"></i> {% trans "You are registered for this webinar!" %}
+              </div>
+
+              <p style="color:#999;margin:0.5rem 0;">
+                {% trans "The access link will be sent to you by email in good time before the webinar." %}
+              </p>
+
+              <form method="post" action="{% url 'webinars:webinar_cancel' slug=webinar.slug %}" style="margin-top:1rem;">
+                {% csrf_token %}
+                <button type="submit" class="btn-action btn-cancel">
+                  <i class="fas fa-times"></i> {% trans "Cancel registration" %}
+                </button>
+              </form>
+            {% elif user_registration.status == 'cancelled' %}
+              <h3>{% trans "Registration cancelled" %}</h3>
+              <p>{% trans "You have cancelled your registration for this webinar." %}</p>
+              <form method="post" action="{% url 'webinars:webinar_register' slug=webinar.slug %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-action btn-register">
+                  <i class="fas fa-redo"></i> {% trans "Register again" %}
+                </button>
+              </form>
+            {% endif %}
+          {% elif user.is_authenticated %}
+            {% if webinar.is_full %}
+              <h3><i class="fas fa-times-circle" style="color:#f87171;"></i> {% trans "Fully booked" %}</h3>
+              <p>{% trans "This webinar is unfortunately fully booked." %}</p>
+            {% elif not webinar.is_registration_open %}
+              {% if webinar.is_past %}
+                <h3><i class="fas fa-check-circle" style="color:#4ade80;"></i> {% trans "Webinar ended" %}</h3>
+              {% elif webinar.registration_start and webinar.registration_start > now %}
+                <h3><i class="fas fa-clock" style="color:#f59e0b;"></i> {% trans "Registration not yet open" %}</h3>
+                <p>{% blocktrans with date=webinar.registration_start|date:"d.m.Y H:i" %}Registration opens on {{ date }}{% endblocktrans %}</p>
+              {% else %}
+                <h3><i class="fas fa-times-circle" style="color:#f87171;"></i> {% trans "Registration closed" %}</h3>
+                <p>{% trans "The registration period for this webinar has ended." %}</p>
+              {% endif %}
+            {% else %}
+              <h3>{% trans "Interested? Register now!" %}</h3>
+              <p>{% trans "Secure your spot for this free webinar." %}</p>
+              <form method="post" action="{% url 'webinars:webinar_register' slug=webinar.slug %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-action btn-register">
+                  <i class="fas fa-check"></i> {% trans "Register for free" %}
+                </button>
+              </form>
+            {% endif %}
+          {% else %}
+            {% if webinar.is_registration_open and not webinar.is_full %}
+              <h3>{% trans "Interested? Register now!" %}</h3>
+              <p>{% trans "Please log in to register for this webinar." %}</p>
+              <a href="{% url 'login' %}?next={{ request.path }}" class="btn-action btn-login">
+                <i class="fas fa-lock"></i> {% trans "Log in to register" %}
+              </a>
+            {% endif %}
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="action-box">
+          <h3><i class="fas fa-check-circle" style="color:#4ade80;"></i> {% trans "Webinar ended" %}</h3>
+          {% if webinar.recording_url %}
+            <p>{% trans "The recording is available for viewing." %}</p>
+            <a href="{{ webinar.recording_url }}" target="_blank" class="btn-action btn-recording">
+              <i class="fas fa-play"></i> {% trans "Watch recording" %}
+            </a>
+          {% else %}
+            <p>{% trans "No recording available for this webinar." %}</p>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

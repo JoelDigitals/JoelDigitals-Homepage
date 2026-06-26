@@ -529,10 +529,10 @@
           <i class="fas fa-truck"></i> {% blocktrans with cost=app.shipping_cost|floatformat:2 %}+€{{ cost }} Shipping{% endblocktrans %}
         </span>
       {% endif %}
-      {% if app.requires_shipping and app.effective_delivery_time %}
+      {% if app.effective_delivery_time %}
         <span style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2);">
           <i class="fas fa-clock"></i> {% trans "Delivery" %}: {{ app.effective_delivery_time }}
-          {% if app.is_backorder %}<span style="color:#ff9800;">({% trans "Backorder" %})</span>{% endif %}
+          {% if app.requires_shipping and app.is_backorder %}<span style="color:#ff9800;">({% trans "Backorder" %})</span>{% endif %}
         </span>
       {% endif %}
       {% if app.refundable %}

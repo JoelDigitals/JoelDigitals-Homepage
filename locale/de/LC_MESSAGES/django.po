@@ -3122,3 +3122,81 @@ msgstr "%(pct)s%% sparen"
 
 msgid "Save €%(amount)s (%(pct)s%%) compared to single purchase"
 msgstr "€%(amount)s (%(pct)s%%) sparen im Vergleich zum Einzelkauf"
+
+msgid "Notify me when available"
+msgstr "Benachrichtige mich bei Verfügbarkeit"
+
+msgid "Notify me"
+msgstr "Benachrichtigen"
+
+msgid "Digital Items"
+msgstr "Digitale Artikel"
+
+msgid "Physical Items"
+msgstr "Physische Artikel"
+
+msgid "Digital"
+msgstr "Digital"
+
+msgid "Physical"
+msgstr "Physisch"
+
+#: templates/main/home.html
+msgid "Free Webinars"
+msgstr "Kostenlose Webinare"
+
+#: templates/main/home.html
+msgid "Register"
+msgstr "Anmelden"
+
+#: templates/main/home.html
+msgid "View all webinars"
+msgstr "Alle Webinare anzeigen"
+
+#: templates/main/home.html
+msgid "Fully booked"
+msgstr "Ausgebucht"
+
+#: templates/main/home.html
+msgid "Upcoming Webinars"
+msgstr "Anstehende Webinare"
+
+#: templates/main/home.html
+msgid "Send reminder"
+msgstr "Erinnerung senden"
+
+#: templates/main/home.html
+msgid "Manage Webinars"
+msgstr "Webinare verwalten"
+
+#: templates/faq/faq_list.html
+msgid "%(count)s results found"
+msgstr "%(count)s Ergebnisse gefunden"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Registration not yet open"
+msgstr "Anmeldung noch nicht geöffnet"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Registration opens on %(date)s"
+msgstr "Anmeldung öffnet am %(date)s"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Registration closed"
+msgstr "Anmeldung geschlossen"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "The registration period for this webinar has ended."
+msgstr "Der Anmeldezeitraum für dieses Webinar ist abgelaufen."
+
+#: webinars/views.py
+msgid "Dieses Webinar hat bereits stattgefunden."
+msgstr "This webinar has already taken place."
+
+#: webinars/views.py
+msgid "Die Anmeldung für dieses Webinar hat noch nicht begonnen."
+msgstr "Registration for this webinar has not yet started."
+
+#: webinars/views.py
+msgid "Der Anmeldezeitraum für dieses Webinar ist vorbei."
+msgstr "The registration period for this webinar is over."

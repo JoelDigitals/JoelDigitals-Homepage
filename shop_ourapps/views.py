@@ -934,7 +934,7 @@ def checkout(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
     items = cart.items.all()
     subtotal = sum(
-        (item.package.price if item.package else item.app.discounted_price) * item.quantity
+        (item.package.discounted_price if item.package else item.app.discounted_price) * item.quantity
         for item in items
     )
 
@@ -942,15 +942,29 @@ def checkout(request):
         item.app.shipping_cost for item in items
         if item.app and item.app.requires_shipping and item.app.shipping_cost
     ]
+    shipping_costs.extend(
+        item.package.shipping_cost for item in items
+        if item.package and item.package.requires_shipping and item.package.shipping_cost
+    )
     shipping_cost = max(shipping_costs) if shipping_costs else Decimal('0.00')
 
-    has_physical = any(item.app.requires_shipping for item in items)
-    has_backorder = any(item.app.is_backorder for item in items)
+    has_physical = any(
+        (item.app and item.app.requires_shipping) or (item.package and item.package.requires_shipping)
+        for item in items
+    )
+    has_backorder = any(
+        (item.app and item.app.is_backorder) or (item.package and item.package.is_backorder)
+        for item in items
+    )
     delivery_times = [
         item.app.effective_delivery_time for item in items
-        if item.app.requires_shipping and item.app.effective_delivery_time
+        if item.app and item.app.effective_delivery_time
     ]
-    delivery_time = max(delivery_times, key=lambda t: len(t)) if delivery_times else ""
+    delivery_times.extend(
+        item.package.effective_delivery_time for item in items
+        if item.package and item.package.effective_delivery_time
+    )
+    delivery_time = max(set(delivery_times), key=delivery_times.count) if delivery_times else ""
 
     discount_amount = 0
     final_total = subtotal
@@ -1713,34 +1727,16 @@ def order_admin(request):
                             app_name, code_val = part.split(':', 1)
                             codes[app_name.strip()] = code_val.strip()
 
-                    suggestion_map = {
-                        'JDS Management': {
-                            'title': 'JDS Management',
-                            'description': 'Manage fast, easy & smart.',
-                            'url': 'https://www.joel-digitals.de/our-apps/ManagementApp/',
-                            'btn_text': 'Jetzt entdecken',
-                        },
-                        'AuftragNetz': {
-                            'title': 'OrderNetwork',
-                            'description': 'Find Companies, Freelancer and Contracts',
-                            'url': 'https://joel-digitals.de/our-apps/auftragnetz/',
-                            'btn_text': 'Entdecken',
-                        },
-                        'weatherai': {
-                            'title': 'Weather AI',
-                            'description': 'Intelligente Wettervorhersage mit KI.',
-                            'url': 'https://joel-digitals.de/store/weatherai',
-                            'btn_text': 'Mehr erfahren',
-                        },
-                    }
-                    suggestions = [suggestion_map[sid] for sid in suggested_ids if sid in suggestion_map]
+                    # Automatische App-Empfehlungen aus aktiven Apps
+                    from .services.automation_service import OrderAutomationService
+                    auto_suggestions = OrderAutomationService.get_app_suggestions(limit=6)
 
                     ctx = {
                         'order': order,
                         'codes': codes,
                         'apps': codes.keys(),
                         'message_type': message_type,
-                        'suggestions': suggestions,
+                        'suggestions': auto_suggestions,
                         'now': timezone.now(),
                     }
                     html_content = render_to_string(f'emails/{message_type}.html', ctx)
@@ -2433,7 +2429,7 @@ def custom_landing(request, slug):
 
 @login_required
 def watchlist_view(request):
-    entries = WatchlistEntry.objects.filter(user=request.user).select_related('app')
+    entries = WatchlistEntry.objects.filter(user=request.user).select_related('app', 'package')
     return render(request, 'apps/watchlist.html', {'entries': entries})
 
 
@@ -2453,6 +2449,24 @@ def watchlist_remove(request, app_id):
     WatchlistEntry.objects.filter(user=request.user, app=app).delete()
     messages.success(request, _('%(name)s removed from your watchlist.') % {'name': app.name})
     return redirect('app_detail', slug=app.slug)
+
+
+@login_required
+@require_POST
+def watchlist_add_package(request, package_id):
+    package = get_object_or_404(Package, id=package_id)
+    WatchlistEntry.objects.get_or_create(user=request.user, package=package)
+    messages.success(request, _('%(name)s added to your watchlist.') % {'name': package.name})
+    return redirect('package_detail', slug=package.slug)
+
+
+@login_required
+@require_POST
+def watchlist_remove_package(request, package_id):
+    package = get_object_or_404(Package, id=package_id)
+    WatchlistEntry.objects.filter(user=request.user, package=package).delete()
+    messages.success(request, _('%(name)s removed from your watchlist.') % {'name': package.name})
+    return redirect('package_detail', slug=package.slug)
 
 
 def withdrawal_form(request):

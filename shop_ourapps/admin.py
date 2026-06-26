@@ -26,6 +26,40 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ['status', 'created_at', 'payment_method']
     search_fields = ['first_name', 'last_name', 'email', 'id']
     readonly_fields = ['delivered_at', 'registration_code_sent_at', 'review_email_sent_at', 'review_email_scheduled_for']
+    actions = ['send_review_email_action', 'send_shipping_notification_action']
+
+    @admin.action(description="📧 Review-Email manuell senden (nur wenn Delivered)")
+    def send_review_email_action(self, request, queryset):
+        from .services.automation_service import OrderAutomationService
+        count = 0
+        errors = 0
+        for order in queryset:
+            try:
+                if OrderAutomationService.send_single_review_email(order):
+                    count += 1
+                else:
+                    errors += 1
+            except Exception as e:
+                errors += 1
+        msg = f"{count} Review-Email(s) gesendet."
+        if errors:
+            msg += f" {errors} Bestellung(en) übersprungen (nicht im Status Delivered oder bereits gesendet)."
+        self.message_user(request, msg)
+
+    @admin.action(description="📦 Versandbenachrichtigung senden")
+    def send_shipping_notification_action(self, request, queryset):
+        from .services.automation_service import OrderAutomationService
+        from .models import ShipmentTracking
+        count = 0
+        for order in queryset:
+            shipment = ShipmentTracking.objects.filter(order=order).first()
+            if shipment:
+                try:
+                    OrderAutomationService.send_shipping_notification(order, shipment)
+                    count += 1
+                except Exception:
+                    pass
+        self.message_user(request, f"{count} Versandbenachrichtigung(en) gesendet.")
 
 admin.site.register(AffiliateLink, AffiliateAdmin)
 admin.site.register(Purchase, PurchaseAdmin)

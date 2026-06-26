@@ -6,480 +6,144 @@
 
 {% block content %}
 <style>
-  .faq-page-container {
-    max-width: 900px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    box-sizing: border-box;
-  }
+  .fq-wrap { max-width:920px; margin:2rem auto; padding:0 1rem; }
+  .fq-hdr { background:linear-gradient(135deg,var(--primary),#0066ff); border-radius:16px 16px 0 0; padding:3rem 2rem; text-align:center; position:relative; overflow:hidden; }
+  .fq-hdr::before { content:''; position:absolute; top:-50%; right:-50%; width:200%; height:200%; background:radial-gradient(circle,rgba(255,255,255,0.08) 0%,transparent 70%); animation:pulse 15s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.1);opacity:.8} }
+  .fq-hdr-icon { width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:2rem;color:white;border:3px solid rgba(255,255,255,0.2);position:relative;z-index:1;}
+  .fq-hdr h1 { margin:0; font-size:2rem; color:white; position:relative; z-index:1; }
+  .fq-hdr p { margin:.3rem 0 0; color:rgba(255,255,255,.85); font-size:1.05rem; position:relative; z-index:1; }
 
-  .faq-header {
-    background: linear-gradient(135deg, var(--primary), #0066ff);
-    padding: 4rem 2rem;
-    border-radius: 16px 16px 0 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
+  .fq-body { background:var(--surface); padding:2.5rem; border-radius:0 0 16px 16px; box-shadow:0 4px 12px rgba(0,0,0,.3); }
 
-  .faq-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: pulse 15s ease-in-out infinite;
-  }
+  .fq-search { margin-bottom:2rem; }
+  .fq-search form { display:flex; gap:.75rem; align-items:center; background:var(--bg); border:2px solid var(--border); border-radius:12px; padding:.5rem .5rem .5rem 1rem; transition:border-color .2s; }
+  .fq-search form:focus-within { border-color:var(--primary); box-shadow:0 0 0 3px rgba(0,68,204,.1); }
+  .fq-search i { color:#888; }
+  .fq-search input { flex:1; background:transparent; border:none; color:var(--text); font-size:1rem; padding:.5rem; outline:none; font-family:inherit; }
+  .fq-search input::placeholder { color:#888; }
+  .fq-search button { background:linear-gradient(135deg,var(--primary),#0066ff); border:none; color:white; padding:.65rem 1.25rem; border-radius:10px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:.5rem; transition:opacity .2s; white-space:nowrap; }
+  .fq-search button:hover { opacity:.9; }
 
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.1); opacity: 0.8; }
-  }
+  .fq-result-count { font-size:.85rem; color:#888; margin-bottom:1.5rem; }
 
-  .header-icon {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-    color: white;
-    margin: 0 auto 1.5rem;
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    position: relative;
-    z-index: 1;
-  }
+  .fq-accordion { display:flex; flex-direction:column; gap:.5rem; }
+  .fq-card { border:2px solid var(--border); border-radius:12px; overflow:hidden; background:var(--bg); transition:border-color .2s; }
+  .fq-card:hover { border-color:var(--primary); }
+  .fq-card[open] { border-color:var(--primary); }
+  .fq-card summary { padding:1.1rem 1.25rem; cursor:pointer; font-weight:600; font-size:1rem; color:var(--text); list-style:none; display:flex; justify-content:space-between; align-items:center; user-select:none; }
+  .fq-card summary::-webkit-details-marker { display:none; }
+  .fq-card summary i.fa-chevron-down { font-size:.75rem; color:#888; transition:transform .25s; flex-shrink:0; margin-left:1rem; }
+  .fq-card[open] summary i.fa-chevron-down { transform:rotate(180deg); }
+  .fq-card .fq-answer { padding:0 1.25rem 1.25rem; border-top:1px solid var(--border); padding-top:1rem; margin-top:0; }
+  .fq-card .fq-answer h3 { font-size:1rem; font-weight:600; color:var(--text); margin:1.25rem 0 .5rem; }
+  .fq-card .fq-answer h3:first-child { margin-top:0; }
+  .fq-card .fq-answer p, .fq-card .fq-answer li { color:#666; line-height:1.7; font-size:.925rem; margin:0 0 .75rem; }
+  .fq-card .fq-answer a { color:var(--primary); font-weight:600; text-decoration:none; }
+  .fq-card .fq-answer a:hover { text-decoration:underline; }
+  .fq-card .fq-answer ol, .fq-card .fq-answer ul { padding-left:1.25rem; margin:0 0 .75rem; }
+  .fq-card .fq-read { display:inline-flex; align-items:center; gap:.4rem; margin-top:.5rem; font-size:.85rem; font-weight:600; color:var(--primary); text-decoration:none; transition:gap .2s; }
+  .fq-card:hover .fq-read { gap:.65rem; }
 
-  .faq-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: white;
-    margin: 0.5rem 0;
-    position: relative;
-    z-index: 1;
-  }
+  .fq-empty { text-align:center; padding:3rem 1rem; color:#888; }
+  .fq-empty i { font-size:3rem; color:var(--border); margin-bottom:1rem; display:block; }
+  .fq-empty h3 { margin:0 0 .5rem; color:var(--text); }
 
-  .faq-subtitle {
-    font-size: 1.2rem;
-    color: rgba(255, 255, 255, 0.9);
-    position: relative;
-    z-index: 1;
-  }
+  .fq-pag { display:flex; justify-content:center; align-items:center; gap:1.5rem; margin-top:2.5rem; padding-top:1.5rem; border-top:2px solid var(--border); }
+  .fq-pag a, .fq-pag span { display:inline-flex; align-items:center; gap:.4rem; padding:.6rem 1.1rem; border:2px solid var(--border); border-radius:10px; font-weight:600; font-size:.9rem; text-decoration:none; color:var(--text); transition:all .2s; }
+  .fq-pag a:hover { border-color:var(--primary); color:var(--primary); transform:translateY(-2px); }
+  .fq-pag .disabled { opacity:.4; cursor:default; pointer-events:none; }
+  .fq-pag .info { color:#888; border:none; padding:.6rem 0; }
 
-  .faq-body {
-    background: var(--surface);
-    padding: 3rem;
-    border-radius: 0 0 16px 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  }
+  .fq-cta { margin-top:2.5rem; padding:2.5rem; background:linear-gradient(135deg,var(--primary),#0066ff); border-radius:16px; text-align:center; color:white; }
+  .fq-cta h2 { margin:0 0 .5rem; font-size:1.4rem; }
+  .fq-cta p { margin:0 0 1.25rem; opacity:.9; }
+  .fq-cta a { display:inline-flex; align-items:center; gap:.5rem; padding:.85rem 1.75rem; background:white; color:var(--primary); border-radius:10px; text-decoration:none; font-weight:600; font-size:1rem; transition:transform .2s; box-shadow:0 4px 12px rgba(0,0,0,.15); }
+  .fq-cta a:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.2); }
 
-  /* Back Link */
-  .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #666;
-    text-decoration: none;
-    margin-bottom: 2rem;
-    font-size: 0.95rem;
-    transition: color 0.3s ease;
-  }
-
-  .back-link:hover {
-    color: var(--primary);
-  }
-
-  /* Search */
-  .search-section {
-    margin-bottom: 2.5rem;
-  }
-
-  .search-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: var(--bg);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
-  }
-
-  .search-wrapper:focus-within {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.1);
-  }
-
-  .search-icon {
-    color: #888;
-    font-size: 1.25rem;
-  }
-
-  .search-wrapper input[type="text"] {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: var(--text);
-    font-size: 1rem;
-    padding: 0.5rem;
-    outline: none;
-    font-family: inherit;
-  }
-
-  .search-wrapper input::placeholder {
-    color: #888;
-  }
-
-  .search-btn {
-    background: linear-gradient(135deg, var(--primary), #0066ff);
-    border: none;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .search-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
-  }
-
-  /* FAQ Cards */
-  .faq-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-
-  .faq-card {
-    background: var(--bg);
-    border-radius: 12px;
-    padding: 1.75rem;
-    border: 2px solid var(--border);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    text-decoration: none;
-    display: block;
-  }
-
-  .faq-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(180deg, var(--primary), #0066ff);
-    transform: scaleY(0);
-    transition: transform 0.3s ease;
-  }
-
-  .faq-card:hover {
-    border-color: var(--primary);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(0, 68, 204, 0.1);
-  }
-
-  .faq-card:hover::before {
-    transform: scaleY(1);
-  }
-
-  .faq-question {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--text);
-    margin: 0 0 0.75rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .faq-question i {
-    color: var(--primary);
-    font-size: 1.1rem;
-  }
-
-  .faq-answer {
-    color: #666;
-    line-height: 1.7;
-    margin: 0 0 1rem 0;
-    padding-left: 1.85rem;
-  }
-
-  .read-more {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--primary);
-    font-weight: 600;
-    font-size: 0.95rem;
-    padding-left: 1.85rem;
-    transition: gap 0.3s ease;
-  }
-
-  .faq-card:hover .read-more {
-    gap: 0.75rem;
-  }
-
-  /* Empty State */
-  .empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: #666;
-  }
-
-  .empty-state i {
-    font-size: 4rem;
-    color: var(--border);
-    margin-bottom: 1rem;
-  }
-
-  /* Pagination */
-  .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 2px solid var(--border);
-  }
-
-  .pagination-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    background: var(--bg);
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  }
-
-  .pagination-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    transform: translateY(-2px);
-  }
-
-  .pagination-btn.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-
-  .pagination-info {
-    color: #888;
-    font-weight: 500;
-  }
-
-  /* CTA Section */
-  .cta-section {
-    margin-top: 3rem;
-    padding: 2.5rem;
-    background: linear-gradient(135deg, var(--primary), #0066ff);
-    border-radius: 16px;
-    text-align: center;
-    color: white;
-  }
-
-  .cta-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-  }
-
-  .cta-text {
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
-    opacity: 0.95;
-  }
-
-  .cta-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2rem;
-    background: white;
-    color: var(--primary);
-    text-decoration: none;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
-
-  .cta-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .faq-page-container {
-      margin: 1rem auto;
-    }
-
-    .faq-header {
-      padding: 3rem 1.5rem;
-    }
-
-    .header-icon {
-      width: 100px;
-      height: 100px;
-      font-size: 2.5rem;
-    }
-
-    .faq-title {
-      font-size: 2rem;
-    }
-
-    .faq-body {
-      padding: 2rem 1.5rem;
-    }
-
-    .search-wrapper {
-      flex-direction: column;
-    }
-
-    .search-btn {
-      width: 100%;
-      justify-content: center;
-    }
-
-    .faq-answer,
-    .read-more {
-      padding-left: 0;
-    }
-
-    .faq-question {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .faq-title {
-      font-size: 1.6rem;
-    }
-
-    .pagination {
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .pagination-btn {
-      width: 100%;
-      justify-content: center;
-    }
+  @media (max-width:640px) {
+    .fq-wrap { margin:1rem auto; }
+    .fq-hdr { padding:2rem 1.25rem; }
+    .fq-hdr h1 { font-size:1.5rem; }
+    .fq-body { padding:1.5rem; }
+    .fq-search form { flex-direction:column; padding:.75rem; }
+    .fq-search button { width:100%; justify-content:center; }
+    .fq-pag { flex-direction:column; gap:.75rem; }
+    .fq-card summary { padding:.9rem 1rem; font-size:.95rem; }
+    .fq-card .fq-answer { padding:0 1rem 1rem; }
+    .fq-cta { padding:1.75rem; }
   }
 </style>
 
-<div class="faq-page-container">
-  <!-- Header -->
-  <div class="faq-header">
-    <div class="header-icon">
-      <i class="fas fa-question-circle"></i>
-    </div>
-    <h1 class="faq-title">{% trans "FAQ" %}</h1>
-    <p class="faq-subtitle">{% trans "Find answers to frequently asked questions" %}</p>
+<div class="fq-wrap">
+  <div class="fq-hdr">
+    <div class="fq-hdr-icon"><i class="fas fa-question-circle"></i></div>
+    <h1>{% trans "FAQ" %}</h1>
+    <p>{% trans "Find answers to frequently asked questions" %}</p>
   </div>
 
-  <!-- Body -->
-  <div class="faq-body">
-    <a href="{% url 'home' %}" class="back-link">
-      <i class="fas fa-arrow-left"></i> {% trans "Back to Home" %}
-    </a>
-
-    <!-- Search -->
-    <div class="search-section">
-      <form method="get" class="search-wrapper">
-        <i class="fas fa-search search-icon"></i>
+  <div class="fq-body">
+    <div class="fq-search">
+      <form method="get">
+        <i class="fas fa-search"></i>
         {{ form.q }}
-        <button type="submit" class="search-btn">
-          <i class="fas fa-search"></i> {% trans "Search" %}
-        </button>
+        <button type="submit"><i class="fas fa-search"></i> {% trans "Search" %}</button>
       </form>
     </div>
 
-    <!-- FAQ List -->
     {% if faqs %}
-      <div class="faq-list">
+      <div class="fq-result-count">
+        {% blocktrans with count=page_obj.paginator.count %}{{ count }} results found{% endblocktrans %}
+      </div>
+
+      <div class="fq-accordion">
         {% for faq in faqs %}
-          <a href="{{ faq.get_absolute_url }}" class="faq-card">
-            <h2 class="faq-question">
-              <i class="fas fa-question-circle"></i>
+          <details class="fq-card">
+            <summary>
               {{ faq.question }}
-            </h2>
-            {% if faq.short_answer %}
-              <p class="faq-answer">{{ faq.short_answer|linebreaksbr }}</p>
-            {% else %}
-              <p class="faq-answer">{{ faq.answer|striptags|truncatechars:220 }}</p>
-            {% endif %}
-            <span class="read-more">
-              {% trans "Read more" %} <i class="fas fa-arrow-right"></i>
-            </span>
-          </a>
+              <i class="fas fa-chevron-down"></i>
+            </summary>
+            <div class="fq-answer">
+              <p style="margin:0 0 .75rem;">{{ faq.short_answer|linebreaksbr }}</p>
+              <a href="{{ faq.get_absolute_url }}" class="fq-read">
+                {% trans "Read more" %} <i class="fas fa-arrow-right" style="font-size:.7rem;"></i>
+              </a>
+            </div>
+          </details>
         {% endfor %}
       </div>
 
-      <!-- Pagination -->
       {% if page_obj.paginator.num_pages > 1 %}
-        <div class="pagination">
+        <div class="fq-pag">
           {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-btn">
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
               <i class="fas fa-chevron-left"></i> {% trans "Previous" %}
             </a>
           {% else %}
-            <span class="pagination-btn disabled">
-              <i class="fas fa-chevron-left"></i> {% trans "Previous" %}
-            </span>
+            <span class="disabled"><i class="fas fa-chevron-left"></i> {% trans "Previous" %}</span>
           {% endif %}
-
-          <span class="pagination-info">
-            {% trans "Page" %} {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-          </span>
-
+          <span class="info">{% trans "Page" %} {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
           {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-btn">
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
               {% trans "Next" %} <i class="fas fa-chevron-right"></i>
             </a>
           {% else %}
-            <span class="pagination-btn disabled">
-              {% trans "Next" %} <i class="fas fa-chevron-right"></i>
-            </span>
+            <span class="disabled">{% trans "Next" %} <i class="fas fa-chevron-right"></i></span>
           {% endif %}
         </div>
       {% endif %}
     {% else %}
-      <div class="empty-state">
+      <div class="fq-empty">
         <i class="fas fa-search"></i>
         <h3>{% trans "No FAQs found" %}</h3>
         <p>{% trans "Try a different search term or check back later." %}</p>
       </div>
     {% endif %}
 
-    <!-- CTA -->
-    <div class="cta-section">
-      <h2 class="cta-title">{% trans "Still have questions?" %}</h2>
-      <p class="cta-text">{% trans "Can't find the answer you're looking for? Please contact us." %}</p>
-      <a href="{% url 'contactz_home' %}" class="cta-button">
+    <div class="fq-cta">
+      <h2>{% trans "Still have questions?" %}</h2>
+      <p>{% trans "Can't find the answer you're looking for? Please contact us." %}</p>
+      <a href="{% url 'contactz_home' %}">
         <i class="fas fa-envelope"></i> {% trans "Contact Us" %}
       </a>
     </div>

@@ -727,6 +727,11 @@
                     <div class="item">
                       <span class="item-name">{{ item.get_name }}</span>
                       <span class="item-meta">{{ item.quantity }}× @ {{ item.price }} €</span>
+                      {% if item.app and item.app.requires_shipping or item.package and item.package.requires_shipping %}
+                        <span style="display:inline-block;font-size:0.65rem;padding:2px 6px;border-radius:4px;background:rgba(249,115,22,0.15);color:#f97316;margin-left:6px;vertical-align:middle;font-weight:600;">{% trans "Physical" %}</span>
+                      {% else %}
+                        <span style="display:inline-block;font-size:0.65rem;padding:2px 6px;border-radius:4px;background:rgba(34,197,94,0.15);color:#22c55e;margin-left:6px;vertical-align:middle;font-weight:600;">{% trans "Digital" %}</span>
+                      {% endif %}
                     </div>
                   {% empty %}
                     <div class="item"><em>{% trans "No items available." %}</em></div>

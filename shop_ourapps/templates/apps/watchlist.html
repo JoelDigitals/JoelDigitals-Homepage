@@ -227,6 +227,43 @@
   {% if entries %}
     <div class="watchlist-grid">
       {% for entry in entries %}
+        {% if entry.package %}
+        <div class="watchlist-card" style="border-color:rgba(34,197,94,0.3);">
+          {% if entry.package.image %}
+            <img src="{{ entry.package.image.url }}" alt="{{ entry.package.name }}" class="watchlist-img">
+          {% else %}
+            <div class="watchlist-img-placeholder"><i class="fas fa-gift" style="color:#22c55e;"></i></div>
+          {% endif %}
+
+          <div class="watchlist-info">
+            <h3><a href="{% url 'package_detail' slug=entry.package.slug %}">{{ entry.package.name }}</a></h3>
+            <div class="watchlist-meta">
+              {% if entry.package.stock_level == "full" %}
+                <span class="stock-badge in-stock"><i class="fas fa-check-circle"></i> {% trans "In stock" %}</span>
+              {% elif entry.package.stock_level == "low" %}
+                <span class="stock-badge low-stock"><i class="fas fa-box"></i> {% trans "Limited availability" %}</span>
+              {% elif entry.package.stock_level == "critical" %}
+                <span class="stock-badge critical"><i class="fas fa-exclamation-triangle"></i> {% trans "Low stock" %}</span>
+              {% elif entry.package.stock_level == "none" or entry.package.is_backorder %}
+                <span class="stock-badge out-of-stock"><i class="fas fa-times-circle"></i> {% trans "Out of stock" %}</span>
+              {% endif %}
+              <span class="price-tag">€{{ entry.package.discounted_price|floatformat:2 }}</span>
+            </div>
+          </div>
+
+          <div class="watchlist-actions">
+            <a href="{% url 'package_detail' slug=entry.package.slug %}" class="btn-goto">
+              <i class="fas fa-eye"></i> {% trans "View" %}
+            </a>
+            <form method="post" action="{% url 'watchlist_remove_package' entry.package.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn-watchlist-remove" title="{% trans 'Remove from watchlist' %}">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+        {% else %}
         <div class="watchlist-card">
           {% if entry.app.image %}
             <img src="{{ entry.app.image.url }}" alt="{{ entry.app.name }}" class="watchlist-img">
@@ -262,6 +299,7 @@
             </form>
           </div>
         </div>
+        {% endif %}
       {% endfor %}
     </div>
   {% else %}

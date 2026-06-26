@@ -18,8 +18,6 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.utils.http import url_has_allowed_host_and_scheme
 
-now = timezone.now()# views.py - Korrigierte Version mit echten Blog- und GA-Daten
-
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -416,6 +414,36 @@ def admin_dashboard(request):
     pending_withdrawals = WithdrawalRequest.objects.filter(status='pending').order_by('-created_at')[:5]
     withdrawal_count = WithdrawalRequest.objects.filter(status='pending').count()
 
+    # === WEBINAR REMINDER VIA DASHBOARD ===
+    if request.method == "POST" and request.POST.get("send_webinar_reminder"):
+        from webinars.models import Webinar as Wb, WebinarRegistration
+        from django.core.mail import EmailMultiAlternatives
+        from django.template.loader import render_to_string
+        from django.conf import settings
+        wid = request.POST.get("send_webinar_reminder")
+        webinar = get_object_or_404(Wb, id=wid, is_active=True)
+        registrations = WebinarRegistration.objects.filter(webinar=webinar, status='registered', reminder_sent=False)
+        sent_count = 0
+        for reg in registrations:
+            try:
+                ctx = {'user': reg.user, 'webinar': reg.webinar}
+                html = render_to_string('emails/webinar_reminder.html', ctx)
+                msg = EmailMultiAlternatives(
+                    subject=f"🔔 Erinnerung: {webinar.title} beginnt bald!",
+                    body="",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[reg.user.email],
+                )
+                msg.attach_alternative(html, "text/html")
+                msg.send()
+                reg.reminder_sent = True
+                reg.save(update_fields=['reminder_sent'])
+                sent_count += 1
+            except Exception:
+                pass
+        messages.success(request, f"{sent_count} Erinnerung(en) für '{webinar.title}' gesendet.")
+        return redirect("admin_dashboard")
+
     if request.method == "POST" and "withdrawal_action" in request.POST:
         wr_id = request.POST.get("wr_id")
         action = request.POST.get("action")
@@ -470,6 +498,20 @@ def admin_dashboard(request):
     new_users_month = User.objects.filter(date_joined__gte=month_ago).count()
     total_users = User.objects.count()
 
+    # === WEBINARE ===
+    from webinars.models import Webinar, WebinarRegistration
+    total_webinars = Webinar.objects.count()
+    upcoming_webinars = Webinar.objects.filter(is_active=True, date_time__gte=now).count()
+    total_registrations = WebinarRegistration.objects.filter(status='registered').count()
+    upcoming_webinar_list = Webinar.objects.filter(
+        is_active=True, date_time__gte=now
+    ).order_by('date_time')[:5]
+    webinar_registration_counts = {}
+    for w in upcoming_webinar_list:
+        webinar_registration_counts[w.id] = WebinarRegistration.objects.filter(
+            webinar=w, status='registered'
+        ).count()
+
     context.update({
         'total_orders': total_orders,
         'new_orders_count': new_orders_count,
@@ -502,6 +544,11 @@ def admin_dashboard(request):
         'total_users': total_users,
         'pending_withdrawals': pending_withdrawals,
         'withdrawal_count': withdrawal_count,
+        'total_webinars': total_webinars,
+        'upcoming_webinars': upcoming_webinars,
+        'total_registrations': total_registrations,
+        'upcoming_webinar_list': upcoming_webinar_list,
+        'webinar_registration_counts': webinar_registration_counts,
     })
     
     # Debug-Ausgabe
@@ -579,6 +626,7 @@ def _send_withdrawal_email(wr, status):
 
 
 def home(request):
+    now = timezone.now()
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     lang = request.LANGUAGE_CODE  # aktuelle Sprache ("de" oder "en")
 
@@ -586,7 +634,8 @@ def home(request):
     latest_blog = BlogPost.objects.filter(is_published=True, published_at__lte=now).order_by("-published_at")[:2]
     for post in latest_blog:
         post.title = post.title_en if lang == "en" else post.title_de
-        post.teaser_text = (post.content_en if lang == "en" else post.content_de)[:200]
+        content = post.content_en if lang == "en" else post.content_de
+        post.teaser_text = (content or "")[:200]
 
     # 3 zufällige Produkte
     products = list(App.objects.filter(is_available_for_purchase=True).filter(
@@ -616,10 +665,20 @@ def home(request):
             "slug": f.slug,
             "question": f.question_en if lang == "en" else f.question_de,
             "short_answer": f.short_answer_en if lang == "en" else f.short_answer_de,
+            "answer": f.answer_en if lang == "en" else f.answer_de,
         })
 
     # ⭐ Durchschnittsbewertung hinzufügen
     rating = get_average_rating()
+
+    # 🎥 Webinare für Startseite
+    from webinars.models import Webinar
+    from django.db.models import Q as QQ
+    upcoming_webinars = Webinar.objects.filter(
+        is_active=True, date_time__gte=now
+    ).filter(
+        QQ(registration_start__isnull=True) | QQ(registration_start__lte=now)
+    ).order_by('date_time')[:3]
 
     # 📊 App-Status für Startseite
     from status.models import App as StatusAppModel, GlobalIssue
@@ -649,6 +708,7 @@ def home(request):
         'latest_blog': latest_blog,
         'products': random_products,
         'packages': random_packages,
+        'upcoming_webinars': upcoming_webinars,
         'faqs': localized_faqs,
         'rating': rating,
         'lang': lang,

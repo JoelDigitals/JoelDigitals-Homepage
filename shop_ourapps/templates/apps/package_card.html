@@ -79,12 +79,21 @@
       <i class="fas fa-info-circle"></i> {% trans "Details" %}
     </a>
     {% if user.is_authenticated %}
-    <form method="post" action="{% url 'add_package_to_cart' package.id %}" style="flex:1;">
-      {% csrf_token %}
-      <button type="submit" class="btn-shop" style="background:linear-gradient(135deg,var(--primary),#0066ff);border:none;cursor:pointer;">
-        <i class="fas fa-shopping-cart"></i> {% trans "Buy" %}
-      </button>
-    </form>
+      {% if package.is_backorder and not package.is_preorder %}
+        <form method="post" action="{% url 'watchlist_add_package' package.id %}" style="flex:1;">
+          {% csrf_token %}
+          <button type="submit" class="btn-shop" style="background:linear-gradient(135deg,#7c3aed,#6366f1);border:none;cursor:pointer;">
+            <i class="fas fa-bell"></i> {% trans "Notify me" %}
+          </button>
+        </form>
+      {% else %}
+        <form method="post" action="{% url 'add_package_to_cart' package.id %}" style="flex:1;">
+          {% csrf_token %}
+          <button type="submit" class="btn-shop" style="background:linear-gradient(135deg,var(--primary),#0066ff);border:none;cursor:pointer;">
+            <i class="fas fa-shopping-cart"></i> {% trans "Buy" %}
+          </button>
+        </form>
+      {% endif %}
     {% endif %}
   </div>
 </div>

@@ -1,0 +1,231 @@
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Webinars" %} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .webinar-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .page-header {
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .page-header h1 {
+    color: white;
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+  }
+
+  .page-header p {
+    color: rgba(255,255,255,0.85);
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  .webinar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .webinar-card {
+    background: var(--surface);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+    border: 1px solid var(--border);
+  }
+
+  .webinar-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .webinar-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
+  }
+
+  .webinar-image-placeholder {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: rgba(255,255,255,0.3);
+  }
+
+  .webinar-body {
+    padding: 1.25rem;
+  }
+
+  .webinar-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.75rem 0;
+  }
+
+  .webinar-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .webinar-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: #999;
+  }
+
+  .webinar-meta-item i {
+    color: #7c3aed;
+  }
+
+  .webinar-description {
+    color: #aaa;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .webinar-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .spots-badge {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+  }
+
+  .spots-available {
+    background: rgba(34,197,94,0.15);
+    color: #4ade80;
+  }
+
+  .spots-full {
+    background: rgba(248,113,113,0.15);
+    color: #f87171;
+  }
+
+  .btn-webinar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-webinar-primary {
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
+    color: white;
+  }
+
+  .btn-webinar-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124,58,237,0.3);
+  }
+
+  .btn-webinar-secondary {
+    background: rgba(255,255,255,0.1);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 1.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 768px) {
+    .webinar-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="webinar-container">
+  <div class="page-header">
+    <h1><i class="fas fa-video"></i> {% trans "Webinars" %}</h1>
+    <p>{% trans "Join our live webinars and learn more about our apps." %}</p>
+  </div>
+
+  <!-- Bevorstehende Webinare -->
+  <h2 class="section-title">
+    <i class="fas fa-calendar-check" style="color:#7c3aed;"></i>
+    {% trans "Upcoming Webinars" %}
+  </h2>
+
+  {% if upcoming_webinars %}
+    <div class="webinar-grid">
+      {% for webinar in upcoming_webinars %}
+        {% include "webinars/webinar_card.html" %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <i class="fas fa-calendar-times"></i>
+      <p>{% trans "No upcoming webinars at the moment. Check back later!" %}</p>
+    </div>
+  {% endif %}
+
+  <!-- Vergangene Webinare -->
+  {% if past_webinars %}
+    <h2 class="section-title" style="margin-top: 3rem;">
+      <i class="fas fa-history" style="color:#999;"></i>
+      {% trans "Past Webinars" %}
+    </h2>
+    <div class="webinar-grid">
+      {% for webinar in past_webinars %}
+        {% include "webinars/webinar_card.html" %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

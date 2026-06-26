@@ -76,3 +76,20 @@ def sync_stock():
         pkg.save(update_fields=["stock"])
 
     return updated
+
+
+def update_product_stock(product_number, new_stock):
+    """
+    Sendet den aktualisierten Lagerbestand an die JDS Management API.
+    Wird nach erfolgreichem Kaufs aufgerufen, damit das Warenwirtschaftssystem
+    den reduzierten Bestand kennt.
+    """
+    url = f"{settings.JDS_API_BASE_URL}/api/v2/products/{product_number}/"
+    try:
+        resp = requests.patch(url, headers=get_api_headers(), json={"stock": new_stock}, timeout=15)
+        resp.raise_for_status()
+        logger.info(f"JDS API stock updated for {product_number}: {new_stock}")
+        return True
+    except requests.RequestException as e:
+        logger.error(f"JDS API update_stock failed for {product_number}: {e}")
+        return False

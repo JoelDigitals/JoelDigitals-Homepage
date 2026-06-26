@@ -56,6 +56,23 @@
   {% endfor %}
 </div>
 
+{% if suggestions %}
+<div class="section-de" style="padding-top:4px;padding-bottom:4px;">
+  <div class="suggestions-wrap">
+    <p style="font-size:13px;font-weight:600;color:#00bfff;margin-bottom:10px;">💡 Entdecken Sie auch unsere anderen Apps:</p>
+    {% for item in suggestions %}
+    <div class="suggestion-box">
+      <p class="suggestion-title">{{ item.title }}</p>
+      <p class="suggestion-desc">{{ item.description }}</p>
+      <div class="suggestion-links">
+        <a href="{{ item.url }}" class="sug-btn">{{ item.btn_text }}</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
 <div class="section-de" style="padding-top:20px;padding-bottom:24px;">
   <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7;">
     <strong style="color:#fff;">Was ist dir wichtig?</strong> 💭<br>
@@ -120,6 +137,23 @@
   </div>
   {% endfor %}
 </div>
+
+{% if suggestions %}
+<div class="section-en" style="padding-top:4px;padding-bottom:4px;">
+  <div class="suggestions-wrap">
+    <p style="font-size:13px;font-weight:600;color:#00bfff;margin-bottom:10px;">💡 Discover our other apps:</p>
+    {% for item in suggestions %}
+    <div class="suggestion-box">
+      <p class="suggestion-title">{{ item.title }}</p>
+      <p class="suggestion-desc">{{ item.description }}</p>
+      <div class="suggestion-links">
+        <a href="{{ item.url }}" class="sug-btn">{{ item.btn_text }}</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
 
 <div class="section-en" style="padding-top:20px;">
   <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7;">

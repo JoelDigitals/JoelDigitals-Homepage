@@ -254,7 +254,11 @@ class App(models.Model):
 
     @property
     def effective_delivery_time(self):
-        return self.delivery_time or "2-5 Werktage"
+        if self.delivery_time:
+            return self.delivery_time
+        if self.requires_shipping:
+            return "2-5 Werktage"
+        return "ca. 2 Werktage"
 
     def __str__(self):
         return self.name
@@ -268,6 +272,10 @@ class Package(models.Model):
     description_english = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='package_images/', null=True, blank=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
+    requires_shipping = models.BooleanField(default=False, help_text="Benötigt dieses Paket einen Versand?")
+    shipping_cost = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, help_text="Versandkosten (einmalig pro Bestellung)")
+    delivery_time = models.CharField(max_length=100, blank=True, default="", help_text="z.B. 2-3 Werktage")
+    is_physical = models.BooleanField(default=False, help_text="Ist dies ein physisches Produkt?")
     is_active = models.BooleanField(default=True)
     is_available_for_purchase = models.BooleanField(default=False)
     release_date = models.DateField(null=True, blank=True, verbose_name="Release-Datum")
@@ -338,6 +346,14 @@ class Package(models.Model):
             return False
         return True
 
+    @property
+    def effective_delivery_time(self):
+        if self.delivery_time:
+            return self.delivery_time
+        if self.requires_shipping:
+            return "2-5 Werktage"
+        return "ca. 2 Werktage"
+
     def __str__(self):
         return self.name
 
@@ -362,8 +378,8 @@ class Package(models.Model):
         from django.db.models import Min
         min_stock = PackageApp.objects.filter(package=self).aggregate(Min('app__stock'))['app__stock__min']
         if min_stock is None:
-            return False  # keine Apps zugewiesen → nicht als "out of stock" blockieren
-        return min_stock <= 0
+            return False
+        return min_stock <= 0 and self.requires_shipping
 
 
 class PackageApp(models.Model):
@@ -498,6 +514,32 @@ class Order(models.Model):
     def __str__(self):
         return f"Bestellung {self.id} von {self.user}"
     
+    @property
+    def has_physical_items(self):
+        return self.items.filter(
+            models.Q(app__requires_shipping=True) | models.Q(package__requires_shipping=True)
+        ).exists()
+
+    @property
+    def has_digital_items(self):
+        return self.items.filter(
+            models.Q(app__requires_shipping=False, app__isnull=False) |
+            models.Q(package__requires_shipping=False, package__isnull=False)
+        ).exists()
+
+    @property
+    def physical_items(self):
+        return self.items.filter(
+            models.Q(app__requires_shipping=True) | models.Q(package__requires_shipping=True)
+        )
+
+    @property
+    def digital_items(self):
+        return self.items.filter(
+            models.Q(app__requires_shipping=False, app__isnull=False) |
+            models.Q(package__requires_shipping=False, package__isnull=False)
+        )
+
     def schedule_review_email(self):
         """Plant den Versand der Review-Email für 12-30 Stunden nach Lieferung."""
         import random
@@ -922,15 +964,17 @@ class WithdrawalRequest(models.Model):
 
 class WatchlistEntry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='watchlist_entries')
-    app = models.ForeignKey(App, on_delete=models.CASCADE, related_name='watchlist_entries')
+    app = models.ForeignKey(App, on_delete=models.CASCADE, null=True, blank=True, related_name='watchlist_entries')
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True, related_name='watchlist_entries')
     created_at = models.DateTimeField(auto_now_add=True)
     notified_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Merkliste Eintrag"
         verbose_name_plural = "Merkliste Einträge"
-        unique_together = ['user', 'app']
         ordering = ['-created_at']
 
     def __str__(self):
+        if self.package:
+            return f"{self.user.username} – {self.package.name}"
         return f"{self.user.username} – {self.app.name}"

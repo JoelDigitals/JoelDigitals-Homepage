@@ -1,6 +1,7 @@
 {% extends "base_home.html" %}
 {% load static %}
 {% load i18n %}
+{% load dash_filters %}
 
 {% block title %}{% trans "Admin Dashboard" %} – Joel Digitals{% endblock %}
 
@@ -24,14 +25,16 @@
   .kpi.c3::before { background:linear-gradient(90deg,#f59e0b,#d97706); }
   .kpi.c4::before { background:linear-gradient(90deg,#6366f1,#8b5cf6); }
   .kpi.c5::before { background:linear-gradient(90deg,#f59e0b,#eab308); }
-  .kpi.c6::before { background:linear-gradient(90deg,#ef4444,#dc2626); }
-  .kpi-icon { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:white; margin-bottom:.75rem; }
-  .kpi.c1 .kpi-icon { background:linear-gradient(135deg,#8b5cf6,#6366f1); }
-  .kpi.c2 .kpi-icon { background:linear-gradient(135deg,#4CAF50,#2E7D32); }
-  .kpi.c3 .kpi-icon { background:linear-gradient(135deg,#f59e0b,#d97706); }
-  .kpi.c4 .kpi-icon { background:linear-gradient(135deg,#6366f1,#8b5cf6); }
-  .kpi.c5 .kpi-icon { background:linear-gradient(135deg,#f59e0b,#eab308); }
-  .kpi.c6 .kpi-icon { background:linear-gradient(135deg,#ef4444,#dc2626); }
+.kpi.c6::before { background:linear-gradient(90deg,#ef4444,#dc2626); }
+.kpi.c7::before { background:linear-gradient(90deg,#06b6d4,#0891b2); }
+.kpi-icon { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:white; margin-bottom:.75rem; }
+.kpi.c1 .kpi-icon { background:linear-gradient(135deg,#8b5cf6,#6366f1); }
+.kpi.c2 .kpi-icon { background:linear-gradient(135deg,#4CAF50,#2E7D32); }
+.kpi.c3 .kpi-icon { background:linear-gradient(135deg,#f59e0b,#d97706); }
+.kpi.c4 .kpi-icon { background:linear-gradient(135deg,#6366f1,#8b5cf6); }
+.kpi.c5 .kpi-icon { background:linear-gradient(135deg,#f59e0b,#eab308); }
+.kpi.c6 .kpi-icon { background:linear-gradient(135deg,#ef4444,#dc2626); }
+.kpi.c7 .kpi-icon { background:linear-gradient(135deg,#06b6d4,#0891b2); }
   .kpi-val { font-size:1.8rem; font-weight:700; color:var(--text); }
   .kpi-lbl { font-size:.8rem; color:#888; margin-bottom:.25rem; }
   .kpi-sub { font-size:.72rem; color:#999; margin-top:.25rem; display:flex; gap:.75rem; }
@@ -120,6 +123,12 @@
       <div class="kpi-val">{{ today_appointments }}</div>
       <div class="kpi-sub"><span>{{ pending_appointments }} offen</span><span>{{ upcoming_appointments }} Woche</span></div>
     </div>
+    <div class="kpi c7">
+      <div class="kpi-icon"><i class="fas fa-video"></i></div>
+      <div class="kpi-lbl">{% trans "Webinars" %}</div>
+      <div class="kpi-val">{{ total_registrations }}</div>
+      <div class="kpi-sub"><span>{{ upcoming_webinars }} {% trans "upcoming" %}</span><span>{{ total_webinars }} {% trans "total" %}</span></div>
+    </div>
   </div>
 
   <!-- Dashboard Layout -->
@@ -184,6 +193,7 @@
         <div class="quick-grid">
           <a href="/admin/" class="quick-btn"><i class="fas fa-cog"></i> Django Admin</a>
           <a href="/admin/shop_ourapps/customlandingpage/" class="quick-btn"><i class="fas fa-pager"></i> Landing Pages</a>
+          <a href="/admin/webinars/webinar/" class="quick-btn"><i class="fas fa-video"></i> {% trans "Webinars" %}</a>
           <a href="/status/tools/" class="quick-btn"><i class="fas fa-tools"></i> {% trans "Tools" %}</a>
         </div>
       </div>
@@ -197,6 +207,28 @@
         {% for item in top_items %}
         <div class="top-row"><span>{{ item.app__name }}</span><span class="top-val">{{ item.total_qty }}× {{ item.total_rev|floatformat:0 }}€</span></div>
         {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if upcoming_webinar_list %}
+      <div class="panel" style="border-color:rgba(6,182,212,.3);">
+        <h3><i class="fas fa-video" style="color:#06b6d4;"></i> {% trans "Upcoming Webinars" %}</h3>
+        {% for w in upcoming_webinar_list %}
+        <div class="top-row" style="flex-wrap:wrap;gap:0.3rem;">
+          <span style="flex:1;min-width:120px;">{{ w.title|truncatechars:22 }}<br><small style="color:#888;">{{ w.date_time|date:"d.m. H:i" }} · {{ webinar_registration_counts|dict_lookup:w.id }}/{{ w.max_participants }}</small></span>
+          <form method="post" action="{% url 'admin_dashboard' %}" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="send_webinar_reminder" value="{{ w.id }}">
+            <button type="submit" class="quick-btn" style="padding:.25rem .5rem;font-size:.7rem;" title="{% trans 'Send reminder' %}">
+              <i class="fas fa-bell"></i>
+            </button>
+          </form>
+          <a href="/admin/webinars/webinar/{{ w.id }}/change/" class="quick-btn" style="padding:.25rem .5rem;font-size:.7rem;"><i class="fas fa-external-link-alt"></i></a>
+        </div>
+        {% endfor %}
+        <a href="/admin/webinars/webinar/" class="quick-btn" style="margin-top:.5rem;width:100%;justify-content:center;">
+          <i class="fas fa-cog"></i> {% trans "Manage Webinars" %}
+        </a>
       </div>
       {% endif %}
 

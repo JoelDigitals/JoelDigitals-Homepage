@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'chat',
     "reviews",
     'landingpages',
+    'webinars',
     'django.contrib.sites',
     'oauth2_provider',
     'admin_api',

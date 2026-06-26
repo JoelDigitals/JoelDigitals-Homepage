@@ -66,4 +66,6 @@ urlpatterns = [
     path('watchlist/', views.watchlist_view, name='watchlist_view'),
     path('watchlist/add/<int:app_id>/', views.watchlist_add, name='watchlist_add'),
     path('watchlist/remove/<int:app_id>/', views.watchlist_remove, name='watchlist_remove'),
+    path('watchlist/add-package/<int:package_id>/', views.watchlist_add_package, name='watchlist_add_package'),
+    path('watchlist/remove-package/<int:package_id>/', views.watchlist_remove_package, name='watchlist_remove_package'),
 ]

@@ -12,34 +12,6 @@
   <div class="suggestions-wrap">
     <p style="font-size:13px;font-weight:600;color:#00bfff;margin-bottom:12px;">✨ Unsere Apps:</p>
 
-    <div class="suggestion-box">
-      <p class="suggestion-title">JDS Management</p>
-      <p class="suggestion-desc">
-        Diese webbasierte Management-Plattform unterstützt Unternehmen, Teams und Einzelpersonen
-        bei der effizienten Organisation, Überwachung und Umsetzung ihrer täglichen Aufgaben und
-        langfristigen Projekte. Fokus auf Benutzerfreundlichkeit und Flexibilität.
-      </p>
-      <div class="suggestion-links">
-        <a href="https://joel-digitals.de/our-apps/JDS-Management/" class="sug-btn">Mehr Infos</a>
-        <a href="https://joel-digitals.de/wiki/Management-EN/" class="sug-btn">Wiki</a>
-        <a href="https://jds-management.de" class="sug-btn">Zur App →</a>
-      </div>
-    </div>
-
-    <div class="suggestion-box">
-      <p class="suggestion-title">AuftragNetz</p>
-      <p class="suggestion-desc">
-        AuftragNetz verbindet Auftraggeber und Dienstleister auf einer modernen, sicheren Plattform.
-        Nutzer können Projekte einstellen, passende Partner finden und den gesamten Auftragsprozess
-        digital verwalten.
-      </p>
-      <div class="suggestion-links">
-        <a href="https://joel-digitals.de/our-apps/AuftragNetz/" class="sug-btn">Mehr Infos</a>
-        <a href="https://auftragnetz.de" class="sug-btn">Zur App →</a>
-      </div>
-    </div>
-
-    {% if suggestions %}
     {% for item in suggestions %}
     <div class="suggestion-box">
       <p class="suggestion-title">{{ item.title }}</p>
@@ -49,7 +21,6 @@
       </div>
     </div>
     {% endfor %}
-    {% endif %}
   </div>
 
   <p class="body-text">
@@ -72,33 +43,6 @@
   <div class="suggestions-wrap">
     <p style="font-size:13px;font-weight:600;color:#00bfff;margin-bottom:12px;">✨ Our Apps:</p>
 
-    <div class="suggestion-box">
-      <p class="suggestion-title">JDS Management</p>
-      <p class="suggestion-desc">
-        This web-based management platform supports organizations, teams, and individuals in
-        efficiently organizing, monitoring, and executing daily operations and long-term projects.
-        Focused on usability and flexibility.
-      </p>
-      <div class="suggestion-links">
-        <a href="https://joel-digitals.de/our-apps/JDS-Management/" class="sug-btn">More Info</a>
-        <a href="https://joel-digitals.de/wiki/Management-EN/" class="sug-btn">Wiki</a>
-        <a href="https://jds-management.de" class="sug-btn">Go to App →</a>
-      </div>
-    </div>
-
-    <div class="suggestion-box">
-      <p class="suggestion-title">OrderNetwork (AuftragNetz)</p>
-      <p class="suggestion-desc">
-        AuftragNetz connects clients and service providers on a modern, secure platform.
-        Users can post projects, find suitable partners, and manage the entire workflow digitally.
-      </p>
-      <div class="suggestion-links">
-        <a href="https://joel-digitals.de/our-apps/auftragnetz/" class="sug-btn">More Info</a>
-        <a href="https://auftragnetz.de" class="sug-btn">Go to App →</a>
-      </div>
-    </div>
-
-    {% if suggestions %}
     {% for item in suggestions %}
     <div class="suggestion-box">
       <p class="suggestion-title">{{ item.title }}</p>
@@ -108,7 +52,6 @@
       </div>
     </div>
     {% endfor %}
-    {% endif %}
   </div>
 
   <p class="body-text">
