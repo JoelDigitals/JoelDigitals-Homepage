@@ -1,0 +1,387 @@
+{% load i18n %}
+{% load static %}
+
+<div class="shop-card"
+     data-name="{{ product.search_name|lower }}"
+     data-desc="{{ product.search_desc|default_if_none:''|lower }}"
+     data-price="{{ product.discounted_price|floatformat:2 }}"
+     data-discount="{{ product.discount_percent|default:0 }}">
+
+  {% if product.discount_is_active and product.sale_badge %}
+    <div class="sale-banner-overlay">
+      <img src="{{ product.sale_badge.image.url }}" alt="{{ product.active_sale_name|default:'' }}">
+    </div>
+  {% elif product.discount_is_active and product.active_sale_name %}
+    <div class="sale-banner-overlay">
+      <span class="sale-banner-text">{{ product.active_sale_name }}</span>
+    </div>
+  {% elif product.discount_is_active and product.item_type != "app" %}
+    {% if product.sale_badge %}
+    <div class="sale-banner-overlay">
+      <span class="sale-banner-text">{{ product.active_sale_name }}</span>
+    </div>
+    {% endif %}
+  {% endif %}
+
+  <div class="image-wrapper">
+    {% if product.image %}
+      <img src="{{ product.image.url }}" alt="{{ product.name }}">
+    {% else %}
+      <div class="image-placeholder">
+        <i class="fas {% if product.item_type == "app" %}fa-cube{% else %}fa-gift{% endif %}"></i>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="card-content">
+    <h2>{{ product.name }}</h2>
+    <p class="description">{{ product.description|truncatechars:80 }}</p>
+
+    {% if product.item_type != "app" %}
+      <div style="font-size:0.85rem;color:#666;margin:0.5rem 0;text-align:center;">
+        <i class="fas fa-cubes" style="color:#22c55e;"></i>
+        {% blocktrans with count=product.apps_count %}{{ count }} apps included{% endblocktrans %}
+      </div>
+      {% if product.savings_amount > 0 %}
+        <div style="text-align:center;margin:0.25rem 0 0.5rem;">
+          <span style="display:inline-block;background:rgba(34,197,94,0.15);color:#22c55e;padding:0.2rem 0.75rem;border-radius:20px;font-weight:600;font-size:0.8rem;">
+            <i class="fas fa-piggy-bank"></i> {% blocktrans with pct=product.savings_percent %}Save {{ pct }}%{% endblocktrans %}
+          </span>
+        </div>
+      {% endif %}
+    {% else %}
+      <p class="version">Version: {{ product.version }}</p>
+      {% if product.review_count %}
+      <div class="review-stars-mini" style="display:flex;align-items:center;gap:6px;justify-content:center;margin:6px 0 4px;">
+        <span style="color:#ffc107;font-size:13px;letter-spacing:1px;">
+          {% with avg=product.review_avg|floatformat:0 %}
+          {% for i in "12345" %}{% if forloop.counter <= avg|add:0 %}★{% else %}<span style="color:rgba(255,255,255,0.2);">★</span>{% endif %}{% endfor %}
+          {% endwith %}
+        </span>
+        <span style="font-size:12px;color:rgba(255,255,255,0.45);">{{ product.review_avg }} ({{ product.review_count }})</span>
+      </div>
+      {% endif %}
+    {% endif %}
+
+    {% if product.is_preorder %}
+      <div class="stock-badge" style="color:#7c3aed;">
+        <i class="fas fa-rocket"></i> {% trans "Pre-order" %}
+      </div>
+    {% elif product.stock_level != "full" %}
+      <div class="stock-badge" style="color:{{ product.stock_display_color }};">
+        {% if product.stock_level == "none" or product.item_type == "package" and product.stock_level == "none" %}
+          {% trans "Out of stock" %}
+        {% elif product.stock_level == "critical" and product.item_type == "app" %}
+          {% blocktrans with count=product.stock %}Only {{ count }} left in stock{% endblocktrans %}
+        {% elif product.stock_level == "critical" %}
+          <i class="fas fa-exclamation-triangle"></i> {% trans "Low stock" %}
+        {% elif product.stock_level == "low" and product.item_type == "app" %}
+          {% blocktrans with count=product.stock %}{{ count }} in stock{% endblocktrans %}
+        {% elif product.stock_level == "low" %}
+          <i class="fas fa-box"></i> {% trans "Limited availability" %}
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="price-section">
+      {% if product.discount_is_active %}
+        <span class="badge-sale">🔖 {{ product.discount_percent }}% OFF</span>
+        <div class="price-block">
+          <span class="price-old">€{{ product.price }}</span>
+          <span class="price-new">€{{ product.discounted_price|floatformat:2 }}</span>
+        </div>
+      {% else %}
+        <div class="price-block no-discount">
+          <span class="price-label">{% trans "Price" %}:</span>
+          <strong class="price-regular">€{{ product.price }}</strong>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <a class="btn-shop" href="{% if product.item_type == "app" %}{% url 'app_detail' slug=product.slug %}{% else %}{% url 'package_detail' product.slug %}{% endif %}">
+      <i class="fas fa-info-circle"></i> {% trans "Details" %}
+    </a>
+    {% if product.item_type != "app" %}
+      {% if user.is_authenticated %}
+        {% if product.is_backorder %}
+          <form method="post" action="{% url 'watchlist_add_package' product.id %}" style="flex:1;">
+            {% csrf_token %}
+            <button type="submit" class="btn-shop" style="background:linear-gradient(135deg,#7c3aed,#6366f1);border:none;cursor:pointer;">
+              <i class="fas fa-bell"></i> {% trans "Notify me" %}
+            </button>
+          </form>
+        {% else %}
+          <form method="post" action="{% url 'add_package_to_cart' product.id %}" style="flex:1;">
+            {% csrf_token %}
+            <button type="submit" class="btn-shop" style="background:linear-gradient(135deg,var(--primary),#0066ff);border:none;cursor:pointer;">
+              <i class="fas fa-shopping-cart"></i> {% trans "Buy" %}
+            </button>
+          </form>
+        {% endif %}
+      {% endif %}
+    {% else %}
+      {% if product.link %}<a class="btn-shop" href="{{ product.link }}" target="_blank">Wiki</a>{% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.shop-card {
+  position: relative;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 480px;
+  transition: all 0.3s ease;
+  overflow: visible;
+}
+
+.shop-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.sale-banner-overlay {
+  position: absolute;
+  top: -12px;
+  left: 12px;
+  padding: 4px 8px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  z-index: 10;
+  background: none;
+  max-width: calc(100% - 24px);
+}
+
+.sale-banner-overlay img {
+  max-width: 180px;
+  max-height: 70px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.sale-banner-text {
+  background: linear-gradient(90deg, #ff6b6b, #ee5a6f);
+  padding: 4px 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(238, 90, 111, 0.4);
+  white-space: nowrap;
+}
+
+.image-wrapper {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 400px;
+  margin: 0 auto 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.shop-card:hover .image-wrapper img {
+  transform: scale(1.05);
+}
+
+.image-placeholder {
+  font-size: 4rem;
+  color: #bbb;
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.card-content h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem 0;
+  text-align: center;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.6em;
+}
+
+.description {
+  margin: 0 0 0.5rem 0;
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 4.5em;
+  flex-shrink: 0;
+}
+
+.version {
+  margin: 0 0 1rem 0;
+  color: #999;
+  font-size: 0.85rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.price-section {
+  margin-top: auto;
+  padding-top: 1rem;
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.badge-sale {
+  background: #ff4d4d;
+  color: #fff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 2px 8px rgba(255, 77, 77, 0.3);
+}
+
+.price-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.price-block.no-discount {
+  gap: 0.5rem;
+}
+
+.price-old {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 1rem;
+}
+
+.price-new {
+  color: #4dff88;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.price-label {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.price-regular {
+  color: var(--text);
+  font-size: 1.2rem;
+}
+
+.stock-badge {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0;
+  margin-top: 0.5rem;
+}
+
+.btn-row {
+  margin-top: auto;
+  padding-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.btn-shop {
+  flex: 1;
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 8px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.2s;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.btn-shop:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 68, 204, 0.3);
+}
+
+@supports not (aspect-ratio: 1 / 1) {
+  .image-wrapper {
+    position: relative;
+    height: 200px;
+  }
+  .image-wrapper::before {
+    content: "";
+    float: left;
+    padding-top: 100%;
+  }
+  .image-wrapper::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+}
+
+@media (max-width: 768px) {
+  .shop-card {
+    min-height: 450px;
+  }
+  .image-wrapper {
+    max-height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .shop-card {
+    min-height: auto;
+  }
+  .card-content h2 {
+    min-height: auto;
+  }
+  .description {
+    min-height: auto;
+    -webkit-line-clamp: 2;
+  }
+  .price-section {
+    min-height: auto;
+  }
+}
+</style>

@@ -79,7 +79,7 @@
       <i class="fas fa-info-circle"></i> {% trans "Details" %}
     </a>
     {% if user.is_authenticated %}
-      {% if package.is_backorder and not package.is_preorder %}
+      {% if package.is_backorder %}
         <form method="post" action="{% url 'watchlist_add_package' package.id %}" style="flex:1;">
           {% csrf_token %}
           <button type="submit" class="btn-shop" style="background:linear-gradient(135deg,#7c3aed,#6366f1);border:none;cursor:pointer;">

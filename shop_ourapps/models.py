@@ -238,7 +238,7 @@ class App(models.Model):
 
     @property
     def is_backorder(self):
-        return self.stock <= 0 and self.requires_shipping
+        return self.stock <= 0 and self.requires_shipping and not self.is_preorder
 
     @property
     def is_preorder(self):
@@ -247,8 +247,6 @@ class App(models.Model):
         if not self.preorder_date:
             return False
         if self.preorder_date > today:
-            return False
-        if self.release_date and self.release_date <= today:
             return False
         return True
 
@@ -342,8 +340,6 @@ class Package(models.Model):
             return False
         if self.preorder_date > today:
             return False
-        if self.release_date and self.release_date <= today:
-            return False
         return True
 
     @property
@@ -375,6 +371,8 @@ class Package(models.Model):
 
     @property
     def is_backorder(self):
+        if self.is_preorder:
+            return False
         from django.db.models import Min
         min_stock = PackageApp.objects.filter(package=self).aggregate(Min('app__stock'))['app__stock__min']
         if min_stock is None:

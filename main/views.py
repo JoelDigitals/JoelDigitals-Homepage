@@ -637,24 +637,29 @@ def home(request):
         content = post.content_en if lang == "en" else post.content_de
         post.teaser_text = (content or "")[:200]
 
-    # 3 zufällige Produkte
+    # 3 zufällige Produkte (Apps + Packages gemischt)
+    from shop_ourapps.models import Package
     products = list(App.objects.filter(is_available_for_purchase=True).filter(
         Q(preorder_date__isnull=False, preorder_date__lte=date.today()) |
         Q(preorder_date__isnull=True, release_date__isnull=True) |
         Q(preorder_date__isnull=True, release_date__lte=date.today())
     ))
-    random_products = random.sample(products, min(len(products), 3))
-    for product in random_products:
-        product.name = product.name if lang == 'de' else product.name_english
-
-    # Pakete für Startseite
-    from shop_ourapps.models import Package
     packages = list(Package.objects.filter(is_active=True, is_available_for_purchase=True).filter(
         Q(preorder_date__isnull=False, preorder_date__lte=date.today()) |
         Q(preorder_date__isnull=True, release_date__isnull=True) |
         Q(preorder_date__isnull=True, release_date__lte=date.today())
     ))
-    random_packages = random.sample(packages, min(len(packages), 3))
+    all_products = products + packages
+    random_products = random.sample(all_products, min(len(all_products), 6))
+    for product in random_products:
+        if hasattr(product, 'version'):  # it's an App
+            product.name = product.name if lang == 'de' else product.name_english
+            product.item_type = "app"
+        else:  # it's a Package
+            if lang == 'en' and product.name_english:
+                product.name = product.name_english
+                product.description = product.description_english or product.description
+            product.item_type = "package"
 
     # FAQs – max. 5, Sprache abhängig
     faqs = FAQ.objects.all()[:5]
@@ -707,7 +712,6 @@ def home(request):
         'user_groups': user_groups,
         'latest_blog': latest_blog,
         'products': random_products,
-        'packages': random_packages,
         'upcoming_webinars': upcoming_webinars,
         'faqs': localized_faqs,
         'rating': rating,

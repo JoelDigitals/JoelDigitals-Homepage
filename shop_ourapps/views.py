@@ -247,7 +247,7 @@ def package_detail(request, slug):
 @require_POST
 def add_package_to_cart(request, package_id):
     package = get_object_or_404(Package, id=package_id, is_active=True, is_available_for_purchase=True)
-    if package.is_backorder and not package.is_preorder:
+    if package.is_backorder:
         messages.error(request, _("This product is currently out of stock."))
         return redirect('package_detail', slug=package.slug)
     cart = get_user_cart(request.user)
@@ -282,7 +282,7 @@ def shop(request):
         Q(preorder_date__isnull=True, release_date__lte=date.today())
     )
 
-    # --- Sprachlogik ---
+    # --- Sprachlogik für Apps ---
     if lang == 'en':
         apps = apps.annotate(
             display_name=Case(
@@ -355,9 +355,41 @@ def shop(request):
         Q(preorder_date__isnull=True, release_date__lte=date.today())
     )
 
+    # --- Sprachlogik + Attribute für Pakete ---
+    for pkg in packages:
+        if lang == 'en' and pkg.name_english:
+            pkg.name = pkg.name_english
+            pkg.description = pkg.description_english or pkg.description
+        pkg.item_type = "package"
+        pkg.search_name = pkg.name.lower()
+        pkg.search_desc = (pkg.description or '').lower()
+        pkg.apps_count = pkg.apps.count()
+
+    # --- Attribute für Apps ---
+    for app in apps:
+        app.item_type = "app"
+        app.search_name = app.display_name.lower()
+        app.search_desc = (app.display_description or '').lower()
+        app.apps_count = 0  # not used for apps
+
+    # --- Merge: alle Produkte in eine Liste ---
+    all_products = list(apps) + list(packages)
+
+    # Review-Statistiken für Sterneanzeige im Shop
+    from .models import AppReview
+    from django.db.models import Avg, Count
+    review_data = AppReview.objects.filter(is_approved=True).values('app_id').annotate(
+        avg=Avg('stars'), count=Count('id')
+    )
+    review_map = {r['app_id']: {'avg': round(r['avg'] or 0, 1), 'count': r['count']} for r in review_data}
+    for product in all_products:
+        if product.item_type == "app":
+            stats = review_map.get(product.id, {'avg': 0, 'count': 0})
+            product.review_avg = stats['avg']
+            product.review_count = stats['count']
+
     context = {
-        "apps": apps,
-        "packages": packages,
+        "products": all_products,
         "groups": groups,
         "active_group": group,
         "query": query,
@@ -368,18 +400,6 @@ def shop(request):
         "lang": lang,
         "wallet_balance": wallet_balance,
     }
-
-    # Review-Statistiken für Sterneanzeige im Shop
-    from .models import AppReview
-    from django.db.models import Avg, Count
-    review_data = AppReview.objects.filter(is_approved=True).values('app_id').annotate(
-        avg=Avg('stars'), count=Count('id')
-    )
-    review_map = {r['app_id']: {'avg': round(r['avg'] or 0, 1), 'count': r['count']} for r in review_data}
-    for app in context['apps']:
-        stats = review_map.get(app.id, {'avg': 0, 'count': 0})
-        app.review_avg = stats['avg']
-        app.review_count = stats['count']
 
     return render(request, "apps/shop.html", context)
 
@@ -792,7 +812,7 @@ def add_to_cart(request, app_id):
     app = get_object_or_404(App, id=app_id)
     cart = get_user_cart(request.user)
 
-    if app.requires_shipping and app.stock <= 0 and not app.is_preorder:
+    if app.is_backorder:
         messages.error(request, _('This product is currently out of stock and cannot be ordered.'))
         return redirect('app_detail', slug=app.slug)
 
@@ -1068,11 +1088,11 @@ def checkout(request):
         # Lagerbestand prüfen (Pre-Order erlaubt leeren Bestand)
         for item in items:
             if item.package:
-                if item.package.is_backorder and not item.package.is_preorder:
+                if item.package.is_backorder:
                     messages.error(request, _('"%(name)s" is currently out of stock and cannot be ordered.') % {'name': item.package.name})
                     return redirect('checkout')
             elif item.app:
-                if item.app.requires_shipping and item.app.stock <= 0 and not item.app.is_preorder:
+                if item.app.is_backorder:
                     messages.error(request, _('"%(name)s" is currently out of stock and cannot be ordered.') % {'name': item.app.name})
                     return redirect('checkout')
                 if item.app.requires_shipping and item.app.stock > 0 and item.quantity > item.app.stock:

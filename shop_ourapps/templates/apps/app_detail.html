@@ -582,7 +582,7 @@
               <i class="far fa-heart"></i> {% trans "Add to Watchlist" %}
             </button>
           </form>
-        {% elif app.requires_shipping and app.stock_level == "none" %}
+        {% elif app.requires_shipping and app.stock_level == "none" and not app.is_preorder %}
           {# Out of stock - nur Watchlist #}
           <div style="padding:1rem;background:rgba(244,67,54,0.08);border-radius:10px;margin-bottom:1rem;">
             <p style="color:#f44336;font-weight:600;margin:0;">

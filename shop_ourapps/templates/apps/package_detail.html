@@ -187,6 +187,15 @@
     </div>
   {% endif %}
 
+  {% if package.discount_is_active and package.sale_badge %}
+    <div style="margin-bottom:1rem;">
+      <img src="{{ package.sale_badge.image.url }}" alt="{{ package.active_sale_name|default:'' }}" style="max-width:200px;max-height:70px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+    </div>
+  {% elif package.discount_is_active and package.active_sale_name %}
+    <div style="margin-bottom:0.75rem;">
+      <span style="display:inline-block;background:linear-gradient(90deg,#ff6b6b,#ee5a6f);color:#fff;padding:4px 14px;border-radius:6px;font-weight:600;font-size:0.9rem;">{{ package.active_sale_name }}</span>
+    </div>
+  {% endif %}
   {% if package.discount_is_active %}
     <div class="savings-badge">
       <i class="fas fa-tag"></i> {{ package.discount_percent }}% {% trans "savings" %}
@@ -251,7 +260,7 @@
 
 <div class="package-cta">
   {% if user.is_authenticated %}
-    {% if package.is_backorder and not package.is_preorder %}
+    {% if package.is_backorder %}
       <form method="post" action="{% url 'watchlist_add_package' package.id %}">
         {% csrf_token %}
         <button type="submit" class="btn-package-buy" style="background:linear-gradient(135deg,#7c3aed,#6366f1);box-shadow:0 6px 20px rgba(124,58,237,0.3);">

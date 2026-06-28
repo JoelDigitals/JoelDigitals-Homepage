@@ -457,7 +457,19 @@
             </span>
           </div>
           {% endif %}
+          {% if package.discount_is_active and package.sale_badge %}
+          <div style="text-align:center;margin-bottom:0.75rem;">
+            <img src="{{ package.sale_badge.image.url }}" alt="{{ package.active_sale_name|default:'' }}" style="max-width:160px;max-height:60px;object-fit:contain;">
+          </div>
+          {% elif package.discount_is_active and package.active_sale_name %}
+          <div style="text-align:center;margin-bottom:0.75rem;">
+            <span style="display:inline-block;background:linear-gradient(90deg,#ff6b6b,#ee5a6f);color:#fff;padding:4px 12px;border-radius:6px;font-weight:600;font-size:0.85rem;">{{ package.active_sale_name }}</span>
+          </div>
+          {% endif %}
           <div style="text-align:center;margin-bottom:1rem;">
+            {% if package.discount_is_active %}
+            <span style="text-decoration:line-through;color:#999;margin-right:0.5rem;">€{{ package.price }}</span>
+            {% endif %}
             <strong style="font-size:1.3rem;color:#22c55e;">€{{ package.discounted_price|floatformat:2 }}</strong>
           </div>
           <div class="app-actions">
@@ -465,7 +477,7 @@
               <i class="fas fa-info-circle"></i> {% trans "Details" %}
             </a>
             {% if user.is_authenticated %}
-              {% if package.is_backorder and not package.is_preorder %}
+              {% if package.is_backorder %}
                 <form method="post" action="{% url 'watchlist_add_package' package.id %}" style="flex:1;">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-primary" style="background:linear-gradient(135deg,#7c3aed,#6366f1);border:none;cursor:pointer;">

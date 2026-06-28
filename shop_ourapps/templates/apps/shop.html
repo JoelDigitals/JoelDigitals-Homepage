@@ -488,25 +488,12 @@
     </div>
     
     <div class="shop-grid" id="shop-grid-all" data-group="all">
-      {% for app in apps %}
-        {% include "apps/shop_card.html" with app=app %}
+      {% for product in products %}
+        {% include "apps/product_card.html" %}
       {% empty %}
         <div class="empty-msg">{% trans "No results found" %}</div>
       {% endfor %}
     </div>
-
-    {% if packages %}
-    <div style="margin-top:3rem;padding-top:2rem;border-top:2px solid var(--border);">
-      <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;text-align:center;">
-        <i class="fas fa-gift" style="color:#22c55e;"></i> {% trans "Packages" %} – {% trans "Save with bundles" %}
-      </h2>
-      <div class="shop-grid">
-        {% for package in packages %}
-          {% include "apps/package_card.html" with package=package %}
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
   </div>
 </div>
 {% endblock %}
