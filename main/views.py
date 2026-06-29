@@ -650,7 +650,7 @@ def home(request):
         Q(preorder_date__isnull=True, release_date__lte=date.today())
     ))
     all_products = products + packages
-    random_products = random.sample(all_products, min(len(all_products), 6))
+    random_products = random.sample(all_products, min(len(all_products), 3))
     for product in random_products:
         if hasattr(product, 'version'):  # it's an App
             product.name = product.name if lang == 'de' else product.name_english
