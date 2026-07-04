@@ -31,17 +31,14 @@ def check_version(request, app_slug):
         )
 
     try:
-        app = AutoUpdateApp.objects.prefetch_related('versions').get(
-            slug=app_slug, versions__is_active=True
-        )
+        app = AutoUpdateApp.objects.get(slug=app_slug)
     except AutoUpdateApp.DoesNotExist:
         return JsonResponse(
             {'error': 'App not found'},
             status=404
         )
 
-    versions = app.versions.filter(is_active=True)
-    latest = versions.first()
+    latest = app.versions.filter(is_active=True).order_by('-release_date').first()
 
     if not latest:
         return JsonResponse({

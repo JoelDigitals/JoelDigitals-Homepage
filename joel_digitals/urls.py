@@ -36,6 +36,12 @@ urlpatterns = [
     path('sitemap.txt', main_views.sitemap_txt, name='sitemap_txt'),
     # Optional: Sprachumschaltung soll auch ohne Sprache funktionieren
     path("i18n/", include("django.conf.urls.i18n")),
+
+    # Auto-Update-API fuer JDS Secure: bewusst NICHT hinter i18n_patterns,
+    # da es sich um einen Maschinen-Client (PowerShell/.NET) ohne Sprachpraefix
+    # handelt. Innerhalb von i18n_patterns wuerde jede Anfrage ohne /de/-Praefix
+    # per 302 umgeleitet statt direkt beantwortet zu werden.
+    path('api/autoupdate/', include('autoupdate.urls')),
     
     # ==================== SSO URLs (OHNE i18n) ===================
     # ============================================================
@@ -57,7 +63,6 @@ urlpatterns += i18n_patterns(
     path('chat/', include('chat.urls')),
     path("reviews/", include("reviews.urls")),
     path('webinars/', include('webinars.urls')),
-    path('api/autoupdate/', include('autoupdate.urls')),
     path('', include('landingpages.urls')),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 )
