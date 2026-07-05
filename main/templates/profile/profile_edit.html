@@ -287,6 +287,26 @@
         </div>
       </div>
 
+      <!-- Marketing-Einstellungen -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i class="fas fa-bullhorn"></i>
+          {% trans "Newsletter & Marketing" %}
+        </h2>
+
+        <div class="form-group">
+          <label class="toggle-label" style="display: flex; align-items: center; gap: 1rem; cursor: pointer; padding: 0.8rem 1rem; background: var(--bg); border-radius: 8px;">
+            <input type="checkbox" name="marketing_opt_in" id="marketing_opt_in" value="1" {% if profile.marketing_opt_in %}checked{% endif %} style="width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer;">
+            <div>
+              <span style="font-weight: 600; color: var(--text);">{% trans "Marketing-E-Mails erhalten" %}</span>
+              <p style="margin: 4px 0 0; font-size: 0.85rem; color: #999; font-style: italic;">
+                {% trans "Erhalte Neuigkeiten, exklusive Angebote und nützliche Tipps per E-Mail. Jederzeit abbestellbar." %}
+              </p>
+            </div>
+          </label>
+        </div>
+      </div>
+
       <!-- Buttons -->
       <div class="form-buttons">
         <button type="submit" class="btn btn-primary">

@@ -1,0 +1,93 @@
+{% extends 'base_home.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% if is_edit %}{% trans "Newsletter bearbeiten" %}{% else %}{% trans "Newsletter erstellen" %}{% endif %} – Joel Digitals{% endblock %}
+
+{% block extra_head %}{{ form.media }}{% endblock %}
+
+{% block content %}
+<style>
+  .nl-wrap { max-width:960px; margin:2rem auto; padding:0 1rem; }
+  .nl-hdr { background:linear-gradient(135deg,var(--primary),#0066ff); border-radius:16px 16px 0 0; padding:2rem; color:white; position:relative; overflow:hidden; }
+  .nl-hdr::before { content:''; position:absolute; top:-50%; right:-50%; width:200%; height:200%; background:radial-gradient(circle,rgba(255,255,255,.08) 0%,transparent 70%); }
+  .nl-hdr h1 { margin:0; font-size:1.8rem; display:flex; align-items:center; gap:.75rem; position:relative; z-index:1; }
+  .nl-hdr p { margin:.3rem 0 0; opacity:.85; position:relative; z-index:1; }
+
+  .nl-body { background:var(--surface); border-radius:0 0 16px 16px; padding:2rem; box-shadow:0 4px 12px rgba(0,0,0,.3); }
+
+  .form-group { margin-bottom:1.5rem; }
+  .form-label { display:block; font-size:.85rem; font-weight:600; color:var(--text); margin-bottom:.5rem; text-transform:uppercase; letter-spacing:.5px; }
+  .form-input { width:100%; padding:.8rem 1rem; background:var(--bg); border:2px solid var(--border); border-radius:8px; color:var(--text); font-size:.95rem; transition:all .3s; font-family:inherit; box-sizing:border-box; }
+  .form-input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(0,68,204,.1); }
+
+  .helper-text { font-size:.82rem; color:#888; margin-top:.4rem; }
+
+  .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.8rem 1.5rem; border-radius:8px; font-size:.95rem; font-weight:600; border:none; cursor:pointer; text-decoration:none; transition:all .2s; font-family:inherit; }
+  .btn-primary { background:var(--primary); color:white; }
+  .btn-primary:hover { background:var(--primary-hover); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,68,204,.4); }
+  .btn-outline { background:transparent; color:var(--text); border:2px solid var(--border); }
+  .btn-outline:hover { border-color:var(--primary); color:var(--primary); }
+
+  .form-buttons { display:flex; gap:1rem; margin-top:2rem; padding-top:2rem; border-top:1px solid var(--border); }
+
+  .cke_focus { outline:none !important; }
+</style>
+
+<div class="nl-wrap">
+  <div class="nl-hdr">
+    <h1><i class="fas {% if is_edit %}fa-edit{% else %}fa-pen-alt{% endif %}"></i>
+      {% if is_edit %}{% trans "Newsletter bearbeiten" %}{% else %}{% trans "Newsletter erstellen" %}{% endif %}</h1>
+    <p>{% trans "Erstelle ansprechende E-Mails mit dem visuellen Editor – Bilder via ibb.co einfügen" %}</p>
+  </div>
+
+  <div class="nl-body">
+    {% if messages %}
+      {% for message in messages %}
+        <div style="padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-weight:500;background:rgba(245,158,11,.15);color:#f59e0b;">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label class="form-label" for="id_title">{{ form.title.label }}</label>
+        {{ form.title }}
+        {% if form.title.help_text %}<p class="helper-text">{{ form.title.help_text }}</p>{% endif %}
+        {% if form.title.errors %}<p style="color:#ef4444;font-size:.85rem;">{{ form.title.errors }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="id_subject">{{ form.subject.label }}</label>
+        {{ form.subject }}
+        {% if form.subject.help_text %}<p class="helper-text">{{ form.subject.help_text }}</p>{% endif %}
+        {% if form.subject.errors %}<p style="color:#ef4444;font-size:.85rem;">{{ form.subject.errors }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="id_subtitle">{{ form.subtitle.label }}</label>
+        {{ form.subtitle }}
+        {% if form.subtitle.help_text %}<p class="helper-text">{{ form.subtitle.help_text }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ form.content.label }}</label>
+        {{ form.content }}
+        <p class="helper-text">{{ form.content.help_text }}</p>
+        {% if form.content.errors %}<p style="color:#ef4444;font-size:.85rem;">{{ form.content.errors }}</p>{% endif %}
+      </div>
+
+      <div class="form-buttons">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i>
+          {% if is_edit %}{% trans "Änderungen speichern" %}{% else %}{% trans "Als Entwurf speichern" %}{% endif %}
+        </button>
+        <a href="{% url 'newsletter_list' %}" class="btn btn-outline">
+          <i class="fas fa-times"></i> {% trans "Abbrechen" %}
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

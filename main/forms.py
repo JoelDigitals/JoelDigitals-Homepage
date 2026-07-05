@@ -30,6 +30,35 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
+from ckeditor.widgets import CKEditorWidget
+
+
+class NewsletterForm(forms.ModelForm):
+    content = forms.CharField(
+        label="Inhalt",
+        widget=CKEditorWidget(config_name='default'),
+        help_text="Verwende den Editor zum Formatieren. Bilder über ibb.co hochladen und den Direktlink einfügen."
+    )
+
+    class Meta:
+        from .models import Newsletter
+        model = Newsletter
+        fields = ("title", "subject", "subtitle", "content")
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-input", "placeholder": "z.B. „Juli-Newsletter 2026“"}),
+            "subject": forms.TextInput(attrs={"class": "form-input", "placeholder": "z.B. „Neue Produkte & exklusive Angebote“"}),
+            "subtitle": forms.TextInput(attrs={"class": "form-input", "placeholder": "z.B. „Deine monatliche Zusammenfassung“"}),
+        }
+        labels = {
+            "title": "Interner Titel",
+            "subject": "E-Mail-Betreff",
+            "subtitle": "Untertitel (optional)",
+        }
+        help_texts = {
+            "title": "Wird nur intern angezeigt, nicht in der E-Mail",
+        }
+
+
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
@@ -60,6 +89,7 @@ class RegisterForm(UserCreationForm):
 
     accept_marketing = forms.BooleanField(
         required=False,
+        initial=True,
         label=_("I would like to receive marketing emails (optional)")
     )
 

@@ -21,6 +21,17 @@ urlpatterns = [
     path('profile/delete-account/', views.delete_account, name='delete_account'),
     path('profile/app-permissions/', views.app_permissions, name='app_permissions'),
     path('profile/app-permissions/revoke/<int:auth_id>/', views.revoke_app_permission, name='revoke_app_permission'),
+    path('profile/marketing-toggle/', views.marketing_toggle, name='marketing_toggle'),
+
+    path('unsubscribe/<uuid:token>/', views.unsubscribe_view, name='unsubscribe'),
+
+    # Newsletter Admin
+    path('dashboard/admin/newsletter/', views.newsletter_list, name='newsletter_list'),
+    path('dashboard/admin/newsletter/create/', views.newsletter_create, name='newsletter_create'),
+    path('dashboard/admin/newsletter/<int:newsletter_id>/edit/', views.newsletter_edit, name='newsletter_edit'),
+    path('dashboard/admin/newsletter/<int:newsletter_id>/preview/', views.newsletter_preview, name='newsletter_preview'),
+    path('dashboard/admin/newsletter/<int:newsletter_id>/send/', views.newsletter_send, name='newsletter_send'),
+    path('dashboard/admin/newsletter/<int:newsletter_id>/delete/', views.newsletter_delete, name='newsletter_delete'),
 
     path('support/', views.support_view, name='support'),
 

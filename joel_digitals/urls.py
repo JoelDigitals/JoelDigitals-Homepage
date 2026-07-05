@@ -6,6 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 from django.conf.urls.i18n import i18n_patterns
+from django.views.static import serve as static_serve
 from django.contrib.sitemaps.views import sitemap
 from main.sitemaps import StaticViewSitemap, BlogSitemap, LandingPageSitemap, ShopAppSitemap, WikiSitemap
 from main import views as main_views  # ← WICHTIG: Import hinzufügen
@@ -42,7 +43,18 @@ urlpatterns = [
     # handelt. Innerhalb von i18n_patterns wuerde jede Anfrage ohne /de/-Praefix
     # per 302 umgeleitet statt direkt beantwortet zu werden.
     path('api/autoupdate/', include('autoupdate.urls')),
-    
+
+    # Downloadbare Update-Pakete: django.conf.urls.static.static() dient nur
+    # im DEBUG-Modus, wird also in Produktion (DEBUG=False) NICHT registriert.
+    # Der JDS-Secure-Client braucht diese Downloads aber auch im Live-Betrieb,
+    # daher hier bewusst und eng auf media/autoupdate/ begrenzt ausliefern
+    # (nicht das komplette MEDIA_ROOT), unabhaengig vom DEBUG-Wert.
+    path(
+        'media/autoupdate/<path:path>',
+        static_serve,
+        {'document_root': str(settings.MEDIA_ROOT / 'autoupdate')},
+    ),
+
     # ==================== SSO URLs (OHNE i18n) ===================
     # ============================================================
 ]

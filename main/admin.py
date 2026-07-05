@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TeamMember, OpeningHour, SpecialOpeningHour, SSOClient_Authorization, SSOClient, SSOSession, FAQ, SSOAuthorization, SSOScope
+from .models import TeamMember, OpeningHour, SpecialOpeningHour, SSOClient_Authorization, SSOClient, SSOSession, FAQ, SSOAuthorization, SSOScope, UserProfile, Newsletter
 from django.contrib import admin
 from django.utils.html import format_html
 
@@ -50,3 +50,28 @@ admin.site.register(SSOSession)
 admin.site.register(SSOAuthorization)
 admin.site.register(SSOScope)
 admin.site.register(SSOClient_Authorization)
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "marketing_opt_in", "marketing_token", "phone", "created_at")
+    list_filter = ("marketing_opt_in",)
+    search_fields = ("user__username", "user__email", "phone", "company")
+    readonly_fields = ("marketing_token", "created_at", "updated_at")
+    list_select_related = ("user",)
+
+
+@admin.register(Newsletter)
+class NewsletterAdmin(admin.ModelAdmin):
+    list_display = ("title", "subject", "created_by", "status", "recipient_count", "created_at", "sent_at")
+    list_filter = ("status",)
+    search_fields = ("title", "subject")
+    readonly_fields = ("recipient_count", "sent_at", "created_at", "updated_at")
+    fieldsets = (
+        ("Newsletter", {
+            "fields": ("title", "subject", "subtitle", "content", "created_by")
+        }),
+        ("Status", {
+            "fields": ("status", "recipient_count", "sent_at", "created_at", "updated_at")
+        }),
+    )

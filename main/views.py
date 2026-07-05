@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import TeamMember, OpeningHour, SpecialOpeningHour
+from .models import TeamMember, OpeningHour, SpecialOpeningHour, UserProfile, Newsletter
 from blog.models import BlogPost
 from shop_ourapps.models import App
 from datetime import date, timedelta
@@ -16,6 +16,7 @@ from django.contrib import messages
 from django.utils.translation import get_language
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.utils.http import url_has_allowed_host_and_scheme
 
 from django.shortcuts import render
@@ -32,6 +33,7 @@ from contact.models import SupportTicket, Appointment, SalesEntry
 from shop_ourapps.models import Order, OrderItem, AffiliatePartner
 from django.contrib.auth.models import User
 from blog.models import BlogPost, BlogCategory, BlogViewTracking
+from django.urls import reverse
 
 # Google Analytics Imports
 try:
@@ -774,28 +776,41 @@ def register_view(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            
-            # Newsletter-Anmeldung an euch senden
+            profile, _ = UserProfile.objects.get_or_create(user=user)
+
+            # Marketing-Präferenz speichern
             if form.cleaned_data.get('accept_marketing'):
+                profile.marketing_opt_in = True
+                profile.save(update_fields=['marketing_opt_in'])
+
+                # Willkommens-E-Mail senden
                 try:
-                    send_mail(
-                        subject=f'Neue Newsletter-Anmeldung: {user.username}',
-                        message=f'''
-Neue Newsletter-Anmeldung:
+                    from django.template.loader import render_to_string
+                    from django.core.mail import EmailMultiAlternatives
+                    from django.utils.html import strip_tags
 
-Username: {user.username}
-Email: {user.email}
-Datum: {user.date_joined.strftime("%d.%m.%Y %H:%M")}
-
-Der Benutzer hat sich für Marketing-E-Mails angemeldet.
-                        ''',
+                    site_url = 'https://joel-digitals.com'
+                    html_content = render_to_string('emails/welcome.html', {
+                        'username': user.username,
+                        'site_url': site_url,
+                        'author_name': 'Joel Nicolay',
+                        'author_image_url': 'https://i.ibb.co/gZ3fRFfP/1.png',
+                        'unsubscribe_url': request.build_absolute_uri(
+                            reverse('unsubscribe', kwargs={'token': profile.marketing_token})
+                        ),
+                    })
+                    text_content = strip_tags(html_content)
+                    email = EmailMultiAlternatives(
+                        subject='Willkommen bei Joel Digitals!',
+                        body=text_content,
                         from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=["j-nicolay@joel-digitals.com"],  # Eure E-Mail-Adresse
-                        fail_silently=False,
+                        to=[user.email],
                     )
+                    email.attach_alternative(html_content, 'text/html')
+                    email.send(fail_silently=False)
                 except Exception as e:
-                    print(f"Newsletter-Benachrichtigung konnte nicht gesendet werden: {e}")
-            
+                    print(f"Willkommens-E-Mail konnte nicht gesendet werden: {e}")
+
             messages.success(
                 request,
                 _("Registration successful. You can now log in.")
@@ -1313,9 +1328,8 @@ def profile_view(request):
         'wallet_balance': getattr(request.user, 'wallet_balance', 0.00),
     }
     
-    # Optional: Zusätzliche Informationen aus UserProfile laden
-    if hasattr(request.user, 'userprofile'):
-        context['profile'] = request.user.userprofile
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    context['profile'] = profile
     
     return render(request, 'profile/profile.html', context)
 
@@ -1347,16 +1361,19 @@ def profile_edit(request):
                 
                 user.save()
                 
-                # Optional: Zusätzliche Profilfelder (UserProfile Model)
-                if hasattr(user, 'userprofile'):
-                    profile = user.userprofile
-                    profile.phone = request.POST.get('phone', '').strip()
-                    profile.address = request.POST.get('address', '').strip()
-                    profile.city = request.POST.get('city', '').strip()
-                    profile.postal_code = request.POST.get('postal_code', '').strip()
-                    profile.country = request.POST.get('country', '').strip()
-                    profile.company = request.POST.get('company', '').strip()
-                    profile.save()
+                # Zusätzliche Profilfelder (UserProfile Model)
+                profile = user.userprofile if hasattr(user, 'userprofile') else UserProfile.objects.get_or_create(user=user)[0]
+                profile.phone = request.POST.get('phone', '').strip()
+                profile.address = request.POST.get('address', '').strip()
+                profile.city = request.POST.get('city', '').strip()
+                profile.postal_code = request.POST.get('postal_code', '').strip()
+                profile.country = request.POST.get('country', '').strip()
+                profile.company = request.POST.get('company', '').strip()
+                if 'marketing_opt_in' in request.POST:
+                    profile.marketing_opt_in = True
+                else:
+                    profile.marketing_opt_in = False
+                profile.save()
                 
                 messages.success(request, 'Profil erfolgreich aktualisiert!')
                 return redirect('profile_view')
@@ -1370,8 +1387,8 @@ def profile_edit(request):
         'wallet_balance': getattr(request.user, 'wallet_balance', 0.00),
     }
     
-    if hasattr(request.user, 'userprofile'):
-        context['profile'] = request.user.userprofile
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    context['profile'] = profile
     
     return render(request, 'profile/profile_edit.html', context)
 
@@ -1535,3 +1552,223 @@ def support_view(request):
         'page_title': 'Support - Joel Digitals',
     }
     return render(request, 'support.html', context)
+
+
+def unsubscribe_view(request, token):
+    profile = None
+    success = False
+
+    try:
+        profile = UserProfile.objects.get(marketing_token=token)
+    except UserProfile.DoesNotExist:
+        pass
+
+    if request.method == 'POST':
+        try:
+            profile = UserProfile.objects.get(marketing_token=token)
+            profile.marketing_opt_in = False
+            profile.save(update_fields=['marketing_opt_in'])
+            profile.regenerate_token()
+            success = True
+        except UserProfile.DoesNotExist:
+            pass
+
+    return render(request, 'main/unsubscribe.html', {
+        'profile': profile,
+        'success': success,
+    })
+
+
+@require_POST
+@login_required
+def marketing_toggle(request):
+    profile = request.user.userprofile if hasattr(request.user, 'userprofile') else UserProfile.objects.get_or_create(user=request.user)[0]
+    action = request.POST.get('action')
+
+    if action == 'subscribe':
+        profile.marketing_opt_in = True
+        messages.success(request, _('Du erhältst jetzt unsere Marketing-E-Mails.'))
+    elif action == 'unsubscribe':
+        profile.marketing_opt_in = False
+        messages.success(request, _('Du wurdest vom Newsletter abgemeldet.'))
+
+        profile.save(update_fields=['marketing_opt_in'])
+    return redirect('profile_edit')
+
+
+# ─── Newsletter Admin ────────────────────────────────────────────
+
+@login_required
+def newsletter_list(request):
+    if "Admin" not in [g.name for g in request.user.groups.all()] and not request.user.is_superuser:
+        messages.error(request, "Zugriff verweigert.")
+        return redirect('home')
+    newsletters = Newsletter.objects.all()
+    total_opt_in = UserProfile.objects.filter(marketing_opt_in=True).count()
+    return render(request, 'main/newsletter_list.html', {
+        'newsletters': newsletters,
+        'total_opt_in': total_opt_in,
+        'user_groups': [g.name for g in request.user.groups.all()],
+    })
+
+
+@login_required
+def newsletter_create(request):
+    if "Admin" not in [g.name for g in request.user.groups.all()] and not request.user.is_superuser:
+        messages.error(request, "Zugriff verweigert.")
+        return redirect('home')
+
+    from .forms import NewsletterForm
+
+    if request.method == 'POST':
+        form = NewsletterForm(request.POST)
+        if form.is_valid():
+            newsletter = form.save(commit=False)
+            newsletter.status = 'draft'
+            newsletter.created_by = request.user
+            newsletter.save()
+            messages.success(request, f"Newsletter „{newsletter.title}“ wurde als Entwurf gespeichert.")
+            return redirect('newsletter_list')
+    else:
+        form = NewsletterForm()
+
+    return render(request, 'main/newsletter_form.html', {
+        'form': form,
+        'is_edit': False,
+        'user_groups': [g.name for g in request.user.groups.all()],
+    })
+
+
+@login_required
+def newsletter_edit(request, newsletter_id):
+    if "Admin" not in [g.name for g in request.user.groups.all()] and not request.user.is_superuser:
+        messages.error(request, "Zugriff verweigert.")
+        return redirect('home')
+
+    newsletter = get_object_or_404(Newsletter, id=newsletter_id)
+
+    if newsletter.status == 'sent':
+        messages.warning(request, "Bereits gesendete Newsletter können nicht bearbeitet werden.")
+        return redirect('newsletter_list')
+
+    from .forms import NewsletterForm
+
+    if request.method == 'POST':
+        form = NewsletterForm(request.POST, instance=newsletter)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Newsletter „{newsletter.title}“ wurde aktualisiert.")
+            return redirect('newsletter_list')
+    else:
+        form = NewsletterForm(instance=newsletter)
+
+    return render(request, 'main/newsletter_form.html', {
+        'form': form,
+        'is_edit': True,
+        'newsletter': newsletter,
+        'user_groups': [g.name for g in request.user.groups.all()],
+    })
+
+
+@login_required
+def newsletter_preview(request, newsletter_id):
+    if "Admin" not in [g.name for g in request.user.groups.all()] and not request.user.is_superuser:
+        messages.error(request, "Zugriff verweigert.")
+        return redirect('home')
+    newsletter = get_object_or_404(Newsletter, id=newsletter_id)
+    return render(request, 'main/newsletter_preview.html', {
+        'newsletter': newsletter,
+        'user_groups': [g.name for g in request.user.groups.all()],
+    })
+
+
+@require_POST
+@login_required
+def newsletter_send(request, newsletter_id):
+    if "Admin" not in [g.name for g in request.user.groups.all()] and not request.user.is_superuser:
+        messages.error(request, "Zugriff verweigert.")
+        return redirect('home')
+
+    newsletter = get_object_or_404(Newsletter, id=newsletter_id)
+
+    if newsletter.status == 'sent':
+        messages.warning(request, f"Newsletter „{newsletter.title}“ wurde bereits gesendet.")
+        return redirect('newsletter_list')
+
+    from django.template.loader import render_to_string
+    from django.core.mail import EmailMultiAlternatives
+    from django.utils.html import strip_tags
+    from django.conf import settings
+    from django.urls import reverse
+
+    recipients = UserProfile.objects.filter(marketing_opt_in=True)
+    count = recipients.count()
+
+    if count == 0:
+        messages.warning(request, "Keine Empfänger mit Marketing-Opt-In gefunden.")
+        return redirect('newsletter_list')
+
+    site_url = 'https://joel-digitals.com'
+    author_name = newsletter.created_by.get_full_name() or newsletter.created_by.username if newsletter.created_by else 'Joel Digitals'
+
+    # Author-Bild je nach Ersteller
+    author_image_url = None
+    if newsletter.created_by:
+        name_lower = (newsletter.created_by.get_full_name() or newsletter.created_by.username).lower()
+        if 'joel' in name_lower or 'nicolay' in name_lower:
+            author_image_url = 'https://i.ibb.co/gZ3fRFfP/1.png'
+        elif 'ayuki' in name_lower:
+            author_image_url = 'https://i.ibb.co/8LhbByJY/2.png'
+    if not author_image_url:
+        author_image_url = f'https://ui-avatars.com/api/?name={author_name}&background=0044cc&color=fff&size=96&bold=true'
+
+    sent = 0
+    errors = 0
+
+    for profile in recipients:
+        try:
+            unsubscribe_url = f'{site_url}{reverse("unsubscribe", kwargs={"token": profile.marketing_token})}'
+            html_content = render_to_string('emails/marketing.html', {
+                'subject': newsletter.subject,
+                'subtitle': newsletter.subtitle,
+                'content': newsletter.content,
+                'site_url': site_url,
+                'unsubscribe_url': unsubscribe_url,
+                'author_name': author_name,
+                'author_image_url': author_image_url,
+            })
+            text_content = strip_tags(html_content)
+
+            email = EmailMultiAlternatives(
+                subject=newsletter.subject,
+                body=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[profile.user.email],
+            )
+            email.attach_alternative(html_content, 'text/html')
+            email.send(fail_silently=False)
+            sent += 1
+        except Exception:
+            errors += 1
+
+    from django.utils import timezone
+    newsletter.status = 'sent'
+    newsletter.recipient_count = sent
+    newsletter.sent_at = timezone.now()
+    newsletter.save(update_fields=['status', 'recipient_count', 'sent_at'])
+
+    messages.success(request, f"Newsletter „{newsletter.title}“ wurde an {sent} Empfänger gesendet. {errors} Fehler.")
+    return redirect('newsletter_list')
+
+
+@require_POST
+@login_required
+def newsletter_delete(request, newsletter_id):
+    if "Admin" not in [g.name for g in request.user.groups.all()] and not request.user.is_superuser:
+        messages.error(request, "Zugriff verweigert.")
+        return redirect('home')
+    newsletter = get_object_or_404(Newsletter, id=newsletter_id)
+    title = newsletter.title
+    newsletter.delete()
+    messages.success(request, f"Newsletter „{title}“ wurde gelöscht.")
+    return redirect('newsletter_list')

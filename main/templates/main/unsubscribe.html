@@ -1,0 +1,135 @@
+{% extends 'base_home.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Newsletter abmelden" %} - Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .unsubscribe-container {
+    max-width: 500px;
+    margin: 4rem auto;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .unsubscribe-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .logo-img {
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: #999;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+
+  .btn-danger {
+    background: #dc3545;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 68, 204, 0.4);
+  }
+
+  .success-icon {
+    font-size: 4rem;
+    color: #28a745;
+    margin-bottom: 1rem;
+  }
+
+  .error-icon {
+    font-size: 4rem;
+    color: #dc3545;
+    margin-bottom: 1rem;
+  }
+
+  .profile-email {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+</style>
+
+<div class="unsubscribe-container">
+  <div class="unsubscribe-card">
+    <img src="https://i.ibb.co/XfqjK2c7/dddffead0cc3.png" alt="Joel Digitals" class="logo-img">
+
+    {% if success %}
+      <div class="success-icon">✓</div>
+      <h1>{% trans "Erfolgreich abgemeldet" %}</h1>
+      <p>{% trans "Du wurdest von unserem Newsletter abgemeldet. Du wirst keine weiteren Marketing-E-Mails von uns erhalten." %}</p>
+      <a href="{% url 'home' %}" class="btn btn-primary">
+        <i class="fas fa-home"></i> {% trans "Zur Startseite" %}
+      </a>
+
+    {% elif profile %}
+      <h1>{% trans "Newsletter abmelden" %}</h1>
+      <p class="profile-email">{{ profile.user.email }}</p>
+      <p>{% trans "Möchtest du dich wirklich von unserem Newsletter abmelden?" %}</p>
+
+      <form method="post" action="{% url 'unsubscribe' token=profile.marketing_token %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+          <i class="fas fa-times"></i> {% trans "Ja, abmelden" %}
+        </button>
+      </form>
+
+    {% else %}
+      <div class="error-icon">!</div>
+      <h1>{% trans "Ungültiger Link" %}</h1>
+      <p>{% trans "Dieser Abmeldelink ist ungültig oder abgelaufen. Bitte kontaktiere uns, wenn du Hilfe benötigst." %}</p>
+      <a href="{% url 'home' %}" class="btn btn-primary">
+        <i class="fas fa-home"></i> {% trans "Zur Startseite" %}
+      </a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

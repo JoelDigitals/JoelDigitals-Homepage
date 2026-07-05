@@ -1,0 +1,108 @@
+{% extends 'base_home.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Vorschau" %}: {{ newsletter.title }} – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .nl-wrap { max-width:900px; margin:2rem auto; padding:0 1rem; }
+  .nl-hdr { background:linear-gradient(135deg,var(--primary),#0066ff); border-radius:16px 16px 0 0; padding:2rem; color:white; position:relative; overflow:hidden; }
+  .nl-hdr::before { content:''; position:absolute; top:-50%; right:-50%; width:200%; height:200%; background:radial-gradient(circle,rgba(255,255,255,.08) 0%,transparent 70%); }
+  .nl-hdr h1 { margin:0; font-size:1.8rem; display:flex; align-items:center; gap:.75rem; position:relative; z-index:1; }
+  .nl-hdr p { margin:.3rem 0 0; opacity:.85; position:relative; z-index:1; }
+
+  .nl-body { background:var(--surface); border-radius:0 0 16px 16px; padding:2rem; box-shadow:0 4px 12px rgba(0,0,0,.3); }
+
+  .info-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:1.5rem; padding:1rem; background:var(--bg); border-radius:8px; }
+  .info-item label { display:block; font-size:.7rem; text-transform:uppercase; letter-spacing:.5px; color:#888; margin-bottom:.25rem; }
+  .info-item span { font-size:.9rem; color:var(--text); font-weight:600; }
+
+  .email-frame { background:#0a0a0f; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:1.5rem; }
+  .email-frame-header { background:linear-gradient(135deg,#0044cc,#0066ff); padding:1.5rem; text-align:center; }
+  .email-frame-header img { width:50px; height:50px; border-radius:50%; border:2px solid rgba(255,255,255,.3); }
+  .email-frame-header h2 { color:white; margin:.5rem 0 0; font-size:1.1rem; }
+  .email-frame-header p { color:rgba(255,255,255,.8); margin:.25rem 0 0; font-size:.85rem; }
+  .email-frame-body { padding:1.5rem; color:#e0e0e0; font-size:.9rem; line-height:1.7; }
+  .email-frame-body h2 { color:white; font-size:1.1rem; margin:0 0 .5rem; }
+  .email-frame-body h3 { color:white; font-size:.95rem; margin:1rem 0 .5rem; }
+  .email-frame-body p { margin:0 0 .5rem; }
+  .email-frame-body ul { margin:0 0 .5rem; padding-left:1.5rem; }
+  .email-frame-body li { margin-bottom:.25rem; }
+
+  .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.8rem 1.5rem; border-radius:8px; font-size:.95rem; font-weight:600; border:none; cursor:pointer; text-decoration:none; transition:all .2s; font-family:inherit; }
+  .btn-primary { background:var(--primary); color:white; }
+  .btn-primary:hover { background:var(--primary-hover); transform:translateY(-2px); }
+  .btn-success { background:#4CAF50; color:white; }
+  .btn-success:hover { background:#388E3C; transform:translateY(-2px); }
+  .btn-outline { background:transparent; color:var(--text); border:2px solid var(--border); }
+  .btn-outline:hover { border-color:var(--primary); color:var(--primary); }
+  .btn-danger { background:#ef4444; color:white; }
+  .btn-danger:hover { background:#dc2626; }
+
+  .form-buttons { display:flex; gap:1rem; margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--border); flex-wrap:wrap; }
+</style>
+
+<div class="nl-wrap">
+  <div class="nl-hdr">
+    <h1><i class="fas fa-eye"></i> {% trans "Newsletter-Vorschau" %}</h1>
+    <p>{{ newsletter.title }}</p>
+  </div>
+
+  <div class="nl-body">
+    <div class="info-grid">
+      <div class="info-item">
+        <label>{% trans "Status" %}</label>
+        <span>{% if newsletter.status == 'draft' %}{% trans "Entwurf" %}{% else %}{% trans "Gesendet" %}{% endif %}</span>
+      </div>
+      <div class="info-item">
+        <label>{% trans "Betreff" %}</label>
+        <span>{{ newsletter.subject }}</span>
+      </div>
+      {% if newsletter.subtitle %}
+      <div class="info-item">
+        <label>{% trans "Untertitel" %}</label>
+        <span>{{ newsletter.subtitle }}</span>
+      </div>
+      {% endif %}
+      <div class="info-item">
+        <label>{% trans "Erstellt" %}</label>
+        <span>{{ newsletter.created_at|date:"d.m.Y H:i" }}</span>
+      </div>
+    </div>
+
+    <h3 style="margin:0 0 .75rem;font-size:.9rem;color:#888;">{% trans "E-Mail-Vorschau (wie sie beim Empfänger ankommt)" %}</h3>
+
+    <div class="email-frame">
+      <div class="email-frame-header">
+        <img src="https://i.ibb.co/XfqjK2c7/dddffead0cc3.png" alt="Joel Digitals">
+        <h2>{{ newsletter.subject }}</h2>
+        {% if newsletter.subtitle %}<p>{{ newsletter.subtitle }}</p>{% endif %}
+      </div>
+      <div class="email-frame-body">
+        {{ newsletter.content|safe }}
+      </div>
+    </div>
+
+    <div class="form-buttons">
+      <a href="{% url 'newsletter_list' %}" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i> {% trans "Zurück zur Übersicht" %}
+      </a>
+      {% if newsletter.status == 'draft' %}
+      <form method="post" action="{% url 'newsletter_send' newsletter.id %}" onsubmit="return confirm('{% trans "Newsletter wirklich an alle Abonnenten senden?" %}')" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">
+          <i class="fas fa-paper-plane"></i> {% trans "Newsletter jetzt senden" %}
+        </button>
+      </form>
+      <form method="post" action="{% url 'newsletter_delete' newsletter.id %}" onsubmit="return confirm('{% trans "Newsletter endgültig löschen?" %}')" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+          <i class="fas fa-trash"></i> {% trans "Löschen" %}
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

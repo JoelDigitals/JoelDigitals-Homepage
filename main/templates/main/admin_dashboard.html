@@ -172,6 +172,7 @@
         <div class="quick-grid">
           <a href="/blog/admin-blog/" class="quick-btn"><i class="fas fa-blog"></i> {% trans "Blog" %}</a>
           <a href="/blog/create/" class="quick-btn"><i class="fas fa-plus"></i> {% trans "New Post" %}</a>
+          <a href="{% url 'newsletter_list' %}" class="quick-btn new"><i class="fas fa-bullhorn"></i> {% trans "Newsletter" %}</a>
         </div>
         {% endif %}
         {% if "Selling" in user_groups %}

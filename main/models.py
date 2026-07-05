@@ -128,6 +128,58 @@ from django.db import models
 from shop_ourapps.models import App
 from django.contrib.auth.models import User
 import secrets
+import uuid
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
+    # Profilfelder
+    phone = models.CharField("Telefon", max_length=50, blank=True)
+    address = models.CharField("Adresse", max_length=255, blank=True)
+    city = models.CharField("Stadt", max_length=100, blank=True)
+    postal_code = models.CharField("PLZ", max_length=20, blank=True)
+    country = models.CharField("Land", max_length=100, blank=True)
+    company = models.CharField("Firma", max_length=255, blank=True)
+    # Marketing
+    marketing_opt_in = models.BooleanField("Marketing erlaubt", default=False)
+    marketing_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Benutzerprofil"
+        verbose_name_plural = "Benutzerprofile"
+
+    def __str__(self):
+        return f"{self.user.username} - Marketing: {'Ja' if self.marketing_opt_in else 'Nein'}"
+
+    def regenerate_token(self):
+        self.marketing_token = uuid.uuid4()
+        self.save(update_fields=['marketing_token'])
+
+class Newsletter(models.Model):
+    title = models.CharField("Titel", max_length=255)
+    subject = models.CharField("E-Mail-Betreff", max_length=255)
+    subtitle = models.CharField("Untertitel", max_length=255, blank=True)
+    content = models.TextField("HTML-Inhalt", help_text="HTML-formatierten Inhalt eingeben. Verwende <h2>, <p>, <ul>, <li> etc.")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Erstellt von")
+    status = models.CharField("Status", max_length=20, choices=[
+        ('draft', 'Entwurf'),
+        ('sent', 'Gesendet'),
+    ], default='draft')
+    recipient_count = models.PositiveIntegerField("Empfängerzahl", default=0, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    sent_at = models.DateTimeField(null=True, blank=True, editable=False)
+
+    class Meta:
+        verbose_name = "Newsletter"
+        verbose_name_plural = "Newsletter"
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return self.title
+
 
 class SSOScope(models.Model):
     """Verfügbare Berechtigungen die Apps anfragen können"""

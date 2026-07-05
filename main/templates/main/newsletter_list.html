@@ -1,0 +1,143 @@
+{% extends 'base_home.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Newsletter verwalten – Joel Digitals{% endblock %}
+
+{% block content %}
+<style>
+  .nl-wrap { max-width:1200px; margin:2rem auto; padding:0 1rem; }
+  .nl-hdr { background:linear-gradient(135deg,var(--primary),#0066ff); border-radius:16px; padding:2rem; color:white; margin-bottom:1.5rem; position:relative; overflow:hidden; }
+  .nl-hdr::before { content:''; position:absolute; top:-50%; right:-50%; width:200%; height:200%; background:radial-gradient(circle,rgba(255,255,255,.08) 0%,transparent 70%); }
+  .nl-hdr h1 { margin:0; font-size:1.8rem; display:flex; align-items:center; gap:.75rem; position:relative; z-index:1; }
+  .nl-hdr p { margin:.3rem 0 0; opacity:.85; font-size:.9rem; position:relative; z-index:1; }
+  .nl-hdr .stat-badge { display:inline-flex; align-items:center; gap:.5rem; background:rgba(255,255,255,.15); padding:.4rem 1rem; border-radius:99px; font-size:.8rem; margin-top:.75rem; position:relative; z-index:1; }
+
+  .panel { background:var(--surface); border-radius:14px; padding:1.25rem; border:2px solid var(--border); margin-bottom:1.5rem; }
+  .panel h3 { margin:0 0 1rem; font-size:1rem; display:flex; align-items:center; gap:.5rem; }
+
+  .nl-table { width:100%; border-collapse:collapse; }
+  .nl-table th { text-align:left; padding:.75rem .5rem; font-size:.75rem; text-transform:uppercase; letter-spacing:.5px; color:#888; border-bottom:2px solid var(--border); }
+  .nl-table td { padding:.75rem .5rem; font-size:.85rem; color:var(--text); border-bottom:1px solid var(--border); vertical-align:middle; }
+  .nl-table tr:hover td { background:rgba(0,68,204,.03); }
+
+  .status-badge { display:inline-flex; align-items:center; gap:.3rem; padding:.2rem .6rem; border-radius:99px; font-size:.75rem; font-weight:600; }
+  .status-draft { background:rgba(245,158,11,.15); color:#f59e0b; }
+  .status-sent { background:rgba(76,175,80,.15); color:#4CAF50; }
+
+  .btn { display:inline-flex; align-items:center; gap:.4rem; padding:.45rem .85rem; border-radius:8px; font-size:.8rem; font-weight:600; border:none; cursor:pointer; text-decoration:none; transition:all .2s; font-family:inherit; }
+  .btn-primary { background:var(--primary); color:white; }
+  .btn-primary:hover { background:var(--primary-hover); transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,68,204,.3); }
+  .btn-success { background:#4CAF50; color:white; }
+  .btn-success:hover { background:#388E3C; transform:translateY(-1px); }
+  .btn-danger { background:#ef4444; color:white; }
+  .btn-danger:hover { background:#dc2626; transform:translateY(-1px); }
+  .btn-outline { background:transparent; color:var(--text); border:1px solid var(--border); }
+  .btn-outline:hover { border-color:var(--primary); color:var(--primary); }
+  .btn-sm { padding:.3rem .55rem; font-size:.75rem; }
+  .btn:disabled { opacity:.5; cursor:not-allowed; transform:none !important; }
+
+  .empty-state { text-align:center; padding:3rem 1rem; color:#888; }
+  .empty-state i { font-size:3rem; margin-bottom:1rem; opacity:.3; }
+
+  .quick-actions { display:flex; gap:.5rem; flex-wrap:wrap; }
+</style>
+
+<div class="nl-wrap">
+  <div class="nl-hdr">
+    <h1><i class="fas fa-bullhorn"></i> {% trans "Newsletter verwalten" %}</h1>
+    <p>{% trans "Erstelle und versende Marketing-E-Mails an alle Abonnenten" %}</p>
+    <div class="stat-badge"><i class="fas fa-users"></i> {{ total_opt_in }} {% trans "Abonnenten" %}</div>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div style="padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-weight:500;background:{% if message.tags == 'success' %}rgba(76,175,80,.15){% else %}rgba(245,158,11,.15){% endif %};color:{% if message.tags == 'success' %}#4CAF50{% else %}#f59e0b{% endif %};">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="quick-actions" style="margin-bottom:1rem;">
+    <a href="{% url 'newsletter_create' %}" class="btn btn-primary">
+      <i class="fas fa-plus"></i> {% trans "Neuen Newsletter erstellen" %}
+    </a>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">
+      <i class="fas fa-arrow-left"></i> {% trans "Zurück zum Dashboard" %}
+    </a>
+  </div>
+
+  <div class="panel">
+    {% if newsletters %}
+    <table class="nl-table">
+      <thead>
+        <tr>
+          <th>{% trans "Titel" %}</th>
+          <th>{% trans "Betreff" %}</th>
+          <th>{% trans "Status" %}</th>
+          <th>{% trans "Empfänger" %}</th>
+          <th>{% trans "Erstellt" %}</th>
+          <th>{% trans "Gesendet" %}</th>
+          <th style="text-align:right;">{% trans "Aktionen" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for nl in newsletters %}
+        <tr>
+          <td style="font-weight:600;">{{ nl.title }}</td>
+          <td style="color:#888;">{{ nl.subject|truncatechars:40 }}</td>
+          <td>
+            {% if nl.status == 'draft' %}
+              <span class="status-badge status-draft"><i class="fas fa-pen"></i> {% trans "Entwurf" %}</span>
+            {% else %}
+              <span class="status-badge status-sent"><i class="fas fa-check"></i> {% trans "Gesendet" %}</span>
+            {% endif %}
+          </td>
+          <td>{% if nl.status == 'sent' %}{{ nl.recipient_count }}{% else %}<span style="color:#888;">–</span>{% endif %}</td>
+          <td style="color:#888;">{{ nl.created_at|date:"d.m.Y H:i" }}</td>
+          <td style="color:#888;">{% if nl.sent_at %}{{ nl.sent_at|date:"d.m.Y H:i" }}{% else %}<span style="color:#888;">–</span>{% endif %}</td>
+          <td style="text-align:right;">
+            <div style="display:flex;gap:.3rem;justify-content:flex-end;">
+              <a href="{% url 'newsletter_preview' nl.id %}" class="btn btn-sm btn-outline" title="{% trans 'Vorschau' %}">
+                <i class="fas fa-eye"></i>
+              </a>
+              {% if nl.status == 'draft' %}
+                <a href="{% url 'newsletter_edit' nl.id %}" class="btn btn-sm btn-outline" title="{% trans 'Bearbeiten' %}">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <form method="post" action="{% url 'newsletter_send' nl.id %}" onsubmit="return confirm('{% trans "Newsletter wirklich an alle Abonnenten senden?" %}')" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-success" title="{% trans 'Senden' %}">
+                    <i class="fas fa-paper-plane"></i>
+                  </button>
+                </form>
+              {% else %}
+                <button class="btn btn-sm btn-success" disabled title="{% trans 'Bereits gesendet' %}">
+                  <i class="fas fa-check"></i>
+                </button>
+              {% endif %}
+              <form method="post" action="{% url 'newsletter_delete' nl.id %}" onsubmit="return confirm('{% trans "Newsletter endgültig löschen?" %}')" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger" title="{% trans 'Löschen' %}">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-envelope-open-text"></i>
+      <h3 style="margin-bottom:.5rem;">{% trans "Noch keine Newsletter" %}</h3>
+      <p style="margin-bottom:1.5rem;">{% trans "Erstelle deinen ersten Newsletter, um mit deinen Abonnenten zu kommunizieren." %}</p>
+      <a href="{% url 'newsletter_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> {% trans "Ersten Newsletter erstellen" %}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
