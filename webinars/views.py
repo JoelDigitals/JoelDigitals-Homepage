@@ -49,7 +49,6 @@ def webinar_detail(request, slug):
     })
 
 
-@login_required
 def webinar_register(request, slug):
     webinar = get_object_or_404(Webinar, slug=slug, is_active=True)
 
@@ -63,49 +62,87 @@ def webinar_register(request, slug):
                 messages.error(request, _("Der Anmeldezeitraum für dieses Webinar ist vorbei."))
             return redirect('webinars:webinar_detail', slug=slug)
 
-        existing = WebinarRegistration.objects.filter(
-            webinar=webinar, user=request.user
-        ).first()
-
-        if existing:
-            if existing.status == 'cancelled':
-                existing.status = 'registered'
-                existing.save()
-                messages.success(request, _("Deine Anmeldung wurde reaktiviert."))
-            else:
-                messages.info(request, _("Du bist bereits für dieses Webinar angemeldet."))
-        elif webinar.is_full:
+        if webinar.is_full:
             messages.error(request, _("Dieses Webinar ist bereits ausgebucht."))
+            return redirect('webinars:webinar_detail', slug=slug)
+
+        if request.user.is_authenticated:
+            return _register_authenticated(request, webinar)
         else:
-            WebinarRegistration.objects.create(
-                webinar=webinar,
-                user=request.user,
-            )
-            messages.success(request, _("Du wurde erfolgreich für das Webinar angemeldet!"))
-
-            # Bestätigungsmail senden (HTML)
-            try:
-                from django.core.mail import EmailMultiAlternatives
-                from django.template.loader import render_to_string
-                ctx = {
-                    'user': request.user,
-                    'webinar': webinar,
-                }
-                html = render_to_string('emails/webinar_confirmation.html', ctx)
-                msg = EmailMultiAlternatives(
-                    subject=f"Anmeldung bestätigt: {webinar.title}",
-                    body=f"Hallo {request.user.first_name or request.user.username},\n\ndeine Anmeldung für '{webinar.title}' ist eingegangen.\n\nTermin: {webinar.date_time.strftime('%d.%m.%Y um %H:%M')} Uhr\nDauer: ca. {webinar.duration_minutes} Minuten\n\nDer Zugangslink wird dir rechtzeitig vor dem Webinar per E-Mail zugesandt.\n\nViele Grüße,\nDein Joel Digitals Team",
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[request.user.email],
-                )
-                msg.attach_alternative(html, "text/html")
-                msg.send()
-            except Exception:
-                pass
-
-        return redirect('webinars:webinar_detail', slug=slug)
+            return _register_guest(request, webinar)
 
     return redirect('webinars:webinar_detail', slug=slug)
+
+
+def _register_authenticated(request, webinar):
+    existing = WebinarRegistration.objects.filter(
+        webinar=webinar, user=request.user
+    ).first()
+
+    if existing:
+        if existing.status == 'cancelled':
+            existing.status = 'registered'
+            existing.save()
+            messages.success(request, _("Deine Anmeldung wurde reaktiviert."))
+        else:
+            messages.info(request, _("Du bist bereits für dieses Webinar angemeldet."))
+        _send_confirmation_email(request, webinar, email=request.user.email, name=request.user.first_name or request.user.username)
+        return redirect('webinars:webinar_detail', slug=webinar.slug)
+
+    WebinarRegistration.objects.create(
+        webinar=webinar,
+        user=request.user,
+    )
+    messages.success(request, _("Du wurde erfolgreich für das Webinar angemeldet!"))
+    _send_confirmation_email(request, webinar, email=request.user.email, name=request.user.first_name or request.user.username)
+    return redirect('webinars:webinar_detail', slug=webinar.slug)
+
+
+def _register_guest(request, webinar):
+    guest_email = request.POST.get('email', '').strip()
+    guest_name = request.POST.get('name', '').strip()
+
+    if not guest_email:
+        messages.error(request, _("Bitte gib eine E-Mail-Adresse ein."))
+        return redirect('webinars:webinar_detail', slug=webinar.slug)
+
+    existing = WebinarRegistration.objects.filter(
+        webinar=webinar, guest_email=guest_email
+    ).exclude(status='cancelled').first()
+
+    if existing:
+        messages.info(request, _("Für diese E-Mail-Adresse besteht bereits eine Anmeldung für dieses Webinar."))
+        return redirect('webinars:webinar_detail', slug=webinar.slug)
+
+    WebinarRegistration.objects.create(
+        webinar=webinar,
+        guest_email=guest_email,
+        guest_name=guest_name or 'Gast',
+    )
+    messages.success(request, _("Du wurde erfolgreich für das Webinar angemeldet!"))
+    _send_confirmation_email(request, webinar, email=guest_email, name=guest_name or 'Gast')
+    return redirect('webinars:webinar_detail', slug=webinar.slug)
+
+
+def _send_confirmation_email(request, webinar, email, name):
+    try:
+        from django.core.mail import EmailMultiAlternatives
+        from django.template.loader import render_to_string
+        ctx = {
+            'name': name,
+            'webinar': webinar,
+        }
+        html = render_to_string('emails/webinar_confirmation.html', ctx)
+        msg = EmailMultiAlternatives(
+            subject=f"Anmeldung bestätigt: {webinar.title}",
+            body=f"Hallo {name},\n\ndeine Anmeldung für '{webinar.title}' ist eingegangen.\n\nTermin: {webinar.date_time.strftime('%d.%m.%Y um %H:%M')} Uhr\nDauer: ca. {webinar.duration_minutes} Minuten\n\nDer Zugangslink wird dir rechtzeitig vor dem Webinar per E-Mail zugesandt.\n\nViele Grüße,\nDein Joel Digitals Team",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[email],
+        )
+        msg.attach_alternative(html, "text/html")
+        msg.send()
+    except Exception:
+        pass
 
 
 @login_required

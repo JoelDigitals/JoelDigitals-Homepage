@@ -428,13 +428,17 @@ def admin_dashboard(request):
         sent_count = 0
         for reg in registrations:
             try:
-                ctx = {'user': reg.user, 'webinar': reg.webinar}
+                recipient_email = reg.user.email if reg.user else reg.guest_email
+                recipient_name = reg.user.first_name or reg.user.username if reg.user else (reg.guest_name or 'Gast')
+                if not recipient_email:
+                    continue
+                ctx = {'user': reg.user, 'name': recipient_name, 'webinar': reg.webinar}
                 html = render_to_string('emails/webinar_reminder.html', ctx)
                 msg = EmailMultiAlternatives(
                     subject=f"🔔 Erinnerung: {webinar.title} beginnt bald!",
                     body="",
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[reg.user.email],
+                    to=[recipient_email],
                 )
                 msg.attach_alternative(html, "text/html")
                 msg.send()
@@ -789,7 +793,7 @@ def register_view(request):
                     from django.core.mail import EmailMultiAlternatives
                     from django.utils.html import strip_tags
 
-                    site_url = 'https://joel-digitals.com'
+                    site_url = 'https://joel-digitals.de'
                     html_content = render_to_string('emails/welcome.html', {
                         'username': user.username,
                         'site_url': site_url,
@@ -1708,7 +1712,7 @@ def newsletter_send(request, newsletter_id):
         messages.warning(request, "Keine Empfänger mit Marketing-Opt-In gefunden.")
         return redirect('newsletter_list')
 
-    site_url = 'https://joel-digitals.com'
+    site_url = 'https://joel-digitals.de'
     author_name = newsletter.created_by.get_full_name() or newsletter.created_by.username if newsletter.created_by else 'Joel Digitals'
 
     # Author-Bild je nach Ersteller

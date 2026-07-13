@@ -11,6 +11,7 @@ class Webinar(models.Model):
     description = models.TextField(verbose_name="Beschreibung")
     description_en = models.TextField(blank=True, null=True, verbose_name="Beschreibung (Englisch)")
     image = models.ImageField(upload_to='webinar_images/', null=True, blank=True)
+    image_url = models.URLField(blank=True, verbose_name="Bild-URL (extern)")
     date_time = models.DateTimeField(verbose_name="Datum & Uhrzeit")
     duration_minutes = models.PositiveIntegerField(default=60, verbose_name="Dauer (Minuten)")
     max_participants = models.PositiveIntegerField(default=50, verbose_name="Max. Teilnehmer")
@@ -74,7 +75,9 @@ class WebinarRegistration(models.Model):
     ]
 
     webinar = models.ForeignKey(Webinar, on_delete=models.CASCADE, related_name='registrations')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='webinar_registrations')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name='webinar_registrations')
+    guest_email = models.EmailField(blank=True, verbose_name="Gast-E-Mail")
+    guest_name = models.CharField(max_length=255, blank=True, verbose_name="Gast-Name")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='registered')
     registered_at = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True)
@@ -83,7 +86,8 @@ class WebinarRegistration(models.Model):
     class Meta:
         verbose_name = "Webinar-Anmeldung"
         verbose_name_plural = "Webinar-Anmeldungen"
-        unique_together = ('webinar', 'user')
 
     def __str__(self):
-        return f"{self.user} → {self.webinar.title} ({self.get_status_display()})"
+        if self.user:
+            return f"{self.user} → {self.webinar.title} ({self.get_status_display()})"
+        return f"{self.guest_name or self.guest_email} → {self.webinar.title} ({self.get_status_display()})"

@@ -1,6 +1,8 @@
 {% load i18n %}
 <div class="webinar-card">
-  {% if webinar.image %}
+  {% if webinar.image_url %}
+    <img src="{{ webinar.image_url }}" alt="{{ webinar.title }}" class="webinar-image">
+  {% elif webinar.image %}
     <img src="{{ webinar.image.url }}" alt="{{ webinar.title }}" class="webinar-image">
   {% else %}
     <div class="webinar-image-placeholder" style="background:linear-gradient(135deg,#7c3aed,#6366f1);">

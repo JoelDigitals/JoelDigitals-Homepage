@@ -244,7 +244,9 @@
 
   <div class="webinar-detail-card">
     <div class="webinar-hero">
-      {% if webinar.image %}
+      {% if webinar.image_url %}
+        <img src="{{ webinar.image_url }}" alt="{{ webinar.title }}">
+      {% elif webinar.image %}
         <img src="{{ webinar.image.url }}" alt="{{ webinar.title }}">
       {% else %}
         <div class="webinar-hero-placeholder">
@@ -345,10 +347,21 @@
           {% else %}
             {% if webinar.is_registration_open and not webinar.is_full %}
               <h3>{% trans "Interested? Register now!" %}</h3>
-              <p>{% trans "Please log in to register for this webinar." %}</p>
-              <a href="{% url 'login' %}?next={{ request.path }}" class="btn-action btn-login">
-                <i class="fas fa-lock"></i> {% trans "Log in to register" %}
-              </a>
+              <p>{% trans "Register without login – just enter your name and email." %}</p>
+              <form method="post" action="{% url 'webinars:webinar_register' slug=webinar.slug %}" style="max-width: 400px; margin: 0 auto;">
+                {% csrf_token %}
+                <div style="margin-bottom: 12px;">
+                  <input type="text" name="name" placeholder="{% trans 'Your name' %}" required
+                    style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 1rem; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                  <input type="email" name="email" placeholder="{% trans 'Your email address' %}" required
+                    style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 1rem; box-sizing: border-box;">
+                </div>
+                <button type="submit" class="btn-action btn-register" style="width: 100%; justify-content: center;">
+                  <i class="fas fa-check"></i> {% trans "Register for free" %}
+                </button>
+              </form>
             {% endif %}
           {% endif %}
         </div>

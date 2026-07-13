@@ -53,7 +53,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING('Abgebrochen.'))
             return
 
-        site_url = 'https://joel-digitals.com'
+        site_url = 'https://joel-digitals.de'
         sent = 0
         errors = 0
 

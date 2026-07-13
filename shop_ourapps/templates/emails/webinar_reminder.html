@@ -4,7 +4,7 @@
 <!-- ════ DEUTSCH ════ -->
 <div class="section-de">
   <span class="lang-badge lang-de">🇩🇪 Deutsch</span>
-  <p class="greeting">Hallo {{ user.first_name }},</p>
+  <p class="greeting">Hallo {{ user.first_name|default:name }},</p>
   <p class="body-text">
     das Webinar <strong style="color:#00bfff;">{{ webinar.title }}</strong> beginnt bald!
   </p>
@@ -45,7 +45,7 @@
 <!-- ════ ENGLISH ════ -->
 <div class="section-en">
   <span class="lang-badge lang-en">🇬🇧 English</span>
-  <p class="greeting">Hello {{ user.first_name }},</p>
+  <p class="greeting">Hello {{ user.first_name|default:name }},</p>
   <p class="body-text">
     the webinar <strong style="color:#00bfff;">{{ webinar.title }}</strong> is starting soon!
   </p>

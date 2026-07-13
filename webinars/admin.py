@@ -11,7 +11,7 @@ class WebinarAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at']
     fieldsets = (
         (None, {
-            'fields': ('title', 'title_en', 'slug', 'description', 'description_en', 'image')
+            'fields': ('title', 'title_en', 'slug', 'description', 'description_en', 'image', 'image_url')
         }),
         ('Termin', {
             'fields': ('date_time', 'duration_minutes', 'max_participants')
@@ -40,13 +40,17 @@ class WebinarAdmin(admin.ModelAdmin):
             registrations = WebinarRegistration.objects.filter(webinar=webinar, status='registered', reminder_sent=False)
             for reg in registrations:
                 try:
-                    ctx = {'user': reg.user, 'webinar': reg.webinar}
+                    recipient_email = reg.user.email if reg.user else reg.guest_email
+                    recipient_name = reg.user.first_name or reg.user.username if reg.user else (reg.guest_name or 'Gast')
+                    if not recipient_email:
+                        continue
+                    ctx = {'user': reg.user, 'name': recipient_name, 'webinar': reg.webinar}
                     html = render_to_string('emails/webinar_reminder.html', ctx)
                     msg = EmailMultiAlternatives(
                         subject=f"🔔 Erinnerung: {webinar.title} beginnt bald!",
                         body="",
                         from_email=settings.DEFAULT_FROM_EMAIL,
-                        to=[reg.user.email],
+                        to=[recipient_email],
                     )
                     msg.attach_alternative(html, "text/html")
                     msg.send()
@@ -63,9 +67,9 @@ class WebinarAdmin(admin.ModelAdmin):
 
 @admin.register(WebinarRegistration)
 class WebinarRegistrationAdmin(admin.ModelAdmin):
-    list_display = ['webinar', 'user', 'status', 'registered_at', 'reminder_sent']
+    list_display = ['webinar', 'user', 'guest_email', 'guest_name', 'status', 'registered_at', 'reminder_sent']
     list_filter = ['status', 'webinar', 'reminder_sent']
-    search_fields = ['user__username', 'user__email', 'webinar__title']
+    search_fields = ['user__username', 'user__email', 'guest_email', 'guest_name', 'webinar__title']
     readonly_fields = ['registered_at']
     actions = ['mark_attended', 'mark_no_show', 'send_reminder']
 
@@ -88,13 +92,17 @@ class WebinarRegistrationAdmin(admin.ModelAdmin):
         errors = 0
         for reg in queryset.filter(status='registered'):
             try:
-                ctx = {'user': reg.user, 'webinar': reg.webinar}
+                recipient_email = reg.user.email if reg.user else reg.guest_email
+                recipient_name = reg.user.first_name or reg.user.username if reg.user else (reg.guest_name or 'Gast')
+                if not recipient_email:
+                    continue
+                ctx = {'user': reg.user, 'name': recipient_name, 'webinar': reg.webinar}
                 html = render_to_string('emails/webinar_reminder.html', ctx)
                 msg = EmailMultiAlternatives(
                     subject=f"🔔 Erinnerung: {reg.webinar.title} beginnt bald!",
                     body="",
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[reg.user.email],
+                    to=[recipient_email],
                 )
                 msg.attach_alternative(html, "text/html")
                 msg.send()
@@ -103,7 +111,7 @@ class WebinarRegistrationAdmin(admin.ModelAdmin):
                 sent += 1
             except Exception:
                 errors += 1
-        msg = f"{sent} Erinnerung(en) gesendet."
+        msg = f"{sent} Erinnerung(s) gesendet."
         if errors:
             msg += f" {errors} Fehler."
         self.message_user(request, msg)
