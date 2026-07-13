@@ -1,4 +1,4 @@
-{% extends "base_mobile.html" %}
+{% extends request.base_template|default:"base_mobile.html" %}
 {% load static %}
 {% load i18n %}
 
@@ -315,7 +315,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
-    background: linear-gradient(135deg, var(--primary), #0066ff);
+    background: linear-gradient(135deg, var(--accent), #0066ff);
     color: white;
     text-decoration: none;
     border-radius: 8px;
@@ -473,7 +473,11 @@
               </div>
 
               {% if not ticket.is_archived %}
-                <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="chat-btn">
+                {% if request.base_template == "base_app.html" %}
+                <a href="{% url 'jd_ticket_detail_app' ticket.ticket_number %}" class="chat-btn">
+                {% else %}
+                <a href="{% url 'ticket_detail_app' ticket.ticket_number %}" class="chat-btn">
+                {% endif %}
                   <i class="fas fa-comments"></i> {% trans "Open Chat" %}
                 </a>
               {% endif %}
@@ -489,4 +493,114 @@
     </div>
   </div>
 </div>
+
+<style>
+  .app-combobox { position: relative; }
+  .app-combobox-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--surface, var(--bg));
+    color: var(--text);
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+  .app-combobox-list {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    max-height: 220px;
+    overflow-y: auto;
+    background: var(--surface, var(--bg));
+    border: 2px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  }
+  .app-combobox-list.open { display: block; }
+  .app-combobox-option {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  .app-combobox-option:hover,
+  .app-combobox-option.highlighted { background: var(--accent, var(--primary)); color: #fff; }
+  .app-combobox-empty { padding: 10px 14px; color: var(--text-muted, #888); font-size: 0.9rem; }
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  var select = document.getElementById('id_app_name');
+  if (!select) return;
+
+  var options = Array.prototype.slice.call(select.options).filter(function (o) { return o.value; });
+
+  var wrapper = document.createElement('div');
+  wrapper.className = 'app-combobox';
+
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'app-combobox-input';
+  input.placeholder = '{% trans "Search app..." %}';
+  input.autocomplete = 'off';
+  if (select.selectedOptions.length && select.selectedOptions[0].value) {
+    input.value = select.selectedOptions[0].textContent.trim();
+  }
+
+  var list = document.createElement('div');
+  list.className = 'app-combobox-list';
+
+  select.style.display = 'none';
+  select.parentNode.insertBefore(wrapper, select);
+  wrapper.appendChild(input);
+  wrapper.appendChild(list);
+  wrapper.appendChild(select);
+
+  function renderOptions(filter) {
+    list.innerHTML = '';
+    var term = (filter || '').toLowerCase();
+    var matches = options.filter(function (o) {
+      return o.textContent.toLowerCase().indexOf(term) !== -1;
+    });
+    if (!matches.length) {
+      var empty = document.createElement('div');
+      empty.className = 'app-combobox-empty';
+      empty.textContent = '{% trans "No matching app" %}';
+      list.appendChild(empty);
+      return;
+    }
+    matches.forEach(function (o) {
+      var item = document.createElement('div');
+      item.className = 'app-combobox-option';
+      item.textContent = o.textContent.trim();
+      item.addEventListener('click', function () {
+        select.value = o.value;
+        input.value = o.textContent.trim();
+        list.classList.remove('open');
+      });
+      list.appendChild(item);
+    });
+  }
+
+  input.addEventListener('focus', function () {
+    renderOptions(input.value === select.selectedOptions[0].textContent.trim() ? '' : input.value);
+    list.classList.add('open');
+  });
+  input.addEventListener('input', function () {
+    if (select.value) { select.value = ''; }
+    renderOptions(input.value);
+    list.classList.add('open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrapper.contains(e.target)) { list.classList.remove('open'); }
+  });
+})();
+</script>
 {% endblock %}

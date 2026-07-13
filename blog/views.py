@@ -74,7 +74,11 @@ def blog_detail_by_pk(request, pk):
 
 def blog_detail(request, slug):
     lang = request.LANGUAGE_CODE
-    post = get_object_or_404(BlogPost, slug=slug, is_published=True)
+    if request.user.is_staff:
+        # Staff duerfen geplante Posts vorab ansehen/pruefen.
+        post = get_object_or_404(BlogPost, slug=slug, is_published=True)
+    else:
+        post = get_object_or_404(BlogPost, slug=slug, is_published=True, published_at__lte=timezone.now())
     post.views += 1
     post.save(update_fields=["views"])
 
@@ -96,10 +100,10 @@ def blog_detail(request, slug):
             return redirect("blog_detail", slug=slug)
 
     related_posts = (
-        BlogPost.objects.filter(is_published=True)
+        BlogPost.objects.filter(is_published=True, published_at__lte=timezone.now())
         .exclude(pk=post.pk)
         .annotate(same_categories=Count("categories"))
-        .order_by("-same_categories", "-created_at")[:3]
+        .order_by("-same_categories", "-published_at")[:3]
     )
 
     # Sprachabhängiger Inhalt

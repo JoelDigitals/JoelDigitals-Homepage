@@ -655,6 +655,17 @@
 
     <!-- Body -->
     <div class="order-body">
+      {% if order.status == "In Delivery" %}
+      <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.4); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+        <i class="fas fa-envelope-open-text" style="color:#f59e0b; font-size:1.3rem; margin-top:0.15rem;"></i>
+        <div>
+          <strong>{% trans "Your order is being delivered" %}</strong>
+          <p style="margin:0.25rem 0 0; font-size:0.9rem; color:#888;">
+            {% trans "We've sent your registration code by email. Please check your inbox - and don't forget your spam folder." %}
+          </p>
+        </div>
+      </div>
+      {% endif %}
       <!-- Items -->
       <div class="items-section">
         <h2 class="section-title">

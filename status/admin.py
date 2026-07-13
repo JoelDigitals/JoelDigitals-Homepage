@@ -11,10 +11,10 @@ class AppStatusAdmin(admin.ModelAdmin):
 
 @admin.register(AppIssue)
 class AppIssueAdmin(admin.ModelAdmin):
-    list_display = ['app', 'title', 'is_resolved', 'created']
-    list_filter = ['is_resolved']
+    list_display = ['app', 'title_de', 'severity', 'status', 'is_resolved', 'started_at', 'created']
+    list_filter = ['is_resolved', 'severity', 'status']
 
 @admin.register(GlobalIssue)
 class GlobalIssueAdmin(admin.ModelAdmin):
-    list_display = ['title', 'is_resolved', 'created']
-    list_filter = ['is_resolved']
+    list_display = ['title_de', 'severity', 'status', 'is_resolved', 'started_at', 'created']
+    list_filter = ['is_resolved', 'severity', 'status']

@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends base_template|default:"base_home.html" %}
 {% load static %}
 {% load i18n %}
 {% load dash_filters %}
@@ -170,24 +170,41 @@
         {% if "Marketing" in user_groups %}
         <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;margin-top:.75rem;">{% trans "Marketing" %}</div>
         <div class="quick-grid">
+          {% if base_template == "base_app.html" %}
+          <a href="{% url 'jd_blog_admin_app' %}" class="quick-btn"><i class="fas fa-blog"></i> {% trans "Blog" %}</a>
+          <a href="{% url 'jd_blog_create_app' %}" class="quick-btn"><i class="fas fa-plus"></i> {% trans "New Post" %}</a>
+          <a href="{% url 'jd_newsletter_app' %}" class="quick-btn new"><i class="fas fa-bullhorn"></i> {% trans "Newsletter" %}</a>
+          {% else %}
           <a href="/blog/admin-blog/" class="quick-btn"><i class="fas fa-blog"></i> {% trans "Blog" %}</a>
           <a href="/blog/create/" class="quick-btn"><i class="fas fa-plus"></i> {% trans "New Post" %}</a>
           <a href="{% url 'newsletter_list' %}" class="quick-btn new"><i class="fas fa-bullhorn"></i> {% trans "Newsletter" %}</a>
+          {% endif %}
         </div>
         {% endif %}
         {% if "Selling" in user_groups %}
         <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;margin-top:.75rem;">{% trans "Sales" %}</div>
         <div class="quick-grid">
+          {% if base_template == "base_app.html" %}
+          <a href="{% url 'jd_order_admin_app' %}" class="quick-btn"><i class="fas fa-box"></i> {% trans "Orders" %}</a>
+          <a href="{% url 'jd_new_order_app' %}" class="quick-btn new"><i class="fas fa-plus-circle"></i> {% trans "New Order" %}</a>
+          <a href="{% url 'admin_sales_app' %}" class="quick-btn"><i class="fas fa-comments"></i> {% trans "Chat" %}</a>
+          {% else %}
           <a href="/admin-sales/orders/" class="quick-btn"><i class="fas fa-box"></i> {% trans "Orders" %}</a>
           <a href="/admin-sales/create-order/" class="quick-btn new"><i class="fas fa-plus-circle"></i> {% trans "New Order" %}</a>
           <a href="/contact/admin-sales/" class="quick-btn"><i class="fas fa-comments"></i> {% trans "Chat" %}</a>
+          {% endif %}
         </div>
         {% endif %}
         {% if "Support" in user_groups %}
         <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;margin-top:.75rem;">{% trans "Support" %}</div>
         <div class="quick-grid">
+          {% if base_template == "base_app.html" %}
+          <a href="{% url 'admin_tickets_app' %}" class="quick-btn"><i class="fas fa-headset"></i> {% trans "Tickets" %}</a>
+          <a href="{% url 'admin_appointments_app' %}" class="quick-btn"><i class="fas fa-calendar-plus"></i> {% trans "Appointments" %}</a>
+          {% else %}
           <a href="/contact/admin-tickets/" class="quick-btn"><i class="fas fa-headset"></i> {% trans "Tickets" %}</a>
           <a href="/contact/appointment/admin/" class="quick-btn"><i class="fas fa-calendar-plus"></i> {% trans "Appointments" %}</a>
+          {% endif %}
         </div>
         {% endif %}
         <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;margin-top:.75rem;">{% trans "System" %}</div>
@@ -195,7 +212,11 @@
           <a href="/admin/" class="quick-btn"><i class="fas fa-cog"></i> Django Admin</a>
           <a href="/admin/shop_ourapps/customlandingpage/" class="quick-btn"><i class="fas fa-pager"></i> Landing Pages</a>
           <a href="/admin/webinars/webinar/" class="quick-btn"><i class="fas fa-video"></i> {% trans "Webinars" %}</a>
+          {% if base_template == "base_app.html" %}
+          <a href="{% url 'jd_tools_app' %}" class="quick-btn"><i class="fas fa-tools"></i> {% trans "Tools" %}</a>
+          {% else %}
           <a href="/status/tools/" class="quick-btn"><i class="fas fa-tools"></i> {% trans "Tools" %}</a>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -206,7 +227,17 @@
       <div class="panel">
         <h3><i class="fas fa-trophy" style="color:#f59e0b;"></i> {% trans "Top Products" %}</h3>
         {% for item in top_items %}
-        <div class="top-row"><span>{{ item.app__name }}</span><span class="top-val">{{ item.total_qty }}× {{ item.total_rev|floatformat:0 }}€</span></div>
+        <a class="top-row" href="{% url 'app_detail' slug=item.app__slug %}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;">
+          <span style="display:flex;align-items:center;gap:.5rem;overflow:hidden;">
+            {% if item.app__display_image %}
+              <img src="{{ item.app__display_image }}" alt="" style="width:24px;height:24px;border-radius:6px;object-fit:cover;flex-shrink:0;">
+            {% else %}
+              <span style="width:24px;height:24px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-cube" style="font-size:.7rem;color:#888;"></i></span>
+            {% endif %}
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ item.app__name }}</span>
+          </span>
+          <span class="top-val" style="flex-shrink:0;">{{ item.total_qty }}× {{ item.total_rev|floatformat:0 }}€</span>
+        </a>
         {% endfor %}
       </div>
       {% endif %}
@@ -217,7 +248,7 @@
         {% for w in upcoming_webinar_list %}
         <div class="top-row" style="flex-wrap:wrap;gap:0.3rem;">
           <span style="flex:1;min-width:120px;">{{ w.title|truncatechars:22 }}<br><small style="color:#888;">{{ w.date_time|date:"d.m. H:i" }} · {{ webinar_registration_counts|dict_lookup:w.id }}/{{ w.max_participants }}</small></span>
-          <form method="post" action="{% url 'admin_dashboard' %}" style="display:inline;">
+          <form method="post" action="{% url dashboard_url_name|default:'admin_dashboard' %}" style="display:inline;">
             {% csrf_token %}
             <input type="hidden" name="send_webinar_reminder" value="{{ w.id }}">
             <button type="submit" class="quick-btn" style="padding:.25rem .5rem;font-size:.7rem;" title="{% trans 'Send reminder' %}">

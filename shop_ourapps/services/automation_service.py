@@ -112,6 +112,15 @@ class OrderAutomationService:
                         if item.app.product_number:
                             update_product_stock(item.app.product_number, new_stock)
 
+            # Bestellung an JDS Management uebertragen, damit sie dort im
+            # Auftragsbuch sichtbar ist. Best-effort: darf den Checkout nie
+            # blockieren, auch wenn die JDS-API nicht erreichbar ist.
+            try:
+                from shop_ourapps.services.jds_api import push_order
+                push_order(order)
+            except Exception:
+                pass
+
             return True
         return False
 

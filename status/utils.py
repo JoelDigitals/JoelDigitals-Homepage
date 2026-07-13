@@ -739,3 +739,94 @@ Joel Digitals | """ + getattr(settings, 'SITE_URL', 'https://joeldigitals.de')
         import traceback
         traceback.print_exc()
         return False
+
+
+# ─── Status Hotline text (shared by the browser voice button, the desktop and
+# mobile status pages, and the real phone hotline in status/views.py) ────────
+
+SEVERITY_LABELS = {
+    'de': {'minor': 'Gering', 'major': 'Erheblich', 'critical': 'Kritisch'},
+    'en': {'minor': 'Minor', 'major': 'Major', 'critical': 'Critical'},
+}
+
+ISSUE_STAGE_LABELS = {
+    'de': {
+        'investigating': 'wird untersucht',
+        'identified': 'Ursache identifiziert',
+        'monitoring': 'wird beobachtet',
+        'resolved': 'behoben',
+    },
+    'en': {
+        'investigating': 'investigating',
+        'identified': 'identified',
+        'monitoring': 'monitoring',
+        'resolved': 'resolved',
+    },
+}
+
+
+def apply_issue_language(issue, lang):
+    """Setzt .title/.description auf die passende Sprache (EN faellt auf DE
+    zurueck, falls noch nicht uebersetzt). Gleiche Konvention wie BlogPost
+    in blog/views.py (post.title = post.title_en if lang == 'en' else post.title_de)."""
+    if lang == 'en':
+        issue.title = issue.title_en or issue.title_de
+        issue.description = issue.description_en or issue.description_de
+    else:
+        issue.title = issue.title_de
+        issue.description = issue.description_de
+    return issue
+
+
+def _describe_issue(issue, lang):
+    severity = SEVERITY_LABELS[lang].get(issue.severity, issue.severity)
+    stage = ISSUE_STAGE_LABELS[lang].get(issue.status, issue.status)
+    if lang == 'en':
+        title = issue.title_en or issue.title_de
+        description = issue.description_en or issue.description_de
+        return f"{title}. Severity: {severity}. Status: {stage}. {description}."
+    return f"{issue.title_de}. Schweregrad: {severity}. Status: {stage}. {issue.description_de}."
+
+
+def build_hotline_texts(global_issues, issue_apps, total, online_count, offline_count, issue_count):
+    """Builds the German and English status-hotline texts.
+
+    `issue_apps` is a list of dicts with at least 'app' and 'issues' keys
+    (issues being AppIssue instances with unresolved status).
+    """
+    global_issues = list(global_issues)
+    has_global_issues = bool(global_issues)
+
+    def build_de():
+        parts = ["Willkommen bei der Joel Digitals Status Hotline."]
+        if has_global_issues:
+            parts.append("Achtung, es liegen globale Störungen vor.")
+            for issue in global_issues:
+                parts.append(_describe_issue(issue, 'de'))
+        if issue_apps:
+            for app_item in issue_apps:
+                for issue in app_item['issues']:
+                    parts.append(f"Bei {app_item['app'].name} liegt folgendes Problem vor: {_describe_issue(issue, 'de')}")
+        if not has_global_issues and not issue_apps:
+            parts.append("Alle Systeme sind online.")
+        parts.append(f"Von {total} überwachten Diensten sind {online_count} online, {offline_count} offline, {issue_count} haben Probleme.")
+        parts.append("Vielen Dank für Ihren Anruf.")
+        return " ".join(parts)
+
+    def build_en():
+        parts = ["Welcome to the Joel Digitals Status Hotline."]
+        if has_global_issues:
+            parts.append("Attention, there are global issues.")
+            for issue in global_issues:
+                parts.append(_describe_issue(issue, 'en'))
+        if issue_apps:
+            for app_item in issue_apps:
+                for issue in app_item['issues']:
+                    parts.append(f"{app_item['app'].name} has the following problem: {_describe_issue(issue, 'en')}")
+        if not has_global_issues and not issue_apps:
+            parts.append("All systems are operational.")
+        parts.append(f"Of {total} monitored services, {online_count} are online, {offline_count} offline, {issue_count} have issues.")
+        parts.append("Thank you for calling.")
+        return " ".join(parts)
+
+    return build_de(), build_en()

@@ -207,6 +207,20 @@
     margin: 0;
   }
 
+  .issue-badges { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+  .issue-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 10px;
+  }
+  .severity-minor { background: rgba(100,116,139,0.15); color: #64748b; }
+  .severity-major { background: rgba(245,158,11,0.15); color: #d97706; }
+  .severity-critical { background: rgba(239,68,68,0.15); color: #dc2626; }
+  .stage-badge { background: rgba(99,102,241,0.15); color: #6366f1; }
+
   /* Empty State */
   .empty-state {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
@@ -464,6 +478,10 @@ function readStatus() {
         <div class="issues-list">
           {% for issue in global_issues %}
             <div class="issue-card">
+              <div class="issue-badges">
+                <span class="issue-badge severity-{{ issue.severity }}">{{ issue.get_severity_display }}</span>
+                <span class="issue-badge stage-badge">{{ issue.get_status_display }}</span>
+              </div>
               <div class="issue-title">
                 <i class="fas fa-bug"></i>
                 {{ issue.title }}
@@ -493,6 +511,10 @@ function readStatus() {
         {% for app_item in issue_apps %}
           {% for issue in app_item.issues %}
             <div class="issue-card">
+              <div class="issue-badges">
+                <span class="issue-badge severity-{{ issue.severity }}">{{ issue.get_severity_display }}</span>
+                <span class="issue-badge stage-badge">{{ issue.get_status_display }}</span>
+              </div>
               <div class="issue-title">
                 <i class="fas fa-bug" style="color:#f59e0b;"></i>
                 <strong>{{ app_item.app.name }}</strong>&nbsp;–&nbsp;{{ issue.title }}

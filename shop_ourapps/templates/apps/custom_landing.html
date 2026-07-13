@@ -79,7 +79,7 @@
     <!-- Das Produkt -->
     <div class="s-section">
       <div class="s-product">
-        {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product_name }}" loading="lazy">{% endif %}
+        {% if product.display_image %}<img src="{{ product.display_image }}" alt="{{ product_name }}" loading="lazy">{% endif %}
         <h3>{{ product_name }}</h3>
         <p style="color:#888;line-height:1.6;">{{ product.short_description }}</p>
         <div class="s-price">

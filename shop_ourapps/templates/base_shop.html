@@ -35,7 +35,8 @@
     
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
-    
+    html { overflow-x: hidden; max-width: 100%; }
+
     body {
       display: flex;
       flex-direction: column;
@@ -43,8 +44,27 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
+      overflow-x: hidden;
+      max-width: 100%;
     }
-    
+
+    main img, main video, main svg, main iframe, main canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    main table {
+      display: block;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    main pre, main code {
+      max-width: 100%;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
     header {
       position: relative;
       z-index: 10002;

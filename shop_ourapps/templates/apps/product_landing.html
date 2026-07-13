@@ -45,8 +45,8 @@
   </div>
   <div class="pl-body">
     <div class="pl-card">
-      {% if product.image %}
-      <img src="{{ product.image.url }}" alt="{{ product_name }}" loading="lazy">
+      {% if product.display_image %}
+      <img src="{{ product.display_image }}" alt="{{ product_name }}" loading="lazy">
       {% endif %}
       <h2>{{ product_name }}</h2>
       <p class="desc">{{ product.short_description }}</p>

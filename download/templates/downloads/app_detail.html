@@ -366,8 +366,8 @@
   <!-- Header -->
   <div class="app-header">
     <div class="header-icon">
-      {% if app.logo %}
-        <img src="{{ app.logo.url }}" alt="{{ app.name }}">
+      {% if app.display_logo %}
+        <img src="{{ app.display_logo }}" alt="{{ app.name }}">
       {% else %}
         <i class="fas fa-cube"></i>
       {% endif %}

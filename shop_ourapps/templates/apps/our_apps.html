@@ -374,8 +374,8 @@
           {% endif %}
           
           <div class="app-image-container">
-            {% if app.image %}
-              <img src="{{ app.image.url }}" alt="{{ app.display_name }}" class="app-image">
+            {% if app.display_image %}
+              <img src="{{ app.display_image }}" alt="{{ app.display_name }}" class="app-image">
             {% else %}
               <div class="app-image-placeholder">
                 <i class="fas fa-cube"></i>
@@ -432,8 +432,8 @@
         {% for package in packages %}
         <div class="app-card" style="border-color:rgba(34,197,94,0.3);">
           <div class="app-image-container">
-            {% if package.image %}
-              <img src="{{ package.image.url }}" alt="{{ package.name }}" class="app-image">
+            {% if package.display_image %}
+              <img src="{{ package.display_image }}" alt="{{ package.name }}" class="app-image">
             {% else %}
               <div class="app-image-placeholder">
                 <i class="fas fa-gift"></i>

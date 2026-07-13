@@ -1,0 +1,80 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Settings" %} – Joel Digitals{% endblock %}
+
+{% block extra_css %}
+<style>
+.jd-lang-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+.jd-lang-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border);
+    background: var(--surface-elevated);
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+}
+.jd-lang-option.active {
+    border-color: var(--primary);
+    background: rgba(0, 68, 204, 0.15);
+    color: var(--primary);
+}
+.jd-lang-form { display: contents; }
+.jd-lang-form button.jd-lang-option {
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom:16px;">{% trans "Settings" %}</h1>
+
+<div class="jd-card">
+    <h2>{% trans "Language" %}</h2>
+    <p style="color:var(--text-secondary); font-size:0.9rem;">{% trans "The app defaults to German. Choose English if you prefer." %}</p>
+    <div class="jd-lang-row">
+        <form action="{% url 'set_language' %}" method="post" class="jd-lang-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="/app/settings/">
+            <input type="hidden" name="language" value="de">
+            <button type="submit" class="jd-lang-option {% if LANGUAGE_CODE == 'de' %}active{% endif %}">
+                <span class="material-symbols-rounded">translate</span> Deutsch
+            </button>
+        </form>
+        <form action="{% url 'set_language' %}" method="post" class="jd-lang-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="/app/settings/">
+            <input type="hidden" name="language" value="en">
+            <button type="submit" class="jd-lang-option {% if LANGUAGE_CODE == 'en' %}active{% endif %}">
+                <span class="material-symbols-rounded">translate</span> English
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="jd-card">
+    <h2>{% trans "Account" %}</h2>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+        <a href="{% url 'jd_profile_app' %}" class="jd-btn secondary">
+            <span class="material-symbols-rounded" style="font-size:18px;">account_circle</span>
+            {% trans "Profile" %}
+        </a>
+        <a href="{% url 'jd_change_password_app' %}" class="jd-btn secondary">
+            <span class="material-symbols-rounded" style="font-size:18px;">key</span>
+            {% trans "Change Password" %}
+        </a>
+    </div>
+</div>
+{% endblock %}

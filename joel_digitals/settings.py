@@ -46,6 +46,12 @@ OAUTH2_PROVIDER = {
 
 IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
 
+# OneSignal (Push-Benachrichtigungen fuer die Joel Digitals App).
+# Solange kein OneSignal-Account/median.co-Setup existiert, bleiben diese leer -
+# JoelDigitalsApp.services.push loggt dann nur statt zu senden.
+ONESIGNAL_APP_ID = os.getenv("ONESIGNAL_APP_ID", "")
+ONESIGNAL_REST_API_KEY = os.getenv("ONESIGNAL_REST_API_KEY", "")
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -67,6 +73,7 @@ INSTALLED_APPS = [
     'status',
     'download',
     'MobileApp',
+    'JoelDigitalsApp',
     'chat',
     "reviews",
     'landingpages',

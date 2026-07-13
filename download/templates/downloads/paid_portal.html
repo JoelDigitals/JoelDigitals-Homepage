@@ -33,7 +33,7 @@
       {% if package_apps %}
         {% for pa in package_apps %}
         <div class="dp-app">
-          {% if pa.app.logo %}<img src="{{ pa.app.logo.url }}" alt="{{ pa.app.name }}">{% endif %}
+          {% if pa.app.display_logo %}<img src="{{ pa.app.display_logo }}" alt="{{ pa.app.name }}">{% endif %}
           <div class="dp-app-info">
             <strong>{{ pa.app.name }}</strong>
             <span>{{ pa.os.name }}{% if pa.download.version %} – v{{ pa.download.version }}{% endif %}</span>

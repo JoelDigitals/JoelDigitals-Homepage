@@ -53,13 +53,30 @@ def detect_language(text):
     
     return "de" if de_score >= en_score else "en"
 
-def fuzzy_match(text, keywords, threshold=0.7):
-    """Fuzzy-Matching für fehlertolerante Suche"""
-    text_words = normalize_text(text).split()
-    for word in text_words:
-        matches = difflib.get_close_matches(word, keywords, n=1, cutoff=threshold)
-        if matches:
-            return True
+def fuzzy_match(norm_text, words, keywords, threshold=0.78):
+    """Fehlertolerante Suche über eine Liste bereits normalisierter Wörter.
+
+    Kurze Keywords (<=3 Zeichen, z.B. 'hi') werden nur exakt gematcht, weil sie
+    sonst zufällig zu viele andere Wörter treffen (z.B. wurde "mein" früher
+    fälschlich als Gruß "moin" erkannt). Für längere Keywords wird zusätzlich
+    zum Fuzzy-Ratio eine Substring-Prüfung gemacht (z.B. "telefonnummer" enthält
+    "telefon"). Mehrwort-Keywords ("good morning") werden gegen den ganzen
+    normalisierten Text geprüft, da sie nie als Einzelwort vorkommen.
+    """
+    for keyword in keywords:
+        if " " in keyword:
+            if keyword in norm_text:
+                return True
+            continue
+        for word in words:
+            if len(keyword) <= 3 or len(word) <= 3:
+                if word == keyword:
+                    return True
+                continue
+            if keyword in word or word in keyword:
+                return True
+            if difflib.SequenceMatcher(None, word, keyword).ratio() >= threshold:
+                return True
     return False
 
 def add_to_history(session_id, question, answer, max_len=10):
@@ -80,8 +97,15 @@ def get_last_topic(session_id):
 
 def detect_intent(text, lang):
     """Erkennt die Absicht des Nutzers"""
-    text = normalize_text(text)
-    
+    norm_text = normalize_text(text)
+    all_words = norm_text.split()
+    # Begrüßung/Verabschiedung/Danke stehen in echten Nachrichten so gut wie immer
+    # am Satzanfang. Nur die ersten Wörter dafür zu prüfen verhindert, dass ein
+    # Wort mitten in einer echten Frage (z.B. "mein") zufällig als Gruß erkannt wird.
+    opening_words = all_words[:2]
+
+    social_intents = {"greeting", "farewell", "thanks"}
+
     intents = {
         "greeting": {
             "de": ["hallo", "hi", "hey", "guten", "servus", "moin"],
@@ -126,7 +150,8 @@ def detect_intent(text, lang):
     }
     
     for intent, keywords in intents.items():
-        if fuzzy_match(text, keywords.get(lang, []), threshold=0.65):
+        words = opening_words if intent in social_intents else all_words
+        if fuzzy_match(norm_text, words, keywords.get(lang, [])):
             return intent
     
     return "general"
@@ -140,12 +165,14 @@ def detect_products(text, kb):
     text_norm = normalize_text(text)
     detected = []
     
-    product_keys = ["jds_management", "auftragnetz", "jds_appstore", "logo_design", 
-                    "support", "hosting", "webentwicklung", "digitalisierung"]
-    
+    # Muss exakt so geschrieben sein wie die Keys in knowledge.json - dict-Lookups
+    # sind case-sensitiv, "hosting" fand z.B. nie den Eintrag "Hosting".
+    product_keys = ["jds_management", "auftragnetz", "jds_appstore", "logo_design",
+                    "support", "Hosting", "Digitalisierung", "webentwicklung", "Ticket"]
+
     for key in product_keys:
         prod = kb.get(key, {})
-        names = [key.lower()]
+        names = [normalize_text(key.replace("_", " "))]
         
         if "name" in prod:
             names.append(normalize_text(prod["name"]))

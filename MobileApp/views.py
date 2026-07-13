@@ -25,6 +25,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from status.models import App, AppStatus, GlobalIssue
+from status.utils import build_hotline_texts, apply_issue_language
 
 
 def login_view_app(request):
@@ -54,7 +55,7 @@ def home_view_app(request):
         'is_superuser': user.is_superuser,
         'in_support_sales': 'Selling' in groups,
         'in_support_tickets': 'Support' in groups,
-        'in_support_admin': 'support_admAdmin Supportin' in groups,
+        'in_support_admin': 'Admin Support' in groups,
         'in_marketing' : 'Marketing' in groups,
         'user_groups': list(groups),
     }
@@ -106,7 +107,7 @@ def sales_app(request):
         email_msg.send()
 
         messages.success(request, _("Wünsche wurden gespeichert."))
-        return redirect('sales')
+        return redirect('sales_app')
 
     entries = SalesEntry.objects.filter(user=request.user)\
         .prefetch_related('wishes', 'chat_messages')\
@@ -142,7 +143,7 @@ def sales_chat_app(request, entry_id):
                 recipient = entry.email
 
             chat_url = request.build_absolute_uri(
-                reverse("sales_chat", args=[entry.id])
+                reverse("sales_chat_app", args=[entry.id])
             )
 
             html_content = render_to_string(
@@ -164,7 +165,7 @@ def sales_chat_app(request, entry_id):
             email_msg.attach_alternative(html_content, "text/html")
             email_msg.send()
 
-            return redirect('sales_chat', entry_id=entry.id)
+            return redirect('sales_chat_app', entry_id=entry.id)
 
     messages_qs = SalesChatMessage.objects.filter(entry=entry).order_by('created_at')
 
@@ -226,7 +227,8 @@ def support_tickets_app(request):
             recipient_list=[ticket.email]
         )
         messages.success(request, _("Ticket erfolgreich erstellt."))
-        return redirect('support_tickets_app')
+        redirect_name = 'jd_support_app' if getattr(request, 'base_template', None) == 'base_app.html' else 'support_tickets_app'
+        return redirect(redirect_name)
 
     tickets = SupportTicket.objects.filter(user=request.user).order_by('-created_at')  # hier auch "user"
     return render(request, 'mobile/support.html', {'form': form, 'tickets': tickets, 'user_groups': user_groups})
@@ -258,7 +260,7 @@ def ticket_detail_app(request, ticket_number):
                 recipient = ticket.user.email
 
             ticket_url = request.build_absolute_uri(
-                reverse("ticket_detail", args=[ticket.ticket_number])
+                reverse("ticket_detail_app", args=[ticket.ticket_number])
             )
 
             html_content = render_to_string(
@@ -281,14 +283,15 @@ def ticket_detail_app(request, ticket_number):
             email.send()
 
             messages.success(request, _("Nachricht gesendet."))
-            return redirect('ticket_detail', ticket_number=ticket.ticket_number)
+            redirect_name = 'jd_ticket_detail_app' if getattr(request, 'base_template', None) == 'base_app.html' else 'ticket_detail_app'
+            return redirect(redirect_name, ticket_number=ticket.ticket_number)
 
     else:
         form = TicketMessageForm()
 
     messages_list = ticket.messages.order_by('created_at')
 
-    return render(request, 'contact/ticket_detail.html', {
+    return render(request, 'mobile/ticket_detail.html', {
         'ticket': ticket,
         'messages': messages_list,
         'form': form,
@@ -381,12 +384,14 @@ def admin_sales_view_app(request):
     entries = SalesEntry.objects.all().order_by('-created_at')
     return render(request, 'mobile/admin_sales.html', {'entries': entries, 'user_groups': user_groups})
 
+@user_passes_test(is_Sales_Editor)
 def sales_entry_detail_app(request, entry_id):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     entry = get_object_or_404(SalesEntry, id=entry_id)
     wishes = entry.wishes.all()
     return render(request, 'mobile/sales_entry_detail.html', {'entry': entry, 'wishes': wishes, 'user_groups': user_groups})
 
+@user_passes_test(is_Sales_Editor)
 def add_wish_app(request, entry_id):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     # Holen des Entry-Objekts, das dem Wunsch zugeordnet werden soll
@@ -406,6 +411,7 @@ def add_wish_app(request, entry_id):
 
     return render(request, 'mobile/wish_form.html', {'form': form, 'title': 'Neuen Wunsch hinzufügen', 'user_groups': user_groups})
 
+@user_passes_test(is_Sales_Editor)
 def edit_wish_app(request, entry_id, wish_id):
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     wish = get_object_or_404(SalesWish, pk=wish_id)
@@ -418,6 +424,7 @@ def edit_wish_app(request, entry_id, wish_id):
         form = SalesWishForm(instance=wish)
     return render(request, 'mobile/wish_form.html', {'form': form, 'title': 'Wunsch bearbeiten', 'user_groups': user_groups})
 
+@user_passes_test(is_Sales_Editor)
 def delete_wish_app(request, entry_id, wish_id):
     wish = get_object_or_404(SalesWish, pk=wish_id)
     if request.method == 'POST':
@@ -425,6 +432,7 @@ def delete_wish_app(request, entry_id, wish_id):
         return redirect('sales_entry_detail_app', entry_id=entry_id)
     return render(request, 'mobile/confirm_delete.html', {'wish': wish})
 
+@user_passes_test(is_Sales_Editor)
 def export_single_wish_app(request, entry_id, wish_id):
     wish = get_object_or_404(SalesWish, pk=wish_id)
     response = HttpResponse(content_type='text/plain')
@@ -535,52 +543,18 @@ Status: {appointment.get_status_display()}
 def appointment_success_app(request):
     return render(request, "mobile/appointment_success.html")
 
-def _build_hotline_texts(global_issues, issue_apps, total, online_count, offline_count, issue_count):
-    has_global_issues = bool(global_issues)
-
-    def build_de():
-        parts = ["Willkommen bei der Joel Digitals Status Hotline."]
-        if has_global_issues:
-            parts.append("Achtung, es liegen globale Störungen vor.")
-            for issue in global_issues:
-                parts.append(f"{issue.title}. {issue.description}.")
-        if issue_apps:
-            for app_item in issue_apps:
-                for issue in app_item['issues']:
-                    parts.append(f"Bei {app_item['app'].name} liegt folgendes Problem vor: {issue.title}. {issue.description}.")
-        if not has_global_issues and not issue_apps:
-            parts.append("Alle Systeme sind online.")
-        parts.append(f"Von {total} überwachten Diensten sind {online_count} online, {offline_count} offline, {issue_count} haben Probleme.")
-        parts.append("Vielen Dank für Ihren Anruf.")
-        return " ".join(parts)
-
-    def build_en():
-        parts = ["Welcome to the Joel Digitals Status Hotline."]
-        if has_global_issues:
-            parts.append("Attention, there are global issues.")
-            for issue in global_issues:
-                parts.append(f"{issue.title}. {issue.description}.")
-        if issue_apps:
-            for app_item in issue_apps:
-                for issue in app_item['issues']:
-                    parts.append(f"{app_item['app'].name} has the following problem: {issue.title}. {issue.description}.")
-        if not has_global_issues and not issue_apps:
-            parts.append("All systems are operational.")
-        parts.append(f"Of {total} monitored services, {online_count} are online, {offline_count} offline, {issue_count} have issues.")
-        parts.append("Thank you for calling.")
-        return " ".join(parts)
-
-    return build_de(), build_en()
-
 def status_app(request):
+    lang = request.LANGUAGE_CODE
     apps = App.objects.filter(is_active=True).prefetch_related('issues')
-    global_issues = GlobalIssue.objects.filter(is_resolved=False)
+    global_issues = list(GlobalIssue.objects.filter(is_resolved=False))
+    for issue in global_issues:
+        apply_issue_language(issue, lang)
 
     status_data = []
     issue_apps  = []
     for app in apps:
         latest    = app.statuses.order_by('-timestamp').first()
-        unresolved = [i for i in app.issues.all() if not i.is_resolved]
+        unresolved = [apply_issue_language(i, lang) for i in app.issues.all() if not i.is_resolved]
         entry = {
             'app': app,
             'latest': latest,
@@ -595,7 +569,7 @@ def status_app(request):
     issues  = sum(1 for s in status_data if s['issues'])
     total   = len(status_data)
 
-    hotline_de, hotline_en = _build_hotline_texts(
+    hotline_de, hotline_en = build_hotline_texts(
         list(global_issues), issue_apps, total, online, offline, issues
     )
 
@@ -604,6 +578,7 @@ def status_app(request):
         'global_issues': global_issues,
         'online': online,
         'offline': offline,
+        'issues': issues,
         'total': total,
         'hotline_text_de': hotline_de,
         'hotline_text_en': hotline_en,
@@ -678,7 +653,7 @@ def update_appointment_status_app(request, pk, status):
             "Ihr Joel Digitals Team"
         )
     else:
-        return redirect('appointment_admin_app')  # keine Mail bei pending
+        return redirect('admin_appointments_app')  # keine Mail bei pending
 
     send_mail(
         subject=subject,
@@ -687,5 +662,5 @@ def update_appointment_status_app(request, pk, status):
         recipient_list=[appointment.email],
     )
 
-    return redirect('appointment_admin')
+    return redirect('admin_appointments_app')
 

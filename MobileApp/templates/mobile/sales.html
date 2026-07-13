@@ -342,7 +342,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
-    background: linear-gradient(135deg, var(--primary), #0066ff);
+    background: linear-gradient(135deg, var(--accent), #0066ff);
     color: white;
     text-decoration: none;
     border-radius: 8px;
@@ -438,7 +438,7 @@
   <!-- Body -->
   <div class="sales-body">
 
-    <form action="{% url 'sales' %}" method="POST" class="sales-form" id="wish-form">           
+    <form action="{% url 'sales_app' %}" method="POST" class="sales-form" id="wish-form">
       {% csrf_token %}
       
       <div class="form-group">
@@ -518,7 +518,7 @@
           </div>
           {% endif %}
           
-          <a href="{% url 'sales_chat' entry.id %}" class="chat-btn">
+          <a href="{% url 'sales_chat_app' entry.id %}" class="chat-btn">
             <i class="fas fa-comments"></i> {% trans "Open Chat" %}
           </a>
         </div>

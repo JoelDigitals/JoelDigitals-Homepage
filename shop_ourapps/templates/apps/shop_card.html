@@ -17,8 +17,8 @@
 
   <!-- 1:1 Bild Container -->
   <div class="image-wrapper">
-    {% if app.image %}
-      <img src="{{ app.image.url }}" alt="{{ app.display_name }}">
+    {% if app.display_image %}
+      <img src="{{ app.display_image }}" alt="{{ app.display_name }}">
     {% else %}
       <div class="image-placeholder">
         <i class="fas fa-cube"></i>

@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static i18n %}
 
 {% block title %}{% trans "Register" %} – Joel Digitals{% endblock %}

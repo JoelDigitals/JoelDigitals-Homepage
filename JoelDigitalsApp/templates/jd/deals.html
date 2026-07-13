@@ -1,0 +1,72 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Deals" %} – Joel Digitals{% endblock %}
+
+{% block extra_css %}
+<style>
+.jd-deal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+.jd-deal-card img {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: var(--surface-elevated);
+    flex-shrink: 0;
+}
+.jd-deal-info { flex: 1; }
+.jd-deal-info h3 { font-size: 1rem; margin-bottom: 4px; }
+.jd-deal-price { font-size: 0.85rem; color: var(--text-secondary); }
+.jd-deal-price strong { color: var(--success); font-size: 1rem; }
+.jd-deal-old { text-decoration: line-through; color: var(--text-muted); margin-left: 4px; }
+.jd-badge-pct {
+    background: var(--error);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 4px 10px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom:16px;">{% trans "Current Deals" %}</h1>
+
+{% if deals %}
+{% for app in deals %}
+<a href="{{ app.external_url }}" target="_blank" rel="noopener" class="jd-deal-card" style="text-decoration:none; color:inherit;">
+    {% if app.display_image %}
+    <img src="{{ app.display_image }}" alt="{{ app.name }}">
+    {% else %}
+    <div style="width:56px;height:56px;border-radius:12px;background:var(--surface-elevated);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span class="material-symbols-rounded" style="color:var(--text-muted);">apps</span>
+    </div>
+    {% endif %}
+    <div class="jd-deal-info">
+        <h3>{{ app.name }}</h3>
+        <div class="jd-deal-price">
+            <strong>{{ app.discounted_price|floatformat:2 }} €</strong>
+            <span class="jd-deal-old">{{ app.price|floatformat:2 }} €</span>
+        </div>
+    </div>
+    <span class="jd-badge-pct">-{{ app.discount_percent }}%</span>
+</a>
+{% endfor %}
+{% else %}
+<div class="jd-empty">
+    <span class="material-symbols-rounded" style="font-size:40px;">local_offer</span>
+    <p>{% trans "No active deals right now - check back soon!" %}</p>
+</div>
+{% endif %}
+{% endblock %}

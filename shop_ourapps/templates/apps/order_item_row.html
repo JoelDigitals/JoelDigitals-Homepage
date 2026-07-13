@@ -3,10 +3,10 @@
   <td data-label="{% trans 'Product' %}">
     <div class="product-cell">
       <div class="product-image">
-        {% if item.package and item.package.image %}
-          <img src="{{ item.package.image.url }}" alt="{{ item.get_name }}">
-        {% elif item.app and item.app.image %}
-          <img src="{{ item.app.image.url }}" alt="{{ item.get_name }}">
+        {% if item.package and item.package.display_image %}
+          <img src="{{ item.package.display_image }}" alt="{{ item.get_name }}">
+        {% elif item.app and item.app.display_image %}
+          <img src="{{ item.app.display_image }}" alt="{{ item.get_name }}">
         {% else %}
           <div class="product-image-placeholder">
             <i class="fas fa-cube"></i>

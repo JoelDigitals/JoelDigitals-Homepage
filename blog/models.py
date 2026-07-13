@@ -30,6 +30,11 @@ class BlogPost(models.Model):
     main_image_medium_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="ImgBB Medium URL")
     main_image_delete_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="ImgBB Lösch-URL")
 
+    push_notified_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Wann die 'Neuer Artikel'-Push-Benachrichtigung fuer diesen Post gesendet wurde (vom Cron-Check gesetzt)."
+    )
+
     def save(self, *args, **kwargs):
         if not self.slug:
             base = self.title_de

@@ -1,0 +1,115 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Order" %} #{{ order.id }} – Joel Digitals{% endblock %}
+
+{% block extra_css %}
+<style>
+.jd-back { display: inline-flex; align-items: center; gap: 4px; color: var(--text-secondary); text-decoration: none; margin-bottom: 14px; font-size: 0.9rem; }
+.jd-item-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+.jd-item-row:last-child { border-bottom: none; }
+.jd-track-step { display: flex; gap: 12px; padding: 8px 0; }
+.jd-track-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); margin-top: 5px; flex-shrink: 0; }
+.jd-track-text { font-size: 0.85rem; }
+.jd-track-text .muted { color: var(--text-muted); font-size: 0.75rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'jd_orders_app' %}" class="jd-back">
+    <span class="material-symbols-rounded" style="font-size:18px;">arrow_back</span>
+    {% trans "Back to Orders" %}
+</a>
+
+{% if order.status == "In Delivery" %}
+<div class="jd-card" style="border-color: var(--warning); background: rgba(245,158,11,0.08);">
+    <h2 style="display:flex; align-items:center; gap:8px; color: var(--warning);">
+        <span class="material-symbols-rounded">mark_email_unread</span>
+        {% trans "Your order is being delivered" %}
+    </h2>
+    <p style="color:var(--text-secondary); font-size:0.9rem;">
+        {% trans "We've sent your registration code by email. Please check your inbox - and don't forget your spam folder." %}
+    </p>
+</div>
+{% endif %}
+
+<div class="jd-card">
+    <h1>{% trans "Order" %} #{{ order.id }}</h1>
+    <p style="color:var(--text-secondary); margin-bottom:12px;">{{ order.created_at|date:"d.m.Y H:i" }}</p>
+    <span class="jd-status-pill" style="background:rgba(0,68,204,0.15); color:var(--primary); padding:6px 12px; border-radius:20px; font-weight:700; font-size:0.85rem;">
+        {{ order.get_status_display }}
+    </span>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;">
+        <a href="{% url 'download_invoice' order.id %}" class="jd-btn secondary">
+            <span class="material-symbols-rounded" style="font-size:18px;">receipt_long</span>
+            {% trans "Download Invoice" %}
+        </a>
+    </div>
+</div>
+
+{% if shipment %}
+<div class="jd-card">
+    <h2>{% trans "Shipment Tracking" %}</h2>
+    <p class="jd-track-text">{{ shipment.get_carrier_display }} · {{ shipment.tracking_number }}</p>
+    {% if shipment.estimated_delivery %}
+    <p class="jd-track-text muted">{% trans "Estimated delivery" %}: {{ shipment.estimated_delivery|date:"d.m.Y" }}</p>
+    {% endif %}
+    {% if shipment.resolved_tracking_url %}
+    <a href="{{ shipment.resolved_tracking_url }}" target="_blank" rel="noopener" class="jd-btn" style="margin-top:12px;">
+        <span class="material-symbols-rounded" style="font-size:18px;">local_shipping</span>
+        {% trans "Track Shipment" %}
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="jd-card">
+    <h2>{% trans "Items" %}</h2>
+    {% for item in items %}
+    <div class="jd-item-row">
+        <span>{{ item.get_name }} × {{ item.quantity }}</span>
+        <span>{{ item.price }} €</span>
+    </div>
+    {% endfor %}
+    <div class="jd-item-row" style="font-weight:700;">
+        <span>{% trans "Total" %}</span>
+        <span>{{ order.total_amount }} €</span>
+    </div>
+    {% if can_request_return %}
+    <a href="{% url 'jd_request_return_app' order.id %}" class="jd-btn secondary" style="margin-top:16px;">
+        <span class="material-symbols-rounded" style="font-size:18px;">assignment_return</span>
+        {% trans "Return / Exchange" %}
+    </a>
+    {% endif %}
+</div>
+
+{% if status_logs %}
+<div class="jd-card">
+    <h2>{% trans "Status History" %}</h2>
+    {% for log in status_logs %}
+    <div class="jd-track-step">
+        <div class="jd-track-dot"></div>
+        <div class="jd-track-text">
+            {{ log.get_event_type_display }}{% if log.new_status %} → {{ log.new_status }}{% endif %}
+            <div class="muted">{{ log.created_at|date:"d.m.Y H:i" }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if can_request_callback %}
+<div class="jd-card">
+    <h2>{% trans "Need help with this order?" %}</h2>
+    <p style="color:var(--text-secondary); margin-bottom:12px; font-size:0.9rem;">{% trans "Request a callback and our support team will call you back." %}</p>
+    <form method="post" action="{% url 'jd_request_callback_app' order.id %}" style="display:flex; gap:8px; flex-wrap:wrap;">
+        {% csrf_token %}
+        <input type="tel" name="phone" placeholder="{% trans 'Phone number (optional)' %}" style="flex:1; min-width:160px; padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--surface-elevated); color:var(--text);">
+        <button type="submit" class="jd-btn">
+            <span class="material-symbols-rounded" style="font-size:18px;">call</span>
+            {% trans "Request Callback" %}
+        </button>
+    </form>
+</div>
+{% endif %}
+{% endblock %}

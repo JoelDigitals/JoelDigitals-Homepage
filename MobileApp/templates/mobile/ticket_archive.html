@@ -135,7 +135,7 @@
                     <span>
                         <strong>{{ ticket.ticket_number }}</strong> – {{ ticket.user.email }} – {{ ticket.subject }} – {{ ticket.created_at|date:"d.m.Y H:i" }} – {{ ticket.name }}
                     </span>
-                    <a href="{% url 'admin_ticket_detail' ticket.ticket_number %}" class="details-link">➤ Details & Chat</a>
+                    <a href="{% url 'admin_ticket_detail_app' ticket.ticket_number %}" class="details-link">➤ Details & Chat</a>
                 </li>
             {% empty %}
                 <li><em>Keine passenden Tickets gefunden.</em></li>

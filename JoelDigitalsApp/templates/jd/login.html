@@ -1,0 +1,56 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Login" %} – Joel Digitals{% endblock %}
+
+{% block extra_css %}
+<style>
+.jd-login-card { margin-top: 10vh; }
+.jd-field { margin-bottom: 16px; }
+.jd-field label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px; }
+.jd-field input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface-elevated);
+    color: var(--text);
+    font-size: 1rem;
+}
+.jd-field input:focus { outline: none; border-color: var(--primary); }
+.jd-errors { color: var(--error); font-size: 0.85rem; margin-bottom: 12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="jd-card jd-login-card">
+    <h1>{% trans "Welcome back" %}</h1>
+    <p style="color:var(--text-secondary); margin-bottom:20px;">{% trans "Log in to track orders, deals and support." %}</p>
+
+    {% if form.non_field_errors %}
+    <div class="jd-errors">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="jd-field">
+            <label for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
+            {{ form.username }}
+        </div>
+        <div class="jd-field">
+            <label for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
+            {{ form.password }}
+        </div>
+        <button type="submit" class="jd-btn" style="width:100%; justify-content:center;">
+            {% trans "Log In" %}
+        </button>
+    </form>
+
+    <p style="text-align:center; margin-top:18px; color:var(--text-secondary); font-size:0.9rem;">
+        {% trans "No account yet?" %}
+        <a href="{% url 'jd_register_app' %}" style="color:var(--primary); font-weight:600; text-decoration:none;">
+            {% trans "Register now" %}
+        </a>
+    </p>
+</div>
+{% endblock %}

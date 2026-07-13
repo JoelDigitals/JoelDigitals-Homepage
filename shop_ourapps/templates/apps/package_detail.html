@@ -175,8 +175,8 @@
 </style>
 
 <div class="package-hero">
-  {% if package.image %}
-    <img src="{{ package.image.url }}" alt="{{ package.name }}" style="width:100%;max-width:300px;border-radius:16px;margin-bottom:1.5rem;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+  {% if package.display_image %}
+    <img src="{{ package.display_image }}" alt="{{ package.name }}" style="width:100%;max-width:300px;border-radius:16px;margin-bottom:1.5rem;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
   {% endif %}
 
   {% if package.is_preorder %}
@@ -243,8 +243,8 @@
   <div class="app-list">
     {% for pa in package_apps %}
     <div class="app-card">
-      {% if pa.app.image %}
-        <img src="{{ pa.app.image.url }}" alt="{{ pa.app.name }}">
+      {% if pa.app.display_image %}
+        <img src="{{ pa.app.display_image }}" alt="{{ pa.app.name }}">
       {% else %}
         <div class="app-icon-placeholder"><i class="fas fa-cube"></i></div>
       {% endif %}

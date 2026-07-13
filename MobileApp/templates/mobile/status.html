@@ -36,6 +36,7 @@
 }
 .summary-chip.online { background: rgba(16,185,129,0.15); color: #10b981; }
 .summary-chip.offline { background: rgba(239,68,68,0.15); color: #ef4444; }
+.summary-chip.issues { background: rgba(245,158,11,0.15); color: #f59e0b; }
 .summary-chip.total { background: rgba(100,116,139,0.15); color: #94a3b8; }
 .app-list { display: flex; flex-direction: column; gap: 12px; }
 .app-item {
@@ -73,6 +74,19 @@
 .issue-banner h4 { color: #ef4444; font-size: 0.9rem; margin-bottom: 4px; }
 .issue-banner p { color: var(--text-secondary); font-size: 0.85rem; }
 .issue-banner .issue-title { font-weight: 600; color: var(--text); }
+.issue-badges { display: flex; gap: 6px; margin: 6px 0; flex-wrap: wrap; }
+.issue-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+.severity-minor { background: rgba(100,116,139,0.15); color: #94a3b8; }
+.severity-major { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.severity-critical { background: rgba(239,68,68,0.15); color: #ef4444; }
+.stage-badge { background: rgba(99,102,241,0.15); color: #818cf8; }
 .hotline-btn {
   display: flex;
   align-items: center;
@@ -102,6 +116,9 @@
   <div class="summary-chip online">● {{ online }}/{{ total }} {% trans "Online" %}</div>
   {% if offline > 0 %}
   <div class="summary-chip offline">● {{ offline }} {% trans "Offline" %}</div>
+  {% endif %}
+  {% if issues > 0 %}
+  <div class="summary-chip issues">● {{ issues }} {% trans "With Issues" %}</div>
   {% endif %}
   <div class="summary-chip total">{{ total }} {% trans "Services" %}</div>
 </div>
@@ -169,6 +186,10 @@ function readStatus() {
 {% for issue in global_issues %}
 <div class="issue-banner">
   <h4>⚠️ {% trans "Global Issue" %}</h4>
+  <div class="issue-badges">
+    <span class="issue-badge severity-{{ issue.severity }}">{{ issue.get_severity_display }}</span>
+    <span class="issue-badge stage-badge">{{ issue.get_status_display }}</span>
+  </div>
   <p class="issue-title">{{ issue.title }}</p>
   <p>{{ issue.description }}</p>
 </div>
@@ -177,7 +198,9 @@ function readStatus() {
 <div class="app-list">
   {% for item in status_data %}
   <div class="app-item">
-    {% if item.latest and item.latest.status == "online" %}
+    {% if item.issues %}
+    <div class="status-dot offline"></div>
+    {% elif item.latest and item.latest.status == "online" %}
     <div class="status-dot online"></div>
     {% elif item.latest and item.latest.status == "offline" %}
     <div class="status-dot offline"></div>
@@ -196,6 +219,17 @@ function readStatus() {
     <div class="app-ms">{{ item.latest.response_time_ms }}ms</div>
     {% endif %}
   </div>
+  {% for issue in item.issues %}
+  <div class="issue-banner">
+    <h4>⚠️ {{ item.app.name }}</h4>
+    <div class="issue-badges">
+      <span class="issue-badge severity-{{ issue.severity }}">{{ issue.get_severity_display }}</span>
+      <span class="issue-badge stage-badge">{{ issue.get_status_display }}</span>
+    </div>
+    <p class="issue-title">{{ issue.title }}</p>
+    <p>{{ issue.description }}</p>
+  </div>
+  {% endfor %}
   {% empty %}
   <p style="text-align:center;color:var(--text-muted);padding:32px 0;">
     {% trans "No applications configured." %}

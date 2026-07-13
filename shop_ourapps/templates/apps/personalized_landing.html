@@ -36,8 +36,8 @@
 
   <div class="lp-body">
     <div class="lp-product">
-      {% if product.image %}
-      <img src="{{ product.image.url }}" alt="{{ product_name }}">
+      {% if product.display_image %}
+      <img src="{{ product.display_image }}" alt="{{ product_name }}">
       {% endif %}
       <h2>{{ product_name }}</h2>
       <p class="desc">{{ product.short_description }}</p>

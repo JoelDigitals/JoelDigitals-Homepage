@@ -466,15 +466,15 @@
             <!-- 1:1 Image -->
             <div class="item-image">
               {% if item.package %}
-                {% if item.package.image %}
-                  <img src="{{ item.package.image.url }}" alt="{{ item.package.name }}">
+                {% if item.package.display_image %}
+                  <img src="{{ item.package.display_image }}" alt="{{ item.package.name }}">
                 {% else %}
                   <div class="item-image-placeholder">
                     <i class="fas fa-gift"></i>
                   </div>
                 {% endif %}
-              {% elif item.app.image %}
-                <img src="{{ item.app.image.url }}" alt="{{ item.app.name }}">
+              {% elif item.app.display_image %}
+                <img src="{{ item.app.display_image }}" alt="{{ item.app.name }}">
               {% else %}
                 <div class="item-image-placeholder">
                   <i class="fas fa-cube"></i>

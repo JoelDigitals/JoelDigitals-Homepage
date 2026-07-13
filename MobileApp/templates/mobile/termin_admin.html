@@ -146,8 +146,8 @@
             <td>{{ a.appointment_datetime|date:"d.m.Y H:i" }}</td>
             <td>{{ a.appointment_type }}</td>
             <td>
-                <a class="btn accept" href="{% url 'update_appointment_status' a.id 'accepted' %}">Annehmen</a>
-                <a class="btn reject" href="{% url 'update_appointment_status' a.id 'rejected' %}">Ablehnen</a>
+                <a class="btn accept" href="{% url 'update_appointment_status_app' a.id 'accepted' %}">Annehmen</a>
+                <a class="btn reject" href="{% url 'update_appointment_status_app' a.id 'rejected' %}">Ablehnen</a>
             </td>
         </tr>
         {% empty %}

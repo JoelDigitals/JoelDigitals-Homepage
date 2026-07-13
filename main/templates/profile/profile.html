@@ -1,4 +1,4 @@
-{% extends 'base_home.html' %}
+{% extends request.base_template|default:'base_home.html' %}
 {% load static %}
 {% load i18n %}
 
@@ -430,6 +430,16 @@
 
     <!-- Action Buttons -->
     <div class="action-buttons">
+      {% if request.base_template == "base_app.html" %}
+      <a href="{% url 'jd_profile_edit_app' %}" class="btn btn-primary">
+        <i class="fas fa-edit"></i>
+        {% trans "Edit Profile" %}
+      </a>
+      <a href="{% url 'jd_change_password_app' %}" class="btn btn-secondary">
+        <i class="fas fa-key"></i>
+        {% trans "Change Password" %}
+      </a>
+      {% else %}
       <a href="{% url 'profile_edit' %}" class="btn btn-primary">
         <i class="fas fa-edit"></i>
         {% trans "Edit Profile" %}
@@ -438,6 +448,7 @@
         <i class="fas fa-key"></i>
         {% trans "Change Password" %}
       </a>
+      {% endif %}
       <a href="{% url 'app_permissions' %}" class="btn btn-secondary">
         <i class="fas fa-key"></i>
         {% trans "App Permissions" %}

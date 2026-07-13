@@ -2183,17 +2183,19 @@ def request_return(request, order_id):
     """Kunde stellt Rücksende-/Rückerstattungsantrag für eine Bestellung."""
     from .models import ReturnRequest
     order = get_object_or_404(Order, id=order_id, user=request.user)
+    in_app = getattr(request, 'base_template', None) == 'base_app.html'
+    order_detail_name = 'jd_order_detail_app' if in_app else 'order_detail'
 
     # Nur für bezahlte/gelieferte Bestellungen
     if order.status not in ('Paid', 'In Delivery', 'Delivered', 'Finished'):
         messages.error(request, "Für diese Bestellung kann kein Rücksendeantrag gestellt werden.")
-        return redirect('my_order_detail', order_id=order.id)
+        return redirect(order_detail_name, order_id=order.id)
 
     # Bereits ein offener Antrag?
     existing = ReturnRequest.objects.filter(order=order, user=request.user).exclude(status='rejected').first()
     if existing:
         messages.warning(request, f"Es gibt bereits einen Antrag (Status: {existing.get_status_display()}).")
-        return redirect('my_order_detail', order_id=order.id)
+        return redirect(order_detail_name, order_id=order.id)
 
     if request.method == 'POST':
         reason      = request.POST.get('reason', '')
@@ -2201,7 +2203,7 @@ def request_return(request, order_id):
 
         if reason not in dict(ReturnRequest.REASON_CHOICES):
             messages.error(request, "Bitte einen gültigen Grund auswählen.")
-            return redirect('request_return', order_id=order.id)
+            return redirect('jd_request_return_app' if in_app else 'request_return', order_id=order.id)
 
         return_type = request.POST.get('return_type', 'refund')
         if return_type not in ('refund', 'exchange'):
@@ -2264,7 +2266,7 @@ def request_return(request, order_id):
         except Exception:
             pass
 
-        return redirect('order_detail', order_id=order.id)
+        return redirect(order_detail_name, order_id=order.id)
 
     # GET: Formular anzeigen
     items = order.items.select_related('app')

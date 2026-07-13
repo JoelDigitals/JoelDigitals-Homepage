@@ -1,0 +1,308 @@
+<!-- base_app.html - Joel Digitals App shell -->
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'de' }}">
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}Joel Digitals{% endblock %}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="hz:app-name" content="Joel Digitals">
+<link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<style>
+:root {
+    --bg: #121212;
+    --surface: #1e1e1e;
+    --surface-elevated: #262626;
+    --primary: #0044cc;
+    --primary-hover: #2a5fe0;
+    --primary-glow: rgba(0, 68, 204, 0.35);
+    --text: #eeeeee;
+    --text-secondary: #a3a3a3;
+    --text-muted: #6b6b6b;
+    --border: #333333;
+    --radius: 16px;
+    --radius-sm: 12px;
+    --admin: #ff9800;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+    line-height: 1.5;
+}
+
+a { color: inherit; }
+
+/* Header */
+header.jd-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(18, 18, 18, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.jd-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 1.15rem;
+    text-decoration: none;
+    color: var(--text);
+}
+
+.jd-brand .material-symbols-rounded {
+    color: var(--primary);
+    background: rgba(0, 68, 204, 0.15);
+    border-radius: 10px;
+    padding: 6px;
+    font-size: 22px;
+}
+
+.jd-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.jd-header-actions a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-elevated);
+    text-decoration: none;
+    color: var(--text-secondary);
+    transition: color .2s ease, background .2s ease;
+}
+
+.jd-header-actions a:hover { color: var(--primary); background: rgba(0,68,204,0.15); }
+
+.jd-header-actions a.admin { color: var(--admin); }
+
+/* Main content, leave room for bottom tab bar */
+main.jd-main {
+    padding: 20px 16px 100px;
+    max-width: 720px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* Safety net for desktop-oriented admin pages rendered inside the app shell:
+   wide tables/grids should scroll within their own box instead of pushing
+   content off-screen (overflow-x:hidden on <body> would otherwise clip it). */
+.jd-main img, .jd-main video, .jd-main svg, .jd-main iframe, .jd-main canvas {
+    max-width: 100%;
+    height: auto;
+}
+.jd-main table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.jd-main pre, .jd-main code {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.jd-main > * {
+    max-width: 100%;
+}
+
+/* Messages */
+.jd-messages { max-width: 720px; margin: 12px auto 0; padding: 0 16px; }
+.jd-message {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+/* Bottom tab bar */
+nav.jd-tabbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-around;
+    background: rgba(18, 18, 18, 0.97);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+}
+
+.jd-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    transition: color .2s ease;
+    flex: 1;
+    max-width: 90px;
+}
+
+.jd-tab .material-symbols-rounded { font-size: 22px; }
+
+.jd-tab.active { color: var(--primary); }
+
+/* Generic card */
+.jd-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.jd-card h2, .jd-card h1 { margin-bottom: 8px; }
+
+.jd-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+}
+
+.jd-btn.secondary {
+    background: var(--surface-elevated);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.jd-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+</style>
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<header class="jd-header">
+    <a href="{% url 'jd_home_app' %}" class="jd-brand">
+        <span class="material-symbols-rounded">bolt</span>
+        Joel Digitals
+    </a>
+    <div class="jd-header-actions">
+        {% if jd_is_admin %}
+        <a href="{% url 'jd_admin_dashboard_app' %}" class="admin" title="{% trans 'Admin Dashboard' %}">
+            <span class="material-symbols-rounded">admin_panel_settings</span>
+        </a>
+        {% endif %}
+        {% if user.is_authenticated %}
+        <a href="{% url 'jd_settings_app' %}" title="{% trans 'Settings' %}">
+            <span class="material-symbols-rounded">settings</span>
+        </a>
+        <a href="{% url 'jd_profile_app' %}" title="{% trans 'Profile' %}">
+            <span class="material-symbols-rounded">account_circle</span>
+        </a>
+        <a href="{% url 'jd_logout_app' %}" title="{% trans 'Logout' %}">
+            <span class="material-symbols-rounded">logout</span>
+        </a>
+        {% else %}
+        <a href="{% url 'jd_login_app' %}" title="{% trans 'Login' %}">
+            <span class="material-symbols-rounded">login</span>
+        </a>
+        {% endif %}
+    </div>
+</header>
+
+{% if messages %}
+<div class="jd-messages">
+    {% for message in messages %}
+    <div class="jd-message">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main class="jd-main">
+{% block content %}{% endblock %}
+</main>
+
+<nav class="jd-tabbar">
+    <a href="{% url 'jd_home_app' %}" class="jd-tab {% if request.resolver_match.url_name == 'jd_home_app' %}active{% endif %}">
+        <span class="material-symbols-rounded">home</span>
+        {% trans "Home" %}
+    </a>
+    <a href="{% url 'jd_deals_app' %}" class="jd-tab {% if request.resolver_match.url_name == 'jd_deals_app' %}active{% endif %}">
+        <span class="material-symbols-rounded">local_offer</span>
+        {% trans "Deals" %}
+    </a>
+    <a href="{% url 'jd_articles_app' %}" class="jd-tab {% if request.resolver_match.url_name == 'jd_articles_app' %}active{% endif %}">
+        <span class="material-symbols-rounded">article</span>
+        {% trans "News" %}
+    </a>
+    <a href="{% url 'jd_orders_app' %}" class="jd-tab {% if request.resolver_match.url_name == 'jd_orders_app' or request.resolver_match.url_name == 'jd_order_detail_app' %}active{% endif %}">
+        <span class="material-symbols-rounded">local_shipping</span>
+        {% trans "Orders" %}
+    </a>
+    <a href="{% url 'jd_support_app' %}" class="jd-tab {% if request.resolver_match.url_name == 'jd_support_app' or request.resolver_match.url_name == 'jd_ticket_detail_app' %}active{% endif %}">
+        <span class="material-symbols-rounded">support_agent</span>
+        {% trans "Support" %}
+    </a>
+</nav>
+
+{% if ONESIGNAL_APP_ID %}
+<!-- Push-Vorbereitung: median.co Native-Push kann direkt an diese OneSignal App-ID gebunden werden.
+     Web-SDK hier nur als Fallback fuer den Browser-Fall. -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({ appId: "{{ ONESIGNAL_APP_ID }}" });
+    {% if user.is_authenticated %}
+    OneSignal.login("{{ user.id }}");
+    {% endif %}
+  });
+</script>
+{% endif %}
+{% block extra_js %}{% endblock %}
+</body>
+</html>

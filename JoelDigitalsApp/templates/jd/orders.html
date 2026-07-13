@@ -1,0 +1,55 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "My Orders" %} – Joel Digitals{% endblock %}
+
+{% block extra_css %}
+<style>
+.jd-order-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    text-decoration: none;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.jd-order-card h3 { font-size: 1rem; margin-bottom: 4px; }
+.jd-order-meta { font-size: 0.8rem; color: var(--text-secondary); }
+.jd-status-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(0, 68, 204, 0.15);
+    color: var(--primary);
+    white-space: nowrap;
+}
+.jd-status-Delivered, .jd-status-Finished { background: rgba(16,185,129,0.15); color: var(--success); }
+.jd-status-Canceled, .jd-status-Return { background: rgba(239,68,68,0.15); color: var(--error); }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom:16px;">{% trans "My Orders" %}</h1>
+
+{% if orders %}
+{% for order in orders %}
+<a href="{% url 'jd_order_detail_app' order.id %}" class="jd-order-card">
+    <div>
+        <h3>{% trans "Order" %} #{{ order.id }}</h3>
+        <div class="jd-order-meta">{{ order.created_at|date:"d.m.Y" }} · {{ order.total_amount }} €</div>
+    </div>
+    <span class="jd-status-pill jd-status-{{ order.status }}">{{ order.get_status_display }}</span>
+</a>
+{% endfor %}
+{% else %}
+<div class="jd-empty">
+    <span class="material-symbols-rounded" style="font-size:40px;">local_shipping</span>
+    <p>{% trans "You don't have any orders yet." %}</p>
+</div>
+{% endif %}
+{% endblock %}

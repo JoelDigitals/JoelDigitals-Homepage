@@ -1,4 +1,4 @@
-{% extends 'base_home.html' %}
+{% extends request.base_template|default:'base_home.html' %}
 {% load static %}
 {% load i18n %}
 
@@ -225,7 +225,7 @@
       {% endfor %}
     {% endif %}
 
-    <form method="post" action="{% url 'profile_edit' %}">
+    <form method="post">
       {% csrf_token %}
 
       <!-- Benutzername & Name -->
@@ -313,7 +313,11 @@
           <i class="fas fa-save"></i>
           {% trans "Save Changes" %}
         </button>
+        {% if request.base_template == "base_app.html" %}
+        <a href="{% url 'jd_profile_app' %}" class="btn btn-secondary">
+        {% else %}
         <a href="{% url 'profile_view' %}" class="btn btn-secondary">
+        {% endif %}
           <i class="fas fa-times"></i>
           {% trans "Cancel" %}
         </a>

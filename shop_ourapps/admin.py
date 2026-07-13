@@ -22,11 +22,26 @@ class OrderStatusLogAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'order', 'event_type', 'old_status', 'new_status', 'note']
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'first_name', 'email', 'status', 'total_amount', 'created_at', 'registration_code_sent_at']
+    list_display = ['id', 'first_name', 'email', 'status', 'total_amount', 'created_at', 'registration_code_sent_at', 'jds_synced_at']
     list_filter = ['status', 'created_at', 'payment_method']
     search_fields = ['first_name', 'last_name', 'email', 'id']
-    readonly_fields = ['delivered_at', 'registration_code_sent_at', 'review_email_sent_at', 'review_email_scheduled_for']
-    actions = ['send_review_email_action', 'send_shipping_notification_action']
+    readonly_fields = ['delivered_at', 'registration_code_sent_at', 'review_email_sent_at', 'review_email_scheduled_for', 'jds_customer_id', 'jds_synced_at', 'jds_sync_error']
+    actions = ['send_review_email_action', 'send_shipping_notification_action', 'retry_jds_sync_action']
+
+    @admin.action(description="🔄 JDS Management Sync erneut versuchen")
+    def retry_jds_sync_action(self, request, queryset):
+        from .services.jds_api import push_order
+        count = 0
+        errors = 0
+        for order in queryset:
+            if push_order(order):
+                count += 1
+            else:
+                errors += 1
+        msg = f"{count} Bestellung(en) synchronisiert."
+        if errors:
+            msg += f" {errors} fehlgeschlagen (siehe jds_sync_error)."
+        self.message_user(request, msg)
 
     @admin.action(description="📧 Review-Email manuell senden (nur wenn Delivered)")
     def send_review_email_action(self, request, queryset):
@@ -71,7 +86,7 @@ class AppAdmin(admin.ModelAdmin):
     search_fields = ['name', 'slug']
     fieldsets = (
         (None, {
-            'fields': ('name', 'name_english', 'slug', 'description', 'description_english', 'image')
+            'fields': ('name', 'name_english', 'slug', 'description', 'description_english', 'image', 'image_url')
         }),
         ('Produktdetails', {
             'fields': ('product_number', 'version', 'group')
@@ -105,7 +120,7 @@ class PackageAdmin(admin.ModelAdmin):
     inlines = [PackageAppInline]
     fieldsets = (
         (None, {
-            'fields': ('name', 'name_english', 'slug', 'description', 'description_english', 'image')
+            'fields': ('name', 'name_english', 'slug', 'description', 'description_english', 'image', 'image_url')
         }),
         ('Verfügbarkeit', {
             'fields': ('is_active', 'is_available_for_purchase', 'release_date', 'preorder_date', 'stock')

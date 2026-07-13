@@ -3,6 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .models import App, AppIssue, GlobalIssue, AppStatus
+from .utils import build_hotline_texts, apply_issue_language
 import requests
 import time
 import socket
@@ -155,16 +156,19 @@ def check_server_status(url):
         return "offline", None
 
 def status_overview(request):
+    lang = request.LANGUAGE_CODE
     apps = App.objects.filter(is_active=True).prefetch_related('issues')
-    global_issues = GlobalIssue.objects.filter(is_resolved=False)
+    global_issues = list(GlobalIssue.objects.filter(is_resolved=False))
+    for issue in global_issues:
+        apply_issue_language(issue, lang)
 
-    has_global_issues = global_issues.exists()
+    has_global_issues = bool(global_issues)
     has_any_issues = False
 
     app_data = []
     for app in apps:
         latest = app.statuses.order_by('-timestamp').first()
-        unresolved = [i for i in app.issues.all() if not i.is_resolved]
+        unresolved = [apply_issue_language(i, lang) for i in app.issues.all() if not i.is_resolved]
         has_issues = len(unresolved) > 0
 
         if has_issues:
@@ -191,37 +195,9 @@ def status_overview(request):
     issue_apps = [a for a in app_data if a['status'] == 'issue']
     all_issues = [i for a in issue_apps for i in a['issues']]
 
-    def build_hotline_de():
-        parts = ["Willkommen bei der Joel Digitals Status Hotline."]
-        if has_global_issues:
-            parts.append("Achtung, es liegen globale Störungen vor.")
-            for issue in global_issues:
-                parts.append(f"{issue.title}. {issue.description}.")
-        if issue_apps:
-            for app_item in issue_apps:
-                for issue in app_item['issues']:
-                    parts.append(f"Bei {app_item['app'].name} liegt folgendes Problem vor: {issue.title}. {issue.description}.")
-        if not has_global_issues and not issue_apps:
-            parts.append("Alle Systeme sind online.")
-        parts.append(f"Von {total} überwachten Diensten sind {online_count} online, {offline_count} offline, {issue_count} haben Probleme.")
-        parts.append("Vielen Dank für Ihren Anruf.")
-        return " ".join(parts)
-
-    def build_hotline_en():
-        parts = ["Welcome to the Joel Digitals Status Hotline."]
-        if has_global_issues:
-            parts.append("Attention, there are global issues.")
-            for issue in global_issues:
-                parts.append(f"{issue.title}. {issue.description}.")
-        if issue_apps:
-            for app_item in issue_apps:
-                for issue in app_item['issues']:
-                    parts.append(f"{app_item['app'].name} has the following problem: {issue.title}. {issue.description}.")
-        if not has_global_issues and not issue_apps:
-            parts.append("All systems are operational.")
-        parts.append(f"Of {total} monitored services, {online_count} are online, {offline_count} offline, {issue_count} have issues.")
-        parts.append("Thank you for calling.")
-        return " ".join(parts)
+    hotline_text_de, hotline_text_en = build_hotline_texts(
+        list(global_issues), issue_apps, total, online_count, offline_count, issue_count
+    )
 
     return render(request, 'status/status_overview.html', {
         'app_data': app_data,
@@ -233,8 +209,8 @@ def status_overview(request):
         'issue_count': issue_count,
         'issue_apps': issue_apps,
         'all_issues': all_issues,
-        'hotline_text_de': build_hotline_de(),
-        'hotline_text_en': build_hotline_en(),
+        'hotline_text_de': hotline_text_de,
+        'hotline_text_en': hotline_text_en,
     })
 
 # ⬇️ Hier wird beim Aufruf die App live geprüft
@@ -250,7 +226,7 @@ def app_detail(request, app_id):
         message="Automatische Prüfung"
     )
 
-    unresolved_issues = app.issues.filter(is_resolved=False)
+    unresolved_issues = [apply_issue_language(i, request.LANGUAGE_CODE) for i in app.issues.filter(is_resolved=False)]
 
     return render(request, 'status/app_detail.html', {
         'app': app,
@@ -303,41 +279,25 @@ def status_hotline(request):
     global_issues = GlobalIssue.objects.filter(is_resolved=False)
     now = timezone.now()
 
-    lines = ["Willkommen bei der Joel Digitals Status Hotline."]
-    lines.append(f"Heute ist der {now.strftime('%d. %B %Y')}, es ist {now.strftime('%H:%M')} Uhr.")
-
-    if global_issues.exists():
-        lines.append("Achtung, es liegen globale Störungen vor.")
-        for issue in global_issues:
-            lines.append(f"{issue.title}. {issue.description}")
-
-    for app in apps:
-        unresolved = app.issues.filter(is_resolved=False)
-        if unresolved.exists():
-            lines.append(f"Bei {app.name} liegen folgende Probleme vor.")
-            for issue in unresolved:
-                lines.append(f"{issue.title}. {issue.description}")
-
+    issue_apps = []
     online_count = 0
     offline_count = 0
     issue_count = 0
     for app in apps:
         latest = app.statuses.order_by('-timestamp').first()
-        has_issues = app.issues.filter(is_resolved=False).exists()
-        if has_issues:
+        unresolved = [i for i in app.issues.all() if not i.is_resolved]
+        if unresolved:
             issue_count += 1
+            issue_apps.append({'app': app, 'issues': unresolved})
         elif latest and latest.status == "offline":
             offline_count += 1
         else:
             online_count += 1
 
-    if not global_issues.exists() and issue_count == 0:
-        lines.append("Alle Systeme sind online.")
-
-    lines.append(f"Von {apps.count()} überwachten Diensten sind {online_count} online, {offline_count} offline und {issue_count} haben bekannte Probleme.")
-    lines.append("Vielen Dank für Ihren Anruf.")
-
-    text = ". ".join(lines)
+    hotline_text_de, _ = build_hotline_texts(
+        list(global_issues), issue_apps, apps.count(), online_count, offline_count, issue_count
+    )
+    text = f"Heute ist der {now.strftime('%d. %B %Y')}, es ist {now.strftime('%H:%M')} Uhr. " + hotline_text_de
 
     twiml = f'''<?xml version="1.0" encoding="UTF-8"?>
 <Response>

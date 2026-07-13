@@ -200,7 +200,7 @@
   }
 
   .message-user {
-    background: linear-gradient(135deg, var(--primary), #0066ff);
+    background: linear-gradient(135deg, var(--accent), #0066ff);
     color: white;
     align-self: flex-end;
     border-bottom-right-radius: 4px;
@@ -469,11 +469,11 @@
   <div class="chat-body">
     <!-- Back Link -->
     {% if user.is_staff %}
-      <a href="{% url 'admin_sales' %}" class="back-link">
+      <a href="{% url 'admin_sales_app' %}" class="back-link">
         <i class="fas fa-arrow-left"></i> {% trans "Back to Orders" %}
       </a>
     {% else %}
-      <a href="{% url 'sales' %}" class="back-link">
+      <a href="{% url 'sales_app' %}" class="back-link">
         <i class="fas fa-arrow-left"></i> {% trans "Back to My Orders" %}
       </a>
     {% endif %}

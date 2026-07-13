@@ -16,8 +16,8 @@
   {% endif %}
 
   <div class="image-wrapper">
-    {% if package.image %}
-      <img src="{{ package.image.url }}" alt="{{ package.name }}">
+    {% if package.display_image %}
+      <img src="{{ package.display_image }}" alt="{{ package.name }}">
     {% else %}
       <div class="image-placeholder">
         <i class="fas fa-gift"></i>

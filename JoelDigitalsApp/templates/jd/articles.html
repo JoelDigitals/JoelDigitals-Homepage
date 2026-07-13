@@ -1,0 +1,44 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "News" %} – Joel Digitals{% endblock %}
+
+{% block extra_css %}
+<style>
+.jd-article-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+}
+.jd-article-card h3 { font-size: 1rem; margin-bottom: 6px; }
+.jd-article-meta { font-size: 0.78rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom:16px;">{% trans "Latest Articles" %}</h1>
+
+{% if articles %}
+{% for post in articles %}
+<a href="{{ post.external_url }}" target="_blank" rel="noopener" class="jd-article-card">
+    <h3>{{ post.title_de }}</h3>
+    <div class="jd-article-meta">
+        <span class="material-symbols-rounded" style="font-size:16px;">calendar_today</span>
+        {{ post.published_at|date:"d.m.Y H:i" }}
+        <span class="material-symbols-rounded" style="font-size:16px; margin-left:8px;">open_in_new</span>
+        {% trans "Read on joel-digitals.de" %}
+    </div>
+</a>
+{% endfor %}
+{% else %}
+<div class="jd-empty">
+    <span class="material-symbols-rounded" style="font-size:40px;">article</span>
+    <p>{% trans "No articles published yet." %}</p>
+</div>
+{% endif %}
+{% endblock %}

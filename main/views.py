@@ -248,8 +248,79 @@ def get_blog_analytics():
     }
 
 
-@login_required
-def admin_dashboard(request):
+def _handle_admin_dashboard_actions(request, redirect_name):
+    """POST-Aktionen des Admin-Dashboards (Webinar-Erinnerung, Widerruf).
+
+    Wird sowohl von der Desktop- als auch der App-Ansicht des Dashboards
+    aufgerufen. Gibt einen Redirect zurueck wenn eine Aktion verarbeitet
+    wurde, sonst None.
+    """
+    if request.method == "POST" and request.POST.get("send_webinar_reminder"):
+        from webinars.models import Webinar as Wb, WebinarRegistration
+        from django.core.mail import EmailMultiAlternatives
+        from django.template.loader import render_to_string
+        from django.conf import settings
+        wid = request.POST.get("send_webinar_reminder")
+        webinar = get_object_or_404(Wb, id=wid, is_active=True)
+        registrations = WebinarRegistration.objects.filter(webinar=webinar, status='registered', reminder_sent=False)
+        sent_count = 0
+        for reg in registrations:
+            try:
+                recipient_email = reg.user.email if reg.user else reg.guest_email
+                recipient_name = reg.user.first_name or reg.user.username if reg.user else (reg.guest_name or 'Gast')
+                if not recipient_email:
+                    continue
+                ctx = {'user': reg.user, 'name': recipient_name, 'webinar': reg.webinar}
+                html = render_to_string('emails/webinar_reminder.html', ctx)
+                msg = EmailMultiAlternatives(
+                    subject=f"🔔 Erinnerung: {webinar.title} beginnt bald!",
+                    body="",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[recipient_email],
+                )
+                msg.attach_alternative(html, "text/html")
+                msg.send()
+                reg.reminder_sent = True
+                reg.save(update_fields=['reminder_sent'])
+                sent_count += 1
+            except Exception:
+                pass
+        messages.success(request, f"{sent_count} Erinnerung(en) für '{webinar.title}' gesendet.")
+        return redirect(redirect_name)
+
+    if request.method == "POST" and "withdrawal_action" in request.POST:
+        from shop_ourapps.models import WithdrawalRequest
+        from django.utils import timezone as tz
+        wr_id = request.POST.get("wr_id")
+        action = request.POST.get("action")
+        note = request.POST.get("note", "")
+        wr = get_object_or_404(WithdrawalRequest, id=wr_id)
+        if action == "approve":
+            wr.status = "approved"
+            wr.admin_note = note
+            wr.processed_at = tz.now()
+            wr.save()
+            messages.success(request, f"Widerruf #{wr.order_number} genehmigt.")
+            _send_withdrawal_email(wr, 'approved')
+        elif action == "reject":
+            wr.status = "rejected"
+            wr.admin_note = note
+            wr.processed_at = tz.now()
+            wr.save()
+            messages.success(request, f"Widerruf #{wr.order_number} abgelehnt.")
+            _send_withdrawal_email(wr, 'rejected')
+        return redirect(redirect_name)
+
+    return None
+
+
+def _build_admin_dashboard_context(request):
+    """Baut den kompletten Kontext des Admin-Dashboards (KPIs, Analytics, Charts, ...).
+
+    Wird von der Desktop-Ansicht (main/admin_dashboard.html + base_home.html)
+    und der App-Ansicht (JoelDigitalsApp, gleiches Template + base_app.html)
+    gemeinsam genutzt, damit beide Oberflaechen exakt dieselben Daten zeigen.
+    """
     user_groups = [group.name for group in request.user.groups.all()] if request.user.is_authenticated else []
     now = timezone.now()
     today = now.date()
@@ -416,61 +487,6 @@ def admin_dashboard(request):
     pending_withdrawals = WithdrawalRequest.objects.filter(status='pending').order_by('-created_at')[:5]
     withdrawal_count = WithdrawalRequest.objects.filter(status='pending').count()
 
-    # === WEBINAR REMINDER VIA DASHBOARD ===
-    if request.method == "POST" and request.POST.get("send_webinar_reminder"):
-        from webinars.models import Webinar as Wb, WebinarRegistration
-        from django.core.mail import EmailMultiAlternatives
-        from django.template.loader import render_to_string
-        from django.conf import settings
-        wid = request.POST.get("send_webinar_reminder")
-        webinar = get_object_or_404(Wb, id=wid, is_active=True)
-        registrations = WebinarRegistration.objects.filter(webinar=webinar, status='registered', reminder_sent=False)
-        sent_count = 0
-        for reg in registrations:
-            try:
-                recipient_email = reg.user.email if reg.user else reg.guest_email
-                recipient_name = reg.user.first_name or reg.user.username if reg.user else (reg.guest_name or 'Gast')
-                if not recipient_email:
-                    continue
-                ctx = {'user': reg.user, 'name': recipient_name, 'webinar': reg.webinar}
-                html = render_to_string('emails/webinar_reminder.html', ctx)
-                msg = EmailMultiAlternatives(
-                    subject=f"🔔 Erinnerung: {webinar.title} beginnt bald!",
-                    body="",
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[recipient_email],
-                )
-                msg.attach_alternative(html, "text/html")
-                msg.send()
-                reg.reminder_sent = True
-                reg.save(update_fields=['reminder_sent'])
-                sent_count += 1
-            except Exception:
-                pass
-        messages.success(request, f"{sent_count} Erinnerung(en) für '{webinar.title}' gesendet.")
-        return redirect("admin_dashboard")
-
-    if request.method == "POST" and "withdrawal_action" in request.POST:
-        wr_id = request.POST.get("wr_id")
-        action = request.POST.get("action")
-        note = request.POST.get("note", "")
-        wr = get_object_or_404(WithdrawalRequest, id=wr_id)
-        if action == "approve":
-            wr.status = "approved"
-            wr.admin_note = note
-            wr.processed_at = tz.now()
-            wr.save()
-            messages.success(request, f"Widerruf #{wr.order_number} genehmigt.")
-            _send_withdrawal_email(wr, 'approved')
-        elif action == "reject":
-            wr.status = "rejected"
-            wr.admin_note = note
-            wr.processed_at = tz.now()
-            wr.save()
-            messages.success(request, f"Widerruf #{wr.order_number} abgelehnt.")
-            _send_withdrawal_email(wr, 'rejected')
-        return redirect("admin_dashboard")
-
     # === ERWEITERTE STATISTIKEN ===
     from decimal import Decimal
     from django.db.models.functions import TruncMonth as TrM
@@ -484,11 +500,15 @@ def admin_dashboard(request):
         rev_labels.append(entry['m'].strftime('%d.%m'))
         rev_data.append(float(entry['total'] or 0))
 
-    top_items = OrderItem.objects.filter(
+    top_items = list(OrderItem.objects.filter(
         order__status__in=['Paid', 'Finished', 'Delivered']
-    ).exclude(app__isnull=True).values('app__name').annotate(
+    ).exclude(app__isnull=True).values('app__name', 'app__slug').annotate(
         total_qty=Sum('quantity'), total_rev=Sum('price')
-    ).order_by('-total_rev')[:5]
+    ).order_by('-total_rev')[:5])
+    top_item_apps = {a.slug: a for a in App.objects.filter(slug__in=[i['app__slug'] for i in top_items])}
+    for item in top_items:
+        app = top_item_apps.get(item['app__slug'])
+        item['app__display_image'] = app.display_image if app else None
 
     affiliate_count = AffiliatePartner.objects.filter(approved=True).count()
     affiliate_commission = Decimal('0.00')
@@ -557,11 +577,18 @@ def admin_dashboard(request):
         'webinar_registration_counts': webinar_registration_counts,
     })
     
-    # Debug-Ausgabe
-    print(f"Context keys being passed to template: {context.keys()}")
-    print(f"Total blog views in context: {context.get('total_blog_views_formatted')}")
-    
+    return context
+
+
+@login_required
+def admin_dashboard(request):
+    action_response = _handle_admin_dashboard_actions(request, 'admin_dashboard')
+    if action_response is not None:
+        return action_response
+
+    context = _build_admin_dashboard_context(request)
     return render(request, 'main/admin_dashboard.html', context)
+
 
 def faq_list(request):
     """
@@ -819,7 +846,7 @@ def register_view(request):
                 request,
                 _("Registration successful. You can now log in.")
             )
-            return redirect('login')
+            return redirect('jd_login_app' if getattr(request, 'base_template', None) == 'base_app.html' else 'login')
     else:
         form = RegisterForm()
 
@@ -1360,9 +1387,9 @@ def profile_edit(request):
                     from django.contrib.auth.models import User
                     if User.objects.filter(username=new_username).exclude(pk=user.pk).exists():
                         messages.error(request, 'Dieser Benutzername ist bereits vergeben.')
-                        return redirect('profile_edit')
+                        return redirect('jd_profile_edit_app' if getattr(request, 'base_template', None) == 'base_app.html' else 'profile_edit')
                     user.username = new_username
-                
+
                 user.save()
                 
                 # Zusätzliche Profilfelder (UserProfile Model)
@@ -1380,11 +1407,11 @@ def profile_edit(request):
                 profile.save()
                 
                 messages.success(request, 'Profil erfolgreich aktualisiert!')
-                return redirect('profile_view')
-                
+                return redirect('jd_profile_app' if getattr(request, 'base_template', None) == 'base_app.html' else 'profile_view')
+
         except Exception as e:
             messages.error(request, f'Fehler beim Aktualisieren: {str(e)}')
-            return redirect('profile_edit')
+            return redirect('jd_profile_edit_app' if getattr(request, 'base_template', None) == 'base_app.html' else 'profile_edit')
     
     context = {
         'user': request.user,
@@ -1408,7 +1435,7 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)  # Wichtig: Session beibehalten
             messages.success(request, 'Ihr Passwort wurde erfolgreich geändert!')
-            return redirect('profile_view')
+            return redirect('jd_profile_app' if getattr(request, 'base_template', None) == 'base_app.html' else 'profile_view')
         else:
             for error in form.errors.values():
                 messages.error(request, error)
@@ -1530,7 +1557,7 @@ def sitemap_txt(request):
         for page in static_pages:
             lines.append(f"{base_url}{prefix}{page}")
 
-        for post in BlogPost.objects.filter(is_published=True):
+        for post in BlogPost.objects.filter(is_published=True, published_at__lte=timezone.now()):
             lines.append(f"{base_url}{prefix}/blog/{post.slug}/")
 
         for lp in LandingPage.objects.filter(is_active=True):

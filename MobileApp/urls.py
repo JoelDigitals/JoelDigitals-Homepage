@@ -20,6 +20,9 @@ urlpatterns = [
     path('admin-sales/<int:entry_id>/delete/<int:wish_id>/', views.delete_wish_app, name='delete_wish_app'),
     path('admin-sales/<int:entry_id>/export/<int:wish_id>/', views.export_single_wish_app, name='export_single_wish_app'),
     path('appointments/', views.appointment_create_app, name='appointments_app'),
+    path('appointments/success/', views.appointment_success_app, name='appointment_success_app'),
     path('admin-appointments/', views.appointment_admin_view_app, name='admin_appointments_app'),
+    path('admin-appointments/update/<int:pk>/<str:status>/', views.update_appointment_status_app, name='update_appointment_status_app'),
     path('status/', views.status_app, name='status_app'),
+    path('ai-support/', views.ai_support_app, name='ai_support_app'),
 ]

@@ -1,0 +1,153 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "System Status" %} – Joel Digitals{% endblock %}
+
+{% block extra_css %}
+<style>
+.jd-status-summary { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.jd-chip {
+  padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;
+  display: flex; align-items: center; gap: 6px;
+}
+.jd-chip.online { background: rgba(16,185,129,0.15); color: var(--success); }
+.jd-chip.offline { background: rgba(239,68,68,0.15); color: var(--error); }
+.jd-chip.issues { background: rgba(245,158,11,0.15); color: var(--warning); }
+.jd-chip.total { background: var(--surface-elevated); color: var(--text-secondary); }
+
+.jd-hotline-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff;
+  border: none; border-radius: var(--radius); font-weight: 700; font-size: 0.95rem;
+  cursor: pointer; margin-bottom: 20px;
+}
+
+.jd-issue-badges { display: flex; gap: 6px; margin: 6px 0; flex-wrap: wrap; }
+.jd-issue-badge { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 10px; }
+.jd-severity-minor { background: rgba(100,116,139,0.15); color: #94a3b8; }
+.jd-severity-major { background: rgba(245,158,11,0.15); color: var(--warning); }
+.jd-severity-critical { background: rgba(239,68,68,0.15); color: var(--error); }
+.jd-stage-badge { background: rgba(99,102,241,0.15); color: #818cf8; }
+
+.jd-status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.jd-status-dot.online { background: var(--success); }
+.jd-status-dot.offline { background: var(--error); }
+.jd-status-dot.unknown { background: var(--text-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom:12px;">{% trans "System Status" %}</h1>
+
+<div class="jd-status-summary">
+  <div class="jd-chip online">● {{ online }}/{{ total }} {% trans "Online" %}</div>
+  {% if offline > 0 %}<div class="jd-chip offline">● {{ offline }} {% trans "Offline" %}</div>{% endif %}
+  {% if issues > 0 %}<div class="jd-chip issues">● {{ issues }} {% trans "With Issues" %}</div>{% endif %}
+  <div class="jd-chip total">{{ total }} {% trans "Services" %}</div>
+</div>
+
+<button class="jd-hotline-btn" onclick="jdReadStatus()">
+  <span class="material-symbols-rounded">call</span> {% trans "Status Hotline" %}
+</button>
+
+{% for issue in global_issues %}
+<div class="jd-card">
+  <strong>⚠️ {% trans "Global Issue" %}</strong>
+  <div class="jd-issue-badges">
+    <span class="jd-issue-badge jd-severity-{{ issue.severity }}">{{ issue.get_severity_display }}</span>
+    <span class="jd-issue-badge jd-stage-badge">{{ issue.get_status_display }}</span>
+  </div>
+  <p style="font-weight:600;">{{ issue.title }}</p>
+  <p style="color:var(--text-secondary);">{{ issue.description }}</p>
+</div>
+{% endfor %}
+
+{% for item in status_data %}
+<div class="jd-card" style="display:flex;align-items:center;gap:12px;">
+  {% if item.issues %}
+    <div class="jd-status-dot offline"></div>
+  {% elif item.latest and item.latest.status == "online" %}
+    <div class="jd-status-dot online"></div>
+  {% elif item.latest and item.latest.status == "offline" %}
+    <div class="jd-status-dot offline"></div>
+  {% else %}
+    <div class="jd-status-dot unknown"></div>
+  {% endif %}
+  <div style="flex:1;">
+    <div style="font-weight:600;">{{ item.app.name }}</div>
+    {% if item.latest %}
+      <div style="font-size:0.8rem;color:var(--text-muted);">{{ item.latest.timestamp|date:"d.m.Y H:i" }}</div>
+    {% else %}
+      <div style="font-size:0.8rem;color:var(--text-muted);">{% trans "Not checked yet" %}</div>
+    {% endif %}
+  </div>
+  {% if item.latest and item.latest.response_time_ms %}
+    <div style="font-size:0.85rem;color:var(--text-secondary);">{{ item.latest.response_time_ms }}ms</div>
+  {% endif %}
+</div>
+{% for issue in item.issues %}
+<div class="jd-card">
+  <strong>⚠️ {{ item.app.name }}</strong>
+  <div class="jd-issue-badges">
+    <span class="jd-issue-badge jd-severity-{{ issue.severity }}">{{ issue.get_severity_display }}</span>
+    <span class="jd-issue-badge jd-stage-badge">{{ issue.get_status_display }}</span>
+  </div>
+  <p style="font-weight:600;">{{ issue.title }}</p>
+  <p style="color:var(--text-secondary);">{{ issue.description }}</p>
+</div>
+{% endfor %}
+{% empty %}
+<div class="jd-empty">{% trans "No applications configured." %}</div>
+{% endfor %}
+
+<script>
+function jdGetBestVoice(voiceLang) {
+  return new Promise(function(resolve) {
+    var voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) {
+      window.speechSynthesis.onvoiceschanged = function() {
+        voices = window.speechSynthesis.getVoices();
+        resolve(jdSelectVoice(voices, voiceLang));
+      };
+      setTimeout(function() { resolve(null); }, 2000);
+    } else {
+      resolve(jdSelectVoice(voices, voiceLang));
+    }
+  });
+}
+
+function jdSelectVoice(voices, voiceLang) {
+  var prefix = voiceLang === 'en' ? 'en' : 'de';
+  var scored = voices
+    .filter(function(v) { return v.lang.startsWith(prefix); })
+    .map(function(v) {
+      var score = 0;
+      if (/Google/i.test(v.name)) score += 10;
+      if (/Neural/i.test(v.name)) score += 8;
+      if (/Natural/i.test(v.name)) score += 8;
+      if (/Microsoft/i.test(v.name)) score += 5;
+      return { voice: v, score: score };
+    })
+    .sort(function(a, b) { return b.score - a.score; });
+  return scored.length > 0 ? scored[0].voice : null;
+}
+
+var jdBestHotlineVoice = null;
+jdGetBestVoice(document.documentElement.lang || 'de').then(function(v) { jdBestHotlineVoice = v; });
+
+function jdReadStatus() {
+  if (!window.speechSynthesis) {
+    alert("{% trans 'Speech synthesis is not supported in your browser.' %}");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  var lang = document.documentElement.lang || 'de';
+  var text = lang === 'en' ? '{{ hotline_text_en|escapejs }}' : '{{ hotline_text_de|escapejs }}';
+  var utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = lang === 'en' ? 'en-US' : 'de-DE';
+  utterance.rate = 0.85;
+  if (jdBestHotlineVoice) { utterance.voice = jdBestHotlineVoice; }
+  window.speechSynthesis.speak(utterance);
+}
+</script>
+{% endblock %}

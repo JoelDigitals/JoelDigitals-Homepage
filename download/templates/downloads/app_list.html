@@ -321,8 +321,8 @@
       <div class="apps-grid">
         {% for app in apps %}
           <div class="app-card">
-            {% if app.logo %}
-              <img src="{{ app.logo.url }}" alt="{{ app.name }}" class="app-logo">
+            {% if app.display_logo %}
+              <img src="{{ app.display_logo }}" alt="{{ app.name }}" class="app-logo">
             {% else %}
               <div class="app-logo" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary), #0066ff);">
                 <i class="fas fa-cube" style="font-size: 2.5rem; color: white;"></i>

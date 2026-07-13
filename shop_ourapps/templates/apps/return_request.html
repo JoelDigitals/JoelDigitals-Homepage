@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 {% load i18n %}
 
@@ -189,8 +189,13 @@
     </form>
 
     <p class="back-link">
+      {% if request.base_template == "base_app.html" %}
+      <a href="{% url 'jd_order_detail_app' order.id %}">&#8592; Zurück</a> &middot;
+      <a href="{% url 'jd_order_detail_app' order.id %}">&#128230; Sendungsverfolgung</a>
+      {% else %}
       <a href="{% url 'order_detail' order.id %}">&#8592; Zurück</a> &middot;
       <a href="{% url 'order_tracking' order.id %}">&#128230; Sendungsverfolgung</a>
+      {% endif %}
     </p>
   </div>
 </div>

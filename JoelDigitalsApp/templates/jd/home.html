@@ -1,0 +1,180 @@
+{% extends "base_app.html" %}
+{% load i18n %}
+
+{% block title %}Joel Digitals{% endblock %}
+
+{% block extra_css %}
+<style>
+.jd-hero {
+    background: linear-gradient(135deg, var(--primary), #002a80);
+    border-radius: var(--radius);
+    padding: 32px 24px;
+    margin-bottom: 20px;
+}
+.jd-hero h1 { font-size: 1.6rem; margin-bottom: 6px; }
+.jd-hero p { color: rgba(255,255,255,0.85); font-size: 0.95rem; }
+
+.jd-section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 24px 0 10px;
+    font-weight: 700;
+}
+.jd-section-title a { font-size: 0.85rem; color: var(--primary); text-decoration: none; }
+
+.jd-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.jd-quick-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-decoration: none;
+    color: var(--text);
+}
+.jd-quick-card .material-symbols-rounded { color: var(--primary); font-size: 26px; margin-bottom: 8px; display: block; }
+.jd-quick-card h3 { font-size: 0.95rem; margin-bottom: 2px; }
+.jd-quick-card p { font-size: 0.75rem; color: var(--text-secondary); }
+
+.jd-deal-row, .jd-article-row, .jd-order-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: var(--text);
+}
+.jd-deal-badge {
+    background: var(--error);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+.jd-row-title { font-weight: 600; font-size: 0.9rem; }
+.jd-row-sub { font-size: 0.78rem; color: var(--text-secondary); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="jd-hero">
+    <h1>{% trans "Welcome to Joel Digitals" %}</h1>
+    <p>{% trans "Deals, news, orders and support - all in one app." %}</p>
+</div>
+
+<div class="jd-quick-grid">
+    <a href="{% url 'jd_deals_app' %}" class="jd-quick-card">
+        <span class="material-symbols-rounded">local_offer</span>
+        <h3>{% trans "Deals" %}</h3>
+        <p>{% trans "Current discounts" %}</p>
+    </a>
+    <a href="{% url 'jd_articles_app' %}" class="jd-quick-card">
+        <span class="material-symbols-rounded">article</span>
+        <h3>{% trans "News" %}</h3>
+        <p>{% trans "Latest articles" %}</p>
+    </a>
+    <a href="{% url 'jd_orders_app' %}" class="jd-quick-card">
+        <span class="material-symbols-rounded">local_shipping</span>
+        <h3>{% trans "Orders" %}</h3>
+        <p>{% trans "Track your orders" %}</p>
+    </a>
+    <a href="{% url 'jd_support_app' %}" class="jd-quick-card">
+        <span class="material-symbols-rounded">support_agent</span>
+        <h3>{% trans "Support" %}</h3>
+        <p>{% trans "Tickets & help" %}</p>
+    </a>
+    <a href="{% url 'jd_status_app' %}" class="jd-quick-card">
+        <span class="material-symbols-rounded" style="color: var(--success);">monitor_heart</span>
+        <h3>{% trans "System Status" %}</h3>
+        <p>{% trans "Live status & hotline" %}</p>
+    </a>
+    <a href="{% url 'jd_wallet_app' %}" class="jd-quick-card">
+        <span class="material-symbols-rounded" style="color: #f59e0b;">account_balance_wallet</span>
+        <h3>{% trans "Wallet" %}</h3>
+        <p>{% if wallet_balance is not None %}{{ wallet_balance|floatformat:2 }} €{% else %}{% trans "View balance" %}{% endif %}</p>
+    </a>
+    {% if is_affiliate %}
+    <a href="{% url 'jd_affiliate_dashboard_app' %}" class="jd-quick-card">
+        <span class="material-symbols-rounded" style="color: #a855f7;">handshake</span>
+        <h3>{% trans "Affiliate" %}</h3>
+        <p>{% trans "Earnings & links" %}</p>
+    </a>
+    {% endif %}
+</div>
+
+{% if jd_is_admin %}
+<div class="jd-quick-grid" style="grid-template-columns: 1fr;">
+    <a href="{% url 'jd_admin_dashboard_app' %}" class="jd-quick-card" style="border-color: var(--admin);">
+        <span class="material-symbols-rounded" style="color: var(--admin);">admin_panel_settings</span>
+        <h3>{% trans "Admin Dashboard" %}</h3>
+        <p>{% trans "Orders, tickets, sales & appointments overview" %}</p>
+    </a>
+</div>
+{% endif %}
+
+{% if user.is_authenticated and orders_preview %}
+<div class="jd-section-title">
+    {% trans "Recent Orders" %}
+    <a href="{% url 'jd_orders_app' %}">{% trans "View all" %}</a>
+</div>
+{% for order in orders_preview %}
+<a href="{% url 'jd_order_detail_app' order.id %}" class="jd-order-row">
+    <span class="material-symbols-rounded" style="color:var(--primary);">local_shipping</span>
+    <div>
+        <div class="jd-row-title">{% trans "Order" %} #{{ order.id }}</div>
+        <div class="jd-row-sub">{{ order.get_status_display }} · {{ order.created_at|date:"d.m.Y" }}</div>
+    </div>
+</a>
+{% endfor %}
+{% endif %}
+
+{% if deals_preview %}
+<div class="jd-section-title">
+    {% trans "Current Deals" %}
+    <a href="{% url 'jd_deals_app' %}">{% trans "View all" %}</a>
+</div>
+{% for app in deals_preview %}
+<div class="jd-deal-row">
+    <span class="jd-deal-badge">-{{ app.discount_percent }}%</span>
+    <div>
+        <div class="jd-row-title">{{ app.name }}</div>
+        <div class="jd-row-sub">{{ app.discounted_price|floatformat:2 }} € {% trans "instead of" %} {{ app.price|floatformat:2 }} €</div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if articles_preview %}
+<div class="jd-section-title">
+    {% trans "Latest Articles" %}
+    <a href="{% url 'jd_articles_app' %}">{% trans "View all" %}</a>
+</div>
+{% for post in articles_preview %}
+<div class="jd-article-row">
+    <span class="material-symbols-rounded" style="color:var(--primary);">article</span>
+    <div>
+        <div class="jd-row-title">{{ post.title_de }}</div>
+        <div class="jd-row-sub">{{ post.published_at|date:"d.m.Y H:i" }}</div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if not user.is_authenticated %}
+<div class="jd-card" style="text-align:center;">
+    <p style="margin-bottom:14px;">{% trans "Log in to track your orders and get personalized support." %}</p>
+    <a href="{% url 'jd_login_app' %}" class="jd-btn">{% trans "Log In" %}</a>
+</div>
+{% endif %}
+{% endblock %}

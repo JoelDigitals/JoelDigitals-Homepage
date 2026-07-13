@@ -10,6 +10,7 @@ from django.views.static import serve as static_serve
 from django.contrib.sitemaps.views import sitemap
 from main.sitemaps import StaticViewSitemap, BlogSitemap, LandingPageSitemap, ShopAppSitemap, WikiSitemap
 from main import views as main_views  # ← WICHTIG: Import hinzufügen
+from JoelDigitalsApp import cron as jd_cron
 
 # --- Sitemap Definition ---
 sitemaps = {
@@ -44,6 +45,11 @@ urlpatterns = [
     # per 302 umgeleitet statt direkt beantwortet zu werden.
     path('api/autoupdate/', include('autoupdate.urls')),
 
+    # Push-Cron fuer die Joel Digitals App (z.B. FastCron ruft diese URL alle
+    # paar Minuten auf) - aus demselben Grund wie oben bewusst NICHT hinter
+    # i18n_patterns.
+    path('api/push-check/', jd_cron.push_check, name='jd_push_check'),
+
     # Downloadbare Update-Pakete: django.conf.urls.static.static() dient nur
     # im DEBUG-Modus, wird also in Produktion (DEBUG=False) NICHT registriert.
     # Der JDS-Secure-Client braucht diese Downloads aber auch im Live-Betrieb,
@@ -72,6 +78,7 @@ urlpatterns += i18n_patterns(
     path('downloads/', include('download.urls')),
     path('paid-downloads/', include('download.paid_urls')),
     path('mobile/', include('MobileApp.urls')),
+    path('app/', include('JoelDigitalsApp.urls')),
     path('chat/', include('chat.urls')),
     path("reviews/", include("reviews.urls")),
     path('webinars/', include('webinars.urls')),

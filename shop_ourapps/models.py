@@ -136,6 +136,8 @@ class App(models.Model):
     product_number = models.CharField(max_length=50, unique=True, blank=True, null=True)
     version = models.CharField(max_length=20)
     image = models.ImageField(upload_to='app_images/', null=True, blank=True)
+    image_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="ImgBB Bild-URL",
+        help_text="Externe Bild-URL (z.B. von ibb.co) - hat Vorrang vor dem Datei-Upload und entlastet den Server.")
     is_available_for_purchase = models.BooleanField(default=False)
     price = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     is_active = models.BooleanField(default=True)
@@ -164,6 +166,15 @@ class App(models.Model):
     discount_start = models.DateTimeField(blank=True, null=True)
     discount_end = models.DateTimeField(blank=True, null=True)
     discount_percent = models.PositiveIntegerField(default=0)
+
+    @property
+    def display_image(self):
+        """Bevorzugt die externe ImgBB-URL, faellt sonst auf den lokalen Upload zurueck."""
+        if self.image_url:
+            return self.image_url
+        if self.image:
+            return self.image.url
+        return None
 
     @property
     def discount_is_active(self):
@@ -269,6 +280,8 @@ class Package(models.Model):
     description = models.TextField()
     description_english = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='package_images/', null=True, blank=True)
+    image_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="ImgBB Bild-URL",
+        help_text="Externe Bild-URL (z.B. von ibb.co) - hat Vorrang vor dem Datei-Upload und entlastet den Server.")
     price = models.DecimalField(max_digits=8, decimal_places=2)
     requires_shipping = models.BooleanField(default=False, help_text="Benötigt dieses Paket einen Versand?")
     shipping_cost = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, help_text="Versandkosten (einmalig pro Bestellung)")
@@ -286,6 +299,15 @@ class Package(models.Model):
     discount_percent = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def display_image(self):
+        """Bevorzugt die externe ImgBB-URL, faellt sonst auf den lokalen Upload zurueck."""
+        if self.image_url:
+            return self.image_url
+        if self.image:
+            return self.image.url
+        return None
 
     @property
     def discount_is_active(self):
@@ -508,6 +530,11 @@ class Order(models.Model):
     delivered_at = models.DateTimeField(null=True, blank=True, help_text="Automatisch auf 30 Min nach registration_code_sent_at gesetzt")
     review_email_sent_at = models.DateTimeField(null=True, blank=True, help_text="Zeitpunkt, wann Review-Email gesendet wurde")
     review_email_scheduled_for = models.DateTimeField(null=True, blank=True, help_text="Geplante Zeit zum Versand der Review-Email (12-30 Stunden nach delivered_at)")
+
+    # JDS Management Integration
+    jds_customer_id = models.CharField(max_length=100, blank=True, null=True, help_text="Kunden-ID in JDS Management (aus der Sync-API)")
+    jds_synced_at = models.DateTimeField(null=True, blank=True, help_text="Wann diese Bestellung zuletzt erfolgreich an JDS Management übertragen wurde")
+    jds_sync_error = models.TextField(blank=True, help_text="Letzter Fehler beim Sync mit JDS Management (falls vorhanden)")
 
     def __str__(self):
         return f"Bestellung {self.id} von {self.user}"

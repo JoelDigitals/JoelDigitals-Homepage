@@ -4,6 +4,17 @@ class App(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     logo = models.ImageField(upload_to='app_logos/', blank=True, null=True)
+    logo_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="ImgBB Logo-URL",
+        help_text="Externe Bild-URL (z.B. von ibb.co) - hat Vorrang vor dem Datei-Upload und entlastet den Server.")
+
+    @property
+    def display_logo(self):
+        """Bevorzugt die externe ImgBB-URL, faellt sonst auf den lokalen Upload zurueck."""
+        if self.logo_url:
+            return self.logo_url
+        if self.logo:
+            return self.logo.url
+        return None
 
     def __str__(self):
         return self.name
