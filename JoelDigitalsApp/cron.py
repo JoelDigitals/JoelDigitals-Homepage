@@ -16,7 +16,42 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from .services.push import send_push_notification
+from .services.push import send_push_notification, check_onesignal_credentials
+
+ONESIGNAL_CHECK_INTERVAL_DAYS = 10
+
+
+def _maybe_check_onesignal_health(now):
+    """Prueft die OneSignal-Zugangsdaten hoechstens alle 10 Tage (nicht bei
+    jedem Cron-Aufruf), und schickt bei einem Fehlschlag eine Warnmail an den
+    Support, damit ein rotierter/ungueltiger Key nicht unbemerkt bleibt."""
+    from .models import PushHealthCheck
+
+    last_check = PushHealthCheck.objects.first()
+    if last_check and (now - last_check.checked_at) < timedelta(days=ONESIGNAL_CHECK_INTERVAL_DAYS):
+        return None
+
+    success, detail = check_onesignal_credentials()
+    check = PushHealthCheck.objects.create(success=success, detail=detail)
+
+    if not success:
+        try:
+            from django.core.mail import send_mail
+            send_mail(
+                subject="⚠️ OneSignal Push-Check fehlgeschlagen",
+                message=(
+                    f"Der 10-taegige OneSignal-Zugangsdaten-Check ist fehlgeschlagen:\n\n{detail}\n\n"
+                    "Push-Benachrichtigungen funktionieren aktuell vermutlich nicht. "
+                    "Bitte ONESIGNAL_APP_ID / ONESIGNAL_REST_API_KEY pruefen."
+                ),
+                from_email=settings.COMPANY_EMAIL_NO_REPLY,
+                recipient_list=[settings.SUPPORT_EMAIL],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+
+    return {'success': success, 'detail': detail, 'checked_at': check.checked_at.isoformat()}
 
 
 @csrf_exempt
@@ -49,7 +84,10 @@ def push_check(request):
         post.save(update_fields=['push_notified_at'])
         notified_articles.append(post.slug)
 
+    onesignal_health = _maybe_check_onesignal_health(now)
+
     return JsonResponse({
         'checked_at': now.isoformat(),
         'articles_notified': notified_articles,
+        'onesignal_health_check': onesignal_health,
     })

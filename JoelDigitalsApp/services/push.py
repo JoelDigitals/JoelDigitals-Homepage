@@ -55,3 +55,31 @@ def send_push_notification(title, message, user_ids=None, url=None, data=None):
     except requests.RequestException:
         logger.exception("Failed to send OneSignal push notification")
         return None
+
+
+def check_onesignal_credentials():
+    """Prueft, ob ONESIGNAL_APP_ID/ONESIGNAL_REST_API_KEY noch gueltig sind
+    (z.B. falls der Key mal in OneSignal rotiert/geloescht wird), ohne dabei
+    eine echte Push-Benachrichtigung zu versenden. Wird vom Cron-Endpunkt
+    alle 10 Tage aufgerufen (siehe JoelDigitalsApp/cron.py).
+
+    Gibt (success: bool, detail: str) zurueck.
+    """
+    app_id = getattr(settings, "ONESIGNAL_APP_ID", "")
+    api_key = getattr(settings, "ONESIGNAL_REST_API_KEY", "")
+
+    if not app_id or not api_key:
+        return False, "ONESIGNAL_APP_ID/ONESIGNAL_REST_API_KEY nicht konfiguriert."
+
+    try:
+        response = requests.get(
+            f"https://onesignal.com/api/v1/apps/{app_id}",
+            headers={"Authorization": f"Key {api_key}"},
+            timeout=10,
+        )
+        if response.status_code == 200:
+            return True, "OK"
+        return False, f"OneSignal API antwortete mit Status {response.status_code}: {response.text[:200]}"
+    except requests.RequestException as e:
+        logger.exception("OneSignal Zugangsdaten-Check fehlgeschlagen")
+        return False, str(e)[:200]
