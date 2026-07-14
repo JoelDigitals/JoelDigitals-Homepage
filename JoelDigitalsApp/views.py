@@ -383,12 +383,20 @@ def jd_settings_app(request):
 @login_required
 @require_POST
 def onesignal_sync_view(request):
+    import json
     from main.models import UserProfile
     profile = getattr(request.user, 'userprofile', None)
     if not profile:
         profile = UserProfile.objects.create(user=request.user)
     profile.last_onesignal_sync = timezone.now()
-    profile.save(update_fields=['last_onesignal_sync'])
+    try:
+        data = json.loads(request.body)
+        player_id = data.get('player_id', '').strip()
+        if player_id:
+            profile.onesignal_player_id = player_id
+    except (json.JSONDecodeError, AttributeError):
+        pass
+    profile.save(update_fields=['last_onesignal_sync', 'onesignal_player_id'])
     if 'needs_onesignal_sync' in request.session:
         del request.session['needs_onesignal_sync']
     return JsonResponse({'ok': True, 'synced_at': profile.last_onesignal_sync.isoformat()})
