@@ -143,6 +143,7 @@ class UserProfile(models.Model):
     # Marketing
     marketing_opt_in = models.BooleanField("Marketing erlaubt", default=False)
     marketing_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    last_onesignal_sync = models.DateTimeField(null=True, blank=True, verbose_name="Letzter OneSignal-Sync")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -20,6 +20,7 @@ class Voucher(models.Model):
     redeemed_at = models.DateTimeField(null=True, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    used_in_order = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True, related_name='vouchers')
 
 class VoucherOrder(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -512,6 +513,9 @@ class Order(models.Model):
 
     affiliate_code = models.ForeignKey('AffiliateCode', on_delete=models.SET_NULL, null=True, blank=True)
     discount_code = models.ForeignKey('DiscountCode', on_delete=models.SET_NULL, null=True, blank=True)
+    voucher = models.ForeignKey('Voucher', on_delete=models.SET_NULL, null=True, blank=True)
+    voucher_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    wallet_used_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     sepa_mandate_ref = models.CharField(max_length=64, blank=True, null=True, help_text="SEPA-Mandatsreferenz")
     sepa_mandate_date = models.DateTimeField(blank=True, null=True, help_text="Datum des SEPA-Mandats")

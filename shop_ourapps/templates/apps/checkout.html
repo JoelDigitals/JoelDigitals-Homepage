@@ -670,6 +670,17 @@
               <div id="code-status" style="margin-top:6px;font-size:0.85rem;display:none;"></div>
             </div>
 
+            <div class="form-group">
+              <label>Gutschein-Code</label>
+              <div style="display:flex;gap:8px;width:100%;">
+                <input type="text" name="voucher_code" id="voucher-code-input" placeholder="ABCD-EFGH-IJKL-MNOP" autocomplete="off" style="flex:1;">
+                <button type="button" id="voucher-redeem-btn" style="padding:0.75rem 1.25rem;background:linear-gradient(135deg,#FF9800,#F57C00);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.3s ease;">
+                  <i class="fas fa-gift"></i> {% trans "Redeem" %}
+                </button>
+              </div>
+              <div id="voucher-status" style="margin-top:6px;font-size:0.85rem;display:none;"></div>
+            </div>
+
             <div class="form-group full-width">
               <label>{% trans "Payment Method" %} *</label>
               <select name="payment_method" id="payment-method-select" required>
@@ -688,6 +699,21 @@
                   {% trans "SEPA Direct Debit" %}
                 </option>-->
               </select>
+            </div>
+
+            <!-- Wallet zuerst verwenden (nur bei anderen Zahlungsmethoden) -->
+            <div id="wallet-first-section" class="form-group full-width" style="display:none;margin-top:0.5rem;">
+              <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem;">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="use_wallet_first" id="use-wallet-first" value="1">
+                  <span class="checkbox-text">
+                    <strong>Wallet-Guthaben zuerst verwenden</strong>
+                    <span style="display:block;font-size:0.85rem;color:#aaa;margin-top:4px;">
+                      Aktuelles Guthaben: <strong id="wallet-balance-display" style="color:#4CAF50;">{{ wallet_balance|floatformat:2 }} €</strong>
+                    </span>
+                  </span>
+                </label>
+              </div>
             </div>
 
             <!-- SEPA Lastschrift Felder -->
@@ -928,6 +954,76 @@ document.addEventListener("DOMContentLoaded", function() {
     if (paymentSelect) {
         paymentSelect.addEventListener("change", toggleSepaFields);
         toggleSepaFields();
+    }
+
+    // ─── Gutschein (Voucher) ───
+    const voucherInput = document.getElementById("voucher-code-input");
+    const voucherRedeemBtn = document.getElementById("voucher-redeem-btn");
+    const voucherStatus = document.getElementById("voucher-status");
+
+    function showVoucherStatus(message, type) {
+        voucherStatus.textContent = message;
+        voucherStatus.style.display = "block";
+        voucherStatus.style.color = type === "success" ? "#4CAF50" : "#f44336";
+    }
+
+    function hideVoucherStatus() {
+        voucherStatus.style.display = "none";
+    }
+
+    voucherRedeemBtn.addEventListener("click", function() {
+        const code = voucherInput.value.trim();
+        if (!code) {
+            showVoucherStatus("✗ Bitte einen Gutschein-Code eingeben", "error");
+            return;
+        }
+
+        fetch("{% url 'validate_codes' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({
+                voucher_code: code
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.voucher_valid && data.voucher_amount > 0) {
+                showVoucherStatus("✓ Gutschein über " + data.voucher_amount.toFixed(2) + " € eingelöst", "success");
+                const newTotal = parseFloat(data.new_total || originalTotal);
+                totalAmount.textContent = newTotal.toFixed(2);
+                voucherRedeemBtn.disabled = true;
+                voucherRedeemBtn.style.opacity = "0.5";
+                voucherInput.readOnly = true;
+            } else {
+                showVoucherStatus("✗ " + (data.voucher_message || "Ungültiger Gutschein-Code"), "error");
+            }
+        })
+        .catch(function() {
+            showVoucherStatus("✗ Fehler bei der Prüfung", "error");
+        });
+    });
+
+    // ─── Wallet zuerst verwenden ───
+    const walletFirstSection = document.getElementById("wallet-first-section");
+    const walletBalance = parseFloat("{{ wallet_balance|floatformat:2 }}");
+
+    function toggleWalletFirst() {
+        if (!walletFirstSection) return;
+        const val = paymentSelect.value;
+        if (val && val !== "wallet" && walletBalance > 0) {
+            walletFirstSection.style.display = "block";
+        } else {
+            walletFirstSection.style.display = "none";
+            document.getElementById("use-wallet-first").checked = false;
+        }
+    }
+
+    if (paymentSelect) {
+        paymentSelect.addEventListener("change", toggleWalletFirst);
+        toggleWalletFirst();
     }
 });
 </script>

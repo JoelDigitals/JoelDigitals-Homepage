@@ -1,4 +1,5 @@
 {% extends "base_app.html" %}
+{% load static %}
 {% load i18n %}
 
 {% block title %}{% trans "Settings" %} – Joel Digitals{% endblock %}
@@ -63,6 +64,51 @@
         </form>
     </div>
 </div>
+
+{% if ONESIGNAL_APP_ID %}
+<div class="jd-card">
+    <h2>{% trans "Push Notifications" %}</h2>
+    <p style="color:var(--text-secondary); font-size:0.9rem;">{% trans "Enable push notifications to receive order updates, news and webinar reminders directly on your device." %}</p>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+        <button id="enablePush" class="jd-btn primary" style="display:none;">
+            <span class="material-symbols-rounded" style="font-size:18px;">notifications_active</span>
+            {% trans "Enable notifications" %}
+        </button>
+        <div id="pushStatus" style="color:var(--text-secondary); font-size:0.9rem; margin-top:8px;"></div>
+    </div>
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('enablePush');
+    var status = document.getElementById('pushStatus');
+    function updatePushStatus() {
+        if (!window.OneSignal || !window.OneSignal.Notifications) {
+            btn.style.display = 'none';
+            status.textContent = "⚠️ OneSignal wird geladen...";
+            return;
+        }
+        OneSignal.Notifications.permission.then(function(perm) {
+            if (perm === 'granted') {
+                btn.style.display = 'none';
+                status.textContent = "✅ {% trans 'Notifications are enabled.' %}";
+            } else if (perm === 'denied') {
+                btn.style.display = 'none';
+                status.textContent = "⛔ {% trans 'Notifications are blocked. Please enable them in your browser settings.' %}";
+            } else {
+                btn.style.display = 'inline-flex';
+                status.textContent = "";
+            }
+        });
+    }
+    setTimeout(updatePushStatus, 2000);
+    btn.addEventListener('click', function() {
+        OneSignal.Notifications.requestPermission().then(function(perm) {
+            updatePushStatus();
+        });
+    });
+})();
+</script>
+{% endif %}
 
 <div class="jd-card">
     <h2>{% trans "Account" %}</h2>

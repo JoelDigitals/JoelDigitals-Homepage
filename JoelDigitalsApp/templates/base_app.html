@@ -290,15 +290,38 @@ nav.jd-tabbar {
 </nav>
 
 {% if ONESIGNAL_APP_ID %}
-<!-- Push-Vorbereitung: median.co Native-Push kann direkt an diese OneSignal App-ID gebunden werden.
-     Web-SDK hier nur als Fallback fuer den Browser-Fall. -->
+<!-- Push-Vorbereitung: OneSignal Web SDK fuer Push-Benachrichtigungen -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({ appId: "{{ ONESIGNAL_APP_ID }}" });
+    await OneSignal.init({
+      appId: "{{ ONESIGNAL_APP_ID }}",
+      serviceWorkerPath: "/OneSignalSDKWorker.js",
+    });
     {% if user.is_authenticated %}
     OneSignal.login("{{ user.id }}");
+    // 30-Tage-Regel: OneSignal-ID neu abgleichen
+    {% if last_onesignal_sync %}
+    var lastSync = new Date("{{ last_onesignal_sync }}");
+    var now = new Date();
+    var daysSinceSync = (now - lastSync) / (1000 * 60 * 60 * 24);
+    {% else %}
+    var daysSinceSync = 999;
+    {% endif %}
+    if (daysSinceSync > 30) {
+      (function() {
+        var csrf = '';
+        var m = document.cookie.match(/csrftoken=([^;]+)/);
+        if (m) csrf = m[1];
+        fetch('/app/api/onesignal-sync/', {
+          method: 'POST',
+          headers: {'X-CSRFToken': csrf, 'Content-Type': 'application/json'},
+        }).then(function(r){ return r.json(); })
+          .then(function(d){ if(d.ok) console.log('OneSignal sync ok'); })
+          .catch(function(e){ console.warn('OneSignal sync failed', e); });
+      })();
+    }
     {% endif %}
   });
 </script>

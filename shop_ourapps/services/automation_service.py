@@ -43,6 +43,23 @@ class OrderAutomationService:
         Erstellt Purchase-Einträge für alle gekauften Apps/Pakete.
         """
         if order.status not in ('Paid', 'In Delivery', 'Delivered', 'Finished'):
+            from shop_ourapps.models import Wallet
+
+            # Wallet-Guthaben einziehen, wenn Wallet zuerst verwendet wurde
+            if order.wallet_used_amount > 0:
+                try:
+                    wallet = Wallet.objects.get(user=order.user)
+                    wallet.deduct(order.wallet_used_amount)
+                except Wallet.DoesNotExist:
+                    pass
+
+            # Gutschein als eingelöst markieren
+            if order.voucher and not order.voucher.redeemed:
+                order.voucher.redeemed = True
+                order.voucher.redeemed_at = timezone.now()
+                order.voucher.used_in_order = order
+                order.voucher.save()
+
             old_status = order.status
             order.status = 'Paid'
             order.save(update_fields=['status'])

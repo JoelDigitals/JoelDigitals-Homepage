@@ -3,7 +3,7 @@ from .models import App, OperatingSystem
 from django.utils.timezone import localdate
 
 def app_list(request):
-    apps = App.objects.all()
+    apps = App.objects.filter(downloads__version__gt='').distinct().order_by('name')
     return render(request, 'downloads/app_list.html', {'apps': apps})
 
 def app_detail(request, app_id):

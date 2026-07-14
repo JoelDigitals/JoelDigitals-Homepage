@@ -1055,6 +1055,8 @@ def checkout(request):
 
         affiliate_code_input = data.get('affiliate_code', '').strip()
         discount_code_input = data.get('discount_code', '').strip()
+        voucher_code_input = data.get('voucher_code', '').strip()
+        use_wallet_first = data.get('use_wallet_first') == '1'
 
         account_holder = data.get('account_holder') if payment_method == 'lastschrift' else None
         iban = data.get('iban') if payment_method == 'lastschrift' else None
@@ -1084,6 +1086,27 @@ def checkout(request):
                     affiliate_code_obj = None
             except AffiliateCode.DoesNotExist:
                 messages.warning(request, 'Affiliate-Code ist ungültig.')
+
+        # Gutschein (Voucher) prüfen
+        voucher_obj = None
+        voucher_amount = 0
+        if voucher_code_input:
+            try:
+                voucher_obj = Voucher.objects.get(code__iexact=voucher_code_input, user=request.user, redeemed=False)
+                if voucher_obj.amount <= 0:
+                    messages.error(request, 'Gutschein hat keinen Wert.')
+                    voucher_obj = None
+                else:
+                    voucher_amount = min(voucher_obj.amount, final_total)
+                    final_total -= voucher_amount
+            except Voucher.DoesNotExist:
+                messages.error(request, 'Ungültiger oder bereits eingelöster Gutschein.')
+
+        # Wallet zuerst verwenden (nur wenn nicht Wallet als Zahlungsmethode)
+        wallet_used_amount = 0
+        if use_wallet_first and wallet and wallet.balance > 0 and payment_method != 'wallet':
+            wallet_used_amount = min(wallet.balance, final_total)
+            final_total -= wallet_used_amount
 
         # Lagerbestand prüfen (Pre-Order erlaubt leeren Bestand)
         for item in items:
@@ -1126,9 +1149,12 @@ def checkout(request):
             payment_method=payment_method,
             subtotal=subtotal,
             discount_amount=discount_amount,
-            total_amount=final_total + shipping_cost,
+            total_amount=max(0, final_total + shipping_cost),
             affiliate_code=affiliate_code_obj,
             discount_code=discount_code_obj,
+            voucher=voucher_obj,
+            voucher_amount=voucher_amount,
+            wallet_used_amount=wallet_used_amount,
             account_holder=account_holder,
             iban=iban,
             bic=bic,
@@ -1205,9 +1231,29 @@ def checkout(request):
         except Exception as e:
             messages.error(request, f"Fehler beim Mailversand: {e}")
 
+        # Wenn der Gesamtbetrag durch Gutschein + Wallet vollständig gedeckt ist
+        if order.total_amount <= 0:
+            if wallet_used_amount > 0:
+                wallet.deduct(wallet_used_amount)
+            if voucher_obj:
+                voucher_obj.redeemed = True
+                voucher_obj.redeemed_at = timezone.now()
+                voucher_obj.used_in_order = order
+                voucher_obj.save()
+            messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben.')
+            cart.items.all().delete()
+            order.status = 'Paid'
+            order.save(update_fields=['status'])
+            return redirect('order_confirmation', order_id=order.id)
+
         # Wallet-Zahlung
         if payment_method == 'wallet':
             wallet.deduct(final_total)
+            if voucher_obj:
+                voucher_obj.redeemed = True
+                voucher_obj.redeemed_at = timezone.now()
+                voucher_obj.used_in_order = order
+                voucher_obj.save()
             messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben.')
             cart.items.all().delete()
             order.status = 'Paid'
@@ -1230,7 +1276,7 @@ def checkout(request):
             from django.core.mail import send_mail
             send_mail(
                 subject='Zahlungsinformationen – Joel Digitals',
-                message=f'Bitte überweisen Sie {final_total:.2f} € auf unser Konto DE35 2022 0800 0056 4323 94. Verwendungszweck: Bestellung #{order.id}.',
+                message=f'Bitte überweisen Sie {order.total_amount:.2f} € auf unser Konto DE35 2022 0800 0056 4323 94. Verwendungszweck: Bestellung #{order.id}.',
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[email],
                 fail_silently=False
@@ -1241,6 +1287,7 @@ def checkout(request):
 
         # Stripe
         if payment_method == "stripe":
+            charge_amount = max(1, int(order.total_amount * 100))
             session = stripe.checkout.Session.create(
                 payment_method_types=["card"],
                 mode="payment",
@@ -1248,7 +1295,7 @@ def checkout(request):
                     "price_data": {
                         "currency": "eur",
                         "product_data": {"name": f"Bestellung #{order.id}"},
-                        "unit_amount": int(final_total * 100),
+                        "unit_amount": charge_amount,
                     },
                     "quantity": 1,
                 }],
@@ -1266,7 +1313,7 @@ def checkout(request):
         # PayPal
         if payment_method == 'paypal':
             paypal_order = create_paypal_order(
-                amount=final_total,
+                amount=order.total_amount,
                 invoice_id=order.id,
                 return_url=request.build_absolute_uri(reverse('paypal_execute')),
                 cancel_url=request.build_absolute_uri(reverse('checkout'))
@@ -1380,13 +1427,17 @@ def validate_codes(request):
     cart = Cart.objects.filter(user=request.user).first()
     if not cart or not cart.items.exists():
         return JsonResponse({"valid": False, "message": "Warenkorb ist leer."})
-    subtotal = sum(item.app.discounted_price * item.quantity for item in cart.items.all())
+    subtotal = sum(
+        (item.package.discounted_price if item.package else item.app.discounted_price) * item.quantity
+        for item in cart.items.all()
+    )
     discount = 0
     discount_code_obj = None
     affiliate_code_obj = None
 
     discount_code_input = data.get("discount_code", "")
     affiliate_code_input = data.get("affiliate_code", "")
+    voucher_code_input = data.get("voucher_code", "")
 
     if discount_code_input:
         try:
@@ -1407,8 +1458,12 @@ def validate_codes(request):
 
     shipping_costs = [
         item.app.shipping_cost for item in cart.items.all()
-        if item.app.requires_shipping and item.app.shipping_cost
+        if item.app and item.app.requires_shipping and item.app.shipping_cost
     ]
+    shipping_costs.extend(
+        item.package.shipping_cost for item in cart.items.all()
+        if item.package and item.package.requires_shipping and item.package.shipping_cost
+    )
     shipping_cost = max(shipping_costs) if shipping_costs else Decimal('0.00')
 
     total = max(0, subtotal - discount) + shipping_cost
@@ -1419,6 +1474,23 @@ def validate_codes(request):
         "shipping_cost": f"{shipping_cost:.2f}",
         "discount_percent": float(discount_code_obj.percentage) if discount_code_obj else 0,
     }
+
+    # Gutschein (Voucher) prüfen
+    if voucher_code_input:
+        try:
+            voucher = Voucher.objects.get(code__iexact=voucher_code_input, user=request.user, redeemed=False)
+            if voucher.amount > 0:
+                voucher_amt = min(voucher.amount, total)
+                total -= voucher_amt
+                result["voucher_valid"] = True
+                result["voucher_amount"] = float(voucher_amt)
+                result["new_total"] = f"{max(0, total):.2f}"
+            else:
+                result["voucher_valid"] = False
+                result["voucher_message"] = "Gutschein hat keinen Wert."
+        except Voucher.DoesNotExist:
+            result["voucher_valid"] = False
+            result["voucher_message"] = "Ungültiger oder bereits eingelöster Gutschein."
 
     # Matching: gleicher Code-Name in beiden Systemen → automatisch vorschlagen
     if discount_code_input and not affiliate_code_input:

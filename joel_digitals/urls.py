@@ -11,6 +11,7 @@ from django.contrib.sitemaps.views import sitemap
 from main.sitemaps import StaticViewSitemap, BlogSitemap, LandingPageSitemap, ShopAppSitemap, WikiSitemap
 from main import views as main_views  # ← WICHTIG: Import hinzufügen
 from JoelDigitalsApp import cron as jd_cron
+from django.views.generic import TemplateView
 
 # --- Sitemap Definition ---
 sitemaps = {
@@ -49,6 +50,14 @@ urlpatterns = [
     # paar Minuten auf) - aus demselben Grund wie oben bewusst NICHT hinter
     # i18n_patterns.
     path('api/push-check/', jd_cron.push_check, name='jd_push_check'),
+
+    # OneSignal Service Worker – MUSS auf der Root-Ebene liegen, da der
+    # Browser ihn fuer Push-Benachrichtigungen unter dieser exakten URL
+    # registriert. Darf NICHT in i18n_patterns liegen.
+    path('OneSignalSDKWorker.js', TemplateView.as_view(
+        template_name='OneSignalSDKWorker.js',
+        content_type='application/javascript',
+    )),
 
     # Downloadbare Update-Pakete: django.conf.urls.static.static() dient nur
     # im DEBUG-Modus, wird also in Produktion (DEBUG=False) NICHT registriert.

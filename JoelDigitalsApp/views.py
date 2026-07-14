@@ -7,6 +7,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.http import require_POST
 
 from blog.models import BlogPost
 from contact.views import is_Sales_Editor, is_Support_Editor, is_Support_Ticket_Admin
@@ -19,7 +21,7 @@ from status.utils import build_hotline_texts, apply_issue_language
 
 def _nav_context(user):
     groups = list(user.groups.values_list('name', flat=True)) if user.is_authenticated else []
-    return {
+    ctx = {
         'user_groups': groups,
         'in_support_sales': 'Selling' in groups,
         'in_support_tickets': 'Support' in groups,
@@ -29,6 +31,11 @@ def _nav_context(user):
         ),
         'ONESIGNAL_APP_ID': settings.ONESIGNAL_APP_ID,
     }
+    if user.is_authenticated:
+        profile = getattr(user, 'userprofile', None)
+        if profile:
+            ctx['last_onesignal_sync'] = profile.last_onesignal_sync.isoformat() if profile.last_onesignal_sync else None
+    return ctx
 
 
 def jd_login_app(request):
@@ -371,3 +378,17 @@ def jd_change_password_app(request):
 @login_required(login_url='jd_login_app')
 def jd_settings_app(request):
     return render(request, 'jd/settings.html', _nav_context(request.user))
+
+
+@login_required
+@require_POST
+def onesignal_sync_view(request):
+    from main.models import UserProfile
+    profile = getattr(request.user, 'userprofile', None)
+    if not profile:
+        profile = UserProfile.objects.create(user=request.user)
+    profile.last_onesignal_sync = timezone.now()
+    profile.save(update_fields=['last_onesignal_sync'])
+    if 'needs_onesignal_sync' in request.session:
+        del request.session['needs_onesignal_sync']
+    return JsonResponse({'ok': True, 'synced_at': profile.last_onesignal_sync.isoformat()})

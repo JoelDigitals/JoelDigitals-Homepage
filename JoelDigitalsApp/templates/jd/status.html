@@ -103,16 +103,21 @@
 <script>
 function jdGetBestVoice(voiceLang) {
   return new Promise(function(resolve) {
-    var voices = window.speechSynthesis.getVoices();
-    if (voices.length === 0) {
-      window.speechSynthesis.onvoiceschanged = function() {
-        voices = window.speechSynthesis.getVoices();
+    try {
+      if (!window.speechSynthesis) { resolve(null); return; }
+      var voices = window.speechSynthesis.getVoices();
+      if (voices.length === 0) {
+        window.speechSynthesis.onvoiceschanged = function() {
+          try {
+            voices = window.speechSynthesis.getVoices();
+            resolve(jdSelectVoice(voices, voiceLang));
+          } catch(e) { resolve(null); }
+        };
+        setTimeout(function() { resolve(null); }, 2000);
+      } else {
         resolve(jdSelectVoice(voices, voiceLang));
-      };
-      setTimeout(function() { resolve(null); }, 2000);
-    } else {
-      resolve(jdSelectVoice(voices, voiceLang));
-    }
+      }
+    } catch(e) { resolve(null); }
   });
 }
 
@@ -133,21 +138,32 @@ function jdSelectVoice(voices, voiceLang) {
 }
 
 var jdBestHotlineVoice = null;
-jdGetBestVoice(document.documentElement.lang || 'de').then(function(v) { jdBestHotlineVoice = v; });
+jdGetBestVoice(document.documentElement.lang || 'de').then(function(v) {
+  jdBestHotlineVoice = v;
+  if (!v && !window.speechSynthesis) {
+    var btn = document.querySelector('.jd-hotline-btn');
+    if (btn) btn.style.display = 'none';
+  }
+});
 
 function jdReadStatus() {
-  if (!window.speechSynthesis) {
+  try {
+    if (!window.speechSynthesis) {
+      alert("{% trans 'Speech synthesis is not supported in your browser.' %}");
+      return;
+    }
+    window.speechSynthesis.cancel();
+    var lang = document.documentElement.lang || 'de';
+    var text = lang === 'en' ? '{{ hotline_text_en|escapejs }}' : '{{ hotline_text_de|escapejs }}';
+    var utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang === 'en' ? 'en-US' : 'de-DE';
+    utterance.rate = 0.85;
+    if (jdBestHotlineVoice) { utterance.voice = jdBestHotlineVoice; }
+    window.speechSynthesis.speak(utterance);
+  } catch(e) {
+    console.warn('Speech synthesis error:', e);
     alert("{% trans 'Speech synthesis is not supported in your browser.' %}");
-    return;
   }
-  window.speechSynthesis.cancel();
-  var lang = document.documentElement.lang || 'de';
-  var text = lang === 'en' ? '{{ hotline_text_en|escapejs }}' : '{{ hotline_text_de|escapejs }}';
-  var utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = lang === 'en' ? 'en-US' : 'de-DE';
-  utterance.rate = 0.85;
-  if (jdBestHotlineVoice) { utterance.voice = jdBestHotlineVoice; }
-  window.speechSynthesis.speak(utterance);
 }
 </script>
 {% endblock %}
