@@ -289,41 +289,71 @@ nav.jd-tabbar {
     </a>
 </nav>
 
-{% if ONESIGNAL_APP_ID %}
-<!-- Push-Vorbereitung: OneSignal Web SDK fuer Push-Benachrichtigungen -->
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+{% if FIREBASE_API_KEY and user.is_authenticated %}
+<!-- Push-Benachrichtigungen ueber Firebase Cloud Messaging - gleiches Muster
+     wie im JDS-Management-Projekt: median.co liefert den Token nativ ueber
+     median.firebase.getToken(), im normalen Browser laeuft das Firebase-Web-SDK.
+     Nur fuer eingeloggte Nutzer, da /app/api/register-device/ Login erfordert -
+     auf der Login-Seite selbst laeuft ein eigener Token-Fetch (siehe jd/login.html),
+     der den Token stattdessen als verstecktes Feld ins Login-Formular schreibt. -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 <script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "{{ ONESIGNAL_APP_ID }}",
-      serviceWorkerPath: "/OneSignalSDKWorker.js",
-    });
-    {% if user.is_authenticated %}
-    OneSignal.login("{{ user.id }}");
-    // 30-Tage-Regel: OneSignal-ID neu abgleichen
-    {% if last_onesignal_sync %}
-    var lastSync = new Date("{{ last_onesignal_sync }}");
-    var now = new Date();
-    var daysSinceSync = (now - lastSync) / (1000 * 60 * 60 * 24);
-    {% else %}
-    var daysSinceSync = 999;
-    {% endif %}
-    if (daysSinceSync > 30) {
-      (function() {
-        var csrf = '';
-        var m = document.cookie.match(/csrftoken=([^;]+)/);
-        if (m) csrf = m[1];
-        fetch('/app/api/onesignal-sync/', {
-          method: 'POST',
-          headers: {'X-CSRFToken': csrf, 'Content-Type': 'application/json'},
-        }).then(function(r){ return r.json(); })
-          .then(function(d){ if(d.ok) console.log('OneSignal sync ok'); })
-          .catch(function(e){ console.warn('OneSignal sync failed', e); });
-      })();
+(function () {
+  function csrfToken() {
+    var m = document.cookie.match(/csrftoken=([^;]+)/);
+    return m ? m[1] : '';
+  }
+
+  function registerDevice(token, deviceType) {
+    if (!token) return;
+    fetch('{% url "jd_register_device_app" %}', {
+      method: 'POST',
+      headers: {'X-CSRFToken': csrfToken(), 'Content-Type': 'application/json'},
+      body: JSON.stringify({firebase_token: token, device_type: deviceType || 'web', app_version: ''}),
+    }).then(function (r) { return r.json(); })
+      .then(function (d) { if (d.ok) console.log('Firebase device registered'); })
+      .catch(function (e) { console.warn('Firebase device registration failed', e); });
+  }
+
+  async function initPush() {
+    // In der median.co-App: natives Bridge-API liefert den FCM-Token direkt,
+    // ohne Web-Push-Berechtigungsdialog.
+    if (window.median && window.median.firebase && window.median.firebase.getToken) {
+      try {
+        var token = await window.median.firebase.getToken();
+        registerDevice(token, /Android/i.test(navigator.userAgent) ? 'android' : 'ios');
+      } catch (e) {
+        console.warn('median.firebase.getToken failed', e);
+      }
+      return;
     }
-    {% endif %}
-  });
+
+    // Normaler Browser: Firebase-Web-SDK + Service Worker.
+    if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
+    try {
+      var firebaseConfig = {
+        apiKey: "{{ FIREBASE_API_KEY }}",
+        authDomain: "{{ FIREBASE_AUTH_DOMAIN }}",
+        projectId: "{{ FIREBASE_PROJECT_ID }}",
+        storageBucket: "{{ FIREBASE_STORAGE_BUCKET }}",
+        messagingSenderId: "{{ FIREBASE_MESSAGING_SENDER_ID }}",
+        appId: "{{ FIREBASE_APP_ID }}",
+      };
+      firebase.initializeApp(firebaseConfig);
+      var reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {scope: '/firebase-cloud-messaging-push-scope'});
+      var messaging = firebase.messaging();
+      var permission = await Notification.requestPermission();
+      if (permission !== 'granted') return;
+      var token = await messaging.getToken({vapidKey: "{{ FIREBASE_VAPID_KEY }}", serviceWorkerRegistration: reg});
+      registerDevice(token, 'web');
+    } catch (e) {
+      console.warn('Firebase Web-SDK Push-Setup fehlgeschlagen', e);
+    }
+  }
+
+  initPush();
+})();
 </script>
 {% endif %}
 {% block extra_js %}{% endblock %}

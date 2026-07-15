@@ -11,6 +11,7 @@ from django.contrib.sitemaps.views import sitemap
 from main.sitemaps import StaticViewSitemap, BlogSitemap, LandingPageSitemap, ShopAppSitemap, WikiSitemap
 from main import views as main_views  # ← WICHTIG: Import hinzufügen
 from JoelDigitalsApp import cron as jd_cron
+from JoelDigitalsApp import views as jd_views
 from django.views.generic import TemplateView
 
 # --- Sitemap Definition ---
@@ -58,6 +59,11 @@ urlpatterns = [
         template_name='OneSignalSDKWorker.js',
         content_type='application/javascript',
     )),
+
+    # Firebase-Messaging-Service-Worker - MUSS ebenfalls auf Root-Ebene liegen
+    # (Browser registriert den Push-Scope relativ zur Service-Worker-URL).
+    # Darf NICHT in i18n_patterns liegen.
+    path('firebase-messaging-sw.js', jd_views.firebase_messaging_sw, name='firebase_messaging_sw'),
 
     # Downloadbare Update-Pakete: django.conf.urls.static.static() dient nur
     # im DEBUG-Modus, wird also in Produktion (DEBUG=False) NICHT registriert.

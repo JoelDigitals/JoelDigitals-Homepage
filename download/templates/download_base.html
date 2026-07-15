@@ -1,0 +1,109 @@
+<!-- download_base.html - eigenstaendiger, von der Homepage abgeschotteter Bereich:
+     kein Header/Nav/Login/Sprachumschalter der Haupt-Website, eigenes Design. -->
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'de' }}">
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}Downloads – Joel Digitals{% endblock %}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+:root {
+    --dp-bg: #0d0f14;
+    --dp-surface: #161923;
+    --dp-surface-elevated: #1e2230;
+    --dp-primary: #0044cc;
+    --dp-primary-hover: #2a5fe0;
+    --dp-text: #f0f1f5;
+    --dp-text-secondary: #9099ac;
+    --dp-text-muted: #5c6478;
+    --dp-border: #262b3a;
+    --dp-radius: 18px;
+    --dp-radius-sm: 12px;
+    --dp-success: #10b981;
+    --dp-error: #ef4444;
+    /* Aliase, damit bestehende Templates (die var(--primary)/var(--surface)/... nutzen) unveraendert funktionieren */
+    --primary: var(--dp-primary);
+    --primary-hover: var(--dp-primary-hover);
+    --bg: var(--dp-bg);
+    --surface: var(--dp-surface);
+    --text: var(--dp-text);
+    --border: var(--dp-border);
+}
+
+* { box-sizing: border-box; }
+html, body {
+    margin: 0;
+    min-height: 100%;
+    overflow-x: hidden;
+    max-width: 100%;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--dp-bg);
+    color: var(--dp-text);
+    line-height: 1.5;
+}
+a { color: inherit; }
+
+.dp-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px 16px 6px;
+}
+.dp-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    text-decoration: none;
+    color: var(--dp-text);
+}
+.dp-brand .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--dp-primary), #2a8fff);
+    box-shadow: 0 0 12px rgba(0,68,204,0.6);
+}
+
+main.dp-main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+    width: 100%;
+    overflow-x: hidden;
+}
+main.dp-main img, main.dp-main table { max-width: 100%; }
+main.dp-main table { display: block; overflow-x: auto; }
+
+footer.dp-footer {
+    text-align: center;
+    padding: 30px 16px 40px;
+    color: var(--dp-text-muted);
+    font-size: 0.78rem;
+}
+footer.dp-footer a { color: var(--dp-text-muted); text-decoration: underline; }
+
+{% block extra_css %}{% endblock %}
+</style>
+</head>
+<body>
+
+<div class="dp-topbar">
+    <span class="dp-brand"><span class="dot"></span> Joel Digitals Downloads</span>
+</div>
+
+<main class="dp-main">
+{% block content %}{% endblock %}
+</main>
+
+<footer class="dp-footer">
+    &copy; {% now "Y" %} Joel Digitals &middot; <a href="mailto:support@joel-digitals.com">support@joel-digitals.com</a>
+</footer>
+</body>
+</html>

@@ -30,11 +30,14 @@ def _nav_context(user):
             user.is_superuser or is_Support_Ticket_Admin(user) or is_Support_Editor(user) or is_Sales_Editor(user)
         ),
         'ONESIGNAL_APP_ID': settings.ONESIGNAL_APP_ID,
+        'FIREBASE_API_KEY': settings.FIREBASE_API_KEY,
+        'FIREBASE_AUTH_DOMAIN': settings.FIREBASE_AUTH_DOMAIN,
+        'FIREBASE_PROJECT_ID': settings.FIREBASE_PROJECT_ID,
+        'FIREBASE_STORAGE_BUCKET': settings.FIREBASE_STORAGE_BUCKET,
+        'FIREBASE_MESSAGING_SENDER_ID': settings.FIREBASE_MESSAGING_SENDER_ID,
+        'FIREBASE_APP_ID': settings.FIREBASE_APP_ID,
+        'FIREBASE_VAPID_KEY': settings.FIREBASE_VAPID_KEY,
     }
-    if user.is_authenticated:
-        profile = getattr(user, 'userprofile', None)
-        if profile:
-            ctx['last_onesignal_sync'] = profile.last_onesignal_sync.isoformat() if profile.last_onesignal_sync else None
     return ctx
 
 
@@ -42,11 +45,102 @@ def jd_login_app(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            login(request, form.get_user())
+            user = form.get_user()
+            login(request, user)
+
+            # Firebase-Geraet registrieren - gleiche Stelle/Logik wie
+            # custom_login() im JDS-Management-Projekt: Token kommt als
+            # verstecktes Formularfeld mit, das der Login-Seiten-JS vor dem
+            # Absenden befuellt (median.firebase.getToken() in der App bzw.
+            # Firebase-Web-SDK im Browser).
+            firebase_token = request.POST.get('firebase_token', '').strip()
+            if firebase_token:
+                from .services.push import register_device
+                register_device(
+                    user,
+                    firebase_token,
+                    device_type=request.POST.get('device_type', '').strip(),
+                    app_version=request.POST.get('app_version', '').strip(),
+                )
+
             return redirect('jd_home_app')
     else:
         form = AuthenticationForm()
     return render(request, 'jd/login.html', {'form': form})
+
+
+@login_required(login_url='jd_login_app')
+@require_POST
+def jd_register_device_app(request):
+    """Registriert/aktualisiert das Firebase-Geraet des eingeloggten Nutzers.
+    Wird von base_app.html bei jedem Seitenaufruf aufgerufen, damit
+    last_seen aktuell bleibt und ein neu ausgestelltes Token uebernommen
+    wird - gleiches Muster wie register_device() im JDS-Management-Projekt."""
+    import json
+    from .services.push import register_device
+
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, TypeError):
+        return JsonResponse({'error': 'invalid json'}, status=400)
+
+    firebase_token = (data.get('firebase_token') or '').strip()
+    if not firebase_token:
+        return JsonResponse({'error': 'missing firebase_token'}, status=400)
+
+    device = register_device(
+        request.user,
+        firebase_token,
+        device_type=(data.get('device_type') or '').strip(),
+        app_version=(data.get('app_version') or '').strip(),
+    )
+    return JsonResponse({'ok': bool(device)})
+
+
+def firebase_messaging_sw(request):
+    """Liefert den Firebase-Messaging-Service-Worker unter /firebase-messaging-sw.js
+    aus - MUSS auf Root-Ebene liegen (Browser-Vorgabe fuer den Push-Scope),
+    daher in joel_digitals/urls.py ausserhalb von i18n_patterns registriert.
+    Gleiches Muster wie firebase_messaging_sw() im JDS-Management-Projekt."""
+    js = """
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: "%s",
+  authDomain: "%s",
+  projectId: "%s",
+  storageBucket: "%s",
+  messagingSenderId: "%s",
+  appId: "%s",
+});
+
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage(function (payload) {
+  const title = (payload.notification && payload.notification.title) || 'Joel Digitals';
+  const body = (payload.notification && payload.notification.body) || '';
+  self.registration.showNotification(title, {
+    body: body,
+    icon: '/static/icons/icon-192.png',
+    data: payload.data || {},
+  });
+});
+
+self.addEventListener('notificationclick', function (event) {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/';
+  event.waitUntil(clients.openWindow(url));
+});
+""" % (
+        settings.FIREBASE_API_KEY,
+        settings.FIREBASE_AUTH_DOMAIN,
+        settings.FIREBASE_PROJECT_ID,
+        settings.FIREBASE_STORAGE_BUCKET,
+        settings.FIREBASE_MESSAGING_SENDER_ID,
+        settings.FIREBASE_APP_ID,
+    )
+    return HttpResponse(js, content_type='application/javascript')
 
 
 def jd_logout_app(request):
@@ -380,23 +474,3 @@ def jd_settings_app(request):
     return render(request, 'jd/settings.html', _nav_context(request.user))
 
 
-@login_required
-@require_POST
-def onesignal_sync_view(request):
-    import json
-    from main.models import UserProfile
-    profile = getattr(request.user, 'userprofile', None)
-    if not profile:
-        profile = UserProfile.objects.create(user=request.user)
-    profile.last_onesignal_sync = timezone.now()
-    try:
-        data = json.loads(request.body)
-        player_id = data.get('player_id', '').strip()
-        if player_id:
-            profile.onesignal_player_id = player_id
-    except (json.JSONDecodeError, AttributeError):
-        pass
-    profile.save(update_fields=['last_onesignal_sync', 'onesignal_player_id'])
-    if 'needs_onesignal_sync' in request.session:
-        del request.session['needs_onesignal_sync']
-    return JsonResponse({'ok': True, 'synced_at': profile.last_onesignal_sync.isoformat()})
