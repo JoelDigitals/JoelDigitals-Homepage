@@ -4016,15 +4016,183 @@ msgstr "Der Anmeldezeitraum für dieses Webinar ist abgelaufen."
 
 #: webinars/views.py
 msgid "Dieses Webinar hat bereits stattgefunden."
-msgstr "This webinar has already taken place."
+msgstr "Dieses Webinar hat bereits stattgefunden."
 
 #: webinars/views.py
 msgid "Die Anmeldung für dieses Webinar hat noch nicht begonnen."
-msgstr "Registration for this webinar has not yet started."
+msgstr "Die Anmeldung für dieses Webinar hat noch nicht begonnen."
 
 #: webinars/views.py
 msgid "Der Anmeldezeitraum für dieses Webinar ist vorbei."
-msgstr "The registration period for this webinar is over."
+msgstr "Der Anmeldezeitraum für dieses Webinar ist vorbei."
+
+#: webinars/views.py
+msgid "Dieses Webinar ist bereits ausgebucht."
+msgstr "Dieses Webinar ist bereits ausgebucht."
+
+#: webinars/views.py
+msgid "Deine Anmeldung wurde reaktiviert."
+msgstr "Deine Anmeldung wurde reaktiviert."
+
+#: webinars/views.py
+msgid "Du bist bereits für dieses Webinar angemeldet."
+msgstr "Du bist bereits für dieses Webinar angemeldet."
+
+#: webinars/views.py
+msgid "Du wurde erfolgreich für das Webinar angemeldet!"
+msgstr "Du wurde erfolgreich für das Webinar angemeldet!"
+
+#: webinars/views.py
+msgid "Bitte gib eine E-Mail-Adresse ein."
+msgstr "Bitte gib eine E-Mail-Adresse ein."
+
+#: webinars/views.py
+msgid "Für diese E-Mail-Adresse besteht bereits eine Anmeldung für dieses Webinar."
+msgstr "Für diese E-Mail-Adresse besteht bereits eine Anmeldung für dieses Webinar."
+
+#: webinars/views.py
+msgid "Deine Anmeldung wurde storniert."
+msgstr "Deine Anmeldung wurde storniert."
+
+#: webinars/views.py
+msgid "Keine aktive Anmeldung gefunden."
+msgstr "Keine aktive Anmeldung gefunden."
+
+#: webinars/templates/webinars/webinar_list.html
+msgid "Join our live webinars and learn more about our apps."
+msgstr "Nimm an unseren Live-Webinaren teil und erfahre mehr über unsere Apps."
+
+#: webinars/templates/webinars/webinar_list.html
+msgid "Past Webinars"
+msgstr "Vergangene Webinare"
+
+#: webinars/templates/webinars/webinar_list.html
+msgid "No upcoming webinars at the moment. Check back later!"
+msgstr "Aktuell keine bevorstehenden Webinare. Schau später wieder vorbei!"
+
+#: webinars/templates/webinars/webinar_card.html
+msgid "Uhr"
+msgstr "Uhr"
+
+#: webinars/templates/webinars/webinar_card.html
+msgid "min"
+msgstr "Min."
+
+#: webinars/templates/webinars/webinar_card.html
+msgid "spots available"
+msgstr "Plätze frei"
+
+#: webinars/templates/webinars/webinar_card.html
+msgid "Recording available"
+msgstr "Aufzeichnung verfügbar"
+
+#: webinars/templates/webinars/webinar_card.html
+msgid "Ended"
+msgstr "Beendet"
+
+#: webinars/templates/webinars/webinar_card.html
+msgid "Details"
+msgstr "Details"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Back to webinars"
+msgstr "Zurück zu den Webinaren"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Webinar"
+msgstr "Webinar"
+
+#: webinars/templates/webinars/webinar_list.html
+msgid "Webinars"
+msgstr "Webinare"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Date"
+msgstr "Datum"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Time"
+msgstr "Uhrzeit"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Duration"
+msgstr "Dauer"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Spots"
+msgstr "Plätze"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Full"
+msgstr "Voll"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "You are registered for this webinar!"
+msgstr "Du bist für dieses Webinar angemeldet!"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "The access link will be sent to you by email in good time before the webinar."
+msgstr "Der Zugangslink wird dir rechtzeitig vor dem Webinar per E-Mail zugeschickt."
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Cancel registration"
+msgstr "Anmeldung stornieren"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Registration cancelled"
+msgstr "Anmeldung storniert"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "You have cancelled your registration for this webinar."
+msgstr "Du hast deine Anmeldung für dieses Webinar storniert."
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Register again"
+msgstr "Erneut anmelden"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "This webinar is unfortunately fully booked."
+msgstr "Dieses Webinar ist leider ausgebucht."
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Interested? Register now!"
+msgstr "Interesse? Jetzt anmelden!"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Secure your spot for this free webinar."
+msgstr "Sichere dir deinen Platz für dieses kostenlose Webinar."
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Register for free"
+msgstr "Kostenlos anmelden"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Register without login – just enter your name and email."
+msgstr "Anmeldung ohne Login – gib einfach Name und E-Mail-Adresse ein."
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Your name"
+msgstr "Dein Name"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Your email address"
+msgstr "Deine E-Mail-Adresse"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Webinar ended"
+msgstr "Webinar beendet"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "The recording is available for viewing."
+msgstr "Die Aufzeichnung steht zur Ansicht bereit."
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "Watch recording"
+msgstr "Aufzeichnung ansehen"
+
+#: webinars/templates/webinars/webinar_detail.html
+msgid "No recording available for this webinar."
+msgstr "Für dieses Webinar ist keine Aufzeichnung verfügbar."
 
 #: JoelDigitalsApp/templates:0
 msgid "Log in to track orders, deals and support."

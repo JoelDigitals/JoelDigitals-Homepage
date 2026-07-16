@@ -97,6 +97,37 @@ def jd_register_device_app(request):
     return JsonResponse({'ok': bool(device)})
 
 
+@login_required(login_url='jd_login_app')
+@require_POST
+def jd_save_onesignal_player_id_app(request):
+    """Speichert die OneSignal-Player-ID der Joel Digitals App. Wird von
+    base_app.html bei JEDEM Seitenaufruf einer eingeloggten Session ueber die
+    median.co JavaScript-Bridge (median.onesignal.onesignalInfo()) aufgerufen -
+    nicht nur einmalig beim Login. Gleiches Muster wie
+    save_onesignal_player_id_app() im JDS-Chat-Projekt bzw.
+    save_onesignal_player_id() im JDS-Management-Projekt: dort war die ID an
+    das Login-Formular gekoppelt, wo der Nutzer noch nicht eingeloggt ist und
+    die ID daher praktisch nie ankam."""
+    from main.models import UserProfile
+
+    player_id = request.POST.get('player_id', '').strip()
+    debug = request.POST.get('debug', '').strip()
+
+    if player_id:
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        if player_id != profile.onesignal_player_id:
+            profile.onesignal_player_id = player_id
+            profile.last_onesignal_sync = timezone.now()
+            profile.save(update_fields=['onesignal_player_id', 'last_onesignal_sync'])
+    elif debug:
+        import logging
+        logging.getLogger(__name__).warning(
+            "OneSignal-Erfassung (Joel Digitals App) ohne gueltige ID fuer User %s: %s",
+            request.user.username, debug,
+        )
+    return JsonResponse({'status': 'ok'})
+
+
 def firebase_messaging_sw(request):
     """Liefert den Firebase-Messaging-Service-Worker unter /firebase-messaging-sw.js
     aus - MUSS auf Root-Ebene liegen (Browser-Vorgabe fuer den Push-Scope),

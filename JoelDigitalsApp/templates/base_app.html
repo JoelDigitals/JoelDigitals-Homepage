@@ -289,6 +289,49 @@ nav.jd-tabbar {
     </a>
 </nav>
 
+{% if user.is_authenticated %}
+<!-- OneSignal-Player-ID einsammeln ueber die Median.co JavaScript-Bridge, bei
+     JEDEM Seitenaufruf einer eingeloggten Session - nicht nur einmalig beim
+     Login (siehe jd_save_onesignal_player_id_app() in views.py fuer den
+     Hintergrund). Gleiches Muster wie base_1.html / base_chat_app.html im
+     JDS-Management- bzw. JDS-Chat-Projekt. -->
+<script>
+(function () {
+  function csrfTokenOneSignal() {
+    var m = document.cookie.match(/csrftoken=([^;]+)/);
+    return m ? m[1] : '';
+  }
+
+  function postOneSignalToServer(body) {
+    fetch('{% url "jd_save_onesignal_player_id_app" %}', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': csrfTokenOneSignal()},
+      body: body,
+    }).catch(function () {});
+  }
+
+  function medianOneSignalInfo(oneSignalInfo) {
+    var osId = oneSignalInfo && (oneSignalInfo.oneSignalId || oneSignalInfo.oneSignalUserId);
+    if (osId) {
+      postOneSignalToServer('player_id=' + encodeURIComponent(osId));
+    } else {
+      postOneSignalToServer('debug=' + encodeURIComponent('no_valid_id:' + JSON.stringify(oneSignalInfo || null)));
+    }
+  }
+  window.median_onesignal_info = medianOneSignalInfo;
+
+  if (window.median && window.median.onesignal && window.median.onesignal.onesignalInfo) {
+    window.median.onesignal.onesignalInfo().then(medianOneSignalInfo).catch(function (err) {
+      postOneSignalToServer('debug=' + encodeURIComponent('bridge_rejected:' + String(err)));
+    });
+  } else {
+    postOneSignalToServer('debug=' + encodeURIComponent('median_bridge_missing'));
+  }
+})();
+</script>
+{% endif %}
+
 {% if FIREBASE_API_KEY and user.is_authenticated %}
 <!-- Push-Benachrichtigungen ueber Firebase Cloud Messaging - gleiches Muster
      wie im JDS-Management-Projekt: median.co liefert den Token nativ ueber
