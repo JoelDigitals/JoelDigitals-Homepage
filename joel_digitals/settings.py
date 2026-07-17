@@ -46,28 +46,10 @@ OAUTH2_PROVIDER = {
 
 IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
 
-# OneSignal (median.co Push-Plugin). Zugangsdaten werden nur noch fuer den
-# 10-Tage-Health-Check verwendet, das eigentliche Versenden laeuft ueber
-# Firebase (siehe unten) - gleiches Muster wie im JDS-Management-Projekt.
+# OneSignal (median.co Push-Plugin). Versand UND Health-Check laufen komplett
+# hierueber - siehe JoelDigitalsApp/services/push.py.
 ONESIGNAL_APP_ID = os.getenv("ONESIGNAL_APP_ID", "")
 ONESIGNAL_REST_API_KEY = os.getenv("ONESIGNAL_REST_API_KEY", "")
-
-# Firebase Cloud Messaging (Push-Benachrichtigungen fuer die Joel Digitals App).
-# FIREBASE_* sind die *oeffentlichen* Web-SDK-Config-Werte (aus der Firebase
-# Console -> Projekteinstellungen -> Allgemein -> "Meine Apps" -> Web-App),
-# unbedenklich im Client-Code sichtbar. FIREBASE_SERVICE_ACCOUNT_JSON ist der
-# GEHEIME Server-Schluessel (Projekteinstellungen -> Dienstkonten -> Neuen
-# privaten Schluessel generieren) - kompletter JSON-Dateiinhalt als ein
-# String in der .env. Ohne FIREBASE_SERVICE_ACCOUNT_JSON bleibt Push
-# deaktiviert (JoelDigitalsApp.services.push loggt dann nur statt zu senden).
-FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY", "")
-FIREBASE_AUTH_DOMAIN = os.getenv("FIREBASE_AUTH_DOMAIN", "")
-FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID", "")
-FIREBASE_STORAGE_BUCKET = os.getenv("FIREBASE_STORAGE_BUCKET", "")
-FIREBASE_MESSAGING_SENDER_ID = os.getenv("FIREBASE_MESSAGING_SENDER_ID", "")
-FIREBASE_APP_ID = os.getenv("FIREBASE_APP_ID", "")
-FIREBASE_VAPID_KEY = os.getenv("FIREBASE_VAPID_KEY", "")
-FIREBASE_SERVICE_ACCOUNT_JSON = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "")
 
 # Application definition
 

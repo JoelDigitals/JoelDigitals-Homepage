@@ -33,32 +33,3 @@ class PushHealthCheck(models.Model):
 
     def __str__(self):
         return f"OneSignal-Check {self.checked_at:%Y-%m-%d %H:%M} - {'OK' if self.success else 'FEHLER'}"
-
-
-class Device(models.Model):
-    """Ein Firebase-Cloud-Messaging-Geraet (Push-Token). Gleiches Muster wie
-    main.Device im JDS-Management-Projekt: firebase_token wird beim Login
-    (oder per /api/register-device/) registriert; send_push_notification()
-    schickt an alle Tokens eines Users und entfernt ungueltige Tokens
-    automatisch."""
-    DEVICE_TYPES = (
-        ("ios", "iOS"),
-        ("android", "Android"),
-        ("web", "Web"),
-    )
-
-    firebase_token = models.CharField(max_length=255, unique=True)
-    device_type = models.CharField(max_length=20, choices=DEVICE_TYPES, blank=True)
-    app_version = models.CharField(max_length=50, blank=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="jd_devices",
-    )
-    last_seen = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.device_type or 'unknown'} - {self.user} ({self.firebase_token[:16]}…)"

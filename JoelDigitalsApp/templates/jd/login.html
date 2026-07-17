@@ -41,8 +41,6 @@
             <label for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
             {{ form.password }}
         </div>
-        <input type="hidden" name="firebase_token" id="id_firebase_token">
-        <input type="hidden" name="device_type" id="id_device_type">
         <button type="submit" class="jd-btn" style="width:100%; justify-content:center;">
             {% trans "Log In" %}
         </button>
@@ -55,65 +53,4 @@
         </a>
     </p>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-{% if FIREBASE_API_KEY %}
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-<script>
-(function () {
-  var form = document.getElementById('jd-login-form');
-  var tokenField = document.getElementById('id_firebase_token');
-  var deviceTypeField = document.getElementById('id_device_type');
-
-  async function fetchToken() {
-    // In der median.co-App: natives Bridge-API liefert den FCM-Token direkt.
-    if (window.median && window.median.firebase && window.median.firebase.getToken) {
-      try {
-        deviceTypeField.value = /Android/i.test(navigator.userAgent) ? 'android' : 'ios';
-        return await window.median.firebase.getToken();
-      } catch (e) {
-        console.warn('median.firebase.getToken failed', e);
-        return '';
-      }
-    }
-
-    // Normaler Browser: Firebase-Web-SDK + Service Worker.
-    if (!('serviceWorker' in navigator) || !('Notification' in window)) return '';
-    try {
-      firebase.initializeApp({
-        apiKey: "{{ FIREBASE_API_KEY }}",
-        authDomain: "{{ FIREBASE_AUTH_DOMAIN }}",
-        projectId: "{{ FIREBASE_PROJECT_ID }}",
-        storageBucket: "{{ FIREBASE_STORAGE_BUCKET }}",
-        messagingSenderId: "{{ FIREBASE_MESSAGING_SENDER_ID }}",
-        appId: "{{ FIREBASE_APP_ID }}",
-      });
-      var reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {scope: '/firebase-cloud-messaging-push-scope'});
-      var permission = await Notification.requestPermission();
-      if (permission !== 'granted') return '';
-      deviceTypeField.value = 'web';
-      return await firebase.messaging().getToken({vapidKey: "{{ FIREBASE_VAPID_KEY }}", serviceWorkerRegistration: reg});
-    } catch (e) {
-      console.warn('Firebase Web-SDK Token-Abruf fehlgeschlagen', e);
-      return '';
-    }
-  }
-
-  // Token vorab abrufen (nicht das Formular blockieren, falls es lange dauert
-  // oder fehlschlaegt - Login funktioniert immer, Push-Registrierung ist optional).
-  var tokenPromise = fetchToken();
-
-  form.addEventListener('submit', function (e) {
-    if (tokenField.value) return; // Token schon gesetzt (langsamer Klick)
-    e.preventDefault();
-    tokenPromise.then(function (token) {
-      tokenField.value = token || '';
-      form.submit();
-    });
-  });
-})();
-</script>
-{% endif %}
 {% endblock %}

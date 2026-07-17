@@ -29,6 +29,5 @@ urlpatterns = [
     path('profile/edit/', views.jd_profile_edit_app, name='jd_profile_edit_app'),
     path('profile/change-password/', views.jd_change_password_app, name='jd_change_password_app'),
     path('settings/', views.jd_settings_app, name='jd_settings_app'),
-    path('api/register-device/', views.jd_register_device_app, name='jd_register_device_app'),
     path('api/save-onesignal/', views.jd_save_onesignal_player_id_app, name='jd_save_onesignal_player_id_app'),
 ]
