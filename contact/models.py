@@ -141,9 +141,11 @@ class SpecialTimeSlot(models.Model):
     date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
+    is_closed = models.BooleanField(default=False, help_text="Wenn aktiv, sind an diesem Tag keine Termine buchbar")
 
     def __str__(self):
-        return f"{self.date} {self.start_time}–{self.end_time}"
+        status = " (Geschlossen)" if self.is_closed else ""
+        return f"{self.date} {self.start_time}–{self.end_time}{status}"
 
 
 class Appointment(models.Model):

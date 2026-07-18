@@ -91,8 +91,11 @@ urlpatterns += i18n_patterns(
     path('chat/', include('chat.urls')),
     path("reviews/", include("reviews.urls")),
     path('webinars/', include('webinars.urls')),
-    path('', include('landingpages.urls')),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    # Muss VOR landingpages.urls stehen: dessen '<slug:slug>/'-Catch-all würde
+    # sonst /jds-management-konfigurator/ faelschlich als Landingpage-Slug matchen.
+    path('jds-management-konfigurator/', include('jds_configurator.urls')),
+    path('', include('landingpages.urls')),
 )
 
 # --- Medien-Dateien ---

@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'admin_api',
     'autoupdate',
+    'jds_configurator',
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"

@@ -30,6 +30,7 @@ urlpatterns = [
     path('profile/change-password/', views.jd_change_password_app, name='jd_change_password_app'),
     path('settings/', views.jd_settings_app, name='jd_settings_app'),
     path('settings/status-subscriptions/<int:app_id>/toggle/', views.jd_toggle_status_subscription_app, name='jd_toggle_status_subscription_app'),
+    path('settings/push-notifications/toggle/', views.jd_toggle_push_notifications_app, name='jd_toggle_push_notifications_app'),
     path('settings/app-permissions/', views.jd_app_permissions_app, name='jd_app_permissions_app'),
     path('settings/delete-account/', views.jd_delete_account_app, name='jd_delete_account_app'),
     path('api/save-onesignal/', views.jd_save_onesignal_player_id_app, name='jd_save_onesignal_player_id_app'),

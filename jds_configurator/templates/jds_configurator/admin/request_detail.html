@@ -1,0 +1,91 @@
+{% extends "base_shop.html" %}
+{% block title %}Anfrage {{ config_request.reference }}{% endblock %}
+{% block content %}
+<style>
+.jdscfg-admin-wrap{max-width:800px;margin:0 auto;padding:2rem 1rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1.1rem;margin:0 0 1rem}
+.row{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.row:last-child{border-bottom:none}
+.badge{display:inline-block;padding:.2rem .6rem;border-radius:99px;font-size:.72rem;font-weight:600}
+.b-pending{background:#4a3b00;color:#facc15}
+.b-approved{background:#06331f;color:#4ade80}
+.b-rejected{background:#3b0d0d;color:#f87171}
+.btn{padding:.6rem 1.2rem;border-radius:8px;font-weight:700;font-size:.875rem;cursor:pointer;border:none;margin-right:.6rem}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-danger{background:#7f1d1d;color:#fff}
+select,textarea{width:100%;padding:.55rem .7rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text);margin-bottom:.75rem}
+</style>
+<div class="jdscfg-admin-wrap">
+  <p><a href="{% url 'jds_configurator:admin_request_list' %}" style="color:#999;text-decoration:none">&larr; Zurück zur Liste</a></p>
+  <h1>{{ config_request.reference }} <span class="badge b-{{ config_request.status }}">{{ config_request.get_status_display }}</span></h1>
+
+  <div class="card">
+    <h2>Kunde</h2>
+    <div class="row"><span>Name</span><span>{{ config_request.first_name }} {{ config_request.last_name }}</span></div>
+    <div class="row"><span>E-Mail</span><span>{{ config_request.email }}</span></div>
+    <div class="row"><span>Telefon</span><span>{{ config_request.phone|default:"–" }}</span></div>
+    <div class="row"><span>Unternehmen</span><span>{{ config_request.company_name|default:"–" }}</span></div>
+    <div class="row"><span>USt-IdNr.</span><span>{{ config_request.vat_number|default:"–" }}</span></div>
+    <div class="row"><span>Adresse</span><span>{{ config_request.address }} {{ config_request.zip_code }} {{ config_request.city }}</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Module &amp; Preis</h2>
+    <div class="row"><span>Basismodul</span><span>{{ config_request.BASISMODUL_PRICE }} €</span></div>
+    {% for m in config_request.addon_modules %}
+    <div class="row"><span>{{ m.name }}</span><span>{{ m.monthly_price }} €</span></div>
+    {% endfor %}
+    <div class="row"><span>Zwischensumme</span><span>{{ config_request.subtotal }} €</span></div>
+    {% if config_request.discount_code %}
+    <div class="row"><span>Rabatt ({{ config_request.discount_code.code }})</span><span>-{{ config_request.discount_amount }} €</span></div>
+    {% endif %}
+    <div class="row"><strong>Gesamt / Monat</strong><strong>{{ config_request.total_amount }} €</strong></div>
+  </div>
+
+  {% if config_request.notes %}
+  <div class="card">
+    <h2>Anmerkungen des Kunden</h2>
+    <p>{{ config_request.notes }}</p>
+  </div>
+  {% endif %}
+
+  {% if config_request.status == 'pending' %}
+  <div class="card">
+    <h2>Genehmigen</h2>
+    <form method="post" action="{% url 'jds_configurator:admin_request_approve' config_request.pk %}">
+      {% csrf_token %}
+      <select name="payment_method" required>
+        <option value="">— Zahlungsart wählen —</option>
+        <option value="bank_transfer">Überweisung</option>
+        <option value="paypal">PayPal</option>
+      </select>
+      <button type="submit" class="btn btn-primary" onclick="return confirm('Anfrage genehmigen und Order anlegen?')">Genehmigen &amp; Order anlegen</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Ablehnen</h2>
+    <form method="post" action="{% url 'jds_configurator:admin_request_reject' config_request.pk %}">
+      {% csrf_token %}
+      <textarea name="internal_notes" rows="2" placeholder="Interne Notiz (optional)"></textarea>
+      <button type="submit" class="btn btn-danger" onclick="return confirm('Anfrage wirklich ablehnen?')">Ablehnen</button>
+    </form>
+  </div>
+  {% elif config_request.order %}
+  <div class="card">
+    <h2>Verknüpfte Bestellung</h2>
+    <div class="row"><span>Order-ID</span><span>#{{ config_request.order.id }}</span></div>
+    <div class="row"><span>Zahlungsart</span><span>{{ config_request.order.payment_method }}</span></div>
+    <div class="row"><span>Status</span><span>{{ config_request.order.status }}</span></div>
+  </div>
+  {% endif %}
+
+  {% if config_request.internal_notes %}
+  <div class="card">
+    <h2>Interne Notizen</h2>
+    <p>{{ config_request.internal_notes }}</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

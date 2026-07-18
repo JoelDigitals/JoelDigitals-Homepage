@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Angebot - JDS Management</title>
+<style>
+@page{size:A4;margin:20mm}
+body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;line-height:1.4;color:#333;margin:0}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12mm}
+.header h1{font-size:18pt;margin:0 0 3mm;color:#0044cc}
+.sender-info{text-align:right;font-size:9pt;color:#666}
+.recipient{margin-bottom:8mm;font-size:10pt}
+table{width:100%;border-collapse:collapse;margin:8mm 0}
+th,td{padding:2.5mm 2mm;border-bottom:1px solid #ddd;text-align:left}
+th{background:#e8f0ff;color:#0044cc;font-weight:bold}
+.totals{width:60%;margin-left:auto;margin-top:6mm}
+.totals p{display:flex;justify-content:space-between;margin:1mm 0}
+.totals .grand{font-weight:bold;font-size:12pt;border-top:1px solid #333;padding-top:2mm}
+.footer{margin-top:16mm;font-size:8.5pt;color:#666;border-top:1px solid #0044cc;padding-top:3mm}
+.note{margin-top:6mm;font-size:9pt;color:#666}
+</style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>Angebot</h1>
+      <p>Datum: {{ now|date:"d.m.Y" }}</p>
+    </div>
+    <div class="sender-info">
+      Joel Digitals Inh. Joel Nicolay<br>
+      Niederwiesstraße 20<br>
+      66822 Lebach
+    </div>
+  </div>
+
+  <div class="recipient">
+    <strong>{{ customer.first_name }} {{ customer.last_name }}</strong><br>
+    {% if customer.company_name %}{{ customer.company_name }}<br>{% endif %}
+    {% if customer.address %}{{ customer.address }}<br>{% endif %}
+    {% if customer.zip_code or customer.city %}{{ customer.zip_code }} {{ customer.city }}<br>{% endif %}
+    {% if customer.email %}{{ customer.email }}<br>{% endif %}
+  </div>
+
+  <p>Vielen Dank für Ihr Interesse an Ihrem individuellen JDS Management. Nachfolgend Ihr unverbindliches Angebot:</p>
+
+  <table>
+    <thead><tr><th>Modul</th><th>Preis / Monat</th></tr></thead>
+    <tbody>
+      <tr><td>JDS Management Basismodul (TeamPage, Arbeitszeiten, Urlaub, Rollenverwaltung, Rechnungen, Finanzen, Lager, Angebote, Produkte, Kunden, Chat, Kalender)</td><td>{{ basismodul_price }} €</td></tr>
+      {% for m in addon_modules %}
+      <tr><td>{{ m.name }}</td><td>{{ m.monthly_price }} €</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <p><span>Zwischensumme</span><span>{{ subtotal }} €</span></p>
+    {% if discount_code %}
+    <p><span>Rabatt ({{ discount_code.code }}, -{{ discount_code.percentage }}%)</span><span>-{{ discount_amount }} €</span></p>
+    {% endif %}
+    <p class="grand"><span>Gesamt / Monat</span><span>{{ total }} €</span></p>
+  </div>
+
+  <p class="note">Dies ist ein unverbindliches Angebot. Alle Preise verstehen sich als monatliche Kosten. Um dieses Angebot verbindlich anzufragen, nutzen Sie bitte die Schaltfläche "Jetzt verbindlich anfragen" im Konfigurator.</p>
+
+  <div class="footer">
+    Joel Digitals Inh. Joel Nicolay · Niederwiesstraße 20 · 66822 Lebach · joel-digitals.de
+  </div>
+</body>
+</html>

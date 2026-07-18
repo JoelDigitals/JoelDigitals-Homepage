@@ -74,40 +74,45 @@ def get_available_times(selected_date, appointment_type, max_parallel=2):
     Gibt alle verfügbaren Zeitslots für ein bestimmtes Datum zurück.
     Slots starten alle 5 Minuten, jeder Termin blockiert die Dauer seines Termintyps.
     
+    Spezielle Zeiten (SpecialTimeSlot) haben Vorrang vor regulären TimeSlots.
+    Wenn SpecialTimeSlots für ein Datum existieren, werden reguläre ignoriert.
+    Wenn alle SpecialTimeSlots als geschlossen markiert sind, gibt es keine Slots.
+    
     Args:
         selected_date: Das Datum für das Slots gesucht werden
         appointment_type: Der AppointmentType mit duration_minutes Attribut
         max_parallel: Maximale Anzahl paralleler Termine (Standard: 2)
     """
     duration_minutes = appointment_type.duration_minutes
-    slot_interval = 10  # Startzeiten alle 5 Minuten
+    slot_interval = 10  # Startzeiten alle 10 Minuten
     
     all_possible_slots = []
     
-    # 1. Reguläre TimeSlots für den Wochentag
-    regular_slots = TimeSlot.objects.filter(weekday=selected_date.weekday())
-    for ts in regular_slots:
-        start_dt = datetime.combine(selected_date, ts.start_time)
-        end_dt = datetime.combine(selected_date, ts.end_time)
-        
-        # Stelle sicher, dass der letzte mögliche Termin noch vollständig in die Zeitspanne passt
-        # Reduziere end_dt um die Termindauer
-        effective_end = end_dt - timedelta(minutes=duration_minutes)
-        
-        if effective_end > start_dt:
-            all_possible_slots += generate_time_slots(start_dt, effective_end + timedelta(minutes=slot_interval), slot_interval)
-    
-    # 2. Spezielle TimeSlots für dieses Datum
+    # 1. Spezielle TimeSlots für dieses Datum prüfen
     special_slots = SpecialTimeSlot.objects.filter(date=selected_date)
-    for sts in special_slots:
-        start_dt = datetime.combine(selected_date, sts.start_time)
-        end_dt = datetime.combine(selected_date, sts.end_time)
-        
-        # Auch hier: letzter Termin muss vollständig passen
-        effective_end = end_dt - timedelta(minutes=duration_minutes)
-        
-        if effective_end > start_dt:
-            all_possible_slots += generate_time_slots(start_dt, effective_end + timedelta(minutes=slot_interval), slot_interval)
+    
+    if special_slots.exists():
+        # Spezielle Zeiten haben Vorrang: reguläre werden ignoriert
+        open_specials = special_slots.filter(is_closed=False)
+        if not open_specials.exists():
+            # Alle Specials sind geschlossen → kein einziger Slot an diesem Tag
+            return []
+        # Nur offene Specials verwenden
+        for sts in open_specials:
+            start_dt = datetime.combine(selected_date, sts.start_time)
+            end_dt = datetime.combine(selected_date, sts.end_time)
+            effective_end = end_dt - timedelta(minutes=duration_minutes)
+            if effective_end > start_dt:
+                all_possible_slots += generate_time_slots(start_dt, effective_end + timedelta(minutes=slot_interval), slot_interval)
+    else:
+        # Keine Specials → reguläre TimeSlots verwenden
+        regular_slots = TimeSlot.objects.filter(weekday=selected_date.weekday())
+        for ts in regular_slots:
+            start_dt = datetime.combine(selected_date, ts.start_time)
+            end_dt = datetime.combine(selected_date, ts.end_time)
+            effective_end = end_dt - timedelta(minutes=duration_minutes)
+            if effective_end > start_dt:
+                all_possible_slots += generate_time_slots(start_dt, effective_end + timedelta(minutes=slot_interval), slot_interval)
     
     # 3. Duplikate entfernen und sortieren
     all_possible_slots = sorted(set(all_possible_slots))
@@ -135,18 +140,22 @@ def get_available_times(selected_date, appointment_type, max_parallel=2):
     return available_slots
 
 def get_available_dates(request):
-    """API-Endpoint: Liefert verfügbare Daten für die nächsten 60 Tage"""
+    """API-Endpoint: Liefert verfügbare Daten für die nächsten 100 Tage"""
     dates = []
     today = datetime.today().date()
     
     for i in range(2, 100):
         d = today + timedelta(days=i)
-        # Optional: Prüfe, ob an diesem Tag überhaupt Slots existieren
-        has_regular = TimeSlot.objects.filter(weekday=d.weekday()).exists()
-        has_special = SpecialTimeSlot.objects.filter(date=d).exists()
         
-        if has_regular or has_special:
-            dates.append(d.strftime("%Y-%m-%d"))
+        special_slots = SpecialTimeSlot.objects.filter(date=d)
+        if special_slots.exists():
+            # Wenn es Specials gibt: nur anbieten wenn mindestens einer offen ist
+            if special_slots.filter(is_closed=False).exists():
+                dates.append(d.strftime("%Y-%m-%d"))
+        else:
+            # Keine Specials → prüfe reguläre TimeSlots
+            if TimeSlot.objects.filter(weekday=d.weekday()).exists():
+                dates.append(d.strftime("%Y-%m-%d"))
     
     return JsonResponse({"dates": dates})
 

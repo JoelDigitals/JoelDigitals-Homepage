@@ -145,6 +145,7 @@ class UserProfile(models.Model):
     marketing_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     last_onesignal_sync = models.DateTimeField(null=True, blank=True, verbose_name="Letzter OneSignal-Sync")
     onesignal_player_id = models.CharField(max_length=255, blank=True, verbose_name="OneSignal Player-ID")
+    push_enabled = models.BooleanField("Push-Benachrichtigungen aktiv", default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

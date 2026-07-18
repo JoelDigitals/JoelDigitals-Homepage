@@ -5,21 +5,23 @@ import datetime as dt
 
 
 def get_available_times(date):
-    """Erzeugt 5-Minuten-Slots basierend auf Regular + Special Times"""
+    """Erzeugt 5-Minuten-Slots basierend auf Regular + Special Times.
+    Special times haben Vorrang vor regulären times."""
 
     weekday = date.weekday()
     slots = []
 
-    regular = TimeSlot.objects.filter(weekday=weekday)
     specials = SpecialTimeSlot.objects.filter(date=date)
 
-    time_ranges = []
-
-    for r in regular:
-        time_ranges.append((r.start_time, r.end_time))
-
-    for s in specials:
-        time_ranges.append((s.start_time, s.end_time))
+    if specials.exists():
+        # Spezielle Zeiten haben Vorrang
+        open_specials = specials.filter(is_closed=False)
+        if not open_specials.exists():
+            return []
+        time_ranges = [(s.start_time, s.end_time) for s in open_specials]
+    else:
+        regular = TimeSlot.objects.filter(weekday=weekday)
+        time_ranges = [(r.start_time, r.end_time) for r in regular]
 
     for start, end in time_ranges:
         current = dt.datetime.combine(date, start)

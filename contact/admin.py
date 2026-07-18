@@ -7,8 +7,12 @@ admin.site.register(SupportTicket)
 admin.site.register(TicketMessage)
 admin.site.register(SalesEntry)
 admin.site.register(SalesChatMessage)
-admin.site.register(SpecialTimeSlot)
 admin.site.register(TimeSlot)
+
+@admin.register(SpecialTimeSlot)
+class SpecialTimeSlotAdmin(admin.ModelAdmin):
+    list_display = ('date', 'start_time', 'end_time', 'is_closed')
+    list_filter = ('date', 'is_closed')
 
 @admin.register(AppointmentType)
 class AppointmentTypeAdmin(admin.ModelAdmin):

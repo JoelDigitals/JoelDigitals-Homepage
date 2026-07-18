@@ -43,7 +43,7 @@
             <span class="jd-list-subtitle" id="pushStatus">{% trans "Checking status…" %}</span>
         </span>
         <label class="jd-switch">
-            <input type="checkbox" id="enablePush">
+            <input type="checkbox" id="enablePush" {% if push_enabled %}checked{% endif %}>
             <span class="jd-switch-track"></span>
             <span class="jd-switch-thumb"></span>
         </label>
@@ -53,6 +53,12 @@
 (function() {
     var toggle = document.getElementById('enablePush');
     var status = document.getElementById('pushStatus');
+    var pushToggleUrl = '{% url "jd_toggle_push_notifications_app" %}';
+
+    function csrfTokenPush() {
+        var m = document.cookie.match(/csrftoken=([^;]+)/);
+        return m ? m[1] : '';
+    }
 
     function setStatus(text, checked, disabled) {
         status.textContent = text;
@@ -60,11 +66,19 @@
         toggle.disabled = disabled;
     }
 
+    function savePushPreference(enabled) {
+        fetch(pushToggleUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': csrfTokenPush(),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'enabled=' + (enabled ? 'true' : 'false'),
+        }).catch(function () {});
+    }
+
     function updatePushStatus() {
-        // Native Browser-API statt OneSignal-SDK-Interna fuer den Status -
-        // Notification.permission ist ueberall verfuegbar und stabil
-        // ('granted'/'denied'/'default'), unabhaengig davon, ob das
-        // OneSignal-SDK schon fertig geladen/initialisiert ist.
         if (window.median && window.median.onesignal) {
             setStatus("{% trans 'Enabled' %}", true, true);
             return;
@@ -84,8 +98,12 @@
 
     setTimeout(updatePushStatus, 1000);
     toggle.addEventListener('change', function() {
-        if (!toggle.checked) { return; }
+        if (!toggle.checked) {
+            savePushPreference(false);
+            return;
+        }
         toggle.disabled = true;
+        savePushPreference(true);
         if (!window.OneSignal || !window.OneSignal.Notifications) {
             setTimeout(function () {
                 if (window.OneSignal && window.OneSignal.Notifications) {
@@ -112,7 +130,7 @@
         <span class="jd-list-icon"><span class="material-symbols-rounded">dns</span></span>
         <span class="jd-list-text"><span class="jd-list-title">{{ app.name }}</span></span>
         <label class="jd-switch">
-            <input type="checkbox" class="jd-status-sub-toggle" data-app-id="{{ app.id }}" {% if app.id in subscribed_app_ids %}checked{% endif %}>
+            <input type="checkbox" class="jd-status-sub-toggle" data-app-id="{{ app.id }}" data-url="{% url 'jd_toggle_status_subscription_app' app_id=app.id %}" {% if app.id in subscribed_app_ids %}checked{% endif %}>
             <span class="jd-switch-track"></span>
             <span class="jd-switch-thumb"></span>
         </label>
@@ -130,10 +148,10 @@
     }
     document.querySelectorAll('.jd-status-sub-toggle').forEach(function (el) {
         el.addEventListener('change', function () {
-            var appId = el.getAttribute('data-app-id');
+            var toggleUrl = el.getAttribute('data-url');
             var wasChecked = el.checked;
             el.disabled = true;
-            fetch('/app/settings/status-subscriptions/' + appId + '/toggle/', {
+            fetch(toggleUrl, {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: { 'X-CSRFToken': csrfTokenStatusSub() },

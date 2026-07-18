@@ -427,12 +427,15 @@ def jd_change_password_app(request):
 def jd_settings_app(request):
     from status.models import App as StatusApp
     from .models import StatusSubscription
+    from main.models import UserProfile
 
     context = _nav_context(request.user)
     context['status_apps'] = StatusApp.objects.filter(is_active=True).order_by('name')
     context['subscribed_app_ids'] = set(
         StatusSubscription.objects.filter(user=request.user).values_list('app_id', flat=True)
     )
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    context['push_enabled'] = profile.push_enabled
     return render(request, 'jd/settings.html', context)
 
 
@@ -450,6 +453,17 @@ def jd_toggle_status_subscription_app(request, app_id):
         sub.delete()
         return JsonResponse({'subscribed': False})
     return JsonResponse({'subscribed': True})
+
+
+@login_required(login_url='jd_login_app')
+@require_POST
+def jd_toggle_push_notifications_app(request):
+    """Speichert ob der Nutzer Push-Benachrichtigungen wuenscht."""
+    from main.models import UserProfile
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    profile.push_enabled = request.POST.get('enabled', 'true') == 'true'
+    profile.save(update_fields=['push_enabled'])
+    return JsonResponse({'push_enabled': profile.push_enabled})
 
 
 @login_required(login_url='jd_login_app')

@@ -51,10 +51,10 @@ header.jd-header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background: rgba(18, 18, 18, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
+    background: rgba(18, 18, 18, 0.7);
+    backdrop-filter: blur(40px) saturate(200%) brightness(1.1);
+    -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     padding: 14px 20px;
     display: flex;
     align-items: center;
@@ -146,15 +146,18 @@ nav.jd-tabbar {
     gap: 2px;
     width: calc(100% - 32px);
     max-width: 460px;
-    background: rgba(38, 38, 38, 0.55);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(40px) saturate(200%) brightness(1.15);
+    -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.15);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 28px;
     padding: 6px;
+    overflow: hidden;
     box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .jd-tab {
@@ -171,6 +174,7 @@ nav.jd-tabbar {
     padding: 8px 10px;
     border-radius: 20px;
     flex: 1;
+    overflow: hidden;
     transition: color .35s cubic-bezier(.4,0,.2,1);
 }
 
@@ -366,7 +370,7 @@ nav.jd-tabbar {
 <body data-tab="{{ request.resolver_match.url_name }}">
 
 <header class="jd-header">
-    <a href="{% url 'jd_home_app' %}" class="jd-brand">
+    <a href="{% url 'jd_home_app' %}" class="jd-brand" target="_blank">
         <img src="{% static 'favicon.png' %}" alt="Joel Digitals" class="jd-brand-logo">
         Joel Digitals
     </a>

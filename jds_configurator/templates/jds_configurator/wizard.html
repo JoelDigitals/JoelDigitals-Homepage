@@ -1,0 +1,228 @@
+{% extends "base_shop.html" %}
+{% load static %}
+{% block title %}Dein individuelles JDS Management{% endblock %}
+{% block content %}
+<style>
+.jdscfg-wrap{max-width:900px;margin:0 auto;padding:2rem 1rem 4rem}
+.jdscfg-h1{font-size:2rem;font-weight:700;margin-bottom:.3rem}
+.jdscfg-sub{color:#aaa;margin-bottom:2rem}
+.jdscfg-steps{display:flex;gap:.5rem;margin-bottom:2rem}
+.jdscfg-step-dot{flex:1;height:4px;border-radius:99px;background:var(--border)}
+.jdscfg-step-dot.active{background:var(--primary)}
+.jdscfg-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.75rem;margin-bottom:1.5rem}
+.jdscfg-card h2{font-size:1.2rem;margin:0 0 1.25rem}
+.jdscfg-step{display:none}
+.jdscfg-step.active{display:block}
+.jdscfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.jdscfg-fld{margin-bottom:1rem}
+.jdscfg-fld label{display:block;font-size:.8rem;font-weight:600;color:#aaa;margin-bottom:.3rem}
+.jdscfg-fld input,.jdscfg-fld textarea{width:100%;padding:.6rem .8rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text);font-size:.9rem}
+.jdscfg-core-box{background:rgba(0,68,204,.1);border:1px solid var(--primary);border-radius:10px;padding:1.1rem 1.25rem;margin-bottom:1.5rem}
+.jdscfg-core-box h3{margin:0 0 .5rem;font-size:1rem}
+.jdscfg-core-list{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem}
+.jdscfg-tag{background:rgba(255,255,255,.07);border-radius:99px;padding:.2rem .6rem;font-size:.75rem;color:#ccc}
+.jdscfg-core-price{font-weight:700;color:var(--primary);font-size:1.1rem;margin-top:.5rem}
+.jdscfg-cat{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#888;margin:1.25rem 0 .6rem}
+.jdscfg-cat:first-child{margin-top:0}
+.jdscfg-module{display:flex;align-items:center;justify-content:space-between;padding:.7rem .9rem;border:1px solid var(--border);border-radius:8px;margin-bottom:.5rem;cursor:pointer}
+.jdscfg-module:hover{border-color:var(--primary)}
+.jdscfg-module.checked{border-color:var(--primary);background:rgba(0,68,204,.08)}
+.jdscfg-module-name{display:flex;align-items:center;gap:.6rem;font-size:.9rem}
+.jdscfg-module-price{font-weight:700;color:var(--primary);font-size:.9rem}
+.jdscfg-total-box{position:sticky;bottom:0;background:var(--surface);border:1px solid var(--primary);border-radius:10px;padding:1.1rem 1.25rem;margin-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem}
+.jdscfg-total-label{font-size:.85rem;color:#aaa}
+.jdscfg-total-val{font-size:1.6rem;font-weight:800;color:var(--primary)}
+.jdscfg-discount-row{display:flex;gap:.5rem;margin-top:1rem}
+.jdscfg-discount-row input{flex:1;padding:.55rem .8rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text)}
+.jdscfg-msg{font-size:.8rem;margin-top:.4rem}
+.jdscfg-msg.ok{color:#4ade80}
+.jdscfg-msg.err{color:#f87171}
+.jdscfg-btn{padding:.7rem 1.4rem;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer;border:none}
+.jdscfg-btn-primary{background:var(--primary);color:#fff}
+.jdscfg-btn-primary:hover{background:var(--primary-hover)}
+.jdscfg-btn-secondary{background:transparent;color:#ccc;border:1px solid var(--border)}
+.jdscfg-actions{display:flex;justify-content:space-between;margin-top:1.5rem}
+.jdscfg-summary-line{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.jdscfg-summary-line:last-child{border-bottom:none}
+.jdscfg-final-actions{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.5rem}
+.jdscfg-final-actions .jdscfg-btn{flex:1;min-width:220px;text-align:center}
+.jdscfg-consult-note{font-size:.78rem;color:#888;margin-top:.6rem}
+</style>
+
+<div class="jdscfg-wrap">
+  <h1 class="jdscfg-h1">Dein individuelles JDS Management</h1>
+  <p class="jdscfg-sub">Stelle dir dein Paket aus dem verpflichtenden Basismodul und optionalen Zusatzmodulen zusammen.</p>
+
+  <div class="jdscfg-steps">
+    <div class="jdscfg-step-dot active" data-dot="1"></div>
+    <div class="jdscfg-step-dot" data-dot="2"></div>
+    <div class="jdscfg-step-dot" data-dot="3"></div>
+  </div>
+
+  <form id="jdscfg-form" method="post">
+    {% csrf_token %}
+
+    <!-- Step 1: Kundendaten -->
+    <div class="jdscfg-step active" data-step="1">
+      <div class="jdscfg-card">
+        <h2>1. Deine Daten</h2>
+        <div class="jdscfg-grid">
+          <div class="jdscfg-fld"><label>Vorname *</label><input type="text" name="first_name" required></div>
+          <div class="jdscfg-fld"><label>Nachname *</label><input type="text" name="last_name" required></div>
+          <div class="jdscfg-fld"><label>E-Mail *</label><input type="email" name="email" required></div>
+          <div class="jdscfg-fld"><label>Telefon</label><input type="text" name="phone"></div>
+          <div class="jdscfg-fld"><label>Unternehmen</label><input type="text" name="company_name"></div>
+          <div class="jdscfg-fld"><label>USt-IdNr.</label><input type="text" name="vat_number"></div>
+          <div class="jdscfg-fld" style="grid-column:1/-1"><label>Adresse</label><input type="text" name="address"></div>
+          <div class="jdscfg-fld"><label>PLZ</label><input type="text" name="zip_code"></div>
+          <div class="jdscfg-fld"><label>Stadt</label><input type="text" name="city"></div>
+        </div>
+      </div>
+      <div class="jdscfg-actions">
+        <span></span>
+        <button type="button" class="jdscfg-btn jdscfg-btn-primary" onclick="jdscfgGoto(2)">Weiter</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Module -->
+    <div class="jdscfg-step" data-step="2">
+      <div class="jdscfg-card">
+        <div class="jdscfg-core-box">
+          <h3>✅ Basismodul (Pflicht)</h3>
+          <div class="jdscfg-core-list">
+            {% for m in core_modules %}<span class="jdscfg-tag">{{ m.name }}</span>{% endfor %}
+          </div>
+          <div class="jdscfg-core-price">{{ basismodul_price }} € / Monat</div>
+        </div>
+
+        <h2>2. Zusatzmodule wählen</h2>
+        {% for cat in categories %}
+        <div class="jdscfg-cat">{{ cat.label }}</div>
+        {% for m in cat.modules %}
+        <label class="jdscfg-module" data-price="{{ m.monthly_price }}">
+          <span class="jdscfg-module-name">
+            <input type="checkbox" name="modules" value="{{ m.key }}" onchange="jdscfgToggleModule(this)">
+            {{ m.name }}
+          </span>
+          <span class="jdscfg-module-price">{{ m.monthly_price }} €/Monat</span>
+        </label>
+        {% endfor %}
+        {% endfor %}
+
+        <div class="jdscfg-discount-row">
+          <input type="text" id="jdscfg-discount-input" placeholder="Rabattcode">
+          <button type="button" class="jdscfg-btn jdscfg-btn-secondary" onclick="jdscfgValidateDiscount()">Prüfen</button>
+        </div>
+        <div class="jdscfg-msg" id="jdscfg-discount-msg"></div>
+
+        <div class="jdscfg-total-box">
+          <span class="jdscfg-total-label">Monatlicher Gesamtpreis</span>
+          <span class="jdscfg-total-val" id="jdscfg-total">{{ basismodul_price }} €</span>
+        </div>
+      </div>
+      <div class="jdscfg-actions">
+        <button type="button" class="jdscfg-btn jdscfg-btn-secondary" onclick="jdscfgGoto(1)">Zurück</button>
+        <button type="button" class="jdscfg-btn jdscfg-btn-primary" onclick="jdscfgFillSummary();jdscfgGoto(3)">Weiter</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Zusammenfassung -->
+    <div class="jdscfg-step" data-step="3">
+      <div class="jdscfg-card">
+        <h2>3. Zusammenfassung</h2>
+        <div id="jdscfg-summary"></div>
+        <div class="jdscfg-fld" style="margin-top:1rem">
+          <label>Anmerkungen (optional)</label>
+          <textarea name="notes" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="jdscfg-final-actions">
+        <button type="submit" formaction="{% url 'jds_configurator:download_offer_pdf' %}" class="jdscfg-btn jdscfg-btn-secondary">📄 Angebot herunterladen</button>
+        <a href="https://joel-digitals.de/contact/appointment/" target="_blank" class="jdscfg-btn jdscfg-btn-secondary" style="display:flex;align-items:center;justify-content:center;text-decoration:none">💬 Beraten lassen</a>
+        <button type="submit" formaction="{% url 'jds_configurator:submit_request' %}" class="jdscfg-btn jdscfg-btn-primary">✅ Jetzt verbindlich anfragen</button>
+      </div>
+      <p class="jdscfg-consult-note">"Angebot herunterladen" ist unverbindlich. "Jetzt verbindlich anfragen" sendet deine Anfrage zur Prüfung an unser Team - danach erhältst du eine Rechnung zur Zahlung per Überweisung oder PayPal.</p>
+      <div class="jdscfg-actions">
+        <button type="button" class="jdscfg-btn jdscfg-btn-secondary" onclick="jdscfgGoto(2)">Zurück</button>
+        <span></span>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+const JDSCFG_BASIS = {{ basismodul_price }};
+let jdscfgDiscountPercent = 0;
+
+function jdscfgGoto(step){
+  document.querySelectorAll('.jdscfg-step').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.jdscfg-step[data-step="${step}"]`).classList.add('active');
+  document.querySelectorAll('.jdscfg-step-dot').forEach(el => el.classList.remove('active'));
+  for(let i=1;i<=step;i++) document.querySelector(`.jdscfg-step-dot[data-dot="${i}"]`).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function jdscfgToggleModule(checkbox){
+  checkbox.closest('.jdscfg-module').classList.toggle('checked', checkbox.checked);
+  jdscfgRecalcTotal();
+}
+
+function jdscfgRecalcTotal(){
+  let subtotal = JDSCFG_BASIS;
+  document.querySelectorAll('.jdscfg-module input[type="checkbox"]:checked').forEach(cb => {
+    subtotal += parseFloat(cb.closest('.jdscfg-module').dataset.price);
+  });
+  const total = subtotal * (1 - jdscfgDiscountPercent/100);
+  document.getElementById('jdscfg-total').textContent = total.toFixed(2).replace('.', ',') + ' €';
+  return {subtotal, total};
+}
+
+async function jdscfgValidateDiscount(){
+  const code = document.getElementById('jdscfg-discount-input').value.trim();
+  const msgEl = document.getElementById('jdscfg-discount-msg');
+  if(!code){ msgEl.textContent=''; jdscfgDiscountPercent=0; jdscfgRecalcTotal(); return; }
+  try{
+    const r = await fetch('{% url "jds_configurator:validate_discount" %}', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({code})
+    });
+    const d = await r.json();
+    if(d.valid){
+      jdscfgDiscountPercent = d.percentage;
+      msgEl.textContent = `Rabattcode gültig: -${d.percentage}%`;
+      msgEl.className = 'jdscfg-msg ok';
+    } else {
+      jdscfgDiscountPercent = 0;
+      msgEl.textContent = d.message || 'Rabattcode ungültig.';
+      msgEl.className = 'jdscfg-msg err';
+    }
+  }catch(e){
+    msgEl.textContent = 'Fehler bei der Prüfung.';
+    msgEl.className = 'jdscfg-msg err';
+  }
+  jdscfgRecalcTotal();
+}
+
+function jdscfgFillSummary(){
+  const {subtotal, total} = jdscfgRecalcTotal();
+  const selected = [...document.querySelectorAll('.jdscfg-module input[type="checkbox"]:checked')]
+    .map(cb => cb.closest('.jdscfg-module').querySelector('.jdscfg-module-name').textContent.trim());
+  let html = `<div class="jdscfg-summary-line"><span>Basismodul</span><span>${JDSCFG_BASIS.toFixed(2)} €</span></div>`;
+  selected.forEach(name => { html += `<div class="jdscfg-summary-line"><span>${name}</span></div>`; });
+  if(jdscfgDiscountPercent > 0){
+    html += `<div class="jdscfg-summary-line"><span>Rabatt</span><span>-${jdscfgDiscountPercent}%</span></div>`;
+  }
+  html += `<div class="jdscfg-summary-line"><strong>Gesamt / Monat</strong><strong>${total.toFixed(2)} €</strong></div>`;
+  document.getElementById('jdscfg-summary').innerHTML = html;
+
+  let discountField = document.querySelector('input[name="discount_code"]');
+  if(!discountField){
+    discountField = document.createElement('input');
+    discountField.type = 'hidden';
+    discountField.name = 'discount_code';
+    document.getElementById('jdscfg-form').appendChild(discountField);
+  }
+  discountField.value = document.getElementById('jdscfg-discount-input').value.trim();
+}
+</script>
+{% endblock %}
