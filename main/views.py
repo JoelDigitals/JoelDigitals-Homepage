@@ -1354,9 +1354,11 @@ def profile_view(request):
     """
     Zeigt das Profil des eingeloggten Benutzers an.
     """
+    from shop_ourapps.models import Wallet
+    wallet = Wallet.objects.filter(user=request.user).first()
     context = {
         'user': request.user,
-        'wallet_balance': getattr(request.user, 'wallet_balance', 0.00),
+        'wallet_balance': wallet.balance if wallet else 0.00,
     }
     
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
@@ -1413,9 +1415,11 @@ def profile_edit(request):
             messages.error(request, f'Fehler beim Aktualisieren: {str(e)}')
             return redirect('jd_profile_edit_app' if getattr(request, 'base_template', None) == 'base_app.html' else 'profile_edit')
     
+    from shop_ourapps.models import Wallet
+    wallet = Wallet.objects.filter(user=request.user).first()
     context = {
         'user': request.user,
-        'wallet_balance': getattr(request.user, 'wallet_balance', 0.00),
+        'wallet_balance': wallet.balance if wallet else 0.00,
     }
     
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
@@ -1442,9 +1446,11 @@ def change_password(request):
     else:
         form = PasswordChangeForm(request.user)
     
+    from shop_ourapps.models import Wallet
+    wallet = Wallet.objects.filter(user=request.user).first()
     context = {
         'form': form,
-        'wallet_balance': getattr(request.user, 'wallet_balance', 0.00),
+        'wallet_balance': wallet.balance if wallet else 0.00,
     }
     
     return render(request, 'profile/change_password.html', context)
@@ -1472,10 +1478,14 @@ def delete_account(request):
         else:
             messages.error(request, 'Bitte geben Sie "löschen" zur Bestätigung ein.')
     
+    in_app = getattr(request, 'base_template', None) == 'base_app.html'
+    from shop_ourapps.models import Wallet
+    wallet = Wallet.objects.filter(user=request.user).first()
     context = {
-        'wallet_balance': getattr(request.user, 'wallet_balance', 0.00),
+        'wallet_balance': wallet.balance if wallet else 0.00,
+        'profile_url_name': 'jd_profile_app' if in_app else 'profile_view',
     }
-    
+
     return render(request, 'profile/delete_account.html', context)
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -1491,9 +1501,11 @@ def app_permissions(request):
     authorizations = SSOAuthorization.objects.filter(
         user=request.user
     ).select_related('client').prefetch_related('scopes').order_by('-last_used')
-    
+
+    in_app = getattr(request, 'base_template', None) == 'base_app.html'
     context = {
         'authorizations': authorizations,
+        'profile_url_name': 'jd_profile_app' if in_app else 'profile_view',
     }
     return render(request, 'profile/app_permissions.html', context)
 
@@ -1502,18 +1514,20 @@ def app_permissions(request):
 def revoke_app_permission(request, auth_id):
     """View zum Widerrufen einer App-Berechtigung"""
     authorization = get_object_or_404(SSOAuthorization, id=auth_id, user=request.user)
-    
+    in_app = getattr(request, 'base_template', None) == 'base_app.html'
+    redirect_name = 'jd_app_permissions_app' if in_app else 'app_permissions'
+
     if request.method == 'POST':
         app_name = authorization.client.name
         authorization.delete()
         messages.success(
-            request, 
+            request,
             _('Access for "{}" has been successfully revoked.').format(app_name)
         )
-        return redirect('app_permissions')
-    
+        return redirect(redirect_name)
+
     # Wenn kein POST, zurück zur Übersicht
-    return redirect('app_permissions')
+    return redirect(redirect_name)
 
 def robots_txt(request):
     lines = [

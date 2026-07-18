@@ -7,12 +7,13 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
 from blog.models import BlogPost
 from contact.views import is_Sales_Editor, is_Support_Editor, is_Support_Ticket_Admin
-from shop_ourapps.models import App as ShopApp
+from shop_ourapps.models import App as ShopApp, Wallet
 from shop_ourapps.models import Order
 from status.models import App as StatusApp
 from status.models import GlobalIssue
@@ -35,15 +36,20 @@ def _nav_context(user):
 
 
 def jd_login_app(request):
+    next_url = request.POST.get('next') or request.GET.get('next') or ''
+    next_is_safe = next_url and url_has_allowed_host_and_scheme(
+        next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+    )
+
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('jd_home_app')
+            return redirect(next_url if next_is_safe else 'jd_home_app')
     else:
         form = AuthenticationForm()
-    return render(request, 'jd/login.html', {'form': form})
+    return render(request, 'jd/login.html', {'form': form, 'next': next_url if next_is_safe else ''})
 
 
 @login_required(login_url='jd_login_app')
@@ -58,13 +64,27 @@ def jd_save_onesignal_player_id_app(request):
     das Login-Formular gekoppelt, wo der Nutzer noch nicht eingeloggt ist und
     die ID daher praktisch nie ankam."""
     from main.models import UserProfile
+    from .services.push import send_push_notification
 
     player_id = request.POST.get('player_id', '').strip()
     debug = request.POST.get('debug', '').strip()
 
     if player_id:
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
-        if player_id != profile.onesignal_player_id:
+        previous_player_id = profile.onesignal_player_id
+        if player_id != previous_player_id:
+            # War schon eine ANDERE Player-ID gespeichert (nicht nur die
+            # allererste Registrierung) -> sieht nach einer Anmeldung auf
+            # einem neuen/anderen Geraet aus. Push geht bewusst an die ALTE
+            # ID, damit das bisherige Geraet ueber die neue Anmeldung
+            # informiert wird (kein eigenes Geraete-Verzeichnis vorhanden,
+            # daher nur eine Naeherung statt einer echten Geraeteliste).
+            if previous_player_id:
+                send_push_notification(
+                    title="Neue Anmeldung erkannt",
+                    message="Dein Konto wurde soeben auf einem anderen Gerät verwendet. Warst du das nicht, ändere bitte dein Passwort.",
+                    user_ids=[request.user.id],
+                )
             profile.onesignal_player_id = player_id
             profile.last_onesignal_sync = timezone.now()
             profile.save(update_fields=['onesignal_player_id', 'last_onesignal_sync'])
@@ -405,6 +425,44 @@ def jd_change_password_app(request):
 
 @login_required(login_url='jd_login_app')
 def jd_settings_app(request):
-    return render(request, 'jd/settings.html', _nav_context(request.user))
+    from status.models import App as StatusApp
+    from .models import StatusSubscription
+
+    context = _nav_context(request.user)
+    context['status_apps'] = StatusApp.objects.filter(is_active=True).order_by('name')
+    context['subscribed_app_ids'] = set(
+        StatusSubscription.objects.filter(user=request.user).values_list('app_id', flat=True)
+    )
+    return render(request, 'jd/settings.html', context)
+
+
+@login_required(login_url='jd_login_app')
+@require_POST
+def jd_toggle_status_subscription_app(request, app_id):
+    """Schaltet ein Stoerungs-Push-Abo fuer eine status.App an/aus - steuert,
+    fuer welche Apps der Nutzer bei neuen AppIssues benachrichtigt wird."""
+    from status.models import App as StatusApp
+    from .models import StatusSubscription
+
+    app = get_object_or_404(StatusApp, id=app_id, is_active=True)
+    sub, created = StatusSubscription.objects.get_or_create(user=request.user, app=app)
+    if not created:
+        sub.delete()
+        return JsonResponse({'subscribed': False})
+    return JsonResponse({'subscribed': True})
+
+
+@login_required(login_url='jd_login_app')
+def jd_app_permissions_app(request):
+    from main.views import app_permissions
+    request.base_template = 'base_app.html'
+    return app_permissions(request)
+
+
+@login_required(login_url='jd_login_app')
+def jd_delete_account_app(request):
+    from main.views import delete_account
+    request.base_template = 'base_app.html'
+    return delete_account(request)
 
 

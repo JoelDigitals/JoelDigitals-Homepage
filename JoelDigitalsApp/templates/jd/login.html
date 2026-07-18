@@ -33,6 +33,7 @@
 
     <form method="post" id="jd-login-form">
         {% csrf_token %}
+        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
         <div class="jd-field">
             <label for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
             {{ form.username }}

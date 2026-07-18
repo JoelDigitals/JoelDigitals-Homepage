@@ -33,3 +33,19 @@ class PushHealthCheck(models.Model):
 
     def __str__(self):
         return f"OneSignal-Check {self.checked_at:%Y-%m-%d %H:%M} - {'OK' if self.success else 'FEHLER'}"
+
+
+class StatusSubscription(models.Model):
+    """Ein Nutzer hat Stoerungs-Pushes fuer eine bestimmte App (status.App)
+    abonniert. Steuert, fuer welche Apps jemand bei neuen AppIssues
+    benachrichtigt wird (siehe JoelDigitalsApp/signals.py). Wer mindestens
+    eine App abonniert hat, bekommt zusaetzlich auch GlobalIssue-Pushes."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='status_subscriptions')
+    app = models.ForeignKey('status.App', on_delete=models.CASCADE, related_name='subscribers')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'app')
+
+    def __str__(self):
+        return f"{self.user} -> {self.app.name}"

@@ -71,12 +71,11 @@ header.jd-header {
     color: var(--text);
 }
 
-.jd-brand .material-symbols-rounded {
-    color: var(--primary);
-    background: rgba(0, 68, 204, 0.15);
-    border-radius: 10px;
-    padding: 6px;
-    font-size: 22px;
+.jd-brand-logo {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    border-radius: 8px;
 }
 
 .jd-header-actions {
@@ -104,7 +103,7 @@ header.jd-header {
 
 /* Main content, leave room for bottom tab bar */
 main.jd-main {
-    padding: 20px 16px 100px;
+    padding: 20px 16px 116px;
     max-width: 720px;
     margin: 0 auto;
     width: 100%;
@@ -135,53 +134,66 @@ main.jd-main {
     max-width: 100%;
 }
 
-/* Messages */
-.jd-messages { max-width: 720px; margin: 12px auto 0; padding: 0 16px; }
-.jd-message {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--primary);
-    border-radius: var(--radius-sm);
-    padding: 12px 16px;
-    margin-bottom: 10px;
-    font-size: 0.9rem;
-}
-
-/* Bottom tab bar */
+/* Bottom tab bar - Apple-style floating "Liquid Glass" pill */
 nav.jd-tabbar {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    left: 50%;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
     z-index: 1000;
     display: flex;
     justify-content: space-around;
-    background: rgba(18, 18, 18, 0.97);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border);
-    padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+    gap: 2px;
+    width: calc(100% - 32px);
+    max-width: 460px;
+    background: rgba(38, 38, 38, 0.55);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    padding: 6px;
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .jd-tab {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    justify-content: center;
+    gap: 1px;
     text-decoration: none;
     color: var(--text-muted);
-    font-size: 0.7rem;
+    font-size: 0.66rem;
     font-weight: 600;
-    padding: 6px 10px;
-    border-radius: var(--radius-sm);
-    transition: color .2s ease;
+    padding: 8px 10px;
+    border-radius: 20px;
     flex: 1;
-    max-width: 90px;
+    transition: color .35s cubic-bezier(.4,0,.2,1);
 }
 
-.jd-tab .material-symbols-rounded { font-size: 22px; }
+.jd-tab .material-symbols-rounded {
+    font-size: 22px;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+}
 
-.jd-tab.active { color: var(--primary); }
+.jd-tab::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    opacity: 0;
+    transform: scale(.7);
+    transition: opacity .35s cubic-bezier(.4,0,.2,1), transform .35s cubic-bezier(.34,1.56,.64,1);
+    z-index: -1;
+}
+
+.jd-tab.active { color: #fff; }
+.jd-tab.active .material-symbols-rounded { transform: translateY(-1px) scale(1.05); }
+.jd-tab.active::before { opacity: 1; transform: scale(1); }
 
 /* Generic card */
 .jd-card {
@@ -193,6 +205,125 @@ nav.jd-tabbar {
 }
 
 .jd-card h2, .jd-card h1 { margin-bottom: 8px; }
+
+/* iOS-style grouped settings list */
+.jd-list-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    margin: 24px 6px 8px;
+}
+.jd-list-label:first-child { margin-top: 0; }
+
+.jd-list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.jd-list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    text-decoration: none;
+    color: var(--text);
+    position: relative;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    transition: background .15s ease;
+}
+.jd-list-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 58px;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--border);
+}
+.jd-list-item:active { background: rgba(255, 255, 255, 0.04); }
+
+.jd-list-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: #fff;
+    flex-shrink: 0;
+}
+.jd-list-icon .material-symbols-rounded { font-size: 18px; }
+
+.jd-list-text { flex: 1; min-width: 0; }
+.jd-list-title { font-size: 0.95rem; font-weight: 500; }
+.jd-list-subtitle { font-size: 0.8rem; color: var(--text-secondary); margin-top: 1px; }
+
+.jd-list-chevron { color: var(--text-muted); font-size: 20px; flex-shrink: 0; }
+.jd-list-value { color: var(--text-secondary); font-size: 0.9rem; flex-shrink: 0; }
+.jd-list-check { color: var(--primary); font-size: 20px; flex-shrink: 0; }
+
+/* iOS-style toggle switch */
+.jd-switch {
+    position: relative;
+    width: 48px;
+    height: 28px;
+    flex-shrink: 0;
+}
+.jd-switch input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+.jd-switch-track {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 999px;
+    transition: background .25s cubic-bezier(.4,0,.2,1);
+}
+.jd-switch-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    transition: transform .25s cubic-bezier(.34, 1.56, .64, 1);
+}
+.jd-switch input:checked ~ .jd-switch-track { background: var(--primary); }
+.jd-switch input:checked ~ .jd-switch-thumb { transform: translateX(20px); }
+
+/* Staggered fade-in for cards/lists */
+@keyframes jdFadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.jd-card, .jd-list {
+    animation: jdFadeInUp .45s cubic-bezier(.4, 0, .2, 1) backwards;
+}
+.jd-main > *:nth-child(1) { animation-delay: .02s; }
+.jd-main > *:nth-child(2) { animation-delay: .07s; }
+.jd-main > *:nth-child(3) { animation-delay: .12s; }
+.jd-main > *:nth-child(4) { animation-delay: .17s; }
+.jd-main > *:nth-child(5) { animation-delay: .22s; }
+.jd-main > *:nth-child(n+6) { animation-delay: .26s; }
 
 .jd-btn {
     display: inline-flex;
@@ -220,14 +351,23 @@ nav.jd-tabbar {
     padding: 40px 20px;
     color: var(--text-muted);
 }
+
+/* PJAX tab-swap slide transition */
+.jd-main { position: relative; }
+.jd-main-slide {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    width: 100%;
+    will-change: transform, opacity;
+}
 </style>
-{% block extra_css %}{% endblock %}
+<div id="jd-page-css" hidden>{% block extra_css %}{% endblock %}</div>
 </head>
-<body>
+<body data-tab="{{ request.resolver_match.url_name }}">
 
 <header class="jd-header">
     <a href="{% url 'jd_home_app' %}" class="jd-brand">
-        <span class="material-symbols-rounded">bolt</span>
+        <img src="{% static 'favicon.png' %}" alt="Joel Digitals" class="jd-brand-logo">
         Joel Digitals
     </a>
     <div class="jd-header-actions">
@@ -254,47 +394,46 @@ nav.jd-tabbar {
     </div>
 </header>
 
-{% if messages %}
-<div class="jd-messages">
-    {% for message in messages %}
-    <div class="jd-message">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
-
-<main class="jd-main">
+<main class="jd-main" id="jd-main">
 {% block content %}{% endblock %}
 </main>
 
 <nav class="jd-tabbar">
-    <a href="{% url 'jd_home_app' %}" class="jd-tab {% if request.resolver_match.url_name == 'jd_home_app' %}active{% endif %}">
+    <a href="{% url 'jd_home_app' %}" data-tab="jd_home_app" class="jd-tab {% if request.resolver_match.url_name == 'jd_home_app' %}active{% endif %}">
         <span class="material-symbols-rounded">home</span>
         {% trans "Home" %}
     </a>
-    <a href="{% url 'jd_deals_app' %}" class="jd-tab {% if request.resolver_match.url_name == 'jd_deals_app' %}active{% endif %}">
+    <a href="{% url 'jd_deals_app' %}" data-tab="jd_deals_app" class="jd-tab {% if request.resolver_match.url_name == 'jd_deals_app' %}active{% endif %}">
         <span class="material-symbols-rounded">local_offer</span>
         {% trans "Deals" %}
     </a>
-    <a href="{% url 'jd_articles_app' %}" class="jd-tab {% if request.resolver_match.url_name == 'jd_articles_app' %}active{% endif %}">
+    <a href="{% url 'jd_articles_app' %}" data-tab="jd_articles_app" class="jd-tab {% if request.resolver_match.url_name == 'jd_articles_app' %}active{% endif %}">
         <span class="material-symbols-rounded">article</span>
         {% trans "News" %}
     </a>
-    <a href="{% url 'jd_orders_app' %}" class="jd-tab {% if request.resolver_match.url_name == 'jd_orders_app' or request.resolver_match.url_name == 'jd_order_detail_app' %}active{% endif %}">
+    <a href="{% url 'jd_orders_app' %}" data-tab="jd_orders_app" class="jd-tab {% if request.resolver_match.url_name == 'jd_orders_app' or request.resolver_match.url_name == 'jd_order_detail_app' %}active{% endif %}">
         <span class="material-symbols-rounded">local_shipping</span>
         {% trans "Orders" %}
     </a>
-    <a href="{% url 'jd_support_app' %}" class="jd-tab {% if request.resolver_match.url_name == 'jd_support_app' or request.resolver_match.url_name == 'jd_ticket_detail_app' %}active{% endif %}">
+    <a href="{% url 'jd_support_app' %}" data-tab="jd_support_app" class="jd-tab {% if request.resolver_match.url_name == 'jd_support_app' or request.resolver_match.url_name == 'jd_ticket_detail_app' %}active{% endif %}">
         <span class="material-symbols-rounded">support_agent</span>
         {% trans "Support" %}
     </a>
 </nav>
 
 {% if user.is_authenticated %}
-<!-- OneSignal-Player-ID einsammeln ueber die Median.co JavaScript-Bridge, bei
-     JEDEM Seitenaufruf einer eingeloggten Session - nicht nur einmalig beim
-     Login (siehe jd_save_onesignal_player_id_app() in views.py fuer den
-     Hintergrund). Gleiches Muster wie base_1.html / base_chat_app.html im
-     JDS-Management- bzw. JDS-Chat-Projekt. -->
+<!-- OneSignal-Player-ID einsammeln + Push standardmaessig aktivieren.
+     Zwei Faelle:
+     1) Innerhalb der median.co-App: natives Bridge-API liefert die Player-ID.
+        Die automatische Berechtigungsabfrage beim ersten App-Start wird von
+        median.co selbst gesteuert (OneSignal-Plugin-Einstellung "Prompt for
+        push on launch" im median.co-Dashboard) - kein JS noetig/moeglich.
+     2) Normaler Browser: das OneSignal-Web-SDK wurde bisher NIRGENDS geladen,
+        wodurch window.OneSignal in jd/settings.html immer undefined war und
+        der Push-Umschalter dort permanent bei "Wird geladen..." haengen
+        blieb. Hier laden + initialisieren wir es jetzt und fragen die
+        Berechtigung direkt automatisch ab (statt nur bei Klick in den
+        Einstellungen), damit Push wie gewuenscht standardmaessig an ist. -->
 <script>
 (function () {
   function csrfTokenOneSignal() {
@@ -332,12 +471,165 @@ nav.jd-tabbar {
       postOneSignalToServer('debug=' + encodeURIComponent('bridge_rejected:' + String(err)));
     });
   } else {
+    {% if ONESIGNAL_APP_ID %}
+    // Kein median.co-Bridge da -> normaler Browser. Web-SDK laden, initialisieren
+    // und Berechtigung direkt anfragen (Push soll standardmaessig an sein).
+    var sdkScript = document.createElement('script');
+    sdkScript.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
+    sdkScript.defer = true;
+    document.head.appendChild(sdkScript);
+
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(function (OneSignal) {
+      OneSignal.init({ appId: '{{ ONESIGNAL_APP_ID }}' }).then(function () {
+        return OneSignal.Notifications.permission ? Promise.resolve(OneSignal.Notifications.permission) : OneSignal.Notifications.requestPermission();
+      }).then(function (granted) {
+        if (!granted) {
+          return OneSignal.Notifications.requestPermission();
+        }
+      }).then(function () {
+        return OneSignal.User.PushSubscription.id;
+      }).then(function (playerId) {
+        if (playerId) {
+          postOneSignalToServer('player_id=' + encodeURIComponent(playerId));
+        }
+      }).catch(function (err) {
+        postOneSignalToServer('debug=' + encodeURIComponent('web_sdk_error:' + String(err)));
+      });
+    });
+    {% else %}
     postOneSignalToServer('debug=' + encodeURIComponent('median_bridge_missing'));
+    {% endif %}
   }
 })();
 </script>
 {% endif %}
 
-{% block extra_js %}{% endblock %}
+<div id="jd-page-js" hidden>{% block extra_js %}{% endblock %}</div>
+
+<script>
+// PJAX-artige Tab-Navigation: die 5 Haupt-Tabs (Home/Deals/News/Orders/Support)
+// werden per fetch() nachgeladen und mit einer Slide-Animation eingeblendet statt
+// eines vollen Seiten-Reloads - fuehlt sich wie eine einzige App-Seite an, ohne
+// die Business-Logik der einzelnen Views (v.a. die Support-Ticket-Berechtigungen)
+// zu duplizieren. Unterseiten (Bestell-/Ticket-Detail) navigieren normal.
+(function () {
+  var TAB_ORDER = ['jd_home_app', 'jd_deals_app', 'jd_articles_app', 'jd_orders_app', 'jd_support_app'];
+  var mainEl = document.getElementById('jd-main');
+  var cssEl = document.getElementById('jd-page-css');
+  var jsEl = document.getElementById('jd-page-js');
+  var currentTab = document.body.getAttribute('data-tab');
+  var busy = false;
+
+  function runScripts(container) {
+    var scripts = container.querySelectorAll('script');
+    scripts.forEach(function (old) {
+      var s = document.createElement('script');
+      for (var i = 0; i < old.attributes.length; i++) {
+        s.setAttribute(old.attributes[i].name, old.attributes[i].value);
+      }
+      s.textContent = old.textContent;
+      old.replaceWith(s);
+    });
+  }
+
+  function swapTo(url, tabName, pushState) {
+    if (busy) return;
+    if (tabName === currentTab && pushState) return;
+
+    var fromIndex = TAB_ORDER.indexOf(currentTab);
+    var toIndex = TAB_ORDER.indexOf(tabName);
+    var forward = toIndex >= fromIndex;
+    busy = true;
+
+    fetch(url, { credentials: 'same-origin' }).then(function (r) {
+      if (!r.ok) { window.location.href = url; return null; }
+      if (r.redirected) {
+        // z.B. Session abgelaufen -> zur Login-Seite umgeleitet worden.
+        // Echte Navigation statt AJAX-Swap, damit ?next= korrekt greift.
+        window.location.href = r.url;
+        return null;
+      }
+      return r.text();
+    }).then(function (html) {
+      if (!html) return;
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var newMain = doc.getElementById('jd-main');
+      if (!newMain) { window.location.href = url; return; }
+      var newCss = doc.getElementById('jd-page-css');
+      var newJs = doc.getElementById('jd-page-js');
+      var newTitle = doc.querySelector('title');
+
+      var oldContent = document.createElement('div');
+      oldContent.className = 'jd-main-slide';
+      oldContent.innerHTML = mainEl.innerHTML;
+
+      var newContent = document.createElement('div');
+      newContent.className = 'jd-main-slide';
+      newContent.innerHTML = newMain.innerHTML;
+      newContent.style.transform = forward ? 'translateX(100%)' : 'translateX(-100%)';
+      newContent.style.opacity = '0';
+
+      mainEl.innerHTML = '';
+      mainEl.style.minHeight = mainEl.offsetHeight + 'px';
+      mainEl.appendChild(oldContent);
+      mainEl.appendChild(newContent);
+
+      requestAnimationFrame(function () {
+        oldContent.style.transition = 'transform .32s cubic-bezier(.4,0,.2,1), opacity .32s ease';
+        newContent.style.transition = 'transform .32s cubic-bezier(.4,0,.2,1), opacity .32s ease';
+        oldContent.style.transform = forward ? 'translateX(-100%)' : 'translateX(100%)';
+        oldContent.style.opacity = '0';
+        newContent.style.transform = 'translateX(0)';
+        newContent.style.opacity = '1';
+      });
+
+      setTimeout(function () {
+        mainEl.innerHTML = newMain.innerHTML;
+        mainEl.style.minHeight = '';
+        runScripts(mainEl);
+        busy = false;
+      }, 340);
+
+      if (cssEl) cssEl.innerHTML = newCss ? newCss.innerHTML : '';
+      if (jsEl) { jsEl.innerHTML = newJs ? newJs.innerHTML : ''; runScripts(jsEl); }
+      if (newTitle) document.title = newTitle.textContent;
+
+      document.querySelectorAll('.jd-tab[data-tab]').forEach(function (t) {
+        t.classList.toggle('active', t.getAttribute('data-tab') === tabName);
+      });
+
+      currentTab = tabName;
+      document.body.setAttribute('data-tab', tabName);
+      if (pushState !== false) {
+        history.pushState({ tab: tabName }, '', url);
+      }
+      window.scrollTo(0, 0);
+    }).catch(function () {
+      window.location.href = url;
+    });
+  }
+
+  document.querySelectorAll('.jd-tab[data-tab]').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var tabName = link.getAttribute('data-tab');
+      if (TAB_ORDER.indexOf(tabName) === -1) return;
+      e.preventDefault();
+      swapTo(link.getAttribute('href'), tabName, true);
+    });
+  });
+
+  window.addEventListener('popstate', function (e) {
+    var tabName = e.state && e.state.tab;
+    if (!tabName) return;
+    swapTo(location.href, tabName, false);
+  });
+
+  if (!history.state) {
+    history.replaceState({ tab: currentTab }, '', location.href);
+  }
+})();
+</script>
 </body>
 </html>

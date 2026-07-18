@@ -53,9 +53,15 @@ def send_push_notification(title, message, user_ids=None, url=None, data=None):
         if not player_ids:
             logger.info("Keine OneSignal-Player-IDs gefunden fuer Push %r (user_ids=%s)", title, user_ids)
             return None
-        payload["include_player_ids"] = player_ids
+        # Diese App laeuft auf OneSignals neuem Subscription-Modell (kein
+        # Legacy-"Player-ID"-Raum mehr) - die REST API erwartet dafuer
+        # include_subscription_ids statt des alten include_player_ids.
+        payload["include_subscription_ids"] = player_ids
     else:
-        payload["included_segments"] = ["Subscribed Users"]
+        # Kein "Subscribed Users"-Segment mehr im neuen Subscription-Modell -
+        # "Active Subscriptions" ist das Default-Segment fuer alle aktuell
+        # erreichbaren Geraete.
+        payload["included_segments"] = ["Active Subscriptions"]
 
     if url:
         payload["url"] = url

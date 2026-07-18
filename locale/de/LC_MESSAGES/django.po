@@ -1,12 +1,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 1.0\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-01 00:00+0000\n"
-"PO-Revision-Date: 2024-01-01 00:00+0000\n"
-"Last-Translator: \n"
-"Language-Team: German\n"
+"Project-Id-Version: Joel Digitals\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -14,7 +9,12 @@ msgstr ""
 
 msgid ""
 msgstr ""
-"Project-Id-Version: Joel Digitals\n"
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: German\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4047,8 +4047,10 @@ msgid "Bitte gib eine E-Mail-Adresse ein."
 msgstr "Bitte gib eine E-Mail-Adresse ein."
 
 #: webinars/views.py
-msgid "Für diese E-Mail-Adresse besteht bereits eine Anmeldung für dieses Webinar."
-msgstr "Für diese E-Mail-Adresse besteht bereits eine Anmeldung für dieses Webinar."
+msgid ""
+"Für diese E-Mail-Adresse besteht bereits eine Anmeldung für dieses Webinar."
+msgstr ""
+"Für diese E-Mail-Adresse besteht bereits eine Anmeldung für dieses Webinar."
 
 #: webinars/views.py
 msgid "Deine Anmeldung wurde storniert."
@@ -4060,7 +4062,8 @@ msgstr "Keine aktive Anmeldung gefunden."
 
 #: webinars/templates/webinars/webinar_list.html
 msgid "Join our live webinars and learn more about our apps."
-msgstr "Nimm an unseren Live-Webinaren teil und erfahre mehr über unsere Apps."
+msgstr ""
+"Nimm an unseren Live-Webinaren teil und erfahre mehr über unsere Apps."
 
 #: webinars/templates/webinars/webinar_list.html
 msgid "Past Webinars"
@@ -4131,8 +4134,11 @@ msgid "You are registered for this webinar!"
 msgstr "Du bist für dieses Webinar angemeldet!"
 
 #: webinars/templates/webinars/webinar_detail.html
-msgid "The access link will be sent to you by email in good time before the webinar."
-msgstr "Der Zugangslink wird dir rechtzeitig vor dem Webinar per E-Mail zugeschickt."
+msgid ""
+"The access link will be sent to you by email in good time before the "
+"webinar."
+msgstr ""
+"Der Zugangslink wird dir rechtzeitig vor dem Webinar per E-Mail zugeschickt."
 
 #: webinars/templates/webinars/webinar_detail.html
 msgid "Cancel registration"
@@ -4426,3 +4432,141 @@ msgid ""
 msgstr ""
 "Wir haben dir deinen Registrierungscode per E-Mail geschickt. Bitte prüfe "
 "dein Postfach - und vergiss nicht den Spam-Ordner."
+
+msgid "Delete Account"
+msgstr "Konto löschen"
+
+msgid "This action is permanent and cannot be undone"
+msgstr "Diese Aktion ist endgültig und kann nicht rückgängig gemacht werden"
+
+msgid "What will be deleted?"
+msgstr "Was wird gelöscht?"
+
+msgid "Your personal profile information"
+msgstr "Deine persönlichen Profildaten"
+
+msgid "All your orders and purchase history"
+msgstr "Alle deine Bestellungen und dein Kaufverlauf"
+
+msgid "Your wallet balance and transaction history"
+msgstr "Dein Wallet-Guthaben und dein Transaktionsverlauf"
+
+msgid "All downloads and licenses"
+msgstr "Alle Downloads und Lizenzen"
+
+msgid "Your affiliate program data"
+msgstr "Deine Affiliate-Programm-Daten"
+
+msgid "All saved preferences and settings"
+msgstr "Alle gespeicherten Einstellungen und Präferenzen"
+
+msgid "Important Notice"
+msgstr "Wichtiger Hinweis"
+
+msgid ""
+"Once you delete your account, there is no going back. Please be certain "
+"before proceeding. We recommend downloading any important data before "
+"deletion."
+msgstr ""
+"Sobald du dein Konto löschst, gibt es kein Zurück mehr. Bitte sei dir "
+"sicher, bevor du fortfährst. Wir empfehlen, wichtige Daten vor dem Löschen "
+"herunterzuladen."
+
+msgid "Type 'löschen' to confirm"
+msgstr "Gib 'löschen' zur Bestätigung ein"
+
+msgid "Type löschen here"
+msgstr "Hier 'löschen' eingeben"
+
+msgid "This verification ensures you understand the consequences"
+msgstr "Diese Bestätigung stellt sicher, dass du die Konsequenzen verstehst"
+
+msgid "Delete My Account"
+msgstr "Mein Konto löschen"
+
+msgid "Go Back"
+msgstr "Zurück"
+
+msgid ""
+"Are you absolutely sure you want to delete your account? This action cannot "
+"be undone!"
+msgstr ""
+"Bist du dir absolut sicher, dass du dein Konto löschen möchtest? Diese "
+"Aktion kann nicht rückgängig gemacht werden!"
+
+msgid "Notifications"
+msgstr "Benachrichtigungen"
+
+msgid "Push Notifications"
+msgstr "Push-Benachrichtigungen"
+
+msgid "Checking status…"
+msgstr "Status wird geprüft…"
+
+msgid "Loading…"
+msgstr "Wird geladen…"
+
+msgid "Enabled"
+msgstr "Aktiviert"
+
+msgid "Blocked - enable in browser settings"
+msgstr "Blockiert - in den Browser-Einstellungen aktivieren"
+
+msgid "Tap to enable"
+msgstr "Zum Aktivieren tippen"
+
+msgid "Danger Zone"
+msgstr "Gefahrenzone"
+
+msgid "App Permissions"
+msgstr "App-Berechtigungen"
+
+msgid "Back to Profile"
+msgstr "Zurück zum Profil"
+
+msgid "Authorized Apps"
+msgstr "Autorisierte Apps"
+
+msgid "Authorized"
+msgstr "Autorisiert"
+
+msgid "Last used"
+msgstr "Zuletzt verwendet"
+
+msgid "Revoke Access"
+msgstr "Zugriff widerrufen"
+
+msgid "No authorized apps"
+msgstr "Keine autorisierten Apps"
+
+msgid "You haven't authorized any apps to access your account yet."
+msgstr "Du hast noch keine Apps für den Zugriff auf dein Konto autorisiert."
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Revoke"
+msgstr "Widerrufen"
+
+msgid "This app will no longer be able to access your account."
+msgstr "Diese App kann dann nicht mehr auf dein Konto zugreifen."
+
+msgid "Are you sure you want to revoke access for"
+msgstr "Möchtest du den Zugriff wirklich widerrufen für"
+
+msgid ""
+"These are apps and services that you've authorized to access your Joel "
+"Digitals account. You can revoke access at any time."
+msgstr ""
+"Das sind Apps und Dienste, denen du Zugriff auf dein Joel-Digitals-Konto "
+"erlaubt hast. Du kannst den Zugriff jederzeit widerrufen."
+
+msgid "Not supported on this device"
+msgstr "Auf diesem Gerät nicht unterstützt"
+
+msgid "Outage Notifications"
+msgstr "Störungsbenachrichtigungen"
+
+msgid "Choose which apps you want outage/status alerts for."
+msgstr ""
+"Wähle, für welche Apps du Störungs-/Statusmeldungen erhalten möchtest."

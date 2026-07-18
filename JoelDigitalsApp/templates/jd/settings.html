@@ -4,105 +4,99 @@
 
 {% block title %}{% trans "Settings" %} – Joel Digitals{% endblock %}
 
-{% block extra_css %}
-<style>
-.jd-lang-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
-}
-.jd-lang-option {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 14px;
-    border-radius: var(--radius-sm);
-    border: 2px solid var(--border);
-    background: var(--surface-elevated);
-    color: var(--text);
-    text-decoration: none;
-    font-weight: 600;
-}
-.jd-lang-option.active {
-    border-color: var(--primary);
-    background: rgba(0, 68, 204, 0.15);
-    color: var(--primary);
-}
-.jd-lang-form { display: contents; }
-.jd-lang-form button.jd-lang-option {
-    font-family: inherit;
-    font-size: 1rem;
-    cursor: pointer;
-}
-</style>
-{% endblock %}
-
 {% block content %}
-<h1 style="margin-bottom:16px;">{% trans "Settings" %}</h1>
+<h1 style="margin-bottom:20px;">{% trans "Settings" %}</h1>
 
-<div class="jd-card">
-    <h2>{% trans "Language" %}</h2>
-    <p style="color:var(--text-secondary); font-size:0.9rem;">{% trans "The app defaults to German. Choose English if you prefer." %}</p>
-    <div class="jd-lang-row">
-        <form action="{% url 'set_language' %}" method="post" class="jd-lang-form">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="/app/settings/">
-            <input type="hidden" name="language" value="de">
-            <button type="submit" class="jd-lang-option {% if LANGUAGE_CODE == 'de' %}active{% endif %}">
-                <span class="material-symbols-rounded">translate</span> Deutsch
-            </button>
-        </form>
-        <form action="{% url 'set_language' %}" method="post" class="jd-lang-form">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="/app/settings/">
-            <input type="hidden" name="language" value="en">
-            <button type="submit" class="jd-lang-option {% if LANGUAGE_CODE == 'en' %}active{% endif %}">
-                <span class="material-symbols-rounded">translate</span> English
-            </button>
-        </form>
-    </div>
+<div class="jd-list-label">{% trans "Language" %}</div>
+<div class="jd-list">
+    <form action="{% url 'set_language' %}" method="post" class="jd-list-item" style="display:flex;">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="/app/settings/">
+        <input type="hidden" name="language" value="de">
+        <span class="jd-list-icon"><span class="material-symbols-rounded">translate</span></span>
+        <span class="jd-list-text"><span class="jd-list-title">Deutsch</span></span>
+        {% if LANGUAGE_CODE == 'de' %}
+        <span class="material-symbols-rounded jd-list-check">check</span>
+        {% endif %}
+        <button type="submit" style="position:absolute; inset:0; opacity:0; cursor:pointer; border:none;"></button>
+    </form>
+    <form action="{% url 'set_language' %}" method="post" class="jd-list-item" style="display:flex;">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="/app/settings/">
+        <input type="hidden" name="language" value="en">
+        <span class="jd-list-icon"><span class="material-symbols-rounded">translate</span></span>
+        <span class="jd-list-text"><span class="jd-list-title">English</span></span>
+        {% if LANGUAGE_CODE == 'en' %}
+        <span class="material-symbols-rounded jd-list-check">check</span>
+        {% endif %}
+        <button type="submit" style="position:absolute; inset:0; opacity:0; cursor:pointer; border:none;"></button>
+    </form>
 </div>
 
 {% if ONESIGNAL_APP_ID %}
-<div class="jd-card">
-    <h2>{% trans "Push Notifications" %}</h2>
-    <p style="color:var(--text-secondary); font-size:0.9rem;">{% trans "Enable push notifications to receive order updates, news and webinar reminders directly on your device." %}</p>
-    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
-        <button id="enablePush" class="jd-btn primary" style="display:none;">
-            <span class="material-symbols-rounded" style="font-size:18px;">notifications_active</span>
-            {% trans "Enable notifications" %}
-        </button>
-        <div id="pushStatus" style="color:var(--text-secondary); font-size:0.9rem; margin-top:8px;"></div>
+<div class="jd-list-label">{% trans "Notifications" %}</div>
+<div class="jd-list">
+    <div class="jd-list-item" style="cursor:default;">
+        <span class="jd-list-icon"><span class="material-symbols-rounded">notifications</span></span>
+        <span class="jd-list-text">
+            <span class="jd-list-title">{% trans "Push Notifications" %}</span>
+            <span class="jd-list-subtitle" id="pushStatus">{% trans "Checking status…" %}</span>
+        </span>
+        <label class="jd-switch">
+            <input type="checkbox" id="enablePush">
+            <span class="jd-switch-track"></span>
+            <span class="jd-switch-thumb"></span>
+        </label>
     </div>
 </div>
 <script>
 (function() {
-    var btn = document.getElementById('enablePush');
+    var toggle = document.getElementById('enablePush');
     var status = document.getElementById('pushStatus');
+
+    function setStatus(text, checked, disabled) {
+        status.textContent = text;
+        toggle.checked = checked;
+        toggle.disabled = disabled;
+    }
+
     function updatePushStatus() {
-        if (!window.OneSignal || !window.OneSignal.Notifications) {
-            btn.style.display = 'none';
-            status.textContent = "⚠️ OneSignal wird geladen...";
+        // Native Browser-API statt OneSignal-SDK-Interna fuer den Status -
+        // Notification.permission ist ueberall verfuegbar und stabil
+        // ('granted'/'denied'/'default'), unabhaengig davon, ob das
+        // OneSignal-SDK schon fertig geladen/initialisiert ist.
+        if (window.median && window.median.onesignal) {
+            setStatus("{% trans 'Enabled' %}", true, true);
             return;
         }
-        OneSignal.Notifications.permission.then(function(perm) {
-            if (perm === 'granted') {
-                btn.style.display = 'none';
-                status.textContent = "✅ {% trans 'Notifications are enabled.' %}";
-            } else if (perm === 'denied') {
-                btn.style.display = 'none';
-                status.textContent = "⛔ {% trans 'Notifications are blocked. Please enable them in your browser settings.' %}";
-            } else {
-                btn.style.display = 'inline-flex';
-                status.textContent = "";
-            }
-        });
+        if (!('Notification' in window)) {
+            setStatus("{% trans 'Not supported on this device' %}", false, true);
+            return;
+        }
+        if (Notification.permission === 'granted') {
+            setStatus("{% trans 'Enabled' %}", true, true);
+        } else if (Notification.permission === 'denied') {
+            setStatus("{% trans 'Blocked - enable in browser settings' %}", false, true);
+        } else {
+            setStatus("{% trans 'Tap to enable' %}", false, false);
+        }
     }
-    setTimeout(updatePushStatus, 2000);
-    btn.addEventListener('click', function() {
-        OneSignal.Notifications.requestPermission().then(function(perm) {
+
+    setTimeout(updatePushStatus, 1000);
+    toggle.addEventListener('change', function() {
+        if (!toggle.checked) { return; }
+        toggle.disabled = true;
+        if (!window.OneSignal || !window.OneSignal.Notifications) {
+            setTimeout(function () {
+                if (window.OneSignal && window.OneSignal.Notifications) {
+                    OneSignal.Notifications.requestPermission().then(updatePushStatus);
+                } else {
+                    updatePushStatus();
+                }
+            }, 1500);
+            return;
+        }
+        OneSignal.Notifications.requestPermission().then(function() {
             updatePushStatus();
         });
     });
@@ -110,17 +104,77 @@
 </script>
 {% endif %}
 
-<div class="jd-card">
-    <h2>{% trans "Account" %}</h2>
-    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
-        <a href="{% url 'jd_profile_app' %}" class="jd-btn secondary">
-            <span class="material-symbols-rounded" style="font-size:18px;">account_circle</span>
-            {% trans "Profile" %}
-        </a>
-        <a href="{% url 'jd_change_password_app' %}" class="jd-btn secondary">
-            <span class="material-symbols-rounded" style="font-size:18px;">key</span>
-            {% trans "Change Password" %}
-        </a>
+{% if status_apps %}
+<div class="jd-list-label">{% trans "Outage Notifications" %}</div>
+<div class="jd-list">
+    {% for app in status_apps %}
+    <div class="jd-list-item" style="cursor:default;">
+        <span class="jd-list-icon"><span class="material-symbols-rounded">dns</span></span>
+        <span class="jd-list-text"><span class="jd-list-title">{{ app.name }}</span></span>
+        <label class="jd-switch">
+            <input type="checkbox" class="jd-status-sub-toggle" data-app-id="{{ app.id }}" {% if app.id in subscribed_app_ids %}checked{% endif %}>
+            <span class="jd-switch-track"></span>
+            <span class="jd-switch-thumb"></span>
+        </label>
     </div>
+    {% endfor %}
+</div>
+<p style="color:var(--text-secondary); font-size:0.8rem; margin:-8px 6px 16px;">
+    {% trans "Choose which apps you want outage/status alerts for." %}
+</p>
+<script>
+(function () {
+    function csrfTokenStatusSub() {
+        var m = document.cookie.match(/csrftoken=([^;]+)/);
+        return m ? m[1] : '';
+    }
+    document.querySelectorAll('.jd-status-sub-toggle').forEach(function (el) {
+        el.addEventListener('change', function () {
+            var appId = el.getAttribute('data-app-id');
+            var wasChecked = el.checked;
+            el.disabled = true;
+            fetch('/app/settings/status-subscriptions/' + appId + '/toggle/', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'X-CSRFToken': csrfTokenStatusSub() },
+            }).then(function (r) { return r.json(); }).then(function (data) {
+                el.checked = !!data.subscribed;
+            }).catch(function () {
+                el.checked = !wasChecked;
+            }).finally(function () {
+                el.disabled = false;
+            });
+        });
+    });
+})();
+</script>
+{% endif %}
+
+<div class="jd-list-label">{% trans "Account" %}</div>
+<div class="jd-list">
+    <a href="{% url 'jd_profile_app' %}" class="jd-list-item">
+        <span class="jd-list-icon"><span class="material-symbols-rounded">account_circle</span></span>
+        <span class="jd-list-text"><span class="jd-list-title">{% trans "Profile" %}</span></span>
+        <span class="material-symbols-rounded jd-list-chevron">chevron_right</span>
+    </a>
+    <a href="{% url 'jd_change_password_app' %}" class="jd-list-item">
+        <span class="jd-list-icon"><span class="material-symbols-rounded">key</span></span>
+        <span class="jd-list-text"><span class="jd-list-title">{% trans "Change Password" %}</span></span>
+        <span class="material-symbols-rounded jd-list-chevron">chevron_right</span>
+    </a>
+    <a href="{% url 'jd_app_permissions_app' %}" class="jd-list-item">
+        <span class="jd-list-icon"><span class="material-symbols-rounded">shield</span></span>
+        <span class="jd-list-text"><span class="jd-list-title">{% trans "App Permissions" %}</span></span>
+        <span class="material-symbols-rounded jd-list-chevron">chevron_right</span>
+    </a>
+</div>
+
+<div class="jd-list-label">{% trans "Danger Zone" %}</div>
+<div class="jd-list">
+    <a href="{% url 'jd_delete_account_app' %}" class="jd-list-item">
+        <span class="jd-list-icon" style="background:linear-gradient(135deg, var(--error), #b91c1c);"><span class="material-symbols-rounded">delete_forever</span></span>
+        <span class="jd-list-text"><span class="jd-list-title" style="color:var(--error);">{% trans "Delete Account" %}</span></span>
+        <span class="material-symbols-rounded jd-list-chevron">chevron_right</span>
+    </a>
 </div>
 {% endblock %}
