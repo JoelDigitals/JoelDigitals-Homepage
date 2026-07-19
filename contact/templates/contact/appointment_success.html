@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 {% load i18n %}
 
@@ -234,10 +234,10 @@
       </div>
 
       <div class="confirmation-actions">
-        <a href="{% url 'home' %}" class="btn btn-primary">
+        <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_home_app' %}{% else %}{% url 'home' %}{% endif %}" class="btn btn-primary">
           <i class="fas fa-home"></i> {% trans "Back to Home" %}
         </a>
-        <a href="{% url 'contact' %}" class="btn btn-secondary">
+        <a href="{% url 'contact_form' %}" class="btn btn-secondary">
           <i class="fas fa-headset"></i> {% trans "Contact Support" %}
         </a>
       </div>

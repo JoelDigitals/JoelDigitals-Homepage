@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 
 {% block title %}Ticket {{ ticket.ticket_number }} – Archiv{% endblock %}
@@ -114,7 +114,7 @@
         <p><em>Keine Notizen vorhanden.</em></p>
     {% endif %}
 
-    <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">🗨️ Zum Chat</a>
+    <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_ticket_detail_app' ticket.ticket_number %}{% else %}{% url 'ticket_detail' ticket.ticket_number %}{% endif %}" class="btn">🗨️ Zum Chat</a>
 </div>
 
 {% endblock %}

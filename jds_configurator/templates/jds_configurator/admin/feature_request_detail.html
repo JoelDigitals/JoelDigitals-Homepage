@@ -1,0 +1,84 @@
+{% extends "base_shop.html" %}
+{% block title %}Funktionswunsch {{ feature_request.reference }}{% endblock %}
+{% block content %}
+<style>
+.jdscfg-admin-wrap{max-width:800px;margin:0 auto;padding:2rem 1rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1.1rem;margin:0 0 1rem}
+.row{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.row:last-child{border-bottom:none}
+.badge{display:inline-block;padding:.2rem .6rem;border-radius:99px;font-size:.72rem;font-weight:600}
+.b-pending{background:#4a3b00;color:#facc15}
+.b-in_review{background:#0c2e4a;color:#38bdf8}
+.b-approved{background:#06331f;color:#4ade80}
+.b-rejected{background:#3b0d0d;color:#f87171}
+.btn{padding:.6rem 1.2rem;border-radius:8px;font-weight:700;font-size:.875rem;cursor:pointer;border:none;margin-right:.6rem}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-danger{background:#7f1d1d;color:#fff}
+.btn-secondary{background:transparent;color:#ccc;border:1px solid var(--border)}
+input,textarea{width:100%;padding:.55rem .7rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text);margin-bottom:.75rem}
+</style>
+<div class="jdscfg-admin-wrap">
+  <p><a href="{% url 'jds_configurator:admin_feature_request_list' %}" style="color:#999;text-decoration:none">&larr; Zurück zur Liste</a></p>
+  <h1>{{ feature_request.reference }} <span class="badge b-{{ feature_request.status }}">{{ feature_request.get_status_display }}</span></h1>
+
+  <div class="card">
+    <h2>Kunde</h2>
+    <div class="row"><span>Name</span><span>{{ feature_request.first_name }} {{ feature_request.last_name }}</span></div>
+    <div class="row"><span>E-Mail</span><span>{{ feature_request.email }}</span></div>
+    <div class="row"><span>Telefon</span><span>{{ feature_request.phone|default:"–" }}</span></div>
+    <div class="row"><span>Unternehmen</span><span>{{ feature_request.company_name|default:"–" }}</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Gewünschte Funktion</h2>
+    <p style="white-space:pre-line">{{ feature_request.description }}</p>
+  </div>
+
+  {% if feature_request.status == 'pending' or feature_request.status == 'in_review' %}
+  <div class="card">
+    <h2>Rückfrage / Status</h2>
+    <form method="post" action="{% url 'jds_configurator:admin_feature_request_in_review' feature_request.pk %}">
+      {% csrf_token %}
+      <textarea name="internal_notes" rows="2" placeholder="Interne Notiz zum Stand der Rückfrage (z.B. per Mail/Telefon)">{{ feature_request.internal_notes }}</textarea>
+      <button type="submit" class="btn btn-secondary">Als "In Prüfung" markieren</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Genehmigen</h2>
+    <form method="post" action="{% url 'jds_configurator:admin_feature_request_approve' feature_request.pk %}">
+      {% csrf_token %}
+      <input type="text" name="estimated_availability" placeholder="Voraussichtliche Verfügbarkeit, z.B. 'ca. 4-6 Wochen'" required>
+      <textarea name="internal_notes" rows="2" placeholder="Interne Notiz (optional)">{{ feature_request.internal_notes }}</textarea>
+      <button type="submit" class="btn btn-primary" onclick="return confirm('Funktionswunsch genehmigen? Der Kunde wird per E-Mail benachrichtigt.')">Genehmigen &amp; Kunde benachrichtigen</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Ablehnen</h2>
+    <form method="post" action="{% url 'jds_configurator:admin_feature_request_reject' feature_request.pk %}">
+      {% csrf_token %}
+      <textarea name="internal_notes" rows="2" placeholder="Interne Notiz (optional)"></textarea>
+      <button type="submit" class="btn btn-danger" onclick="return confirm('Funktionswunsch wirklich ablehnen? Der Kunde wird per E-Mail benachrichtigt.')">Ablehnen</button>
+    </form>
+  </div>
+  {% else %}
+  <div class="card">
+    <h2>Entscheidung</h2>
+    {% if feature_request.status == 'approved' %}
+    <div class="row"><span>Voraussichtliche Verfügbarkeit</span><span>{{ feature_request.estimated_availability }}</span></div>
+    {% endif %}
+    <div class="row"><span>Entschieden am</span><span>{{ feature_request.reviewed_at|date:"d.m.Y H:i" }}</span></div>
+    <div class="row"><span>Entschieden von</span><span>{{ feature_request.reviewed_by|default:"–" }}</span></div>
+  </div>
+  {% endif %}
+
+  {% if feature_request.internal_notes %}
+  <div class="card">
+    <h2>Interne Notizen</h2>
+    <p style="white-space:pre-line">{{ feature_request.internal_notes }}</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

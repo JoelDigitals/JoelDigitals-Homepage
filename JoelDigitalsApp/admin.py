@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import CallbackRequest, PushHealthCheck, StatusSubscription
+from .models import CallbackRequest, PendingPush, PushHealthCheck, StatusSubscription
 
 
 @admin.register(CallbackRequest)
@@ -16,6 +16,14 @@ class PushHealthCheckAdmin(admin.ModelAdmin):
     list_display = ['checked_at', 'success', 'detail']
     list_filter = ['success']
     readonly_fields = ['checked_at', 'success', 'detail']
+
+
+@admin.register(PendingPush)
+class PendingPushAdmin(admin.ModelAdmin):
+    list_display = ['title', 'message', 'created_at', 'sent_at']
+    list_filter = ['sent_at']
+    readonly_fields = ['created_at', 'sent_at']
+    search_fields = ['title', 'message']
 
 
 @admin.register(StatusSubscription)

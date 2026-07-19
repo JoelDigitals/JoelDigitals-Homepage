@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 {% load i18n %}
 
@@ -511,7 +511,7 @@
             Niederwiesstraße 20<br>
             66822 Lebach<br>
             {% trans "Tel" %}: +49 1525 3480270<br>
-            {% trans "Email" %}: buy.joel-digitals@gmx.de
+            {% trans "Email" %}: buy@joel-digitals.com
           </div>
         </div>
 
@@ -563,7 +563,9 @@
             {% for item in items %}
             <tr>
               <td>
-                {% if item.package %}
+                {% if item.jds_configuration %}
+                  {{ item.get_name }}
+                {% elif item.package %}
                   {{ item.package.name }}
                 {% elif lang == "de" or lang|slice:":2" == "de" %}
                   {{ item.app.name }}
@@ -573,7 +575,7 @@
                   {{ item.app.name }}
                 {% endif %}
               </td>
-              <td>{% if item.package %}--{% else %}{{ item.app.product_number }}{% endif %}</td>
+              <td>{% if item.jds_configuration or item.package %}--{% else %}{{ item.app.product_number }}{% endif %}</td>
               <td style="text-align: center;">{{ item.quantity }}</td>
               <td class="numeric">{{ item.single_price|floatformat:2 }} €</td>
               <td class="numeric discount-cell">{{ item.discount_percent }}%</td>

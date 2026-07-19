@@ -1,6 +1,7 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 {% load i18n %}
+{% load l10n %}
 
 {% block title %}{{ app.display_name }} – Joel Digitals Shop{% endblock %}
 
@@ -454,7 +455,7 @@
 
   <!-- Body -->
   <div class="detail-body">
-    <a href="{% url 'shop' %}" class="back-link">
+    <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_shop_app' %}{% else %}{% url 'shop' %}{% endif %}" class="back-link">
       <i class="fas fa-arrow-left"></i>
       {% trans "Back to Shop" %}
     </a>
@@ -489,7 +490,11 @@
 
     <!-- Price -->
     <div class="price-section">
-      {% if app.discount_is_active %}
+      {% if app.slug == "jds-management-individuell" %}
+        <div class="price-display">
+          <span class="price-regular">ab {{ app.price }}€ einmalig</span>
+        </div>
+      {% elif app.discount_is_active %}
         <div class="discount-badge">
           <i class="fas fa-tag"></i>
           {{ app.discount_percent }}% {% trans "Discount" %}
@@ -547,8 +552,12 @@
       {% endif %}
     </div>
 
-    <!-- Cart / Watchlist -->
-    {% if user.is_authenticated %}
+    <!-- Konfigurator (JDS Management: Modulauswahl direkt auf der Produktseite, kein Link) -->
+    {% if app.slug == "jds-management-individuell" %}
+      <div class="cart-section">
+        {% include "jds_configurator/_configurator.html" %}
+      </div>
+    {% elif user.is_authenticated %}
       <div class="cart-section">
         {% if app.is_preorder %}
           {# Pre-Order #}
@@ -560,7 +569,7 @@
               {% trans "Release date" %}: {{ app.release_date|date:"d.m.Y" }}
             </p>
           </div>
-          <form method="post" action="{% url 'add_to_cart' app.id %}">
+          <form method="post" action="{% if request.base_template == 'base_app.html' %}{% url 'jd_add_to_cart_app' app.id %}{% else %}{% url 'add_to_cart' app.id %}{% endif %}">
             {% csrf_token %}
             <div class="quantity-control">
               <button type="button" class="qty-btn" onclick="changeQuantity(-1)">
@@ -596,7 +605,7 @@
             </button>
           </form>
         {% else %}
-          <form method="post" action="{% url 'add_to_cart' app.id %}">
+          <form method="post" action="{% if request.base_template == 'base_app.html' %}{% url 'jd_add_to_cart_app' app.id %}{% else %}{% url 'add_to_cart' app.id %}{% endif %}">
             {% csrf_token %}
             <div class="quantity-control">
               <button type="button" class="qty-btn" onclick="changeQuantity(-1)">

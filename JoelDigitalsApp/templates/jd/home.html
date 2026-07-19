@@ -74,6 +74,11 @@
 </div>
 
 <div class="jd-quick-grid">
+    <a href="{% url 'jd_shop_app' %}" class="jd-quick-card">
+        <span class="material-symbols-rounded">storefront</span>
+        <h3>{% trans "Shop" %}</h3>
+        <p>{% trans "Browse all apps" %}</p>
+    </a>
     <a href="{% url 'jd_deals_app' %}" class="jd-quick-card">
         <span class="material-symbols-rounded">local_offer</span>
         <h3>{% trans "Deals" %}</h3>
@@ -93,6 +98,11 @@
         <span class="material-symbols-rounded">support_agent</span>
         <h3>{% trans "Support" %}</h3>
         <p>{% trans "Tickets & help" %}</p>
+    </a>
+    <a href="{% url 'jds_appointment_app' %}" class="jd-quick-card">
+        <span class="material-symbols-rounded">event</span>
+        <h3>{% trans "Appointment" %}</h3>
+        <p>{% trans "Book a consultation" %}</p>
     </a>
     <a href="{% url 'jd_status_app' %}" class="jd-quick-card">
         <span class="material-symbols-rounded" style="color: var(--success);">monitor_heart</span>

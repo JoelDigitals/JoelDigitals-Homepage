@@ -6,66 +6,97 @@
 <title>Angebot - JDS Management</title>
 <style>
 @page{size:A4;margin:20mm}
-body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;line-height:1.4;color:#333;margin:0}
-.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12mm}
-.header h1{font-size:18pt;margin:0 0 3mm;color:#0044cc}
-.sender-info{text-align:right;font-size:9pt;color:#666}
-.recipient{margin-bottom:8mm;font-size:10pt}
+body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;line-height:1.4;color:#333;margin:0;position:relative}
+.window-area{position:absolute;top:27mm;left:20mm;width:85mm;height:45mm;border:1px dashed #ccc;pointer-events:none}
+.sender-field{display:flex;align-items:center;position:absolute;top:10mm;left:20mm;font-size:9pt;color:#666;gap:5mm}
+.recipient-address{position:absolute;top:27mm;left:20mm;width:85mm;font-size:11pt;line-height:1.3}
+.content{position:absolute;top:100mm;left:20mm;right:20mm}
+.letter-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15mm}
+.letter-header h1{font-size:18pt;margin:0 0 3mm;color:#0044cc}
+.letter-header p{margin:1mm 0}
+.sender-info{text-align:right;font-size:9pt;color:#666;margin-bottom:5mm}
 table{width:100%;border-collapse:collapse;margin:8mm 0}
 th,td{padding:2.5mm 2mm;border-bottom:1px solid #ddd;text-align:left}
 th{background:#e8f0ff;color:#0044cc;font-weight:bold}
 .totals{width:60%;margin-left:auto;margin-top:6mm}
 .totals p{display:flex;justify-content:space-between;margin:1mm 0}
 .totals .grand{font-weight:bold;font-size:12pt;border-top:1px solid #333;padding-top:2mm}
-.footer{margin-top:16mm;font-size:8.5pt;color:#666;border-top:1px solid #0044cc;padding-top:3mm}
+.signature{margin-top:20mm;font-size:10pt}
+.signature-line{width:60mm;border-top:1px solid #333;margin-top:5mm}
 .note{margin-top:6mm;font-size:9pt;color:#666}
+.footer{position:absolute;bottom:20mm;left:20mm;right:20mm;font-size:8.5pt;color:#666;border-top:2px solid #0044cc;padding-top:3mm}
 </style>
 </head>
 <body>
-  <div class="header">
-    <div>
-      <h1>Angebot</h1>
-      <p>Datum: {{ now|date:"d.m.Y" }}</p>
-    </div>
+  <div class="window-area"></div>
+
+  <div class="sender-field">
+    <span>Joel Digitals Inh. Joel Nicolay • Niederwiesstraße 20 • 66822 Lebach</span>
+  </div>
+
+  <div class="recipient-address">
+    <p><strong>{{ customer.first_name }} {{ customer.last_name }}</strong></p>
+    {% if customer.company_name %}<p>{{ customer.company_name }}</p>{% endif %}
+    {% if customer.address %}<p>{{ customer.address }}</p>{% endif %}
+    {% if customer.zip_code or customer.city %}<p>{{ customer.zip_code }} {{ customer.city }}</p>{% endif %}
+    {% if customer.email %}<p>E-Mail: {{ customer.email }}</p>{% endif %}
+  </div>
+
+  <div class="content">
     <div class="sender-info">
-      Joel Digitals Inh. Joel Nicolay<br>
+      <strong>Joel Digitals Inh. Joel Nicolay</strong><br>
       Niederwiesstraße 20<br>
-      66822 Lebach
+      66822 Lebach<br>
+      Tel: +49 1525 3480270<br>
+      E-Mail: buy@joel-digitals.com
+    </div>
+
+    <div class="letter-header">
+      <div>
+        <h1>Angebot - JDS Management</h1>
+        <p>Lebach, {{ now|date:"d.m.Y" }}</p>
+      </div>
+    </div>
+
+    <p style="margin-bottom:8mm;">Vielen Dank für Ihr Interesse an Ihrem individuellen JDS Management. Nachfolgend Ihr unverbindliches Angebot:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:70%">Beschreibung</th>
+          <th style="width:30%">Preis (einmalig)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>JDS Management Basismodul (TeamPage, Arbeitszeiten, Urlaub, Rollenverwaltung, Rechnungen, Finanzen, Lager, Angebote, Produkte, Kunden, Chat, Kalender - inkl. {{ included_users }} User)</td><td>{{ basismodul_price }} €</td></tr>
+        {% for m in addon_modules %}
+        <tr><td>{{ m.name }}</td><td>{{ m.price }} €</td></tr>
+        {% endfor %}
+        {% if extra_users %}
+        <tr><td>{{ extra_users }} zusätzliche(r) User</td><td>{{ extra_users_total }} €</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+
+    <div class="totals">
+      <p>Als Kleinunternehmer im Sinne von § 19 Abs. 1 UStG wird keine Umsatzsteuer berechnet.</p>
+      <p class="grand"><span>Gesamt</span><span>{{ total }} €</span></p>
+    </div>
+
+    <p class="note">Dies ist ein unverbindliches Angebot. Alle Preise verstehen sich als einmalige Kosten (kein Abo). Um dieses Paket zu bestellen, nutze bitte die Schaltfläche "In den Warenkorb" im Konfigurator.</p>
+
+    <p style="margin-top:10mm;">Vielen Dank für dein Vertrauen!</p>
+
+    <div class="signature">
+      <p>Joel Digitals</p>
+      <div class="signature-line"></div>
     </div>
   </div>
 
-  <div class="recipient">
-    <strong>{{ customer.first_name }} {{ customer.last_name }}</strong><br>
-    {% if customer.company_name %}{{ customer.company_name }}<br>{% endif %}
-    {% if customer.address %}{{ customer.address }}<br>{% endif %}
-    {% if customer.zip_code or customer.city %}{{ customer.zip_code }} {{ customer.city }}<br>{% endif %}
-    {% if customer.email %}{{ customer.email }}<br>{% endif %}
-  </div>
-
-  <p>Vielen Dank für Ihr Interesse an Ihrem individuellen JDS Management. Nachfolgend Ihr unverbindliches Angebot:</p>
-
-  <table>
-    <thead><tr><th>Modul</th><th>Preis / Monat</th></tr></thead>
-    <tbody>
-      <tr><td>JDS Management Basismodul (TeamPage, Arbeitszeiten, Urlaub, Rollenverwaltung, Rechnungen, Finanzen, Lager, Angebote, Produkte, Kunden, Chat, Kalender)</td><td>{{ basismodul_price }} €</td></tr>
-      {% for m in addon_modules %}
-      <tr><td>{{ m.name }}</td><td>{{ m.monthly_price }} €</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  <div class="totals">
-    <p><span>Zwischensumme</span><span>{{ subtotal }} €</span></p>
-    {% if discount_code %}
-    <p><span>Rabatt ({{ discount_code.code }}, -{{ discount_code.percentage }}%)</span><span>-{{ discount_amount }} €</span></p>
-    {% endif %}
-    <p class="grand"><span>Gesamt / Monat</span><span>{{ total }} €</span></p>
-  </div>
-
-  <p class="note">Dies ist ein unverbindliches Angebot. Alle Preise verstehen sich als monatliche Kosten. Um dieses Angebot verbindlich anzufragen, nutzen Sie bitte die Schaltfläche "Jetzt verbindlich anfragen" im Konfigurator.</p>
-
-  <div class="footer">
-    Joel Digitals Inh. Joel Nicolay · Niederwiesstraße 20 · 66822 Lebach · joel-digitals.de
-  </div>
+  <footer class="footer">
+    <p>Bankverbindung: Banking Circle S.A. - German Branch | IBAN: DE35 2022 0800 0056 4323 94 | BIC: SXPYDEHHXXX</p>
+    <p>PayPal: buy.joel-digitals@gmx.de</p>
+    <p>Joel Digitals Inh. Joel Nicolay | Niederwiesstraße 20 | 66822 Lebach</p>
+  </footer>
 </body>
 </html>

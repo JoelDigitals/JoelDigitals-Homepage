@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 {% load i18n %}
 
@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', function() {
               </div>
 
               {% if not ticket.is_archived %}
-                <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="chat-btn">
+                <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_ticket_detail_app' ticket.ticket_number %}{% else %}{% url 'ticket_detail' ticket.ticket_number %}{% endif %}" class="chat-btn">
                   <i class="fas fa-comments"></i> {% trans "Open Chat" %}
                 </a>
               {% endif %}

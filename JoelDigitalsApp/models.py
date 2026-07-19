@@ -35,6 +35,28 @@ class PushHealthCheck(models.Model):
         return f"OneSignal-Check {self.checked_at:%Y-%m-%d %H:%M} - {'OK' if self.success else 'FEHLER'}"
 
 
+class PendingPush(models.Model):
+    """Warteschlange fuer Push-Benachrichtigungen, die gesammelt vom 5-Minuten-
+    Cron (siehe JoelDigitalsApp/cron.py push_check) verschickt werden, statt
+    sofort/synchron im ausloesenden Request. sent_at wird ATOMAR per
+    .update(...) gesetzt, BEVOR tatsaechlich gesendet wird - dadurch kann ein
+    Eintrag nie doppelt verschickt werden, auch wenn sich zwei Cron-Aufrufe
+    zeitlich ueberlappen sollten."""
+    title = models.CharField(max_length=255)
+    message = models.CharField(max_length=500)
+    user_ids = models.JSONField(null=True, blank=True, help_text="Liste von User-IDs; leer/None = Broadcast an alle abonnierten Geraete")
+    url = models.URLField(blank=True)
+    data = models.JSONField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.title} ({'gesendet' if self.sent_at else 'ausstehend'})"
+
+
 class StatusSubscription(models.Model):
     """Ein Nutzer hat Stoerungs-Pushes fuer eine bestimmte App (status.App)
     abonniert. Steuert, fuer welche Apps jemand bei neuen AppIssues

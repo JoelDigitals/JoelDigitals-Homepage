@@ -60,6 +60,11 @@
           <span class="price-old">€{{ app.price }}</span>
           <span class="price-new">€{{ app.discounted_price|floatformat:2 }}</span>
         </div>
+      {% elif app.slug == "jds-management-individuell" %}
+        <div class="price-block no-discount">
+          <span class="price-label">ab</span>
+          <strong class="price-regular">€{{ app.price }} einmalig</strong>
+        </div>
       {% else %}
         <div class="price-block no-discount">
           <span class="price-label">Preis:</span>

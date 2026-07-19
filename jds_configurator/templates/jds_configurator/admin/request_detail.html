@@ -31,16 +31,15 @@ select,textarea{width:100%;padding:.55rem .7rem;border:1px solid var(--border);b
   </div>
 
   <div class="card">
-    <h2>Module &amp; Preis</h2>
+    <h2>Module &amp; Preis (einmalig)</h2>
     <div class="row"><span>Basismodul</span><span>{{ config_request.BASISMODUL_PRICE }} €</span></div>
     {% for m in config_request.addon_modules %}
-    <div class="row"><span>{{ m.name }}</span><span>{{ m.monthly_price }} €</span></div>
+    <div class="row"><span>{{ m.name }}</span><span>{{ m.price }} €</span></div>
     {% endfor %}
-    <div class="row"><span>Zwischensumme</span><span>{{ config_request.subtotal }} €</span></div>
-    {% if config_request.discount_code %}
-    <div class="row"><span>Rabatt ({{ config_request.discount_code.code }})</span><span>-{{ config_request.discount_amount }} €</span></div>
+    {% if config_request.extra_users %}
+    <div class="row"><span>{{ config_request.extra_users }} zusätzliche(r) User</span></div>
     {% endif %}
-    <div class="row"><strong>Gesamt / Monat</strong><strong>{{ config_request.total_amount }} €</strong></div>
+    <div class="row"><strong>Gesamt (einmalig)</strong><strong>{{ config_request.total_amount }} €</strong></div>
   </div>
 
   {% if config_request.notes %}

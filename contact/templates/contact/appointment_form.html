@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 {% load i18n %}
 
@@ -638,7 +638,7 @@
 
   <!-- Body -->
   <div class="appointment-body">
-    <a href="{% url 'home' %}" class="back-link">
+    <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_home_app' %}{% else %}{% url 'home' %}{% endif %}" class="back-link">
       <i class="fas fa-arrow-left"></i> {% trans "Back to Home" %}
     </a>
 

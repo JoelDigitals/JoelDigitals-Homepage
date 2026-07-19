@@ -1,4 +1,4 @@
-{% extends "base_shop.html" %}
+{% extends request.base_template|default:"base_shop.html" %}
 {% load static %}
 {% load i18n %}
 

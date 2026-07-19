@@ -187,7 +187,7 @@
           {% if base_template == "base_app.html" %}
           <a href="{% url 'jd_order_admin_app' %}" class="quick-btn"><i class="fas fa-box"></i> {% trans "Orders" %}</a>
           <a href="{% url 'jd_new_order_app' %}" class="quick-btn new"><i class="fas fa-plus-circle"></i> {% trans "New Order" %}</a>
-          <a href="{% url 'admin_sales_app' %}" class="quick-btn"><i class="fas fa-comments"></i> {% trans "Chat" %}</a>
+          <a href="{% url 'jds_admin_sales_app' %}" class="quick-btn"><i class="fas fa-comments"></i> {% trans "Chat" %}</a>
           {% else %}
           <a href="/admin-sales/orders/" class="quick-btn"><i class="fas fa-box"></i> {% trans "Orders" %}</a>
           <a href="/admin-sales/create-order/" class="quick-btn new"><i class="fas fa-plus-circle"></i> {% trans "New Order" %}</a>
@@ -199,8 +199,8 @@
         <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;margin-top:.75rem;">{% trans "Support" %}</div>
         <div class="quick-grid">
           {% if base_template == "base_app.html" %}
-          <a href="{% url 'admin_tickets_app' %}" class="quick-btn"><i class="fas fa-headset"></i> {% trans "Tickets" %}</a>
-          <a href="{% url 'admin_appointments_app' %}" class="quick-btn"><i class="fas fa-calendar-plus"></i> {% trans "Appointments" %}</a>
+          <a href="{% url 'jd_admin_tickets_app' %}" class="quick-btn"><i class="fas fa-headset"></i> {% trans "Tickets" %}</a>
+          <a href="{% url 'jd_admin_appointments_app' %}" class="quick-btn"><i class="fas fa-calendar-plus"></i> {% trans "Appointments" %}</a>
           {% else %}
           <a href="/contact/admin-tickets/" class="quick-btn"><i class="fas fa-headset"></i> {% trans "Tickets" %}</a>
           <a href="/contact/appointment/admin/" class="quick-btn"><i class="fas fa-calendar-plus"></i> {% trans "Appointments" %}</a>
@@ -281,6 +281,28 @@
           </div>
         </form>
         {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if jds_request_count or jds_feature_request_count %}
+      <div class="panel" style="border-color:rgba(0,68,204,.3);">
+        <h3><i class="fas fa-sliders-h" style="color:var(--primary);"></i> {% trans "JDS Management: Anfragen" %} ({{ jds_request_count|add:jds_feature_request_count }})</h3>
+        {% for cr in pending_jds_requests %}
+        <a href="{% url 'jds_configurator:admin_request_detail' pk=cr.pk %}" style="display:block;margin-bottom:.5rem;padding:.5rem;background:var(--bg);border-radius:8px;border:1px solid var(--border);font-size:.8rem;text-decoration:none;color:inherit;">
+          <div style="font-weight:600;">{{ cr.reference }} – {{ cr.first_name }} {{ cr.last_name }}</div>
+          <div style="color:#888;margin:.2rem 0;">{{ cr.email }} | {{ cr.total_amount }} € einmalig</div>
+        </a>
+        {% endfor %}
+        {% for fr in pending_jds_feature_requests %}
+        <a href="{% url 'jds_configurator:admin_feature_request_detail' pk=fr.pk %}" style="display:block;margin-bottom:.5rem;padding:.5rem;background:var(--bg);border-radius:8px;border:1px solid var(--border);font-size:.8rem;text-decoration:none;color:inherit;">
+          <div style="font-weight:600;"><i class="fas fa-lightbulb" style="color:#f59e0b;"></i> {{ fr.reference }} – {{ fr.first_name }} {{ fr.last_name }}</div>
+          <div style="color:#888;margin:.2rem 0;">{{ fr.email }}</div>
+          <div style="color:#888;font-size:.75rem;">{{ fr.description|truncatechars:80 }}</div>
+        </a>
+        {% endfor %}
+        <a href="{% url 'jds_configurator:admin_request_list' %}" class="quick-btn" style="margin-top:.3rem;width:100%;justify-content:center;">
+          <i class="fas fa-list"></i> {% trans "Alle JDS-Anfragen" %}
+        </a>
       </div>
       {% endif %}
 

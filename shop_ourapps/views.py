@@ -433,7 +433,7 @@ def app_detail(request, slug):
         pct = round(cnt / review_count * 100) if review_count else 0
         review_distribution.append({'stars': s, 'count': cnt, 'pct': pct})
 
-    return render(request, 'apps/app_detail.html', {
+    context = {
         'app': app,
         'wallet_balance': wallet.balance if wallet else 0.00,
         'lang': lang,
@@ -442,7 +442,13 @@ def app_detail(request, slug):
         'review_count': review_count,
         'user_review': user_review,
         'review_distribution': review_distribution,
-    })
+    }
+
+    if app.slug == 'jds-management-individuell':
+        from jds_configurator.views import configurator_context
+        context.update(configurator_context())
+
+    return render(request, 'apps/app_detail.html', context)
 
 @login_required
 def wallet_view(request):
@@ -771,6 +777,26 @@ def calculate_affiliate_stats(user):
         "chart_earnings": earnings_chart_data,
     }
 
+
+def _in_app(request):
+    """True wenn die Anfrage ueber /app/ (JoelDigitalsApp-Wrapper) kam - steuert,
+    ob interne redirect()-Sprungziele auf die jd_*_app-Route oder die
+    Desktop-Route zeigen, damit Nutzer die App waehrend Warenkorb/Checkout
+    nicht versehentlich verlassen."""
+    return getattr(request, 'base_template', None) == 'base_app.html'
+
+
+def cart_item_unit_price(item):
+    """Preis pro Einheit eines Cart-/Order-Items. JDS-Konfigurationen haben einen
+    individuellen Preis-Snapshot statt eines festen Katalogpreises (siehe
+    CartItem.jds_configuration / OrderItem.jds_configuration)."""
+    if item.jds_configuration:
+        return item.jds_configuration.total_amount
+    if item.package:
+        return item.package.discounted_price
+    return item.app.discounted_price
+
+
 @login_required
 def cart_view(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
@@ -789,7 +815,7 @@ def cart_view(request):
         wallet = Wallet.objects.filter(user=request.user).first()
 
     if request.method == 'POST':
-        return redirect('checkout')
+        return redirect('jd_checkout_app' if _in_app(request) else 'checkout')
 
     return render(request, 'apps/cart_view.html', {
         'cart': cart,
@@ -814,7 +840,7 @@ def add_to_cart(request, app_id):
 
     if app.is_backorder:
         messages.error(request, _('This product is currently out of stock and cannot be ordered.'))
-        return redirect('app_detail', slug=app.slug)
+        return redirect('jd_app_detail_app' if _in_app(request) else 'app_detail', slug=app.slug)
 
     try:
         quantity = int(request.POST.get('quantity', 1))
@@ -841,7 +867,7 @@ def add_to_cart(request, app_id):
         cart_item.quantity = min(cart_item.quantity + quantity, max_qty)
         cart_item.save()
 
-    return redirect('cart_view')
+    return redirect('jd_cart_app' if _in_app(request) else 'cart_view')
 
 
 @login_required
@@ -860,14 +886,14 @@ def update_cart(request):
                     item.delete()
             except ValueError:
                 continue
-    return redirect('cart_view')
+    return redirect('jd_cart_app' if _in_app(request) else 'cart_view')
 
 
 @login_required
 def remove_from_cart(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
     cart_item.delete()
-    return redirect('cart_view')
+    return redirect('jd_cart_app' if _in_app(request) else 'cart_view')
 # views.py (oder wo du den Checkout hast)
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -951,10 +977,12 @@ def send_order_emails(order, request):
 
 @login_required
 def checkout(request):
+    in_app = _in_app(request)
+    request.session['shop_checkout_in_app'] = in_app
     cart, _ = Cart.objects.get_or_create(user=request.user)
     items = cart.items.all()
     subtotal = sum(
-        (item.package.discounted_price if item.package else item.app.discounted_price) * item.quantity
+        cart_item_unit_price(item) * item.quantity
         for item in items
     )
 
@@ -1113,11 +1141,11 @@ def checkout(request):
             if item.package:
                 if item.package.is_backorder:
                     messages.error(request, _('"%(name)s" is currently out of stock and cannot be ordered.') % {'name': item.package.name})
-                    return redirect('checkout')
+                    return redirect('jd_checkout_app' if in_app else 'checkout')
             elif item.app:
                 if item.app.is_backorder:
                     messages.error(request, _('"%(name)s" is currently out of stock and cannot be ordered.') % {'name': item.app.name})
-                    return redirect('checkout')
+                    return redirect('jd_checkout_app' if in_app else 'checkout')
                 if item.app.requires_shipping and item.app.stock > 0 and item.quantity > item.app.stock:
                     messages.warning(request, _('Only %(count)s of "%(name)s" in stock. Quantity adjusted.') % {'count': item.app.stock, 'name': item.app.name})
                     item.quantity = item.app.stock
@@ -1127,12 +1155,12 @@ def checkout(request):
         if payment_method == 'wallet':
             if not wallet or not wallet.has_funds(final_total):
                 messages.error(request, 'Nicht genügend Guthaben im Wallet.')
-                return redirect('checkout')
+                return redirect('jd_checkout_app' if in_app else 'checkout')
 
         if payment_method == 'lastschrift':
             if not account_holder or not iban:
                 messages.error(request, 'Bitte Kontoinhaber und IBAN für Lastschrift angeben.')
-                return redirect('checkout')
+                return redirect('jd_checkout_app' if in_app else 'checkout')
 
         # Bestellung erstellen
         order = Order.objects.create(
@@ -1178,8 +1206,7 @@ def checkout(request):
         )
 
         from django.db.models import F
-        from decimal import Decimal
-        
+
         if affiliate_code_obj:
             partner_user = affiliate_code_obj.partner.user
         
@@ -1200,7 +1227,19 @@ def checkout(request):
             )
         
         for item in items:
-            if item.package:
+            if item.jds_configuration:
+                OrderItem.objects.create(
+                    order=order,
+                    app=item.app,
+                    jds_configuration=item.jds_configuration,
+                    name_override=item.jds_configuration.display_name,
+                    quantity=item.quantity,
+                    single_price=item.jds_configuration.total_amount,
+                    discount_percent=0,
+                    discount_price=item.jds_configuration.total_amount,
+                    price=item.quantity * item.jds_configuration.total_amount
+                )
+            elif item.package:
                 OrderItem.objects.create(
                     order=order,
                     package=item.package,
@@ -1244,7 +1283,7 @@ def checkout(request):
             cart.items.all().delete()
             order.status = 'Paid'
             order.save(update_fields=['status'])
-            return redirect('order_confirmation', order_id=order.id)
+            return redirect('jd_order_confirmation_app' if in_app else 'order_confirmation', order_id=order.id)
 
         # Wallet-Zahlung
         if payment_method == 'wallet':
@@ -1258,7 +1297,7 @@ def checkout(request):
             cart.items.all().delete()
             order.status = 'Paid'
             order.save()
-            return redirect('order_confirmation', order_id=order.id)
+            return redirect('jd_order_confirmation_app' if in_app else 'order_confirmation', order_id=order.id)
 
         # Lastschrift
         if payment_method == 'lastschrift':
@@ -1269,7 +1308,7 @@ def checkout(request):
             order.save(update_fields=['sepa_mandate_ref', 'sepa_mandate_date', 'status'])
             messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben. Die Lastschrift wird verarbeitet.')
             cart.items.all().delete()
-            return redirect('order_confirmation', order_id=order.id)
+            return redirect('jd_order_confirmation_app' if in_app else 'order_confirmation', order_id=order.id)
 
         # Banküberweisung
         if payment_method == 'überweisung':
@@ -1283,7 +1322,7 @@ def checkout(request):
             )
             messages.success(request, 'Ihre Bestellung wurde erfolgreich aufgegeben. Bitte überweisen Sie den Betrag auf unser Konto.')
             cart.items.all().delete()
-            return redirect('order_confirmation', order_id=order.id)
+            return redirect('jd_order_confirmation_app' if in_app else 'order_confirmation', order_id=order.id)
 
         # Stripe
         if payment_method == "stripe":
@@ -1301,9 +1340,9 @@ def checkout(request):
                 }],
                 metadata={"order_id": order.id, "user_id": request.user.id},
                 success_url=request.build_absolute_uri(
-                    reverse("order_confirmation", args=[order.id])
+                    reverse("jd_order_confirmation_app" if in_app else "order_confirmation", args=[order.id])
                 ) + "?session_id={CHECKOUT_SESSION_ID}",
-                cancel_url=request.build_absolute_uri(reverse("checkout")),
+                cancel_url=request.build_absolute_uri(reverse("jd_checkout_app" if in_app else "checkout")),
             )
             cart.items.all().delete()
             order.stripe_session_id = session.id
@@ -1316,7 +1355,7 @@ def checkout(request):
                 amount=order.total_amount,
                 invoice_id=order.id,
                 return_url=request.build_absolute_uri(reverse('paypal_execute')),
-                cancel_url=request.build_absolute_uri(reverse('checkout'))
+                cancel_url=request.build_absolute_uri(reverse('jd_checkout_app' if in_app else 'checkout'))
             )
             cart.items.all().delete()
             approval_url = next(link["href"] for link in paypal_order["links"] if link["rel"] == "approve")
@@ -1346,12 +1385,16 @@ def checkout(request):
 
 @login_required
 def paypal_execute(request):
+    # PayPal leitet den Nutzer auf einer neuen Anfrage zurueck, request.base_template
+    # ist hier also nie gesetzt - deshalb merkt sich checkout() beim Anlegen der
+    # PayPal-Session in der Session, ob der Kauf ueber /app/ gestartet wurde.
+    in_app = request.session.get('shop_checkout_in_app', False)
     token = request.GET.get('token')
     payer_id = request.GET.get('PayerID')
 
     if not token:
         messages.error(request, "Fehler bei PayPal-Zahlung: Kein Token erhalten.")
-        return redirect('checkout')
+        return redirect('jd_checkout_app' if in_app else 'checkout')
 
     result = capture_paypal_order(token)
 
@@ -1374,14 +1417,14 @@ def paypal_execute(request):
             if order:
                 OrderAutomationService.set_paid(order)
                 messages.success(request, f"Zahlung erfolgreich! Bestellung #{order.id} ist jetzt bezahlt.")
-                return redirect('order_confirmation', order_id=order.id)
+                return redirect('jd_order_confirmation_app' if in_app else 'order_confirmation', order_id=order.id)
         except Exception as e:
             pass
         messages.success(request, "Zahlung erfolgreich!")
-        return redirect('my_orders')
+        return redirect('jd_orders_app' if in_app else 'my_orders')
 
     messages.error(request, "Zahlung fehlgeschlagen.")
-    return redirect('checkout')
+    return redirect('jd_checkout_app' if in_app else 'checkout')
 
 import stripe
 from django.http import JsonResponse
@@ -1428,7 +1471,7 @@ def validate_codes(request):
     if not cart or not cart.items.exists():
         return JsonResponse({"valid": False, "message": "Warenkorb ist leer."})
     subtotal = sum(
-        (item.package.discounted_price if item.package else item.app.discounted_price) * item.quantity
+        cart_item_unit_price(item) * item.quantity
         for item in cart.items.all()
     )
     discount = 0

@@ -231,10 +231,31 @@ Status: {appointment.get_status_display()}
                     fail_silently=False,
                 )
                 
-                return redirect("appointment_success")
+                # Push an Vertrieb ueber die Warteschlange statt sofort -
+                # wird vom 5-Minuten-Cron gesammelt/dedupliziert verschickt
+                # (siehe JoelDigitalsApp.cron.push_check).
+                try:
+                    from django.contrib.auth import get_user_model
+                    from JoelDigitalsApp.models import PendingPush
+                    User = get_user_model()
+                    sales_staff_ids = list(
+                        User.objects.filter(groups__name='Selling').distinct().values_list('id', flat=True)
+                    )
+                    if sales_staff_ids:
+                        PendingPush.objects.create(
+                            title="Neue Terminbuchung",
+                            message=f"{appointment.first_name} {appointment.last_name} - {appointment_type.name} am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}",
+                            user_ids=sales_staff_ids,
+                            url=request.build_absolute_uri(reverse('appointment_admin')),
+                        )
+                except Exception:
+                    pass
+
+                in_app = getattr(request, 'base_template', None) == 'base_app.html'
+                return redirect('jd_appointment_success_app' if in_app else 'appointment_success')
     else:
         form = AppointmentForm()
-    
+
     return render(request, "contact/appointment_form.html", {
         "form": form,
     })
@@ -305,8 +326,10 @@ def update_appointment_status(request, pk, status):
             "Mit freundlichen Grüßen\n"
             "Ihr Joel Digitals Team"
         )
-    else:
-        return redirect('appointment_admin')  # keine Mail bei pending
+    in_app = getattr(request, 'base_template', None) == 'base_app.html'
+
+    if status not in ('accepted', 'rejected'):
+        return redirect('jd_admin_appointments_app' if in_app else 'appointment_admin')  # keine Mail bei pending
 
     send_mail(
         subject=subject,
@@ -315,7 +338,7 @@ def update_appointment_status(request, pk, status):
         recipient_list=[appointment.email],
     )
 
-    return redirect('appointment_admin')
+    return redirect('jd_admin_appointments_app' if in_app else 'appointment_admin')
 
 def appointment_success(request):
     return render(request, 'contact/appointment_success.html')
@@ -412,6 +435,9 @@ def sales_chat(request, entry_id):
     if request.user != entry.user and not request.user.is_staff:
         raise PermissionDenied()
 
+    in_app = getattr(request, 'base_template', None) == 'base_app.html'
+    sales_chat_url_name = 'jd_sales_chat_app' if in_app else 'sales_chat'
+
     if request.method == "POST":
         message_text = request.POST.get("message")
 
@@ -451,7 +477,7 @@ def sales_chat(request, entry_id):
             email_msg.attach_alternative(html_content, "text/html")
             email_msg.send()
 
-            return redirect('sales_chat', entry_id=entry.id)
+            return redirect(sales_chat_url_name, entry_id=entry.id)
 
     messages_qs = SalesChatMessage.objects.filter(entry=entry).order_by('created_at')
 
@@ -467,7 +493,7 @@ def sales_chat(request, entry_id):
                 raise ValueError
         except (ValueError, Decimal.InvalidOperation):
             messages.error(request, "Ungültiger Betrag.")
-            return redirect('sales_chat', entry_id=entry.id)
+            return redirect(sales_chat_url_name, entry_id=entry.id)
 
         order = Order.objects.create(
             user=entry.user,
@@ -493,7 +519,7 @@ def sales_chat(request, entry_id):
                 messages.warning(request, f"Order #{order.id} erstellt, aber Affiliate-Code '{aff_code}' nicht gefunden.")
         else:
             messages.success(request, f"Order #{order.id} erfolgreich erstellt (ohne Affiliate).")
-        return redirect('sales_chat', entry_id=entry.id)
+        return redirect(sales_chat_url_name, entry_id=entry.id)
 
     return render(request, 'contact/sales_chat.html', {
         'entry': entry,
@@ -553,7 +579,8 @@ def support_tickets(request):
             recipient_list=[ticket.email]
         )
         messages.success(request, _("Ticket erfolgreich erstellt."))
-        return redirect('support_tickets')
+        in_app = getattr(request, 'base_template', None) == 'base_app.html'
+        return redirect('jd_support_app' if in_app else 'support_tickets')
 
     tickets = SupportTicket.objects.filter(user=request.user).order_by('-created_at')
 
@@ -634,7 +661,8 @@ def ticket_detail(request, ticket_number):
             email.send()
 
             messages.success(request, _("Nachricht gesendet."))
-            return redirect('ticket_detail', ticket_number=ticket.ticket_number)
+            in_app = getattr(request, 'base_template', None) == 'base_app.html'
+            return redirect('jd_ticket_detail_app' if in_app else 'ticket_detail', ticket_number=ticket.ticket_number)
 
     else:
         form = TicketMessageForm()
@@ -730,7 +758,9 @@ def admin_ticket_view(request):
                     if note_text:
                         TicketNote.objects.create(ticket=ticket, author=user, note=note_text)
 
-            redirect_url = "admin_tickets"
+            in_app = getattr(request, 'base_template', None) == 'base_app.html'
+            redirect_url = "jd_admin_tickets_app" if in_app else "admin_tickets"
+            redirect_url = reverse(redirect_url)
             if query:
                 redirect_url += f"?q={query}"
             return redirect(redirect_url)
@@ -769,7 +799,7 @@ def add_wish(request, entry_id):
             wish.entry = entry  # Setze die entry-Referenz
             wish.save()  # Jetzt speichern
             
-            return redirect('sales_entry_detail', entry_id=entry_id)
+            return redirect('jd_sales_entry_detail_app' if getattr(request, 'base_template', None) == 'base_app.html' else 'sales_entry_detail', entry_id=entry_id)
     else:
         form = SalesWishForm()
 
@@ -782,7 +812,7 @@ def edit_wish(request, entry_id, wish_id):
         form = SalesWishForm(request.POST, instance=wish)
         if form.is_valid():
             form.save()
-            return redirect('sales_entry_detail', entry_id=entry_id)
+            return redirect('jd_sales_entry_detail_app' if getattr(request, 'base_template', None) == 'base_app.html' else 'sales_entry_detail', entry_id=entry_id)
     else:
         form = SalesWishForm(instance=wish)
     return render(request, 'contact/wish_form.html', {'form': form, 'title': 'Wunsch bearbeiten', 'user_groups': user_groups})
@@ -791,7 +821,7 @@ def delete_wish(request, entry_id, wish_id):
     wish = get_object_or_404(SalesWish, pk=wish_id)
     if request.method == 'POST':
         wish.delete()
-        return redirect('sales_entry_detail', entry_id=entry_id)
+        return redirect('jd_sales_entry_detail_app' if getattr(request, 'base_template', None) == 'base_app.html' else 'sales_entry_detail', entry_id=entry_id)
     return render(request, 'contact/confirm_delete.html', {'wish': wish})
 
 def export_single_wish(request, entry_id, wish_id):

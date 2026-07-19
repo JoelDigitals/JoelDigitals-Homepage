@@ -8,6 +8,12 @@ dessen geplante Veroeffentlichungszeit (published_at) gerade erreicht wurde.
 Bestellstatus-Aenderungen (z.B. neuer Sendungsstatus) werden bereits in
 Echtzeit per Signal gepusht, siehe JoelDigitalsApp/signals.py - die brauchen
 diesen Cron nicht.
+
+Verschickt bei jedem Aufruf auch faellige JoelDigitalsApp.models.PendingPush-
+Eintraege (siehe _send_pending_pushes) - die generische Warteschlange fuer
+Pushes, die NICHT sofort im ausloesenden Request verschickt werden sollen
+(z.B. neue Terminanfragen), gesammelt und dedupliziert (sent_at wird atomar
+gesetzt) statt synchron/duplikatanfaellig.
 """
 from datetime import timedelta
 
@@ -19,6 +25,35 @@ from django.views.decorators.csrf import csrf_exempt
 from .services.push import send_push_notification, check_onesignal_credentials
 
 ONESIGNAL_CHECK_INTERVAL_DAYS = 10
+
+
+def _send_pending_pushes(now, limit=100):
+    """Verschickt faellige PendingPush-Eintraege. sent_at wird per .update()
+    ATOMAR gesetzt, BEVOR tatsaechlich gesendet wird, damit ein Eintrag auch
+    bei ueberlappenden Cron-Aufrufen nie doppelt verschickt wird."""
+    from .models import PendingPush
+
+    pending_ids = list(
+        PendingPush.objects.filter(sent_at__isnull=True)
+        .order_by('created_at')
+        .values_list('id', flat=True)[:limit]
+    )
+    if not pending_ids:
+        return []
+
+    PendingPush.objects.filter(id__in=pending_ids, sent_at__isnull=True).update(sent_at=now)
+
+    sent = []
+    for push in PendingPush.objects.filter(id__in=pending_ids):
+        send_push_notification(
+            title=push.title,
+            message=push.message,
+            user_ids=push.user_ids,
+            url=push.url or None,
+            data=push.data,
+        )
+        sent.append(push.id)
+    return sent
 
 
 def _maybe_check_onesignal_health(now):
@@ -84,10 +119,12 @@ def push_check(request):
         post.save(update_fields=['push_notified_at'])
         notified_articles.append(post.slug)
 
+    pending_pushes_sent = _send_pending_pushes(now)
     onesignal_health = _maybe_check_onesignal_health(now)
 
     return JsonResponse({
         'checked_at': now.isoformat(),
         'articles_notified': notified_articles,
+        'pending_pushes_sent': pending_pushes_sent,
         'onesignal_health_check': onesignal_health,
     })

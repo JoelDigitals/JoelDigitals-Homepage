@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 
 {% block title %}Admin Support Tickets – Joel Digitals{% endblock %}
@@ -94,7 +94,7 @@
     <h2>🛠️ Admin Area: Support Tickets</h2>
 
     {% if tickets %}
-        <a href="{% url 'archive_ticket' %}" class="btn">View Archived Tickets</a>
+        <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_ticket_archive_app' %}{% else %}{% url 'archive_ticket' %}{% endif %}" class="btn">View Archived Tickets</a>
 
         <form method="get" style="margin-bottom: 20px; display: flex; gap: 10px;">
             <input type="text" name="q" placeholder="Search by app, subject, ticket #, email..."
@@ -165,14 +165,14 @@
                     {% endif %}
 
                     <input type="submit" name="action" value="update" class="btn">
-                    <a href="{% url 'ticket_detail' ticket.ticket_number %}" class="btn">View Chat</a>
+                    <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_ticket_detail_app' ticket.ticket_number %}{% else %}{% url 'ticket_detail' ticket.ticket_number %}{% endif %}" class="btn">View Chat</a>
                 </form>
             </div>
             {% endif %}
         {% endfor %}
     {% else %}
         <p>No tickets found.</p>
-        <a href="{% url 'archive_ticket' %}" class="btn">View Archived Tickets</a>
+        <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_ticket_archive_app' %}{% else %}{% url 'archive_ticket' %}{% endif %}" class="btn">View Archived Tickets</a>
     {% endif %}
 </div>
 {% endblock %}

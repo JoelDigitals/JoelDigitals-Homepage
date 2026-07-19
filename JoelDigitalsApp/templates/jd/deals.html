@@ -45,7 +45,7 @@
 
 {% if deals %}
 {% for app in deals %}
-<a href="{{ app.external_url }}" target="_blank" rel="noopener" class="jd-deal-card" style="text-decoration:none; color:inherit;">
+<a href="{% url 'jd_app_detail_app' app.slug %}" class="jd-deal-card" style="text-decoration:none; color:inherit;">
     {% if app.display_image %}
     <img src="{{ app.display_image }}" alt="{{ app.name }}">
     {% else %}

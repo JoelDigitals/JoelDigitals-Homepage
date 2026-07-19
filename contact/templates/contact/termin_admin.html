@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 
 {% block title %}Terminverwaltung – Admin{% endblock %}
@@ -146,8 +146,8 @@
             <td>{{ a.appointment_datetime|date:"d.m.Y H:i" }}</td>
             <td>{{ a.appointment_type }}</td>
             <td>
-                <a class="btn accept" href="{% url 'update_appointment_status' a.id 'accepted' %}">Annehmen</a>
-                <a class="btn reject" href="{% url 'update_appointment_status' a.id 'rejected' %}">Ablehnen</a>
+                <a class="btn accept" href="{% if request.base_template == 'base_app.html' %}{% url 'jd_update_appointment_status_app' a.id 'accepted' %}{% else %}{% url 'update_appointment_status' a.id 'accepted' %}{% endif %}">Annehmen</a>
+                <a class="btn reject" href="{% if request.base_template == 'base_app.html' %}{% url 'jd_update_appointment_status_app' a.id 'rejected' %}{% else %}{% url 'update_appointment_status' a.id 'rejected' %}{% endif %}">Ablehnen</a>
             </td>
         </tr>
         {% empty %}

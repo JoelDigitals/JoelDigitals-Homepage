@@ -487,6 +487,13 @@ def _build_admin_dashboard_context(request):
     pending_withdrawals = WithdrawalRequest.objects.filter(status='pending').order_by('-created_at')[:5]
     withdrawal_count = WithdrawalRequest.objects.filter(status='pending').count()
 
+    # === JDS MANAGEMENT: KONFIGURATIONS- & FUNKTIONS-ANFRAGEN ===
+    from jds_configurator.models import JdsConfigRequest, JdsFeatureRequest
+    pending_jds_requests = JdsConfigRequest.objects.filter(status='pending').order_by('-created_at')[:5]
+    jds_request_count = JdsConfigRequest.objects.filter(status='pending').count()
+    pending_jds_feature_requests = JdsFeatureRequest.objects.filter(status='pending').order_by('-created_at')[:5]
+    jds_feature_request_count = JdsFeatureRequest.objects.filter(status='pending').count()
+
     # === ERWEITERTE STATISTIKEN ===
     from decimal import Decimal
     from django.db.models.functions import TruncMonth as TrM
@@ -570,6 +577,10 @@ def _build_admin_dashboard_context(request):
         'total_users': total_users,
         'pending_withdrawals': pending_withdrawals,
         'withdrawal_count': withdrawal_count,
+        'pending_jds_requests': pending_jds_requests,
+        'jds_request_count': jds_request_count,
+        'pending_jds_feature_requests': pending_jds_feature_requests,
+        'jds_feature_request_count': jds_feature_request_count,
         'total_webinars': total_webinars,
         'upcoming_webinars': upcoming_webinars,
         'total_registrations': total_registrations,

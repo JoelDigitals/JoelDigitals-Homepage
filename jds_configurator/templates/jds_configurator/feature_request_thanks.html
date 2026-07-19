@@ -1,0 +1,17 @@
+{% extends "base_shop.html" %}
+{% block title %}Funktionswunsch gesendet - JDS Management{% endblock %}
+{% block content %}
+<style>
+.jdscfg-thanks{max-width:600px;margin:4rem auto;padding:2rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;text-align:center}
+.jdscfg-thanks .icon{font-size:3rem;margin-bottom:1rem}
+.jdscfg-thanks h1{font-size:1.4rem;margin-bottom:.75rem}
+.jdscfg-thanks p{color:#aaa;line-height:1.6}
+.jdscfg-thanks .ref{display:inline-block;background:#111;border-radius:8px;padding:.4rem .9rem;font-family:monospace;margin-top:1rem;color:var(--primary)}
+</style>
+<div class="jdscfg-thanks">
+  <div class="icon">💡</div>
+  <h1>Funktionswunsch erhalten!</h1>
+  <p>Vielen Dank, {{ feature_request.first_name }}! Wir prüfen deinen Wunsch nach einer individuellen Zusatzfunktion und melden uns bei Rückfragen per E-Mail oder Telefon. Nach Genehmigung erhältst du eine Nachricht mit der voraussichtlichen Verfügbarkeit.</p>
+  <div class="ref">{{ feature_request.reference }}</div>
+</div>
+{% endblock %}

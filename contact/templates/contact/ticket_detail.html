@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 {% load i18n %}
 
@@ -492,7 +492,7 @@
         <i class="fas fa-arrow-left"></i> {% trans "Back to Admin Panel" %}
       </a>
     {% else %}
-      <a href="{% url 'support_tickets' %}" class="back-link">
+      <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_support_app' %}{% else %}{% url 'support_tickets' %}{% endif %}" class="back-link">
         <i class="fas fa-arrow-left"></i> {% trans "Back to My Tickets" %}
       </a>
     {% endif %}

@@ -1,0 +1,39 @@
+{% extends "base_shop.html" %}
+{% block title %}JDS-Funktionswünsche{% endblock %}
+{% block content %}
+<style>
+.jdscfg-admin-wrap{max-width:1100px;margin:0 auto;padding:2rem 1rem}
+.jdscfg-admin-wrap h1{font-size:1.6rem;margin-bottom:1.5rem}
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+th,td{padding:.7rem .9rem;text-align:left;border-bottom:1px solid var(--border);font-size:.875rem}
+th{background:#181818;text-transform:uppercase;font-size:.7rem;letter-spacing:.04em;color:#999}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:.2rem .6rem;border-radius:99px;font-size:.72rem;font-weight:600}
+.b-pending{background:#4a3b00;color:#facc15}
+.b-in_review{background:#0c2e4a;color:#38bdf8}
+.b-approved{background:#06331f;color:#4ade80}
+.b-rejected{background:#3b0d0d;color:#f87171}
+a.rowlink{color:var(--primary);text-decoration:none;font-weight:600}
+</style>
+<div class="jdscfg-admin-wrap">
+  <h1>Individuelle Funktionswünsche: JDS Management</h1>
+  <table>
+    <thead><tr><th>Referenz</th><th>Kunde</th><th>Firma</th><th>Beschreibung</th><th>Status</th><th>Erstellt</th><th></th></tr></thead>
+    <tbody>
+      {% for r in requests %}
+      <tr>
+        <td>{{ r.reference }}</td>
+        <td>{{ r.first_name }} {{ r.last_name }}</td>
+        <td>{{ r.company_name|default:"–" }}</td>
+        <td>{{ r.description|truncatechars:60 }}</td>
+        <td><span class="badge b-{{ r.status }}">{{ r.get_status_display }}</span></td>
+        <td>{{ r.created_at|date:"d.m.Y H:i" }}</td>
+        <td><a class="rowlink" href="{% url 'jds_configurator:admin_feature_request_detail' r.pk %}">Öffnen</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" style="text-align:center;color:#888">Keine Funktionswünsche vorhanden.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

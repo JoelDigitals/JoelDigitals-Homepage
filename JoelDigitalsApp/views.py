@@ -134,12 +134,13 @@ def jd_home_app(request):
 
 @login_required(login_url='jd_login_app')
 def jd_deals_app(request):
-    context = _nav_context(request.user)
-    candidates = ShopApp.objects.filter(is_active=True, discount_percent__gt=0).order_by('-discount_start')
-    deals = [app for app in candidates if app.discount_is_active]
+    from shop_ourapps.models import Package
 
-    for app in deals:
-        app.external_url = request.build_absolute_uri(reverse('app_detail', args=[app.slug]))
+    context = _nav_context(request.user)
+    app_candidates = ShopApp.objects.filter(is_active=True, discount_percent__gt=0).order_by('-discount_start')
+    package_candidates = Package.objects.filter(is_active=True, discount_percent__gt=0).order_by('-discount_start')
+    deals = [item for item in list(app_candidates) + list(package_candidates) if item.discount_is_active]
+    deals.sort(key=lambda item: item.discount_start or timezone.now(), reverse=True)
 
     context['deals'] = deals
     return render(request, 'jd/deals.html', context)
@@ -321,18 +322,19 @@ def jd_status_app(request):
 
 @login_required(login_url='jd_login_app')
 def jd_support_app(request):
-    """Native Support-Ticket-Liste in der App - ruft MobileApp.support_tickets_app
-    direkt auf (gleiche Logik/Templates wie die Support-App), nur im App-Design."""
-    from MobileApp.views import support_tickets_app
+    """Wrapt die echte Desktop-Support-Ansicht (contact.views.support_tickets)
+    im App-Design - EIN kanonischer Ticket-Code-Pfad statt einer eigenen
+    MobileApp-Kopie, wie beim Rest der App-Wraps (siehe jd_order_admin_app etc.)."""
+    from contact.views import support_tickets
     request.base_template = 'base_app.html'
-    return support_tickets_app(request)
+    return support_tickets(request)
 
 
 @login_required(login_url='jd_login_app')
 def jd_ticket_detail_app(request, ticket_number):
-    from MobileApp.views import ticket_detail_app
+    from contact.views import ticket_detail
     request.base_template = 'base_app.html'
-    return ticket_detail_app(request, ticket_number)
+    return ticket_detail(request, ticket_number)
 
 
 # ========================================================================
@@ -478,5 +480,179 @@ def jd_delete_account_app(request):
     from main.views import delete_account
     request.base_template = 'base_app.html'
     return delete_account(request)
+
+
+# ========================================================================
+# Shop im App-Design (Phase 1 der /app/-Vollstaendigkeit: Katalog, Produkt,
+# Warenkorb, Checkout, Bestaetigung, Rechnung) - gleiches Wrap-Muster wie oben.
+# ========================================================================
+
+@login_required(login_url='jd_login_app')
+def jd_shop_app(request):
+    from shop_ourapps.views import shop
+    request.base_template = 'base_app.html'
+    return shop(request)
+
+
+@login_required(login_url='jd_login_app')
+def jd_app_detail_app(request, slug):
+    from shop_ourapps.views import app_detail
+    request.base_template = 'base_app.html'
+    return app_detail(request, slug)
+
+
+@login_required(login_url='jd_login_app')
+def jd_cart_app(request):
+    from shop_ourapps.views import cart_view
+    request.base_template = 'base_app.html'
+    return cart_view(request)
+
+
+@login_required(login_url='jd_login_app')
+def jd_checkout_app(request):
+    from shop_ourapps.views import checkout
+    request.base_template = 'base_app.html'
+    return checkout(request)
+
+
+@login_required(login_url='jd_login_app')
+def jd_order_confirmation_app(request, order_id):
+    from shop_ourapps.views import order_confirmation
+    request.base_template = 'base_app.html'
+    return order_confirmation(request, order_id)
+
+
+@login_required(login_url='jd_login_app')
+def jd_invoice_view_app(request, order_id):
+    from shop_ourapps.views import invoice_view
+    request.base_template = 'base_app.html'
+    return invoice_view(request, order_id)
+
+
+@login_required(login_url='jd_login_app')
+def jd_add_to_cart_app(request, app_id):
+    """Eigene /app/-Route noetig (statt nur request.base_template zu setzen):
+    apps/app_detail.html postet mit einer fest verdrahteten {% url 'add_to_cart' %},
+    die IMMER auf die Desktop-Route zeigt - das Template waehlt je nach
+    request.base_template zwischen dieser und der Desktop-Route."""
+    from shop_ourapps.views import add_to_cart
+    request.base_template = 'base_app.html'
+    return add_to_cart(request, app_id)
+
+
+@login_required(login_url='jd_login_app')
+def jd_remove_from_cart_app(request, item_id):
+    from shop_ourapps.views import remove_from_cart
+    request.base_template = 'base_app.html'
+    return remove_from_cart(request, item_id)
+
+
+# ========================================================================
+# Termine (Appointments) im App-Design
+# ========================================================================
+
+@login_required(login_url='jd_login_app')
+def jd_appointment_app(request):
+    from contact.views import appointment_create
+    request.base_template = 'base_app.html'
+    return appointment_create(request)
+
+
+@login_required(login_url='jd_login_app')
+def jd_appointment_success_app(request):
+    from contact.views import appointment_success
+    request.base_template = 'base_app.html'
+    return appointment_success(request)
+
+
+@login_required(login_url='jd_login_app')
+def jd_admin_appointments_app(request):
+    from contact.views import appointment_admin_view
+    request.base_template = 'base_app.html'
+    return appointment_admin_view(request)
+
+
+@login_required(login_url='jd_login_app')
+def jd_update_appointment_status_app(request, pk, status):
+    from contact.views import update_appointment_status
+    request.base_template = 'base_app.html'
+    return update_appointment_status(request, pk, status)
+
+
+# ========================================================================
+# Support-Ticket-Verwaltung (Admin) im App-Design
+# ========================================================================
+
+@login_required(login_url='jd_login_app')
+def jd_admin_tickets_app(request):
+    from contact.views import admin_ticket_view
+    request.base_template = 'base_app.html'
+    return admin_ticket_view(request)
+
+
+@login_required(login_url='jd_login_app')
+def jd_ticket_archive_app(request):
+    from contact.views import ticket_archive_view
+    request.base_template = 'base_app.html'
+    return ticket_archive_view(request)
+
+
+@login_required(login_url='jd_login_app')
+def jd_archived_ticket_detail_app(request, ticket_number):
+    from contact.views import ticket_detail_view
+    request.base_template = 'base_app.html'
+    return ticket_detail_view(request, ticket_number)
+
+
+# ========================================================================
+# Sales-Verwaltung (Admin, inkl. Chat mit Interessenten) im App-Design
+# ========================================================================
+
+@login_required(login_url='jd_login_app')
+def jd_admin_sales_app(request):
+    from contact.views import admin_sales_view
+    request.base_template = 'base_app.html'
+    return admin_sales_view(request)
+
+
+@login_required(login_url='jd_login_app')
+def jd_sales_entry_detail_app(request, entry_id):
+    from contact.views import sales_entry_detail
+    request.base_template = 'base_app.html'
+    return sales_entry_detail(request, entry_id)
+
+
+@login_required(login_url='jd_login_app')
+def jd_sales_chat_app(request, entry_id):
+    from contact.views import sales_chat
+    request.base_template = 'base_app.html'
+    return sales_chat(request, entry_id)
+
+
+@login_required(login_url='jd_login_app')
+def jd_add_wish_app(request, entry_id):
+    from contact.views import add_wish
+    request.base_template = 'base_app.html'
+    return add_wish(request, entry_id)
+
+
+@login_required(login_url='jd_login_app')
+def jd_edit_wish_app(request, entry_id, wish_id):
+    from contact.views import edit_wish
+    request.base_template = 'base_app.html'
+    return edit_wish(request, entry_id, wish_id)
+
+
+@login_required(login_url='jd_login_app')
+def jd_delete_wish_app(request, entry_id, wish_id):
+    from contact.views import delete_wish
+    request.base_template = 'base_app.html'
+    return delete_wish(request, entry_id, wish_id)
+
+
+@login_required(login_url='jd_login_app')
+def jd_export_single_wish_app(request, entry_id, wish_id):
+    from contact.views import export_single_wish
+    return export_single_wish(request, entry_id, wish_id)
 
 

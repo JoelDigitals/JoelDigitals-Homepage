@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 {% load i18n %}
 
@@ -510,7 +510,7 @@
 
   <!-- Body -->
   <div class="checkout-body">
-    <a href="{% url 'cart_view' %}" class="back-link">
+    <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_cart_app' %}{% else %}{% url 'cart_view' %}{% endif %}" class="back-link">
       <i class="fas fa-arrow-left"></i>
       {% trans "Back to Cart" %}
     </a>
@@ -529,7 +529,9 @@
               <div class="item-info">
                 <span class="item-qty">{{ item.quantity }}</span>
                 <span class="item-name">
-                  {% if item.package %}
+                  {% if item.jds_configuration %}
+                    {{ item.jds_configuration.display_name }}
+                  {% elif item.package %}
                     {{ item.package.name }}
                   {% elif "de" in lang %}
                     {{ item.app.name }}
@@ -539,7 +541,9 @@
                 </span>
               </div>
               <div class="item-pricing" style="width:100%;justify-content:flex-start;padding-left:2.5rem;">
-                {% if item.package %}
+                {% if item.jds_configuration %}
+                  <span class="price-regular">€{{ item.jds_configuration.total_amount|floatformat:2 }}</span>
+                {% elif item.package %}
                   {% if item.package.discount_is_active %}
                     <span class="price-strike">€{{ item.package.price|floatformat:2 }}</span>
                     <span class="price-final">€{{ item.package.discounted_price|floatformat:2 }}</span>
@@ -799,7 +803,7 @@
         <h2>{% trans "Your cart is empty" %}</h2>
         <p>{% trans "Add some items before checking out" %}</p>
         <br>
-        <a href="{% url 'shop' %}" class="btn-submit" style="text-decoration: none;">
+        <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_shop_app' %}{% else %}{% url 'shop' %}{% endif %}" class="btn-submit" style="text-decoration: none;">
           <i class="fas fa-store"></i>
           {% trans "Browse Shop" %}
         </a>

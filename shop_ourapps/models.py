@@ -471,12 +471,23 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
     app = models.ForeignKey(App, on_delete=models.CASCADE, null=True, blank=True)
     package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)
+    jds_configuration = models.ForeignKey(
+        'jds_configurator.JdsConfiguration', on_delete=models.CASCADE, null=True, blank=True,
+        help_text="Individuelle JDS-Management-Konfiguration (Module + User) statt eines Katalog-Preises"
+    )
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
     @property
     def total_price(self):
         return self.price * self.quantity
+
+    def get_name(self):
+        if self.jds_configuration:
+            return self.jds_configuration.display_name
+        if self.package:
+            return self.package.name
+        return self.app.name if self.app else f"Item #{self.id}"
 
 
 # ... (alle bisherigen Klassen wie App, AffiliateLink, Purchase etc.)
@@ -606,6 +617,10 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     app = models.ForeignKey(App, on_delete=models.CASCADE, null=True, blank=True)
     package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)
+    jds_configuration = models.ForeignKey(
+        'jds_configurator.JdsConfiguration', on_delete=models.SET_NULL, null=True, blank=True,
+        help_text="Individuelle JDS-Management-Konfiguration (Module + User) statt eines Katalog-Preises"
+    )
     name_override = models.CharField(max_length=255, blank=True, verbose_name="Produktname (manuell)")
     quantity = models.PositiveIntegerField()
     discount_percent = models.PositiveIntegerField(default=0)
@@ -614,6 +629,8 @@ class OrderItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)  # Preis zum Zeitpunkt der Bestellung
 
     def get_name(self):
+        if self.jds_configuration:
+            return self.jds_configuration.display_name
         if self.package:
             return self.package.name
         return self.name_override or (self.app.name if self.app else f"Item #{self.id}")

@@ -81,6 +81,9 @@ urlpatterns += i18n_patterns(
     path('', include('main.urls')),
     path('blog/', include('blog.urls')),
     path('contact/', include('contact.urls')),
+    # Muss VOR shop_ourapps.urls stehen: dessen 'shop/<slug:slug>/'-Catch-all
+    # (app_detail) würde /shop/jds-management/ sonst faelschlich als App-Slug matchen.
+    path('shop/jds-management/', include('jds_configurator.urls')),
     path('', include('shop_ourapps.urls')),
     path('wiki/', include('wiki.urls')),
     path('status/', include('status.urls')),
@@ -92,9 +95,6 @@ urlpatterns += i18n_patterns(
     path("reviews/", include("reviews.urls")),
     path('webinars/', include('webinars.urls')),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    # Muss VOR landingpages.urls stehen: dessen '<slug:slug>/'-Catch-all würde
-    # sonst /jds-management-konfigurator/ faelschlich als Landingpage-Slug matchen.
-    path('jds-management-konfigurator/', include('jds_configurator.urls')),
     path('', include('landingpages.urls')),
 )
 

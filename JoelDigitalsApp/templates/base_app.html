@@ -366,6 +366,8 @@ nav.jd-tabbar {
 }
 </style>
 <div id="jd-page-css" hidden>{% block extra_css %}{% endblock %}</div>
+{# Safety net: einige gewrappte Desktop-Templates (z.B. apps/shop.html) legen ihr <style> in {% block extra_head %} statt extra_css ab - ohne diesen Block wuerde das CSS beim Rendern unter base_app.html stillschweigend verworfen. #}
+{% block extra_head %}{% endblock %}
 </head>
 <body data-tab="{{ request.resolver_match.url_name }}">
 
@@ -381,6 +383,9 @@ nav.jd-tabbar {
         </a>
         {% endif %}
         {% if user.is_authenticated %}
+        <a href="{% url 'jd_cart_app' %}" title="{% trans 'Cart' %}">
+            <span class="material-symbols-rounded">shopping_cart</span>
+        </a>
         <a href="{% url 'jd_settings_app' %}" title="{% trans 'Settings' %}">
             <span class="material-symbols-rounded">settings</span>
         </a>
@@ -635,5 +640,104 @@ nav.jd-tabbar {
   }
 })();
 </script>
+
+{% if user.is_authenticated %}
+<!-- Chatbot (gleiches Widget wie base_home.html/base_shop.html, nur mit Bottom-Offset ueber der jd-tabbar) -->
+<script async src="https://web-ai-designer.lovable.app/widget.js" data-bot-id="410718b2-54ba-4de5-b3e8-2a0fd0dd271a"></script>
+
+<style>
+#chatbot-container { position: fixed; bottom: 90px; right: 20px; z-index: 999; font-family: 'Poppins', sans-serif; }
+#chatbot-toggle { background: linear-gradient(135deg, #007bff, #00c6ff); color: white; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); transition: transform 0.3s ease; position: fixed; bottom: 90px; right: 20px; }
+#chatbot-toggle:hover { transform: scale(1.1); }
+#chatbot-box { display: none; flex-direction: column; width: 350px; max-width: calc(100vw - 40px); height: 450px; background: #1a1a1a; color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.6); position: fixed; bottom: 160px; right: 20px; z-index: 999; }
+#chatbot-header { background: #007bff; padding: 0.8rem; text-align: center; font-weight: 700; }
+#chatbot-messages { flex: 1; padding: 0.8rem; overflow-y: auto; font-size: 0.9rem; display: flex; flex-direction: column; }
+#chatbot-input { border: none; outline: none; padding: 0.7rem; background: #2a2a2a; color: white; width: 100%; box-sizing: border-box; }
+.chat-msg { margin-bottom: 0.6rem; padding: 0.4rem 0.8rem; border-radius: 12px; max-width: 75%; word-wrap: break-word; }
+.chat-msg.user { background: #00c6ff33; color: #00c6ff; align-self: flex-end; text-align: right; }
+.chat-msg.bot { background: #333333; color: #fff; align-self: flex-start; text-align: left; }
+.chat-msg a { color: #00c6ff; text-decoration: underline; }
+</style>
+
+<script>
+const chatBox = document.getElementById("chatbot-box");
+const chatToggle = document.getElementById("chatbot-toggle");
+const chatMessages = document.getElementById("chatbot-messages");
+const chatInput = document.getElementById("chatbot-input");
+
+const JD_CHAT_STORAGE_KEY = "joel_chat_history";
+const JD_CHAT_EXPIRY_KEY = "joel_chat_expiry";
+
+function jdChatLoadHistory() {
+    const expiry = localStorage.getItem(JD_CHAT_EXPIRY_KEY);
+    if (expiry && Date.now() > parseInt(expiry)) {
+        localStorage.removeItem(JD_CHAT_STORAGE_KEY);
+        localStorage.removeItem(JD_CHAT_EXPIRY_KEY);
+        return [];
+    }
+    return JSON.parse(localStorage.getItem(JD_CHAT_STORAGE_KEY) || "[]");
+}
+
+function jdChatSaveHistory() {
+    if (!chatMessages) return;
+    const messages = Array.from(chatMessages.children).map(m => ({
+        role: m.classList.contains("user") ? "user" : "bot",
+        text: m.innerHTML
+    }));
+    localStorage.setItem(JD_CHAT_STORAGE_KEY, JSON.stringify(messages));
+    localStorage.setItem(JD_CHAT_EXPIRY_KEY, Date.now() + 48*60*60*1000);
+}
+
+function jdChatLinkify(text) {
+    return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+}
+
+function jdChatAppendMessage(role, text) {
+    if (!chatMessages) return;
+    const div = document.createElement("div");
+    div.classList.add("chat-msg", role);
+    div.innerHTML = jdChatLinkify(text);
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    jdChatSaveHistory();
+}
+
+if (chatMessages) {
+    jdChatLoadHistory().forEach(msg => jdChatAppendMessage(msg.role, msg.text));
+}
+
+if (chatToggle && chatBox) {
+    chatToggle.onclick = () => {
+        chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
+    };
+}
+
+if (chatInput) {
+    chatInput.addEventListener("keypress", async function(e) {
+        if (e.key === "Enter" && this.value.trim()) {
+            const msg = this.value.trim();
+            jdChatAppendMessage("user", msg);
+            this.value = "";
+
+            try {
+                const response = await fetch("/de/chat/api/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        message: msg,
+                        lang: document.documentElement.lang.startsWith("en") ? "en" : "de"
+                    })
+                });
+                const data = await response.json();
+                jdChatAppendMessage("bot", data.reply);
+            } catch (err) {
+                jdChatAppendMessage("bot", "Entschuldigung, ich konnte gerade nicht antworten.");
+                console.error(err);
+            }
+        }
+    });
+}
+</script>
+{% endif %}
 </body>
 </html>

@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 {% load i18n %}
 
@@ -483,7 +483,15 @@
             </div>
 
             <div class="item-details">
-              {% if item.package %}
+              {% if item.jds_configuration %}
+                <h2 class="item-name">{{ item.jds_configuration.display_name }}</h2>
+                <div class="item-pricing">
+                  <div class="price-line">
+                    <span class="qty-badge">{{ item.quantity }}x</span>
+                    <span class="price-regular">€{{ item.price }}</span>
+                  </div>
+                </div>
+              {% elif item.package %}
                 <h2 class="item-name">{{ item.package.name }}</h2>
                 <div class="item-pricing">
                   <div class="price-line">
@@ -524,7 +532,7 @@
             </div>
 
             <div class="item-actions">
-              <a href="{% url 'remove_from_cart' item.id %}" class="btn-remove">
+              <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_remove_from_cart_app' item.id %}{% else %}{% url 'remove_from_cart' item.id %}{% endif %}" class="btn-remove">
                 <i class="fas fa-trash-alt"></i>
                 {% trans "Remove" %}
               </a>
@@ -558,7 +566,7 @@
             {% trans "Proceed to Checkout" %}
           </button>
         </form>
-        <a href="{% url 'shop' %}" class="btn-secondary">
+        <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_shop_app' %}{% else %}{% url 'shop' %}{% endif %}" class="btn-secondary">
           <i class="fas fa-store"></i>
           {% trans "Back to Shop" %}
         </a>
@@ -571,7 +579,7 @@
         </div>
         <h2 class="empty-title">{% trans "Your cart is empty" %}</h2>
         <p class="empty-text">{% trans "Looks like you haven't added any apps yet" %}</p>
-        <a href="{% url 'shop' %}" class="btn-primary">
+        <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_shop_app' %}{% else %}{% url 'shop' %}{% endif %}" class="btn-primary">
           <i class="fas fa-store"></i>
           {% trans "Browse Shop" %}
         </a>

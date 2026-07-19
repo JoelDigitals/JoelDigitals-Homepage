@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 
 {% block title %}Joel Digitals - Auftrag #{{ entry.id }}{% endblock %}
@@ -53,15 +53,15 @@
           <p><strong>Titel:</strong> {{ wish.title }}</p>
           <p><strong>Beschreibung:</strong><br>{{ wish.description|linebreaks }}</p>
           <p><strong>Erstellt:</strong> {{ wish.created_at|date:"d.m.Y H:i" }}</p>
-          <a href="{% url 'edit_wish' entry.id wish.id %}" class="btn">✏️ Bearbeiten</a>
-          <a href="{% url 'delete_wish' entry.id wish.id %}" class="btn">🗑️ Löschen</a>
+          <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_edit_wish_app' entry.id wish.id %}{% else %}{% url 'edit_wish' entry.id wish.id %}{% endif %}" class="btn">✏️ Bearbeiten</a>
+          <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_delete_wish_app' entry.id wish.id %}{% else %}{% url 'delete_wish' entry.id wish.id %}{% endif %}" class="btn">🗑️ Löschen</a>
       </div>
   {% empty %}
       <p>Keine Wünsche vorhanden.</p>
   {% endfor %}
 
-  <a href="{% url 'add_wish' entry.id %}" class="btn">➕ Neuen Wunsch hinzufügen</a>
-  <a href="{% url 'sales_chat' entry.id %}" class="btn">💬 Zum Chat</a>
-  <a href="{% url 'admin_sales' %}" class="btn">🔙 Zurück zur Übersicht</a>
+  <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_add_wish_app' entry.id %}{% else %}{% url 'add_wish' entry.id %}{% endif %}" class="btn">➕ Neuen Wunsch hinzufügen</a>
+  <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_sales_chat_app' entry.id %}{% else %}{% url 'sales_chat' entry.id %}{% endif %}" class="btn">💬 Zum Chat</a>
+  <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_admin_sales_app' %}{% else %}{% url 'admin_sales' %}{% endif %}" class="btn">🔙 Zurück zur Übersicht</a>
 </div>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends "base_home.html" %}
+{% extends request.base_template|default:"base_home.html" %}
 {% load static %}
 
 {% block title %}Joel Digitals – Admin Verkaufswünsche{% endblock %}
@@ -96,7 +96,7 @@
 
 <div class="sales-container">
     <h2>📋 Bestellungen</h2>
-    <a href="{% url 'order_admin' %}" class="btn">Alle Bestellungen</a>
+    <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_order_admin_app' %}{% else %}{% url 'order_admin' %}{% endif %}" class="btn">Alle Bestellungen</a>
 
     <h2>📋 Adminbereich: Verkaufsaufträge</h2>
 
@@ -109,8 +109,8 @@
                     <span class="status-{{ entry.status|lower }}">{{ entry.status }}</span>
                 </p>
 
-                <a href="{% url 'sales_entry_detail' entry.id %}" class="btn">🔍 Details & Wünsche</a>
-                <a href="{% url 'sales_chat' entry.id %}" class="btn">💬 Chat öffnen</a>
+                <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_sales_entry_detail_app' entry.id %}{% else %}{% url 'sales_entry_detail' entry.id %}{% endif %}" class="btn">🔍 Details & Wünsche</a>
+                <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_sales_chat_app' entry.id %}{% else %}{% url 'sales_chat' entry.id %}{% endif %}" class="btn">💬 Chat öffnen</a>
             </div>
         {% endfor %}
     {% else %}

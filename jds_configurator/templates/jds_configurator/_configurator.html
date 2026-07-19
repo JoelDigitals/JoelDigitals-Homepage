@@ -1,0 +1,321 @@
+{% load static l10n %}
+{% comment %}
+Eigenständiger Konfigurator (Modulauswahl + Zusammenfassung/Aktionen). Einmaliger
+Kauf, kein Abo - Rabattcodes werden erst im Shop-Checkout angegeben, nicht hier.
+Wird sowohl von wizard.html (eigene Seite /shop/jds-management/) als auch
+direkt in app_detail.html (Produktseite "JDS Management" im Shop) eingebunden -
+Kontext (core_modules/categories/basismodul_price/included_users/extra_user_*)
+muss vom aufrufenden View mitgegeben werden, siehe jds_configurator.views.configurator_context().
+{% endcomment %}
+<style>
+.jdscfg-steps{display:flex;gap:.5rem;margin-bottom:2rem}
+.jdscfg-step-dot{flex:1;height:4px;border-radius:99px;background:var(--border)}
+.jdscfg-step-dot.active{background:var(--primary)}
+.jdscfg-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.75rem;margin-bottom:1.5rem}
+.jdscfg-card h2{font-size:1.2rem;margin:0 0 1.25rem}
+.jdscfg-step{display:none}
+.jdscfg-step.active{display:block}
+.jdscfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.jdscfg-fld{margin-bottom:1rem}
+.jdscfg-fld label{display:block;font-size:.8rem;font-weight:600;color:#aaa;margin-bottom:.3rem}
+.jdscfg-fld input,.jdscfg-fld textarea{width:100%;padding:.6rem .8rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text);font-size:.9rem}
+.jdscfg-core-box{background:rgba(0,68,204,.1);border:1px solid var(--primary);border-radius:10px;padding:1.1rem 1.25rem;margin-bottom:1.5rem}
+.jdscfg-core-box h3{margin:0 0 .5rem;font-size:1rem}
+.jdscfg-core-list{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem}
+.jdscfg-tag{background:rgba(255,255,255,.07);border-radius:99px;padding:.2rem .6rem;font-size:.75rem;color:#ccc}
+.jdscfg-core-price{font-weight:700;color:var(--primary);font-size:1.1rem;margin-top:.5rem}
+.jdscfg-core-note{font-size:.78rem;color:#888;margin-top:.3rem}
+.jdscfg-cat-group{margin-bottom:.5rem}
+.jdscfg-cat-header{display:flex;align-items:center;justify-content:space-between;margin:1.25rem 0 .6rem}
+.jdscfg-cat-group:first-child .jdscfg-cat-header{margin-top:0}
+.jdscfg-cat{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#888}
+.jdscfg-cat-selectall{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:#aaa;cursor:pointer;font-weight:600}
+.jdscfg-module{display:flex;align-items:center;justify-content:space-between;padding:.7rem .9rem;border:1px solid var(--border);border-radius:8px;margin-bottom:.5rem;cursor:pointer}
+.jdscfg-module:hover{border-color:var(--primary)}
+.jdscfg-module.checked{border-color:var(--primary);background:rgba(0,68,204,.08)}
+.jdscfg-module-name{display:flex;align-items:center;gap:.6rem;font-size:.9rem}
+.jdscfg-module-price{font-weight:700;color:var(--primary);font-size:.9rem}
+.jdscfg-users-row{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;border:1px solid var(--border);border-radius:10px;margin-bottom:.5rem;flex-wrap:wrap;gap:.6rem}
+.jdscfg-users-label{font-size:.9rem}
+.jdscfg-users-label small{display:block;color:#888;font-size:.75rem;margin-top:.15rem}
+.jdscfg-users-stepper{display:flex;align-items:center;gap:.6rem}
+.jdscfg-users-stepper button{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#111;color:var(--text);font-weight:700;cursor:pointer;font-size:1rem}
+.jdscfg-users-stepper button:hover{border-color:var(--primary);color:var(--primary)}
+.jdscfg-users-stepper input{width:50px;text-align:center;padding:.4rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text)}
+.jdscfg-total-box{position:sticky;bottom:0;background:var(--surface);border:1px solid var(--primary);border-radius:10px;padding:1.1rem 1.25rem;margin-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem}
+.jdscfg-total-label{font-size:.85rem;color:#aaa}
+.jdscfg-total-val{font-size:1.6rem;font-weight:800;color:var(--primary)}
+.jdscfg-btn{padding:.7rem 1.4rem;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer;border:none}
+.jdscfg-btn-primary{background:var(--primary);color:#fff}
+.jdscfg-btn-primary:hover{background:var(--primary-hover)}
+.jdscfg-btn-secondary{background:transparent;color:#ccc;border:1px solid var(--border)}
+.jdscfg-actions{display:flex;justify-content:space-between;margin-top:1.5rem}
+.jdscfg-summary-line{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.jdscfg-summary-line:last-child{border-bottom:none}
+.jdscfg-action-card{border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-top:1rem}
+.jdscfg-action-card h3{margin:0 0 .4rem;font-size:1rem}
+.jdscfg-action-card p{margin:0 0 .9rem;font-size:.82rem;color:#aaa}
+.jdscfg-action-card.primary{border-color:var(--primary);background:rgba(0,68,204,.08)}
+.jdscfg-login-prompt{display:flex;align-items:center;gap:.6rem;font-size:.85rem;color:#aaa}
+.jdscfg-login-prompt a{color:var(--primary);font-weight:700;text-decoration:none}
+.jdscfg-offer-data{display:none;margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem}
+.jdscfg-offer-data.open{display:block}
+</style>
+
+<div class="jdscfg-steps">
+  <div class="jdscfg-step-dot active" data-dot="1"></div>
+  <div class="jdscfg-step-dot" data-dot="2"></div>
+</div>
+
+<form id="jdscfg-form" method="post">
+  {% csrf_token %}
+
+<!-- Step 1: Module & User -->
+<div class="jdscfg-step active" data-step="1">
+  <div class="jdscfg-card">
+    <div class="jdscfg-core-box">
+      <h3>✅ Basismodul (Pflicht)</h3>
+      <div class="jdscfg-core-list">
+        {% for m in core_modules %}<span class="jdscfg-tag">{{ m.name }}</span>{% endfor %}
+      </div>
+      <div class="jdscfg-core-price">{{ basismodul_price }} € einmalig</div>
+      <div class="jdscfg-core-note">Inklusive {{ included_users }} User</div>
+    </div>
+
+    <h2>1. Zusatzmodule wählen</h2>
+    {% for cat in categories %}
+    <div class="jdscfg-cat-group">
+      <div class="jdscfg-cat-header">
+        <span class="jdscfg-cat">{{ cat.label }}</span>
+        <label class="jdscfg-cat-selectall">
+          <input type="checkbox" class="jdscfg-cat-checkbox" onchange="jdscfgToggleCategory(this)">
+          Alle wählen
+        </label>
+      </div>
+      {% for m in cat.modules %}
+      <label class="jdscfg-module" data-price="{{ m.price|unlocalize }}">
+        <span class="jdscfg-module-name">
+          <input type="checkbox" name="modules" value="{{ m.key }}" onchange="jdscfgToggleModule(this)">
+          {{ m.name }}
+        </span>
+        <span class="jdscfg-module-price">{{ m.price }} € einmalig</span>
+      </label>
+      {% endfor %}
+    </div>
+    {% endfor %}
+
+    <h2 style="margin-top:1.5rem">2. Zusätzliche User</h2>
+    <div class="jdscfg-users-row">
+      <span class="jdscfg-users-label">
+        Zusätzliche User über die {{ included_users }} inklusiven hinaus (einmalig)
+        <small>Ab {{ extra_user_first_price }} € für den 1., je weiteren User günstiger, mindestens {{ extra_user_min_price }} €</small>
+      </span>
+      <div class="jdscfg-users-stepper">
+        <button type="button" onclick="jdscfgChangeUsers(-1)">−</button>
+        <input type="number" id="jdscfg-extra-users" name="extra_users" value="0" min="0" oninput="jdscfgRecalcTotal()">
+        <button type="button" onclick="jdscfgChangeUsers(1)">+</button>
+      </div>
+    </div>
+
+    <div class="jdscfg-total-box">
+      <span class="jdscfg-total-label">Gesamtpreis (einmalig)</span>
+      <span class="jdscfg-total-val" id="jdscfg-total">{{ basismodul_price }} €</span>
+    </div>
+  </div>
+  <div class="jdscfg-actions">
+    <span></span>
+    <button type="button" class="jdscfg-btn jdscfg-btn-primary" onclick="jdscfgFillSummary();jdscfgGoto(2)">Weiter</button>
+  </div>
+</div>
+
+<!-- Step 2: Zusammenfassung & Aktion -->
+<div class="jdscfg-step" data-step="2">
+  <div class="jdscfg-card">
+    <h2>Zusammenfassung</h2>
+    <div id="jdscfg-summary"></div>
+  </div>
+
+  <div class="jdscfg-action-card primary">
+    <h3><i class="fas fa-shopping-cart"></i> Direkt bestellen</h3>
+    <p>Landet im normalen Warenkorb - Zahlungsart und Rechnung laufen wie bei jedem anderen Produkt im Shop.</p>
+    {% if user.is_authenticated %}
+      <button type="submit" formaction="{% url 'jds_configurator:add_to_cart' %}" class="jdscfg-btn jdscfg-btn-primary">🛒 In den Warenkorb</button>
+    {% else %}
+      <div class="jdscfg-login-prompt">
+        <i class="fas fa-lock"></i>
+        <span>Bitte <a href="{% url 'login' %}?next={{ request.path }}">melde dich an</a>, um in den Warenkorb zu legen.</span>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="jdscfg-action-card">
+    <h3><i class="fas fa-file-invoice"></i> Unverbindliches Angebot</h3>
+    <p>Für ein PDF-Angebot benötigen wir kurz deine Kontaktdaten.</p>
+    <button type="button" class="jdscfg-btn jdscfg-btn-secondary" onclick="jdscfgToggleOfferData()">📄 Angebot als PDF anfordern</button>
+    <div class="jdscfg-offer-data" id="jdscfg-offer-data">
+      <div class="jdscfg-grid">
+        <div class="jdscfg-fld"><label>Vorname *</label><input type="text" name="first_name"></div>
+        <div class="jdscfg-fld"><label>Nachname *</label><input type="text" name="last_name"></div>
+        <div class="jdscfg-fld"><label>E-Mail *</label><input type="email" name="email"></div>
+        <div class="jdscfg-fld"><label>Telefon</label><input type="text" name="phone"></div>
+        <div class="jdscfg-fld"><label>Unternehmen</label><input type="text" name="company_name"></div>
+        <div class="jdscfg-fld"><label>USt-IdNr.</label><input type="text" name="vat_number"></div>
+        <div class="jdscfg-fld" style="grid-column:1/-1"><label>Adresse</label><input type="text" name="address"></div>
+        <div class="jdscfg-fld"><label>PLZ</label><input type="text" name="zip_code"></div>
+        <div class="jdscfg-fld"><label>Stadt</label><input type="text" name="city"></div>
+      </div>
+      <button type="submit" formaction="{% url 'jds_configurator:download_offer_pdf' %}" class="jdscfg-btn jdscfg-btn-primary" onclick="return jdscfgValidateOfferData(event)">Angebot jetzt herunterladen</button>
+    </div>
+  </div>
+
+  <div class="jdscfg-action-card">
+    <h3><i class="fas fa-comments"></i> Beratung gewünscht?</h3>
+    <p>Wir gehen deine Konfiguration gemeinsam mit dir durch.</p>
+    {% if request.base_template == 'base_app.html' %}
+    <a href="{% url 'jds_appointment_app' %}" class="jdscfg-btn jdscfg-btn-secondary" style="display:inline-flex;align-items:center;gap:.5rem;text-decoration:none">💬 Beratungstermin vereinbaren</a>
+    {% else %}
+    <a href="https://joel-digitals.de/contact/appointment/" target="_blank" class="jdscfg-btn jdscfg-btn-secondary" style="display:inline-flex;align-items:center;gap:.5rem;text-decoration:none">💬 Beratungstermin vereinbaren</a>
+    {% endif %}
+  </div>
+
+  <div class="jdscfg-action-card">
+    <h3><i class="fas fa-lightbulb"></i> Fehlt dir ein Modul?</h3>
+    <p>Beschreibe die gewünschte Funktion - wir prüfen eine individuelle Entwicklung und melden uns mit einer Einschätzung. Kein Kaufvorgang, nur eine Anfrage.</p>
+    <button type="button" class="jdscfg-btn jdscfg-btn-secondary" onclick="jdscfgToggleFeatureData()">💡 Individuelle Funktion anfragen</button>
+    <div class="jdscfg-offer-data" id="jdscfg-feature-data">
+      <div class="jdscfg-fld"><label>Gewünschte Funktion *</label><textarea name="feature_description" rows="3" placeholder="Was soll das Modul können?"></textarea></div>
+      <div class="jdscfg-grid">
+        <div class="jdscfg-fld"><label>Vorname *</label><input type="text" name="feature_first_name"></div>
+        <div class="jdscfg-fld"><label>Nachname *</label><input type="text" name="feature_last_name"></div>
+        <div class="jdscfg-fld"><label>E-Mail *</label><input type="email" name="feature_email"></div>
+        <div class="jdscfg-fld"><label>Telefon</label><input type="text" name="feature_phone"></div>
+        <div class="jdscfg-fld" style="grid-column:1/-1"><label>Unternehmen</label><input type="text" name="feature_company_name"></div>
+      </div>
+      <button type="submit" formaction="{% url 'jds_configurator:submit_feature_request' %}" class="jdscfg-btn jdscfg-btn-primary" onclick="return jdscfgValidateFeatureData(event)">Anfrage senden</button>
+    </div>
+  </div>
+
+  <div class="jdscfg-actions">
+    <button type="button" class="jdscfg-btn jdscfg-btn-secondary" onclick="jdscfgGoto(1)">Zurück</button>
+    <span></span>
+  </div>
+</div>
+</form>
+
+<script>
+const JDSCFG_BASIS = {{ basismodul_price|unlocalize }};
+const JDSCFG_USER_FIRST_PRICE = {{ extra_user_first_price|unlocalize }};
+const JDSCFG_USER_STEP = {{ extra_user_price_step|unlocalize }};
+const JDSCFG_USER_MIN_PRICE = {{ extra_user_min_price|unlocalize }};
+const JDSCFG_INCLUDED_USERS = {{ included_users }};
+
+function jdscfgExtraUsersTotal(count){
+  let total = 0;
+  for(let i=1;i<=count;i++){
+    total += Math.max(JDSCFG_USER_FIRST_PRICE - JDSCFG_USER_STEP*(i-1), JDSCFG_USER_MIN_PRICE);
+  }
+  return total;
+}
+
+function jdscfgGoto(step){
+  document.querySelectorAll('.jdscfg-step').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.jdscfg-step[data-step="${step}"]`).classList.add('active');
+  document.querySelectorAll('.jdscfg-step-dot').forEach(el => el.classList.remove('active'));
+  for(let i=1;i<=step;i++) document.querySelector(`.jdscfg-step-dot[data-dot="${i}"]`).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function jdscfgToggleModule(checkbox){
+  checkbox.closest('.jdscfg-module').classList.toggle('checked', checkbox.checked);
+  const group = checkbox.closest('.jdscfg-cat-group');
+  jdscfgSyncCategoryCheckbox(group);
+  jdscfgRecalcTotal();
+}
+
+function jdscfgSyncCategoryCheckbox(group){
+  const catCb = group.querySelector('.jdscfg-cat-checkbox');
+  const all = group.querySelectorAll('.jdscfg-module input[type="checkbox"]');
+  const checked = group.querySelectorAll('.jdscfg-module input[type="checkbox"]:checked');
+  catCb.checked = all.length > 0 && checked.length === all.length;
+  catCb.indeterminate = checked.length > 0 && checked.length < all.length;
+}
+
+function jdscfgToggleCategory(catCheckbox){
+  const group = catCheckbox.closest('.jdscfg-cat-group');
+  group.querySelectorAll('.jdscfg-module').forEach(label => {
+    const cb = label.querySelector('input[type="checkbox"]');
+    cb.checked = catCheckbox.checked;
+    label.classList.toggle('checked', catCheckbox.checked);
+  });
+  catCheckbox.indeterminate = false;
+  jdscfgRecalcTotal();
+}
+
+function jdscfgChangeUsers(delta){
+  const input = document.getElementById('jdscfg-extra-users');
+  const current = parseInt(input.value) || 0;
+  input.value = Math.max(0, current + delta);
+  jdscfgRecalcTotal();
+}
+
+function jdscfgRecalcTotal(){
+  let total = JDSCFG_BASIS;
+  document.querySelectorAll('.jdscfg-module input[type="checkbox"]:checked').forEach(cb => {
+    total += parseFloat(cb.closest('.jdscfg-module').dataset.price);
+  });
+  const extraUsers = parseInt(document.getElementById('jdscfg-extra-users').value) || 0;
+  total += jdscfgExtraUsersTotal(extraUsers);
+  document.getElementById('jdscfg-total').textContent = total.toFixed(2).replace('.', ',') + ' €';
+  return {total, extraUsers};
+}
+
+function jdscfgFillSummary(){
+  const {total, extraUsers} = jdscfgRecalcTotal();
+  const selected = [...document.querySelectorAll('.jdscfg-module input[type="checkbox"]:checked')]
+    .map(cb => cb.closest('.jdscfg-module').querySelector('.jdscfg-module-name').textContent.trim());
+  let html = `<div class="jdscfg-summary-line"><span>Basismodul (inkl. ${JDSCFG_INCLUDED_USERS} User)</span><span>${JDSCFG_BASIS.toFixed(2)} €</span></div>`;
+  selected.forEach(name => { html += `<div class="jdscfg-summary-line"><span>${name}</span></div>`; });
+  if(extraUsers > 0){
+    html += `<div class="jdscfg-summary-line"><span>${extraUsers} zusätzliche(r) User</span><span>${jdscfgExtraUsersTotal(extraUsers).toFixed(2)} €</span></div>`;
+  }
+  html += `<div class="jdscfg-summary-line"><strong>Gesamt (einmalig)</strong><strong>${total.toFixed(2)} €</strong></div>`;
+  document.getElementById('jdscfg-summary').innerHTML = html;
+}
+
+function jdscfgToggleOfferData(){
+  document.getElementById('jdscfg-offer-data').classList.toggle('open');
+}
+
+function jdscfgValidateOfferData(event){
+  const form = document.getElementById('jdscfg-form');
+  const fn = form.querySelector('[name="first_name"]').value.trim();
+  const ln = form.querySelector('[name="last_name"]').value.trim();
+  const em = form.querySelector('[name="email"]').value.trim();
+  if(!fn || !ln || !em){
+    alert('Bitte Vorname, Nachname und E-Mail für das Angebot angeben.');
+    document.getElementById('jdscfg-offer-data').classList.add('open');
+    event.preventDefault();
+    return false;
+  }
+  return true;
+}
+
+function jdscfgToggleFeatureData(){
+  document.getElementById('jdscfg-feature-data').classList.toggle('open');
+}
+
+function jdscfgValidateFeatureData(event){
+  const form = document.getElementById('jdscfg-form');
+  const fn = form.querySelector('[name="feature_first_name"]').value.trim();
+  const ln = form.querySelector('[name="feature_last_name"]').value.trim();
+  const em = form.querySelector('[name="feature_email"]').value.trim();
+  const desc = form.querySelector('[name="feature_description"]').value.trim();
+  if(!fn || !ln || !em || !desc){
+    alert('Bitte Vorname, Nachname, E-Mail und eine Beschreibung der gewünschten Funktion angeben.');
+    document.getElementById('jdscfg-feature-data').classList.add('open');
+    event.preventDefault();
+    return false;
+  }
+  return true;
+}
+</script>

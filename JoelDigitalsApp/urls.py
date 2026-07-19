@@ -34,4 +34,34 @@ urlpatterns = [
     path('settings/app-permissions/', views.jd_app_permissions_app, name='jd_app_permissions_app'),
     path('settings/delete-account/', views.jd_delete_account_app, name='jd_delete_account_app'),
     path('api/save-onesignal/', views.jd_save_onesignal_player_id_app, name='jd_save_onesignal_player_id_app'),
+
+    # Shop im App-Design
+    path('shop/', views.jd_shop_app, name='jd_shop_app'),
+    path('shop/<slug:slug>/', views.jd_app_detail_app, name='jd_app_detail_app'),
+    path('cart/', views.jd_cart_app, name='jd_cart_app'),
+    path('checkout/', views.jd_checkout_app, name='jd_checkout_app'),
+    path('orders/confirmation/<int:order_id>/', views.jd_order_confirmation_app, name='jd_order_confirmation_app'),
+    path('orders/<int:order_id>/invoice/', views.jd_invoice_view_app, name='jd_invoice_view_app'),
+    path('cart/add/<int:app_id>/', views.jd_add_to_cart_app, name='jd_add_to_cart_app'),
+    path('cart/remove/<int:item_id>/', views.jd_remove_from_cart_app, name='jd_remove_from_cart_app'),
+
+    # Termine
+    path('appointment/', views.jd_appointment_app, name='jds_appointment_app'),
+    path('appointment/success/', views.jd_appointment_success_app, name='jd_appointment_success_app'),
+    path('admin-appointments/', views.jd_admin_appointments_app, name='jd_admin_appointments_app'),
+    path('admin-appointments/update/<int:pk>/<str:status>/', views.jd_update_appointment_status_app, name='jd_update_appointment_status_app'),
+
+    # Support-Ticket-Verwaltung (Admin)
+    path('admin-tickets/', views.jd_admin_tickets_app, name='jd_admin_tickets_app'),
+    path('admin-tickets/archive/', views.jd_ticket_archive_app, name='jd_ticket_archive_app'),
+    path('admin-tickets/archive/<str:ticket_number>/', views.jd_archived_ticket_detail_app, name='jd_archived_ticket_detail_app'),
+
+    # Sales-Verwaltung (Admin) inkl. Chat
+    path('admin-sales/', views.jd_admin_sales_app, name='jds_admin_sales_app'),
+    path('admin-sales/<int:entry_id>/', views.jd_sales_entry_detail_app, name='jd_sales_entry_detail_app'),
+    path('admin-sales/<int:entry_id>/chat/', views.jd_sales_chat_app, name='jd_sales_chat_app'),
+    path('admin-sales/<int:entry_id>/add/', views.jd_add_wish_app, name='jd_add_wish_app'),
+    path('admin-sales/<int:entry_id>/edit/<int:wish_id>/', views.jd_edit_wish_app, name='jd_edit_wish_app'),
+    path('admin-sales/<int:entry_id>/delete/<int:wish_id>/', views.jd_delete_wish_app, name='jd_delete_wish_app'),
+    path('admin-sales/<int:entry_id>/export/<int:wish_id>/', views.jd_export_single_wish_app, name='jd_export_single_wish_app'),
 ]
