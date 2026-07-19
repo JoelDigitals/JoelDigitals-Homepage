@@ -356,7 +356,11 @@
           <span class="info-label">{% trans "Email" %}</span>
           <span class="info-value">{{ user.email }}</span>
         </div>
-        
+        <div class="info-item">
+          <span class="info-label">{% trans "Customer Number" %}</span>
+          <span class="info-value">{% if customer_info and customer_info.jds_customer_number %}{{ customer_info.jds_customer_number }}{% else %}{% trans "Assigned after your first order" %}{% endif %}</span>
+        </div>
+
         {% if profile %}
           {% if profile.phone %}
           <div class="info-item">

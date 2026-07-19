@@ -1365,16 +1365,17 @@ def profile_view(request):
     """
     Zeigt das Profil des eingeloggten Benutzers an.
     """
-    from shop_ourapps.models import Wallet
+    from shop_ourapps.models import Wallet, CustomerInfo
     wallet = Wallet.objects.filter(user=request.user).first()
     context = {
         'user': request.user,
         'wallet_balance': wallet.balance if wallet else 0.00,
     }
-    
+
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
     context['profile'] = profile
-    
+    context['customer_info'] = CustomerInfo.objects.filter(user=request.user).first()
+
     return render(request, 'profile/profile.html', context)
 
 

@@ -1,11 +1,33 @@
 ﻿from django.contrib import admin
 from .models import (
-    Purchase, AffiliateLink, Affiliate, App, Cart, CartItem, AffiliateTransaction, 
-    AffiliatePartner, Order, OrderItem, AffiliateCode, DiscountCode, Wallet, WalletCode, 
+    Purchase, AffiliateLink, Affiliate, App, Cart, CartItem, AffiliateTransaction,
+    AffiliatePartner, Order, OrderItem, AffiliateCode, DiscountCode, Wallet, WalletCode,
     AppGroup, Voucher, VoucherOrder, SaleBadge, OrderStatusLog,
     AffiliateMarketingMaterial, AffiliateInvoice, CustomLandingPage, WithdrawalRequest,
-    WatchlistEntry, Package, PackageApp,
+    WatchlistEntry, Package, PackageApp, CustomerInfo,
 )
+
+
+class CustomerInfoAdmin(admin.ModelAdmin):
+    list_display = ['user', 'first_name', 'last_name', 'email', 'jds_customer_number', 'jds_synced_at']
+    search_fields = ['user__username', 'first_name', 'last_name', 'email', 'jds_customer_number']
+    readonly_fields = ['updated_at', 'jds_customer_id', 'jds_customer_number', 'jds_synced_at', 'jds_sync_error']
+    actions = ['retry_jds_sync_action']
+
+    @admin.action(description="🔄 JDS Management Sync erneut versuchen")
+    def retry_jds_sync_action(self, request, queryset):
+        from .services.jds_api import sync_customer_info
+        count = 0
+        errors = 0
+        for customer_info in queryset:
+            if sync_customer_info(customer_info):
+                count += 1
+            else:
+                errors += 1
+        msg = f"{count} Kunde(n) synchronisiert."
+        if errors:
+            msg += f" {errors} fehlgeschlagen (siehe jds_sync_error)."
+        self.message_user(request, msg)
 
 class PurchaseAdmin(admin.ModelAdmin):
     list_display = ['user', 'app', 'affiliate', 'date', 'full_name', 'email']
@@ -138,6 +160,7 @@ admin.site.register(CartItem)
 admin.site.register(AffiliatePartner)
 admin.site.register(AffiliateTransaction)
 admin.site.register(Order, OrderAdmin)
+admin.site.register(CustomerInfo, CustomerInfoAdmin)
 admin.site.register(OrderStatusLog, OrderStatusLogAdmin)
 admin.site.register(OrderItem)
 admin.site.register(AffiliateCode)

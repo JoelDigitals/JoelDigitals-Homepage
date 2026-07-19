@@ -98,9 +98,13 @@ def push_check(request):
     from blog.models import BlogPost
 
     now = timezone.now()
-    # Fenster von 24h: verhindert, dass ein einmalig verpasster Cron-Lauf
-    # (Ausfall, Deploy, etc.) einen alten Artikel Tage spaeter noch pusht.
-    window_start = now - timedelta(hours=24)
+    # Fenster von 7 Tagen: verhindert, dass wirklich alte/migrierte Artikel
+    # gepusht werden, ist aber grosszuegig genug, dass ein laengerer Cron-
+    # Ausfall (z.B. falsch konfigurierter externer Trigger) einen frisch
+    # veroeffentlichten Artikel nicht dauerhaft aus dem Fenster faellt und nie
+    # gepusht wird - genau das ist am 2026-07-19 passiert (24h-Fenster war zu
+    # knapp, der Cron lief zwischenzeitlich wegen eines Token-Problems nicht).
+    window_start = now - timedelta(days=7)
 
     notified_articles = []
     new_posts = BlogPost.objects.filter(
@@ -122,9 +126,21 @@ def push_check(request):
     pending_pushes_sent = _send_pending_pushes(now)
     onesignal_health = _maybe_check_onesignal_health(now)
 
+    # Kunden nachtraeglich an JDS Management melden, die noch keine Kundennummer
+    # haben oder deren letzter Sync-Versuch fehlgeschlagen ist (API-Ausfall,
+    # oder ein Kunde, der schon vor Einfuehrung dieses Features existierte) -
+    # siehe shop_ourapps.services.jds_api.sync_pending_customers.
+    jds_customers_synced = []
+    try:
+        from shop_ourapps.services.jds_api import sync_pending_customers
+        jds_customers_synced = sync_pending_customers()
+    except Exception:
+        pass
+
     return JsonResponse({
         'checked_at': now.isoformat(),
         'articles_notified': notified_articles,
         'pending_pushes_sent': pending_pushes_sent,
+        'jds_customers_synced': jds_customers_synced,
         'onesignal_health_check': onesignal_health,
     })

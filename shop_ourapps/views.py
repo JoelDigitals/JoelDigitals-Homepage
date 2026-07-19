@@ -1190,7 +1190,7 @@ def checkout(request):
         )
 
         # Kundendaten für zukünftige Bestellungen speichern
-        CustomerInfo.objects.update_or_create(
+        customer_info, _created = CustomerInfo.objects.update_or_create(
             user=request.user,
             defaults={
                 'first_name': first_name,
@@ -1204,6 +1204,14 @@ def checkout(request):
                 'vat_number': vat_number or '',
             }
         )
+
+        # An JDS Management melden (Kunde neu anlegen oder Daten aktualisieren) -
+        # best-effort, darf den Checkout nie blockieren.
+        try:
+            from shop_ourapps.services.jds_api import sync_customer_info
+            sync_customer_info(customer_info)
+        except Exception:
+            pass
 
         from django.db.models import F
 

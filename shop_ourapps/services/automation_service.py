@@ -104,8 +104,7 @@ class OrderAutomationService:
                             new_stock = max(0, pa.app.stock - item.quantity)
                             App_model = pa.app._meta.model
                             App_model.objects.filter(id=pa.app.id).update(stock=new_stock)
-                            if pa.app.product_number:
-                                update_product_stock(pa.app.product_number, new_stock)
+                            update_product_stock(pa.app, new_stock)
                     # Package.stock aus dem Minimum der enthaltenen Apps aktualisieren
                     min_stock = PackageApp.objects.filter(package=item.package).aggregate(Min('app__stock'))['app__stock__min']
                     Package_model = item.package._meta.model
@@ -126,8 +125,7 @@ class OrderAutomationService:
                         new_stock = max(0, item.app.stock - item.quantity)
                         App_model = item.app._meta.model
                         App_model.objects.filter(id=item.app.id).update(stock=new_stock)
-                        if item.app.product_number:
-                            update_product_stock(item.app.product_number, new_stock)
+                        update_product_stock(item.app, new_stock)
 
             # Bestellung an JDS Management uebertragen, damit sie dort im
             # Auftragsbuch sichtbar ist. Best-effort: darf den Checkout nie

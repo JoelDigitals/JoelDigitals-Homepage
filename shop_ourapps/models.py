@@ -99,6 +99,18 @@ class CustomerInfo(models.Model):
     vat_number = models.CharField(max_length=50, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # JDS Management Integration - siehe shop_ourapps/services/jds_api.py.
+    # Jeder Kunde mit CustomerInfo wird dort angelegt/aktualisiert, unabhaengig
+    # davon ob er schon eine bezahlte Bestellung hat (anders als Order.jds_*,
+    # das nur pro Bestellung synct).
+    # jds_customer_id = interne numerische ID in JDS Management (fuer PATCH-Aufrufe).
+    # jds_customer_number = die MENSCHENLESBARE Kundennummer (Format "C20260001"),
+    # das ist es, was dem Kunden im Portal als "Kundennummer" angezeigt wird.
+    jds_customer_id = models.CharField(max_length=100, blank=True, null=True, help_text="Interne Kunden-ID in JDS Management (aus der Sync-API, fuer Updates)")
+    jds_customer_number = models.CharField(max_length=50, blank=True, null=True, help_text="Menschenlesbare Kundennummer in JDS Management (dem Kunden anzuzeigen)")
+    jds_synced_at = models.DateTimeField(null=True, blank=True, help_text="Wann diese Kundendaten zuletzt erfolgreich an JDS Management uebertragen wurden")
+    jds_sync_error = models.TextField(blank=True, help_text="Letzter Fehler beim Sync mit JDS Management (falls vorhanden)")
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.user.username})"
 
@@ -135,6 +147,11 @@ class App(models.Model):
     description = models.TextField()
     description_english = models.TextField(blank=True, null=True)
     product_number = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    jds_product_id = models.CharField(
+        max_length=50, blank=True, null=True,
+        help_text="Interne numerische Produkt-ID in JDS Management (fuer Stock-Updates per PATCH /api/v2/products/<id>/ - "
+                   "wird von sync_stock() gesetzt, product_number ist dort NICHT der URL-Schluessel)."
+    )
     version = models.CharField(max_length=20)
     image = models.ImageField(upload_to='app_images/', null=True, blank=True)
     image_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="ImgBB Bild-URL",
