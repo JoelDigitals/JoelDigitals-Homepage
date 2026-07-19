@@ -360,6 +360,26 @@
           <span class="info-label">{% trans "Customer Number" %}</span>
           <span class="info-value">{% if customer_info and customer_info.jds_customer_number %}{{ customer_info.jds_customer_number }}{% else %}{% trans "Assigned after your first order" %}{% endif %}</span>
         </div>
+        {% if customer_info %}
+        <div class="info-item">
+          <span class="info-label">{% trans "Sync Status" %}</span>
+          <span class="info-value">
+            {% if customer_info.jds_customer_id and not customer_info.jds_sync_error %}
+              <i class="fas fa-check-circle" style="color:#2ecc71;"></i> {% trans "Synced" %}
+            {% elif customer_info.jds_sync_error %}
+              <i class="fas fa-exclamation-triangle" style="color:#e67e22;"></i> {% trans "Pending — will retry automatically" %}
+            {% else %}
+              <i class="fas fa-clock" style="color:#95a5a6;"></i> {% trans "Not yet synced" %}
+            {% endif %}
+          </span>
+        </div>
+        {% if customer_info.jds_synced_at %}
+        <div class="info-item">
+          <span class="info-label">{% trans "Last Sync Attempt" %}</span>
+          <span class="info-value">{{ customer_info.jds_synced_at|date:"d.m.Y H:i" }}</span>
+        </div>
+        {% endif %}
+        {% endif %}
 
         {% if profile %}
           {% if profile.phone %}

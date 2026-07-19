@@ -11,7 +11,13 @@ from .models import (
 class CustomerInfoAdmin(admin.ModelAdmin):
     list_display = ['user', 'first_name', 'last_name', 'email', 'jds_customer_number', 'jds_synced_at']
     search_fields = ['user__username', 'first_name', 'last_name', 'email', 'jds_customer_number']
-    readonly_fields = ['updated_at', 'jds_customer_id', 'jds_customer_number', 'jds_synced_at', 'jds_sync_error']
+    # jds_customer_id/jds_customer_number sind bewusst NICHT readonly - manuelle
+    # Korrektur/Ersteintragung im Admin muss moeglich sein (z.B. wenn der JDS-
+    # Management-Kunde bereits dort existiert, aber der automatische Sync noch
+    # nicht erfolgreich lief). jds_customer_id sollte dabei mit eingetragen
+    # werden, sonst nutzt der naechste automatische Sync wieder POST statt
+    # PATCH und legt einen Duplikat-Kunden an.
+    readonly_fields = ['updated_at', 'jds_synced_at', 'jds_sync_error']
     actions = ['retry_jds_sync_action']
 
     @admin.action(description="🔄 JDS Management Sync erneut versuchen")

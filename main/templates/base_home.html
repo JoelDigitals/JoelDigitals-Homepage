@@ -436,16 +436,20 @@
       
       nav#main-nav {
         position: fixed;
-        top: 0;
+        /* top/height an die Header-Hoehe angepasst (statt 0/100vh), damit das
+           Menue-Panel NICHT mehr über den Header selbst gelegt wird, sondern
+           direkt darunter beginnt - siehe auch header{position:relative} weiter
+           oben: nav ist ein Kind von header, malt also sonst ueber dessen
+           eigenen Hintergrund/Schatten. */
+        top: var(--header-height, 70px);
         left: 0;
         width: 70%;
-        height: 100vh;
+        height: calc(100vh - var(--header-height, 70px));
         transform: translateX(-100%);
         background: rgba(30, 30, 30, 0.98);
         backdrop-filter: blur(10px);
         flex-direction: column;
         padding: 2rem 1rem;
-        padding-top: calc(1rem + 70px);
         gap: 1rem;
         transition: transform 0.3s ease;
         z-index: 10001;
@@ -783,6 +787,20 @@ function switchLanguage(lang) {
     });
   }).observe(document.body, { childList: true, subtree: true });
 })();
+
+// Setzt --header-height auf die tatsaechliche Header-Hoehe (variiert je nach
+// Logo-/Zeilenumbruch), damit das mobile Ausklapp-Menue (nav#main-nav) exakt
+// darunter beginnt statt darueber gelegt zu werden. 70px CSS-Fallback greift
+// nur, falls dieses Script vor dem ersten Paint noch nicht gelaufen ist.
+function updateHeaderHeightVar() {
+  const header = document.querySelector('header');
+  if (header) {
+    document.documentElement.style.setProperty('--header-height', header.offsetHeight + 'px');
+  }
+}
+updateHeaderHeightVar();
+window.addEventListener('resize', updateHeaderHeightVar);
+window.addEventListener('load', updateHeaderHeightVar);
 
 function toggleMenu() {
   const nav = document.getElementById("main-nav");

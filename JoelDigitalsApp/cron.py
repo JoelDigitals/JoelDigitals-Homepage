@@ -126,21 +126,61 @@ def push_check(request):
     pending_pushes_sent = _send_pending_pushes(now)
     onesignal_health = _maybe_check_onesignal_health(now)
 
+    # Bestands-Synchronisation mit JDS Management - holt aktuellen Lager-
+    # bestand und merkt sich die JDS-interne Produkt-ID fuer spaetere Updates.
+    jds_stock_synced = 0
+    jds_stock_error = None
+    try:
+        from shop_ourapps.services.jds_api import sync_stock
+        jds_stock_synced = sync_stock()
+    except Exception as e:
+        jds_stock_error = str(e)
+
     # Kunden nachtraeglich an JDS Management melden, die noch keine Kundennummer
     # haben oder deren letzter Sync-Versuch fehlgeschlagen ist (API-Ausfall,
     # oder ein Kunde, der schon vor Einfuehrung dieses Features existierte) -
     # siehe shop_ourapps.services.jds_api.sync_pending_customers.
     jds_customers_synced = []
+    jds_sync_error = None
     try:
         from shop_ourapps.services.jds_api import sync_pending_customers
         jds_customers_synced = sync_pending_customers()
-    except Exception:
-        pass
+    except Exception as e:
+        jds_sync_error = str(e)
+
+    # Bestellungen nachtraeglich als Einnahmen an JDS Management uebertragen,
+    # die noch nicht synchronisiert wurden (z.B. wegen API-Ausfall beim
+    # Zahlungseingang oder Bestellungen vor Einfuehrung des JDS-Syncs).
+    jds_orders_synced = []
+    jds_order_error = None
+    try:
+        from shop_ourapps.models import Order
+        from shop_ourapps.services.jds_api import push_order as jds_push_order
+
+        from django.db.models import Q
+        unsynced_orders = Order.objects.filter(
+            status__in=['Paid', 'In Delivery', 'Delivered', 'Finished'],
+        ).filter(
+            Q(jds_synced_at__isnull=True) | Q(jds_sync_error__gt='')
+        )[:20]
+        for order in unsynced_orders:
+            try:
+                if jds_push_order(order):
+                    jds_orders_synced.append(order.id)
+            except Exception:
+                pass
+    except Exception as e:
+        jds_order_error = str(e)
 
     return JsonResponse({
         'checked_at': now.isoformat(),
         'articles_notified': notified_articles,
         'pending_pushes_sent': pending_pushes_sent,
+        'jds_stock_synced': jds_stock_synced,
+        'jds_stock_error': jds_stock_error,
         'jds_customers_synced': jds_customers_synced,
+        'jds_sync_error': jds_sync_error,
+        'jds_orders_synced': jds_orders_synced,
+        'jds_order_error': jds_order_error,
         'onesignal_health_check': onesignal_health,
     })
