@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.core.mail import send_mail
+from django.utils import timezone
 from .models import SalesWish, SupportTicket, TicketMessage, SalesEntry, SalesChatMessage, Appointment, AppointmentType, SpecialTimeSlot, TimeSlot
 
 admin.site.register(SalesWish)
@@ -34,7 +35,7 @@ class AppointmentAdmin(admin.ModelAdmin):
                 subject="Termin bestätigt – Joel Digitals",
                 message=(
                     f"Hallo {appointment.first_name},\n\n"
-                    f"Ihr Termin am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')} "
+                    f"Ihr Termin am {timezone.localtime(appointment.appointment_datetime).strftime('%d.%m.%Y %H:%M')} "
                     f"wurde von Joel Digitals bestätigt.\n\nBis bald!\nIhr Joel Digitals Team"
                 ),
                 from_email='no-reply@joel-digitals.com',
@@ -50,7 +51,7 @@ class AppointmentAdmin(admin.ModelAdmin):
                 subject="Termin abgelehnt – Joel Digitals",
                 message=(
                     f"Hallo {appointment.first_name},\n\n"
-                    f"leider müssen wir Ihren Termin am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')} ablehnen.\n\n"
+                    f"leider müssen wir Ihren Termin am {timezone.localtime(appointment.appointment_datetime).strftime('%d.%m.%Y %H:%M')} ablehnen.\n\n"
                     f"Bitte vereinbaren Sie einen neuen Termin oder kontaktieren Sie uns direkt.\n\n"
                     "Ihr Joel Digitals Team"
                 ),

@@ -171,4 +171,4 @@ class Appointment(models.Model):
         return self.appointment_datetime + timedelta(minutes=self.appointment_type.duration_minutes)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} – {self.appointment_datetime.strftime('%d.%m.%Y %H:%M')}"
+        return f"{self.first_name} {self.last_name} – {timezone.localtime(self.appointment_datetime).strftime('%d.%m.%Y %H:%M')}"

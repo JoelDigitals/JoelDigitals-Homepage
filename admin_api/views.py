@@ -191,11 +191,11 @@ def appointment_confirm(request, pk):
         subject="Termin bestätigt – Joel Digitals",
         message=(
             f"Hallo {appointment.first_name},\n\n"
-            f"Ihr Termin am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')} wurde bestätigt.\n\n"
+            f"Ihr Termin am {timezone.localtime(appointment.appointment_datetime).strftime('%d.%m.%Y %H:%M')} wurde bestätigt.\n\n"
             "Wir freuen uns auf das Gespräch und stehen Ihnen bei Fragen jederzeit zur Verfügung.\n\n"
             f"Details Ihres Termins:\n"
             f"- Terminart: {appointment.appointment_type}\n"
-            f"- Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n\n"
+            f"- Datum & Uhrzeit: {timezone.localtime(appointment.appointment_datetime).strftime('%d.%m.%Y %H:%M')}\n\n"
             "Bis bald!\nIhr Joel Digitals Team"
         ),
         from_email=settings.COMPANY_EMAIL_NO_REPLY,
@@ -222,7 +222,7 @@ def appointment_reject(request, pk):
         subject="Termin abgelehnt – Joel Digitals",
         message=(
             f"Hallo {appointment.first_name},\n\n"
-            f"Ihr Termin am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')} wurde leider abgelehnt.\n\n"
+            f"Ihr Termin am {timezone.localtime(appointment.appointment_datetime).strftime('%d.%m.%Y %H:%M')} wurde leider abgelehnt.\n\n"
             "Bitte buchen Sie ggf. einen neuen Termin über unsere Website.\n\n"
             "Mit freundlichen Grüßen\nIhr Joel Digitals Team"
         ),

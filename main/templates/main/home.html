@@ -900,6 +900,17 @@
       </div>
     </section>
 
+    <!-- Website-Konfigurator CTA -->
+    <section class="info-card" style="border-color:rgba(0,68,204,.3);">
+      <h2><i class="fas fa-sliders-h" style="color: var(--primary);"></i> {% trans "Website-Konfigurator" %}</h2>
+      <p style="color:#888;max-width:520px;margin:0.75rem auto 1.5rem;">
+        {% trans "Finde in wenigen Klicks heraus, was deine neue Website kostet - Website-Typ, Umsetzung und Funktionen frei kombinierbar." %}
+      </p>
+      <a href="{% url 'website_configurator:wizard' %}" class="btn-primary" style="background: linear-gradient(135deg, var(--primary), #0066ff); color: white; width: 100%; max-width: 340px;">
+        <i class="fas fa-calculator"></i> {% trans "Jetzt Preis berechnen" %}
+      </a>
+    </section>
+
     {% if upcoming_webinars %}
     <section class="info-card" style="border-color:rgba(6,182,212,0.25);padding:1.5rem 1rem;">
       <h2 style="font-size:clamp(1.1rem,3vw,1.4rem);"><i class="fas fa-video" style="color:#06b6d4;"></i> {% trans "Free Webinars" %}</h2>

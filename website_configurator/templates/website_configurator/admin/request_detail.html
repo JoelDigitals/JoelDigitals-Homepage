@@ -1,0 +1,89 @@
+{% extends request.base_template|default:"base_home.html" %}
+{% block title %}Anfrage {{ config_request.reference }}{% endblock %}
+{% block content %}
+<style>
+.wcfg-admin-wrap{max-width:800px;margin:0 auto;padding:2rem 1rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1.1rem;margin:0 0 1rem}
+.row{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.row:last-child{border-bottom:none}
+.badge{display:inline-block;padding:.2rem .6rem;border-radius:99px;font-size:.72rem;font-weight:600}
+.b-draft{background:#2a2a2a;color:#999}
+.b-pending{background:#4a3b00;color:#facc15}
+.b-in_review{background:#1e3a5f;color:#60a5fa}
+.b-contacted{background:#1e3a5f;color:#60a5fa}
+.b-won{background:#06331f;color:#4ade80}
+.b-lost{background:#3b0d0d;color:#f87171}
+.btn{padding:.6rem 1.2rem;border-radius:8px;font-weight:700;font-size:.875rem;cursor:pointer;border:none;margin-right:.6rem;margin-bottom:.5rem}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-secondary{background:transparent;color:#ccc;border:1px solid var(--border)}
+.btn-danger{background:#7f1d1d;color:#fff}
+select,textarea{width:100%;padding:.55rem .7rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text);margin-bottom:.75rem}
+.status-actions{display:flex;flex-wrap:wrap;gap:.5rem}
+</style>
+<div class="wcfg-admin-wrap">
+  <p><a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_website_config_list_app' %}{% else %}{% url 'website_configurator:admin_request_list' %}{% endif %}" style="color:#999;text-decoration:none">&larr; Zurück zur Liste</a></p>
+  <h1>{{ config_request.reference }} <span class="badge b-{{ config_request.status }}">{{ config_request.get_status_display }}</span></h1>
+  <p style="margin-top:.5rem">
+    <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_website_config_send_mail_app' pk=config_request.pk %}{% else %}{% url 'website_configurator:admin_request_send_mail' config_request.pk %}{% endif %}" class="btn btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:.4rem"><i class="fas fa-envelope"></i> Mail versenden</a>
+  </p>
+
+  <div class="card">
+    <h2>Interessent</h2>
+    <div class="row"><span>Name</span><span>{{ config_request.name }}</span></div>
+    <div class="row"><span>E-Mail</span><span>{{ config_request.email }}</span></div>
+    <div class="row"><span>Telefon</span><span>{{ config_request.phone|default:"–" }}</span></div>
+    <div class="row"><span>Unternehmen</span><span>{{ config_request.company_name|default:"–" }}</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Konfiguration &amp; Preis</h2>
+    <div class="row"><span>Website-Typ</span><span>{{ config_request.get_site_type_display }}</span></div>
+    <div class="row"><span>Umsetzung</span><span>{{ config_request.get_tech_display }}</span></div>
+    {% if config_request.page_count %}
+    <div class="row"><span>Unterseiten</span><span>{{ config_request.page_count }}</span></div>
+    {% endif %}
+    {% for f in config_request.features.all %}
+    <div class="row"><span>{{ f.name }}</span><span>{{ f.price }} €</span></div>
+    {% endfor %}
+    <div class="row"><strong>Geschätzter Gesamtpreis</strong><strong>{% if config_request.estimated_total is not None %}{{ config_request.estimated_total }} €{% else %}Preis auf Anfrage{% endif %}</strong></div>
+  </div>
+
+  <div class="card">
+    <h2>Verbindlichkeit</h2>
+    {% if config_request.terms_accepted %}
+    <div class="row"><span>AGB/Datenschutz akzeptiert</span><span>{{ config_request.terms_accepted_at|date:"d.m.Y H:i" }} Uhr</span></div>
+    {% else %}
+    <div class="row"><span>AGB/Datenschutz akzeptiert</span><span>Noch nicht (Entwurf, nicht final abgesendet)</span></div>
+    {% endif %}
+  </div>
+
+  {% if config_request.message %}
+  <div class="card">
+    <h2>Anmerkungen des Interessenten</h2>
+    <p>{{ config_request.message }}</p>
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <h2>Status aktualisieren</h2>
+    <form method="post" action="{% if request.base_template == 'base_app.html' %}{% url 'jd_website_config_update_status_app' pk=config_request.pk %}{% else %}{% url 'website_configurator:admin_request_update_status' config_request.pk %}{% endif %}">
+      {% csrf_token %}
+      <textarea name="internal_notes" rows="2" placeholder="Interne Notiz (optional)">{{ config_request.internal_notes }}</textarea>
+      <div class="status-actions">
+        <button type="submit" name="status" value="in_review" class="btn btn-secondary">In Prüfung</button>
+        <button type="submit" name="status" value="contacted" class="btn btn-secondary">Kontaktiert</button>
+        <button type="submit" name="status" value="won" class="btn btn-primary">Gewonnen</button>
+        <button type="submit" name="status" value="lost" class="btn btn-danger">Verloren</button>
+      </div>
+    </form>
+  </div>
+
+  {% if config_request.internal_notes %}
+  <div class="card">
+    <h2>Interne Notizen</h2>
+    <p>{{ config_request.internal_notes }}</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

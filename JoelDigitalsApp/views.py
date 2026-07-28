@@ -605,6 +605,45 @@ def jd_archived_ticket_detail_app(request, ticket_number):
 
 
 # ========================================================================
+# Website-Konfigurator-Leads (Admin) im App-Design
+# ========================================================================
+
+@login_required(login_url='jd_login_app')
+def jd_website_config_list_app(request):
+    from website_configurator.admin_views import request_list
+    request.base_template = 'base_app.html'
+    return request_list(request)
+
+
+@login_required(login_url='jd_login_app')
+def jd_website_config_archive_app(request):
+    from website_configurator.admin_views import request_archive
+    request.base_template = 'base_app.html'
+    return request_archive(request)
+
+
+@login_required(login_url='jd_login_app')
+def jd_website_config_detail_app(request, pk):
+    from website_configurator.admin_views import request_detail
+    request.base_template = 'base_app.html'
+    return request_detail(request, pk)
+
+
+@login_required(login_url='jd_login_app')
+def jd_website_config_update_status_app(request, pk):
+    from website_configurator.admin_views import request_update_status
+    request.base_template = 'base_app.html'
+    return request_update_status(request, pk)
+
+
+@login_required(login_url='jd_login_app')
+def jd_website_config_send_mail_app(request, pk):
+    from website_configurator.admin_views import request_send_mail
+    request.base_template = 'base_app.html'
+    return request_send_mail(request, pk)
+
+
+# ========================================================================
 # Sales-Verwaltung (Admin, inkl. Chat mit Interessenten) im App-Design
 # ========================================================================
 

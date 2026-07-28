@@ -494,6 +494,11 @@ def _build_admin_dashboard_context(request):
     pending_jds_feature_requests = JdsFeatureRequest.objects.filter(status='pending').order_by('-created_at')[:5]
     jds_feature_request_count = JdsFeatureRequest.objects.filter(status='pending').count()
 
+    # === WEBSITE-KONFIGURATOR: ANFRAGEN (Lead-Absicherung, Seite selbst noch unverlinkt) ===
+    from website_configurator.models import WebsiteConfigRequest
+    pending_website_requests = WebsiteConfigRequest.objects.filter(status='pending').order_by('-created_at')[:5]
+    website_request_count = WebsiteConfigRequest.objects.filter(status='pending').count()
+
     # === ERWEITERTE STATISTIKEN ===
     from decimal import Decimal
     from django.db.models.functions import TruncMonth as TrM
@@ -581,6 +586,8 @@ def _build_admin_dashboard_context(request):
         'jds_request_count': jds_request_count,
         'pending_jds_feature_requests': pending_jds_feature_requests,
         'jds_feature_request_count': jds_feature_request_count,
+        'pending_website_requests': pending_website_requests,
+        'website_request_count': website_request_count,
         'total_webinars': total_webinars,
         'upcoming_webinars': upcoming_webinars,
         'total_registrations': total_registrations,

@@ -1,0 +1,23 @@
+{% extends "base_home.html" %}
+{% block title %}Auftrag erhalten - Website-Konfigurator{% endblock %}
+{% block content %}
+<style>
+.wcfg-thanks{max-width:600px;margin:4rem auto;padding:2rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;text-align:center}
+.wcfg-thanks .icon{font-size:3rem;margin-bottom:1rem}
+.wcfg-thanks h1{font-size:1.4rem;margin-bottom:.75rem}
+.wcfg-thanks p{color:#aaa;line-height:1.6}
+.wcfg-thanks .price{font-size:1.5rem;font-weight:800;color:var(--primary);margin-top:1rem}
+.wcfg-thanks .ref{display:inline-block;background:#111;border-radius:8px;padding:.4rem .9rem;font-family:monospace;margin-top:1rem;color:var(--primary)}
+</style>
+<div class="wcfg-thanks">
+  <div class="icon">✅</div>
+  <h1>Dein Auftrag ist bei uns eingegangen!</h1>
+  <p>Vielen Dank, {{ config_request.name }}! Du hast die Umsetzung deiner Website verbindlich beauftragt - wir bestätigen dir die Details in Kürze per E-Mail an {{ config_request.email }} und melden uns bei Rückfragen unter deiner Telefonnummer.</p>
+  {% if config_request.estimated_total is not None %}
+  <div class="price">ca. {{ config_request.estimated_total }} € (einmalig)</div>
+  {% else %}
+  <div class="price">Preis auf Anfrage</div>
+  {% endif %}
+  <div class="ref">{{ config_request.reference }}</div>
+</div>
+{% endblock %}

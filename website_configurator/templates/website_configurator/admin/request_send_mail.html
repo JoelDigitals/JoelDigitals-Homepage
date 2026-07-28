@@ -1,0 +1,72 @@
+{% extends request.base_template|default:"base_home.html" %}
+{% block title %}Mail an {{ config_request.name }}{% endblock %}
+{% block content %}
+<style>
+.wcfg-admin-wrap{max-width:700px;margin:0 auto;padding:2rem 1rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1.1rem;margin:0 0 1rem}
+.row{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.row:last-child{border-bottom:none}
+.wcfg-fld{margin-bottom:1rem}
+.wcfg-fld label{display:block;font-size:.8rem;font-weight:600;color:#aaa;margin-bottom:.4rem}
+.wcfg-fld input,.wcfg-fld textarea,.wcfg-fld select{width:100%;padding:.6rem .8rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text);font-size:.9rem;font-family:inherit}
+.btn{padding:.6rem 1.2rem;border-radius:8px;font-weight:700;font-size:.875rem;cursor:pointer;border:none;margin-right:.6rem}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-secondary{background:transparent;color:#ccc;border:1px solid var(--border);text-decoration:none;display:inline-flex;align-items:center}
+</style>
+<div class="wcfg-admin-wrap">
+  <p><a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_website_config_detail_app' pk=config_request.pk %}{% else %}{% url 'website_configurator:admin_request_detail' config_request.pk %}{% endif %}" style="color:#999;text-decoration:none">&larr; Zurück zur Anfrage</a></p>
+  <h1 style="font-size:1.4rem;margin-bottom:1rem">Mail an {{ config_request.name }}</h1>
+
+  <div class="card">
+    <h2>Empfänger</h2>
+    <div class="row"><span>Name</span><span>{{ config_request.name }}</span></div>
+    <div class="row"><span>E-Mail</span><span>{{ config_request.email }}</span></div>
+    <div class="row"><span>Referenz</span><span>{{ config_request.reference }}</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Nachricht</h2>
+    <div class="wcfg-fld">
+      <label>Vorlage (optional)</label>
+      <select id="wcfg-mail-template" onchange="wcfgApplyMailTemplate(this)">
+        <option value="">-- Vorlage wählen --</option>
+      </select>
+    </div>
+    <form method="post" action="{% if request.base_template == 'base_app.html' %}{% url 'jd_website_config_send_mail_app' pk=config_request.pk %}{% else %}{% url 'website_configurator:admin_request_send_mail' config_request.pk %}{% endif %}">
+      {% csrf_token %}
+      <div class="wcfg-fld">
+        <label>Betreff *</label>
+        <input type="text" name="subject" id="wcfg-mail-subject" value="{{ default_subject }}">
+      </div>
+      <div class="wcfg-fld">
+        <label>Nachricht *</label>
+        <textarea name="message" id="wcfg-mail-message" rows="10">{{ default_message }}</textarea>
+      </div>
+      <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_website_config_detail_app' pk=config_request.pk %}{% else %}{% url 'website_configurator:admin_request_detail' config_request.pk %}{% endif %}" class="btn btn-secondary">Abbrechen</a>
+      <button type="submit" class="btn btn-primary">Mail senden</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const WCFG_MAIL_TEMPLATES = {{ templates_json|safe }};
+
+(function(){
+  const select = document.getElementById('wcfg-mail-template');
+  WCFG_MAIL_TEMPLATES.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t.id;
+    opt.textContent = t.name;
+    select.appendChild(opt);
+  });
+})();
+
+function wcfgApplyMailTemplate(select){
+  const template = WCFG_MAIL_TEMPLATES.find(t => String(t.id) === select.value);
+  if(!template) return;
+  document.getElementById('wcfg-mail-subject').value = template.subject;
+  document.getElementById('wcfg-mail-message').value = template.message;
+}
+</script>
+{% endblock %}

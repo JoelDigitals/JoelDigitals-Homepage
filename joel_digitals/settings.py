@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     'admin_api',
     'autoupdate',
     'jds_configurator',
+    'website_configurator',
 ]
 
 CKEDITOR_UPLOAD_PATH = "uploads/"

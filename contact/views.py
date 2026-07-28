@@ -221,7 +221,7 @@ Name: {appointment.first_name} {appointment.last_name}
 E-Mail: {appointment.email}
 Telefon: {appointment.phone}
 Terminart: {appointment_type.name}
-Datum/Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}
+Datum/Uhrzeit: {timezone.localtime(appointment.appointment_datetime).strftime('%d.%m.%Y %H:%M')}
 Dauer: {appointment_type.duration_minutes} Minuten
 
 Status: {appointment.get_status_display()}
@@ -244,7 +244,7 @@ Status: {appointment.get_status_display()}
                     if sales_staff_ids:
                         PendingPush.objects.create(
                             title="Neue Terminbuchung",
-                            message=f"{appointment.first_name} {appointment.last_name} - {appointment_type.name} am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}",
+                            message=f"{appointment.first_name} {appointment.last_name} - {appointment_type.name} am {timezone.localtime(appointment.appointment_datetime).strftime('%d.%m.%Y %H:%M')}",
                             user_ids=sales_staff_ids,
                             url=request.build_absolute_uri(reverse('appointment_admin')),
                         )
@@ -288,12 +288,12 @@ def update_appointment_status(request, pk, status):
         subject = "Termin bestätigt – Joel Digitals"
         message = (
             f"Hallo {appointment.first_name},\n\n"
-            f"Ihr Termin am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')} wurde bestätigt.\n\n"
+            f"Ihr Termin am {timezone.localtime(appointment.appointment_datetime).strftime('%d.%m.%Y %H:%M')} wurde bestätigt.\n\n"
             "Wir freuen uns auf das Gespräch und stehen Ihnen bei Fragen jederzeit zur Verfügung.\n\n"
             "Bitte beachten Sie, dass Sie den Termin bis zu 24 Stunden vorher absagen können.\n\n"
             f"Details Ihres Termins:\n"
             f"- Terminart: {appointment.appointment_type}\n"
-            f"- Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n\n"
+            f"- Datum & Uhrzeit: {timezone.localtime(appointment.appointment_datetime).strftime('%d.%m.%Y %H:%M')}\n\n"
 
             "Bitte halten Sie sich den Termin frei und seien Sie pünktlich.\n\n" \
             f"Sie werden im Nachgang eine Mail mit einer Meeting Einladung an {appointment.email} senden.\n\n"
@@ -307,7 +307,7 @@ def update_appointment_status(request, pk, status):
         subject = "Termin abgelehnt – Joel Digitals"
         message = (
             f"Hallo {appointment.first_name},\n\n"
-            f"Ihr Termin am {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')} wurde leider abgelehnt.\n\n"
+            f"Ihr Termin am {timezone.localtime(appointment.appointment_datetime).strftime('%d.%m.%Y %H:%M')} wurde leider abgelehnt.\n\n"
             
             "Wir entschuldigen uns für die Unannehmlichkeiten und hoffen, dass wir bald einen passenden Termin finden.\n\n"
             "Bitte buchen Sie ggf. einen neuen Termin über unsere Website oder nehmen sie über unser Kontaktformular/Ticketsystem Kontakt mit uns auf.\n\n"
@@ -319,7 +319,7 @@ def update_appointment_status(request, pk, status):
 
             "Details Ihres Termins:\n"
             f"- Terminart: {appointment.appointment_type}\n"
-            f"- Datum & Uhrzeit: {appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M')}\n\n"
+            f"- Datum & Uhrzeit: {timezone.localtime(appointment.appointment_datetime).strftime('%d.%m.%Y %H:%M')}\n\n"
             "Bitte zögern Sie nicht, uns bei Fragen zu kontaktieren.\n\n"
             "Wir danken Ihnen für Ihr Verständnis und Ihre Geduld.\n\n"
 

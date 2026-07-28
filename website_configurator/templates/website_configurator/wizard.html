@@ -1,0 +1,520 @@
+{% extends "base_home.html" %}
+{% load l10n %}
+{% block title %}Website-Konfigurator - Joel Digitals{% endblock %}
+{% block content %}
+<style>
+.wcfg-wrap{max-width:900px;margin:2rem auto;padding:0 1rem 4rem}
+.wcfg-header{background:linear-gradient(135deg,var(--primary),#0066ff);padding:3rem 2.5rem;border-radius:16px;text-align:center;margin-bottom:2rem}
+.wcfg-header h1{font-size:2rem;color:#fff;margin:.3rem 0}
+.wcfg-header p{color:rgba(255,255,255,.9);margin:0}
+.wcfg-steps{display:flex;gap:.5rem;margin-bottom:2rem}
+.wcfg-step-dot{flex:1;height:4px;border-radius:99px;background:var(--border);transition:background .3s ease}
+.wcfg-step-dot.active{background:var(--primary)}
+.wcfg-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.75rem;margin-bottom:1.5rem}
+.wcfg-card h2{font-size:1.2rem;margin:0 0 1.25rem}
+.wcfg-step{display:none;opacity:0;transform:translateY(8px);transition:opacity .22s ease, transform .22s ease}
+.wcfg-step.active{display:block}
+.wcfg-step.active.visible{opacity:1;transform:translateY(0)}
+.wcfg-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.wcfg-option{display:flex;flex-direction:column;gap:.4rem;border:1px solid var(--border);border-radius:10px;padding:1.1rem;cursor:pointer;position:relative;transition:border-color .15s ease, background .15s ease, transform .15s ease}
+.wcfg-option:hover{border-color:var(--primary);transform:translateY(-1px)}
+.wcfg-option.selected{border-color:var(--primary);background:rgba(0,68,204,.08)}
+.wcfg-option input[type=radio]{position:absolute;top:1rem;right:1rem}
+.wcfg-option-title{font-weight:700;font-size:1rem;padding-right:1.5rem}
+.wcfg-option-title i{color:var(--primary);margin-right:.5rem}
+.wcfg-option-desc{font-size:.8rem;color:#aaa}
+.wcfg-fld{margin-top:1.25rem}
+.wcfg-fld label{display:block;font-size:.8rem;font-weight:600;color:#aaa;margin-bottom:.4rem}
+.wcfg-fld input,.wcfg-fld textarea{width:100%;padding:.6rem .8rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text);font-size:.9rem;transition:border-color .15s ease}
+.wcfg-fld input:focus,.wcfg-fld textarea:focus{border-color:var(--primary);outline:none}
+.wcfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.wcfg-users-row{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;border:1px solid var(--border);border-radius:10px;flex-wrap:wrap;gap:.6rem}
+.wcfg-users-stepper{display:flex;align-items:center;gap:.6rem}
+.wcfg-users-stepper button{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#111;color:var(--text);font-weight:700;cursor:pointer;font-size:1rem}
+.wcfg-users-stepper button:hover{border-color:var(--primary);color:var(--primary)}
+.wcfg-users-stepper input{width:60px;text-align:center;padding:.4rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text)}
+.wcfg-cat-group{margin-bottom:.5rem;transition:opacity .15s ease}
+.wcfg-cat-header{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin:1.25rem 0 .6rem}
+.wcfg-cat-group:first-child .wcfg-cat-header{margin-top:0}
+.wcfg-cat{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#888}
+.wcfg-cat-selectall{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:#aaa;cursor:pointer;font-weight:600;white-space:nowrap}
+.wcfg-module{display:flex;align-items:center;justify-content:space-between;padding:.7rem .9rem;border:1px solid var(--border);border-radius:8px;margin-bottom:.5rem;cursor:pointer;transition:border-color .15s ease, background .15s ease}
+.wcfg-module:hover{border-color:var(--primary)}
+.wcfg-module.checked{border-color:var(--primary);background:rgba(0,68,204,.08)}
+.wcfg-module-name{display:flex;flex-direction:column;gap:.15rem;font-size:.9rem}
+.wcfg-module-name small{color:#888;font-size:.75rem}
+.wcfg-module-price{font-weight:700;color:var(--primary);font-size:.9rem;white-space:nowrap;margin-left:1rem}
+.wcfg-total-box{position:sticky;bottom:0;background:var(--surface);border:1px solid var(--primary);border-radius:10px;padding:1.1rem 1.25rem;margin-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem}
+.wcfg-total-label{font-size:.85rem;color:#aaa}
+.wcfg-total-val{font-size:1.6rem;font-weight:800;color:var(--primary)}
+.wcfg-btn{padding:.7rem 1.4rem;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer;border:none;transition:opacity .15s ease, background .15s ease}
+.wcfg-btn:disabled{opacity:.6;cursor:default}
+.wcfg-btn-primary{background:var(--primary);color:#fff}
+.wcfg-btn-primary:hover:not(:disabled){background:var(--primary-hover)}
+.wcfg-btn-secondary{background:transparent;color:#ccc;border:1px solid var(--border)}
+.wcfg-actions{display:flex;justify-content:space-between;margin-top:1.5rem;gap:.6rem;flex-wrap:wrap}
+.wcfg-summary-line{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.wcfg-summary-line:last-child{border-bottom:none}
+.wcfg-consent{display:flex;align-items:flex-start;gap:.6rem;font-size:.85rem;color:#ccc;line-height:1.4}
+.wcfg-consent input{margin-top:.2rem}
+.wcfg-consent a{color:var(--primary);text-decoration:none}
+</style>
+
+<div class="wcfg-wrap">
+  <div class="wcfg-header">
+    <h1><i class="fas fa-sliders-h"></i> Website-Konfigurator</h1>
+    <p>In wenigen Schritten zum Preisvorschlag für deine neue Website</p>
+  </div>
+
+  <div class="wcfg-steps">
+    <div class="wcfg-step-dot active" data-dot="1"></div>
+    <div class="wcfg-step-dot" data-dot="2"></div>
+    <div class="wcfg-step-dot" data-dot="3"></div>
+    <div class="wcfg-step-dot" data-dot="4"></div>
+    <div class="wcfg-step-dot" data-dot="5"></div>
+  </div>
+
+  <form id="wcfg-form" method="post" action="{% url 'website_configurator:submit_request' %}">
+    {% csrf_token %}
+    <input type="hidden" name="request_id" id="wcfg-request-id" value="">
+
+    <!-- Step 1: Kontaktdaten -->
+    <div class="wcfg-step active visible" data-step="1">
+      <div class="wcfg-card">
+        <h2>1. Deine Kontaktdaten</h2>
+        <p style="color:#aaa;font-size:.85rem;margin-top:-.5rem">Damit wir dir deinen Preisvorschlag zuordnen und dich bei Rückfragen erreichen können.</p>
+        <div class="wcfg-grid">
+          <div class="wcfg-fld"><label>Name *</label><input type="text" name="name"></div>
+          <div class="wcfg-fld"><label>E-Mail *</label><input type="email" name="email"></div>
+          <div class="wcfg-fld"><label>Telefon *</label><input type="text" name="phone"></div>
+          <div class="wcfg-fld"><label>Unternehmen</label><input type="text" name="company_name"></div>
+        </div>
+      </div>
+      <div class="wcfg-actions">
+        <span></span>
+        <button type="button" class="wcfg-btn wcfg-btn-primary" onclick="wcfgGoStep2(this)">Weiter</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Website-Typ -->
+    <div class="wcfg-step" data-step="2">
+      <div class="wcfg-card">
+        <h2>2. Welche Art von Website benötigst du?</h2>
+        <div class="wcfg-options">
+          {% for value, label in site_types %}
+          <label class="wcfg-option">
+            <input type="radio" name="site_type" value="{{ value }}" onchange="wcfgSelectOption(this);wcfgAutoAdvance(wcfgGoStep3)">
+            <span class="wcfg-option-title">
+              {% if value == 'onepager' %}<i class="fas fa-file-alt"></i>{% elif value == 'multipage' %}<i class="fas fa-sitemap"></i>{% else %}<i class="fas fa-shopping-cart"></i>{% endif %}
+              {{ label }}
+            </span>
+            <span class="wcfg-option-desc">
+              {% if value == 'onepager' %}Eine einzelne Seite mit allen wichtigen Infos - ideal für Selbstständige & kleine Angebote.
+              {% elif value == 'multipage' %}Mehrere Unterseiten (Leistungen, Über uns, Kontakt, ...) - die klassische Firmenwebsite.
+              {% else %}Eigener Online-Shop mit Produkten, Warenkorb und Zahlungsabwicklung.{% endif %}
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="wcfg-actions">
+        <button type="button" class="wcfg-btn wcfg-btn-secondary" onclick="wcfgGoto(1)">Zurück</button>
+        <button type="button" class="wcfg-btn wcfg-btn-primary" onclick="wcfgGoStep3(this)">Weiter</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Umsetzung/Technologie -->
+    <div class="wcfg-step" data-step="3">
+      <div class="wcfg-card">
+        <h2>3. Wie soll die Website umgesetzt werden?</h2>
+        <div class="wcfg-options" id="wcfg-tech-options">
+          {% for opt in tech_options %}
+          <label class="wcfg-option" data-value="{{ opt.value }}" data-site-types="{{ opt.site_types }}">
+            <input type="radio" name="tech" value="{{ opt.value }}" onchange="wcfgSelectOption(this);wcfgRecalc();wcfgHandleTechAutoAdvance()">
+            <span class="wcfg-option-title">{{ opt.label }}</span>
+            <span class="wcfg-option-desc">
+              {% if opt.value == 'custom' %}Individuell programmiert - maximale Flexibilität, kein Template.
+              {% elif opt.value == 'wordpress' %}Content-Management-System, bewährt und von dir selbst pflegbar.
+              {% elif opt.value == 'wix' %}Baukasten-System, besonders einfach selbst zu pflegen.
+              {% elif opt.value == 'shopify' %}Spezialisiertes Shopsystem inkl. Zahlungsanbindung.
+              {% else %}Sonstiges System - wir melden uns mit einer individuellen Einschätzung.{% endif %}
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+        <div class="wcfg-fld" id="wcfg-pagecount-fld" style="display:none">
+          <label>Anzahl Unterseiten (inkl. Startseite)</label>
+          <div class="wcfg-users-row">
+            <span>Wird für die Preisschätzung berücksichtigt</span>
+            <div class="wcfg-users-stepper">
+              <button type="button" onclick="wcfgChangePages(-1)">−</button>
+              <input type="number" id="wcfg-page-count" name="page_count" value="5" min="1" oninput="wcfgRecalc()">
+              <button type="button" onclick="wcfgChangePages(1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wcfg-actions">
+        <button type="button" class="wcfg-btn wcfg-btn-secondary" onclick="wcfgGoto(2)">Zurück</button>
+        <button type="button" class="wcfg-btn wcfg-btn-primary" onclick="wcfgGoStep4(this)">Weiter</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Features -->
+    <div class="wcfg-step" data-step="4">
+      <div class="wcfg-card">
+        <h2>4. Welche Funktionen benötigst du?</h2>
+        {% for cat in categories %}
+        <div class="wcfg-cat-group">
+          <div class="wcfg-cat-header">
+            <span class="wcfg-cat">{{ cat.label }}</span>
+            <label class="wcfg-cat-selectall">
+              <input type="checkbox" class="wcfg-cat-checkbox" onchange="wcfgToggleCategory(this)">
+              Alle wählen
+            </label>
+          </div>
+          {% for f in cat.features %}
+          <label class="wcfg-module" data-price="{{ f.price|unlocalize }}" data-site-types="{{ f.site_types }}" data-techs="{{ f.techs }}">
+            <span class="wcfg-module-name">
+              <span><input type="checkbox" name="features" value="{{ f.key }}" onchange="wcfgToggleFeature(this)"> {{ f.name }}</span>
+              {% if f.description %}<small>{{ f.description }}</small>{% endif %}
+            </span>
+            <span class="wcfg-module-price">+{{ f.price }} €</span>
+          </label>
+          {% endfor %}
+        </div>
+        {% endfor %}
+
+        <div class="wcfg-total-box">
+          <span class="wcfg-total-label">Geschätzter Gesamtpreis (einmalig)</span>
+          <span class="wcfg-total-val" id="wcfg-total">–</span>
+        </div>
+      </div>
+      <div class="wcfg-actions">
+        <button type="button" class="wcfg-btn wcfg-btn-secondary" onclick="wcfgGoto(3)">Zurück</button>
+        <button type="button" class="wcfg-btn wcfg-btn-primary" onclick="wcfgGoStep5(this)">Weiter</button>
+      </div>
+    </div>
+
+    <!-- Step 5: Zusammenfassung & verbindliche Beauftragung -->
+    <div class="wcfg-step" data-step="5">
+      <div class="wcfg-card">
+        <h2>Zusammenfassung</h2>
+        <div id="wcfg-summary"></div>
+      </div>
+      <div class="wcfg-card">
+        <h2>Anmerkungen</h2>
+        <div class="wcfg-fld" style="margin-top:0">
+          <textarea name="message" rows="3" placeholder="Gibt es sonst noch etwas, das wir wissen sollten?"></textarea>
+        </div>
+      </div>
+      <div class="wcfg-card">
+        <h2>Verbindlich beauftragen</h2>
+        <label class="wcfg-consent">
+          <input type="checkbox" name="agb_accepted" id="wcfg-agb-accepted">
+          <span>Ich beauftrage hiermit verbindlich die Umsetzung der oben konfigurierten Website zu den genannten Konditionen und akzeptiere die <a href="{% url 'terms' %}" target="_blank">AGB</a> sowie die <a href="{% url 'privacy' %}" target="_blank">Datenschutzbestimmungen</a>. Die Details bestätigen wir dir per E-Mail.</span>
+        </label>
+      </div>
+      <div class="wcfg-actions">
+        <button type="button" class="wcfg-btn wcfg-btn-secondary" onclick="wcfgGoto(4)">Zurück</button>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <button type="submit" formaction="{% url 'website_configurator:download_offer_pdf' %}" class="wcfg-btn wcfg-btn-secondary" onclick="return wcfgValidateOffer(event)"><i class="fas fa-file-pdf"></i> Unverbindliches Angebot als PDF</button>
+          <button type="submit" formaction="{% url 'website_configurator:submit_request' %}" class="wcfg-btn wcfg-btn-primary" onclick="return wcfgValidateSubmit(event)">Verbindlich beauftragen</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+const WCFG_BASE = {};
+{% for opt in base_options %}
+WCFG_BASE["{{ opt.site_type }}|{{ opt.tech }}"] = {base:{{ opt.base_price|unlocalize }}, included:{{ opt.included_pages }}, extra:{{ opt.extra_page_price|unlocalize }}};
+{% endfor %}
+
+const WCFG_SAVE_CONTACT_URL = "{% url 'website_configurator:save_contact' %}";
+const WCFG_UPDATE_DRAFT_URL_TEMPLATE = "{% url 'website_configurator:update_draft' pk=999999 %}";
+
+function wcfgCsrfToken(){
+  return document.querySelector('#wcfg-form [name=csrfmiddlewaretoken]').value;
+}
+
+async function wcfgWithBusyState(button, busyLabel, task){
+  if(!button){ await task(); return; }
+  const originalLabel = button.textContent;
+  button.disabled = true;
+  button.textContent = busyLabel;
+  try{
+    await task();
+  } finally {
+    button.disabled = false;
+    button.textContent = originalLabel;
+  }
+}
+
+async function wcfgSaveContact(){
+  const form = document.getElementById('wcfg-form');
+  const body = new FormData();
+  body.append('name', form.querySelector('[name="name"]').value.trim());
+  body.append('email', form.querySelector('[name="email"]').value.trim());
+  body.append('phone', form.querySelector('[name="phone"]').value.trim());
+  body.append('company_name', form.querySelector('[name="company_name"]').value.trim());
+  try{
+    const resp = await fetch(WCFG_SAVE_CONTACT_URL, {method: 'POST', body, headers: {'X-CSRFToken': wcfgCsrfToken()}});
+    if(resp.ok){
+      const data = await resp.json();
+      if(data.id) document.getElementById('wcfg-request-id').value = data.id;
+    }
+  } catch(e) { /* best effort - beim finalen Absenden wird notfalls neu angelegt */ }
+}
+
+async function wcfgUpdateDraft(fields){
+  const id = document.getElementById('wcfg-request-id').value;
+  if(!id) return;
+  const body = new FormData();
+  Object.entries(fields).forEach(([key, value]) => {
+    if(Array.isArray(value)) value.forEach(item => body.append(key, item));
+    else body.append(key, value);
+  });
+  try{
+    await fetch(WCFG_UPDATE_DRAFT_URL_TEMPLATE.replace('999999', id), {method: 'POST', body, headers: {'X-CSRFToken': wcfgCsrfToken()}});
+  } catch(e) { /* best effort */ }
+}
+
+function wcfgGoto(step){
+  document.querySelectorAll('.wcfg-step').forEach(el => { el.classList.remove('active'); el.classList.remove('visible'); });
+  const target = document.querySelector(`.wcfg-step[data-step="${step}"]`);
+  target.classList.add('active');
+  requestAnimationFrame(() => target.classList.add('visible'));
+  document.querySelectorAll('.wcfg-step-dot').forEach(el => el.classList.remove('active'));
+  for(let i=1;i<=step;i++) document.querySelector(`.wcfg-step-dot[data-dot="${i}"]`).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function wcfgSelectOption(radio){
+  const group = radio.closest('.wcfg-options');
+  group.querySelectorAll('.wcfg-option').forEach(opt => opt.classList.remove('selected'));
+  radio.closest('.wcfg-option').classList.add('selected');
+}
+
+function wcfgAutoAdvance(stepFn, delay = 350){
+  // Kurze Verzoegerung, damit die Auswahl (blaue Umrandung) noch sichtbar
+  // aufblitzt, bevor automatisch zum naechsten Schritt gewechselt wird.
+  setTimeout(() => stepFn(null), delay);
+}
+
+function wcfgHandleTechAutoAdvance(){
+  // Bei 'Mehrseitige Homepage' bleibt der Nutzer auf diesem Schritt, damit er
+  // die Anzahl der Unterseiten (Stepper direkt darunter) noch anpassen kann -
+  // dort wird weiterhin manuell per "Weiter" bestaetigt.
+  if(wcfgSelectedSiteType() === 'multipage') return;
+  wcfgAutoAdvance(wcfgGoStep4);
+}
+
+function wcfgSelectedSiteType(){
+  const r = document.querySelector('input[name="site_type"]:checked');
+  return r ? r.value : null;
+}
+
+function wcfgSelectedTech(){
+  const r = document.querySelector('input[name="tech"]:checked');
+  return r ? r.value : null;
+}
+
+async function wcfgGoStep2(button){
+  const form = document.getElementById('wcfg-form');
+  const name = form.querySelector('[name="name"]').value.trim();
+  const email = form.querySelector('[name="email"]').value.trim();
+  const phone = form.querySelector('[name="phone"]').value.trim();
+  if(!name || !email || !phone){
+    alert('Bitte Name, Telefonnummer und E-Mail-Adresse angeben.');
+    return;
+  }
+  await wcfgWithBusyState(button, 'Wird gespeichert...', wcfgSaveContact);
+  wcfgGoto(2);
+}
+
+async function wcfgGoStep3(button){
+  if(!wcfgSelectedSiteType()){
+    alert('Bitte wähle einen Website-Typ.');
+    return;
+  }
+  const siteType = wcfgSelectedSiteType();
+  await wcfgWithBusyState(button, 'Wird gespeichert...', () => wcfgUpdateDraft({site_type: siteType}));
+
+  document.querySelectorAll('#wcfg-tech-options .wcfg-option').forEach(opt => {
+    const siteTypes = opt.dataset.siteTypes.split(',').map(s => s.trim());
+    const visible = siteTypes.includes(siteType);
+    opt.style.display = visible ? '' : 'none';
+    if(!visible){
+      const input = opt.querySelector('input');
+      if(input.checked){ input.checked = false; opt.classList.remove('selected'); }
+    }
+  });
+  document.getElementById('wcfg-pagecount-fld').style.display = siteType === 'multipage' ? '' : 'none';
+  wcfgGoto(3);
+}
+
+async function wcfgGoStep4(button){
+  if(!wcfgSelectedTech()){
+    alert('Bitte wähle, wie die Website umgesetzt werden soll.');
+    return;
+  }
+  const siteType = wcfgSelectedSiteType();
+  const tech = wcfgSelectedTech();
+  const pageCount = siteType === 'multipage' ? document.getElementById('wcfg-page-count').value : '';
+  await wcfgWithBusyState(button, 'Wird gespeichert...', () => wcfgUpdateDraft({tech: tech, page_count: pageCount}));
+
+  document.querySelectorAll('.wcfg-module').forEach(label => {
+    const siteTypes = label.dataset.siteTypes.split(',').map(s => s.trim());
+    const techs = label.dataset.techs.split(',').map(s => s.trim());
+    const visible = siteTypes.includes(siteType) && techs.includes(tech);
+    label.style.display = visible ? '' : 'none';
+    if(!visible){
+      const cb = label.querySelector('input[type="checkbox"]');
+      if(cb.checked){ cb.checked = false; label.classList.remove('checked'); }
+    }
+  });
+  document.querySelectorAll('.wcfg-cat-group').forEach(group => {
+    const anyVisible = [...group.querySelectorAll('.wcfg-module')].some(l => l.style.display !== 'none');
+    group.style.display = anyVisible ? '' : 'none';
+    wcfgSyncCategoryCheckbox(group);
+  });
+  wcfgRecalc();
+  wcfgGoto(4);
+}
+
+async function wcfgGoStep5(button){
+  const featureKeys = [...document.querySelectorAll('.wcfg-module input[type="checkbox"]:checked')]
+    .filter(cb => cb.closest('.wcfg-module').style.display !== 'none')
+    .map(cb => cb.value);
+  await wcfgWithBusyState(button, 'Wird gespeichert...', () => wcfgUpdateDraft({features_step: 1, features: featureKeys}));
+  wcfgFillSummary();
+  wcfgGoto(5);
+}
+
+function wcfgChangePages(delta){
+  const input = document.getElementById('wcfg-page-count');
+  const current = parseInt(input.value) || 1;
+  input.value = Math.max(1, current + delta);
+  wcfgRecalc();
+}
+
+function wcfgToggleFeature(checkbox){
+  checkbox.closest('.wcfg-module').classList.toggle('checked', checkbox.checked);
+  wcfgSyncCategoryCheckbox(checkbox.closest('.wcfg-cat-group'));
+  wcfgRecalc();
+}
+
+function wcfgSyncCategoryCheckbox(group){
+  const catCheckbox = group.querySelector('.wcfg-cat-checkbox');
+  if(!catCheckbox) return;
+  const visibleModules = [...group.querySelectorAll('.wcfg-module')].filter(l => l.style.display !== 'none');
+  const checkedModules = visibleModules.filter(l => l.querySelector('input[type="checkbox"]').checked);
+  catCheckbox.checked = visibleModules.length > 0 && checkedModules.length === visibleModules.length;
+  catCheckbox.indeterminate = checkedModules.length > 0 && checkedModules.length < visibleModules.length;
+}
+
+function wcfgToggleCategory(catCheckbox){
+  const group = catCheckbox.closest('.wcfg-cat-group');
+  group.querySelectorAll('.wcfg-module').forEach(label => {
+    if(label.style.display === 'none') return;
+    const cb = label.querySelector('input[type="checkbox"]');
+    cb.checked = catCheckbox.checked;
+    label.classList.toggle('checked', catCheckbox.checked);
+  });
+  catCheckbox.indeterminate = false;
+  wcfgRecalc();
+}
+
+function wcfgRecalc(){
+  const totalEl = document.getElementById('wcfg-total');
+  const siteType = wcfgSelectedSiteType();
+  const tech = wcfgSelectedTech();
+  if(!siteType || !tech){ totalEl.textContent = '–'; return null; }
+
+  const base = WCFG_BASE[siteType + '|' + tech];
+  if(!base || !base.base){
+    totalEl.textContent = 'Preis auf Anfrage';
+    return {total: null, base: null};
+  }
+
+  let total = base.base;
+  if(siteType === 'multipage'){
+    const pages = parseInt(document.getElementById('wcfg-page-count').value) || base.included;
+    total += Math.max(0, pages - base.included) * base.extra;
+  }
+  document.querySelectorAll('.wcfg-module input[type="checkbox"]:checked').forEach(cb => {
+    const label = cb.closest('.wcfg-module');
+    if(label.style.display !== 'none') total += parseFloat(label.dataset.price);
+  });
+
+  totalEl.textContent = total.toFixed(2).replace('.', ',') + ' €';
+  return {total, base};
+}
+
+function wcfgFillSummary(){
+  const result = wcfgRecalc();
+  const siteTypeInput = document.querySelector('input[name="site_type"]:checked');
+  const techInput = document.querySelector('input[name="tech"]:checked');
+  const siteTypeLabel = siteTypeInput.closest('.wcfg-option').querySelector('.wcfg-option-title').textContent.trim();
+  const techLabel = techInput.closest('.wcfg-option').querySelector('.wcfg-option-title').textContent.trim();
+
+  let html = `<div class="wcfg-summary-line"><span>Website-Typ</span><span>${siteTypeLabel}</span></div>`;
+  html += `<div class="wcfg-summary-line"><span>Umsetzung</span><span>${techLabel}</span></div>`;
+  if(siteTypeInput.value === 'multipage'){
+    html += `<div class="wcfg-summary-line"><span>Unterseiten</span><span>${document.getElementById('wcfg-page-count').value}</span></div>`;
+  }
+  document.querySelectorAll('.wcfg-module input[type="checkbox"]:checked').forEach(cb => {
+    const label = cb.closest('.wcfg-module');
+    if(label.style.display !== 'none'){
+      const name = label.querySelector('.wcfg-module-name').textContent.trim();
+      html += `<div class="wcfg-summary-line"><span>${name}</span></div>`;
+    }
+  });
+  if(result && result.total !== null && result.base){
+    html += `<div class="wcfg-summary-line"><strong>Geschätzter Gesamtpreis</strong><strong>${result.total.toFixed(2).replace('.', ',')} €</strong></div>`;
+  } else {
+    html += `<div class="wcfg-summary-line"><strong>Preis</strong><strong>Preis auf Anfrage</strong></div>`;
+  }
+  document.getElementById('wcfg-summary').innerHTML = html;
+}
+
+function wcfgValidateContact(){
+  const form = document.getElementById('wcfg-form');
+  const name = form.querySelector('[name="name"]').value.trim();
+  const email = form.querySelector('[name="email"]').value.trim();
+  const phone = form.querySelector('[name="phone"]').value.trim();
+  return name && email && phone;
+}
+
+function wcfgValidateOffer(event){
+  if(!wcfgValidateContact()){
+    alert('Bitte Name, Telefonnummer und E-Mail-Adresse angeben.');
+    event.preventDefault();
+    return false;
+  }
+  return true;
+}
+
+function wcfgValidateSubmit(event){
+  if(!wcfgValidateContact()){
+    alert('Bitte Name, Telefonnummer und E-Mail-Adresse angeben.');
+    event.preventDefault();
+    return false;
+  }
+  if(!document.getElementById('wcfg-agb-accepted').checked){
+    alert('Bitte bestätige die AGB/Datenschutzbestimmungen, um den Auftrag verbindlich abzusenden.');
+    event.preventDefault();
+    return false;
+  }
+  return true;
+}
+
+// Sicherheitsnetz: der aktive Schritt braucht die 'visible'-Klasse fuer die
+// Fade-Einblendung (siehe .wcfg-step.active.visible), die sonst nur bei
+// einem Schritt-Wechsel per wcfgGoto() gesetzt wird - ohne das hier waere
+// der erste Schritt beim initialen Laden unsichtbar (opacity:0).
+document.querySelector('.wcfg-step.active')?.classList.add('visible');
+</script>
+{% endblock %}

@@ -56,6 +56,13 @@ urlpatterns = [
     path('admin-tickets/archive/', views.jd_ticket_archive_app, name='jd_ticket_archive_app'),
     path('admin-tickets/archive/<str:ticket_number>/', views.jd_archived_ticket_detail_app, name='jd_archived_ticket_detail_app'),
 
+    # Website-Konfigurator-Leads (Admin)
+    path('admin-website-requests/', views.jd_website_config_list_app, name='jd_website_config_list_app'),
+    path('admin-website-requests/archive/', views.jd_website_config_archive_app, name='jd_website_config_archive_app'),
+    path('admin-website-requests/<int:pk>/', views.jd_website_config_detail_app, name='jd_website_config_detail_app'),
+    path('admin-website-requests/<int:pk>/status/', views.jd_website_config_update_status_app, name='jd_website_config_update_status_app'),
+    path('admin-website-requests/<int:pk>/mail/', views.jd_website_config_send_mail_app, name='jd_website_config_send_mail_app'),
+
     # Sales-Verwaltung (Admin) inkl. Chat
     path('admin-sales/', views.jd_admin_sales_app, name='jds_admin_sales_app'),
     path('admin-sales/<int:entry_id>/', views.jd_sales_entry_detail_app, name='jd_sales_entry_detail_app'),

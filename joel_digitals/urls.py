@@ -95,6 +95,13 @@ urlpatterns += i18n_patterns(
     path("reviews/", include("reviews.urls")),
     path('webinars/', include('webinars.urls')),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+
+    # Website-Konfigurator: bewusst nirgends verlinkt (Hauptnav/Tools/Startseite),
+    # erst mal nur unter dieser URL direkt erreichbar/testbar. Muss VOR
+    # landingpages.urls stehen: dessen '<slug:slug>/'-Catch-all (leerer Prefix)
+    # würde /website-konfigurator/ sonst faelschlich als Landingpage-Slug matchen
+    # (gleiches Muster wie shop/jds-management/ vs. shop_ourapps' Catch-all oben).
+    path('website-konfigurator/', include('website_configurator.urls')),
     path('', include('landingpages.urls')),
 )
 

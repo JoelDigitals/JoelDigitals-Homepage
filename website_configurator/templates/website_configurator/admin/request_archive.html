@@ -1,0 +1,67 @@
+{% extends request.base_template|default:"base_home.html" %}
+{% block title %}Website-Konfigurator-Anfragen: Archiv{% endblock %}
+{% block content %}
+<style>
+.wcfg-admin-wrap{max-width:1100px;margin:0 auto;padding:2rem 1rem}
+.wcfg-admin-wrap h1{font-size:1.6rem;margin-bottom:.25rem}
+.wcfg-admin-nav{margin-bottom:1.5rem}
+.wcfg-admin-nav a{color:var(--primary);text-decoration:none;font-weight:600;font-size:.85rem}
+.wcfg-search{display:flex;gap:.6rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.wcfg-search input{flex:1;min-width:220px;padding:.6rem .8rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text)}
+.wcfg-search button{padding:.6rem 1.2rem;border-radius:8px;border:none;background:var(--primary);color:#fff;font-weight:700;cursor:pointer}
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+th,td{padding:.7rem .9rem;text-align:left;border-bottom:1px solid var(--border);font-size:.875rem}
+th{background:#181818;text-transform:uppercase;font-size:.7rem;letter-spacing:.04em;color:#999}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:.2rem .6rem;border-radius:99px;font-size:.72rem;font-weight:600}
+.b-won{background:#06331f;color:#4ade80}
+.b-lost{background:#3b0d0d;color:#f87171}
+a.rowlink{color:var(--primary);text-decoration:none;font-weight:600}
+.wcfg-pagination{display:flex;justify-content:center;gap:.75rem;margin-top:1.25rem;font-size:.85rem}
+.wcfg-pagination a{color:var(--primary);text-decoration:none}
+.wcfg-pagination span{color:#888}
+</style>
+<div class="wcfg-admin-wrap">
+  <h1>Website-Konfigurator: Archiv</h1>
+  <div class="wcfg-admin-nav">
+    <a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_website_config_list_app' %}{% else %}{% url 'website_configurator:admin_request_list' %}{% endif %}">&larr; Zurück zu den aktiven Anfragen</a>
+  </div>
+
+  <form class="wcfg-search" method="get">
+    <input type="text" name="q" placeholder="Suche nach Referenz, Name, E-Mail, Firma ..." value="{{ query }}">
+    <button type="submit">Suchen</button>
+  </form>
+
+  <table>
+    <thead><tr><th>Referenz</th><th>Kunde</th><th>Firma</th><th>Typ</th><th>Status</th><th>Preis</th><th>Zuletzt aktualisiert</th><th></th></tr></thead>
+    <tbody>
+      {% for r in page_obj %}
+      <tr>
+        <td>{{ r.reference }}</td>
+        <td>{{ r.name }}</td>
+        <td>{{ r.company_name|default:"–" }}</td>
+        <td>{{ r.get_site_type_display }}</td>
+        <td><span class="badge b-{{ r.status }}">{{ r.get_status_display }}</span></td>
+        <td>{% if r.estimated_total is not None %}{{ r.estimated_total }} €{% else %}Preis auf Anfrage{% endif %}</td>
+        <td>{{ r.updated_at|date:"d.m.Y H:i" }}</td>
+        <td><a class="rowlink" href="{% if request.base_template == 'base_app.html' %}{% url 'jd_website_config_detail_app' pk=r.pk %}{% else %}{% url 'website_configurator:admin_request_detail' r.pk %}{% endif %}">Öffnen</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8" style="text-align:center;color:#888">Keine archivierten Anfragen gefunden.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="wcfg-pagination">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">&lsaquo; Zurück</a>
+    {% endif %}
+    <span>Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Weiter &rsaquo;</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

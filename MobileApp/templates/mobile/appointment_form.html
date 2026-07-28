@@ -974,12 +974,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function selectSlot(datetime, time, dateStr) {
         const dt = new Date(datetime);
-        
-        const year = dt.getUTCFullYear();
-        const month = String(dt.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(dt.getUTCDate()).padStart(2, '0');
-        const hours = String(dt.getUTCHours()).padStart(2, '0');
-        const minutes = String(dt.getUTCMinutes()).padStart(2, '0');
+
+        // Lokale (Browser-Zeitzone = Europe/Berlin) Komponenten verwenden, nicht
+        // getUTC* - der Server schickt den Slot bereits als Berlin-Zeit-ISO-String
+        // (z.B. "...T17:00:00+02:00"), getUTC* wuerde daraus faelschlich die
+        // UTC-Uhrzeit (15:00) herausziehen und als naive lokale Zeit einreichen.
+        const year = dt.getFullYear();
+        const month = String(dt.getMonth() + 1).padStart(2, '0');
+        const day = String(dt.getDate()).padStart(2, '0');
+        const hours = String(dt.getHours()).padStart(2, '0');
+        const minutes = String(dt.getMinutes()).padStart(2, '0');
         const djangoFormat = `${year}-${month}-${day} ${hours}:${minutes}:00`;
         
         datetimeInput.value = djangoFormat;

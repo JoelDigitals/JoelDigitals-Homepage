@@ -59,6 +59,24 @@ def fetch_products():
         return []
 
 
+def create_product(payload):
+    """
+    Legt ein neues Produkt im echten JDS Management an (POST /api/v2/products/).
+    Team wird ausschliesslich ueber den X-Team-Code-Header bestimmt (get_api_headers());
+    ein 'team'/'team_id'-Feld im Payload existiert auf API-Seite nicht und wird
+    ignoriert - die Zielteam-Zuordnung kommt allein aus settings.JDS_TEAM_CODE.
+    Akzeptierte payload-Keys: name (Pflicht), price, mwst, description, stock,
+    product_number, storage_location_1, storage_location_2. Gibt das erstellte
+    Produkt-Dict (inkl. interner numerischer "id") zurueck. Kein serverseitiges
+    Dedup - wiederholte Aufrufe mit gleichem "name" legen erneut ein Produkt an,
+    nur "product_number" ist (global, nicht pro Team) unique.
+    """
+    url = f"{settings.JDS_API_BASE_URL}/api/v2/products/"
+    resp = requests.post(url, headers=get_api_headers(), json=payload, timeout=15)
+    resp.raise_for_status()
+    return _unwrap(resp.json())
+
+
 def sync_stock():
     """
     Holt alle Produkte aus JDS Management und gleicht lokalen Bestand ab.
