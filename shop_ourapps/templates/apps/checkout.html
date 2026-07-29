@@ -533,6 +533,8 @@
                     {{ item.jds_configuration.display_name }}
                   {% elif item.package %}
                     {{ item.package.name }}
+                  {% elif item.backroom_product %}
+                    {% if "de" in lang %}{{ item.backroom_product.name }}{% else %}{{ item.backroom_product.name_english|default:item.backroom_product.name }}{% endif %}
                   {% elif "de" in lang %}
                     {{ item.app.name }}
                   {% else %}
@@ -550,6 +552,18 @@
                     <span class="discount-badge-small">-{{ item.package.discount_percent }}%</span>
                   {% else %}
                     <span class="price-regular">€{{ item.package.price|floatformat:2 }}</span>
+                  {% endif %}
+                {% elif item.backroom_product %}
+                  <span style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;padding:1px 7px;border-radius:4px;font-size:0.65rem;font-weight:700;margin-right:0.4rem;">EK</span>
+                  {% if item.backroom_product.discount_is_active %}
+                    <span class="price-strike">€{{ item.backroom_product.price|floatformat:2 }}</span>
+                    <span class="price-final">€{{ item.backroom_product.discounted_price|floatformat:2 }}</span>
+                    <span class="discount-badge-small">-{{ item.backroom_product.discount_percent }}%</span>
+                  {% else %}
+                    <span class="price-regular">€{{ item.backroom_product.price|floatformat:2 }}</span>
+                  {% endif %}
+                  {% if item.backroom_product.uvp %}
+                    <span style="font-size:0.75rem;color:#999;text-decoration:line-through;margin-left:0.4rem;">{% trans "UVP" %}: €{{ item.backroom_product.uvp|floatformat:2 }}</span>
                   {% endif %}
                 {% elif item.app.discount_is_active %}
                   <span class="price-strike">€{{ item.app.price|floatformat:2 }}</span>

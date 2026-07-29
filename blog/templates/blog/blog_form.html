@@ -136,6 +136,14 @@ select, textarea {
                        value="{{ form.main_image_delete_url.value|default:'' }}">
             </div>
             
+            <!-- AI Label Checkbox -->
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    {{ form.main_image_ai_generated }}
+                    <span style="font-weight: normal;">🤖 Dieses Bild wurde KI-generiert (AI-Label anzeigen)</span>
+                </label>
+            </div>
+
             <!-- Fallback: Lokaler Upload (wenn ImgBB fehlschlägt) -->
             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
                 <label for="id_teaser_image" style="font-weight: normal; color: #666;">

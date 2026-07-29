@@ -3172,3 +3172,110 @@ msgstr "Watch recording"
 #: webinars/templates/webinars/webinar_detail.html
 msgid "No recording available for this webinar."
 msgstr "No recording available for this webinar."
+
+# ---------------- Backroom (auto-added) ----------------
+msgid "Anfragen"
+msgstr "Inquire"
+
+msgid "Erneut beantragen"
+msgstr "Apply again"
+
+msgid "In den Warenkorb"
+msgstr "Add to Cart"
+
+msgid "Nachricht"
+msgstr "Message"
+
+msgid "UVP"
+msgstr "RRP"
+
+msgid "Zugang beantragen"
+msgstr "Request Access"
+
+msgid "Zum Kauf anmelden"
+msgstr "Log in to Purchase"
+
+msgid "Zum Shop"
+msgstr "Go to Shop"
+
+msgid "Du hast bereits Zugang zum Backroom."
+msgstr "You already have access to the Backroom."
+
+msgid "Deine Anfrage wird geprüft. Wir melden uns, sobald eine Entscheidung getroffen wurde."
+msgstr "Your request is being reviewed. We'll get back to you once a decision has been made."
+
+msgid "Deine letzte Anfrage wurde leider abgelehnt."
+msgstr "Unfortunately, your last request was rejected."
+
+msgid "Der Backroom Shop richtet sich an Partner mit passendem Zugang. Beschreibe kurz dein Anliegen, wir prüfen deine Anfrage manuell."
+msgstr "The Backroom Shop is for partners with matching access. Briefly describe your request - we'll review it manually."
+
+msgid "Der Backroom ist unser Einkaufspreis-Shop für ausgewählte Partner."
+msgstr "The Backroom is our cost-price shop for selected partners."
+
+msgid "Möchtest du erneut anfragen? Erzähl uns kurz, warum du Zugang benötigst:"
+msgstr "Want to apply again? Tell us briefly why you need access:"
+
+msgid "Nach dem Kauf ist eine Aktivierung erforderlich. Details erhältst du nach Zahlungseingang."
+msgstr "Activation is required after purchase. You'll receive details once payment is received."
+
+msgid "z.B. Firma, Wiederverkäufer-Status, gewünschte Produkte..."
+msgstr "e.g. company, reseller status, desired products..."
+
+msgid "Du hast bereits eine Anfrage laufen."
+msgstr "You already have a request in progress."
+
+msgid "Deine Anfrage wurde eingereicht. Wir melden uns, sobald sie geprüft wurde."
+msgstr "Your request has been submitted. We'll get back to you once it's been reviewed."
+
+msgid "Clear search"
+msgstr "Clear search"
+
+msgid "Sort by"
+msgstr "Sort by"
+
+msgid "Name A-Z"
+msgstr "Name A-Z"
+
+msgid "Newest first"
+msgstr "Newest first"
+
+msgid "Price ascending"
+msgstr "Price ascending"
+
+msgid "Price descending"
+msgstr "Price descending"
+
+msgid "Products"
+msgstr "Products"
+
+msgid "No products available yet."
+msgstr "No products available yet."
+
+msgid "No products found for"
+msgstr "No products found for"
+
+msgid "Search products..."
+msgstr "Search products..."
+
+msgid "Back to Backroom Shop"
+msgstr "Back to Backroom Shop"
+
+msgid "Company"
+msgstr "Company"
+
+msgid "Legal"
+msgstr "Legal"
+
+msgid "Partner"
+msgstr "Partner"
+
+msgid "Affiliate Program"
+msgstr "Affiliate Program"
+
+msgid "Request Backroom Access"
+msgstr "Request Backroom Access"
+
+msgid "Backroom Shop"
+msgstr "Backroom Shop"
+

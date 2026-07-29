@@ -1,0 +1,154 @@
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Backroom Zugang beantragen – Joel Digitals{% endblock %}
+{% block meta_description %}Beantrage Zugang zum Backroom (EK-Shop) von Joel Digitals.{% endblock %}
+
+{% block content %}
+<style>
+  .access-container {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .access-header {
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    padding: 3rem 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+  }
+
+  .access-header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(4px);
+  }
+
+  .access-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .access-header p {
+    color: rgba(255,255,255,0.8);
+    font-size: 1.05rem;
+    margin: 0;
+  }
+
+  .access-body {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .status-box {
+    padding: 1.25rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+  }
+
+  .status-pending { background: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); }
+  .status-approved { background: rgba(76, 175, 80, 0.12); color: #2e7d32; border: 1px solid rgba(76, 175, 80, 0.3); }
+  .status-rejected { background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+  .access-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .access-form textarea {
+    width: 100%;
+    min-height: 140px;
+    padding: 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+    resize: vertical;
+    box-sizing: border-box;
+  }
+
+  .btn-submit {
+    margin-top: 1rem;
+    background: var(--primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-submit:hover {
+    background: var(--primary-hover);
+  }
+</style>
+
+<div class="access-container">
+  <div class="access-header">
+    <div class="badge"><i class="fas fa-store-alt"></i> Backroom – EK Shop</div>
+    <h1><i class="fas fa-user-lock"></i> {% trans "Zugang beantragen" %}</h1>
+    <p>{% trans "Der Backroom ist unser Einkaufspreis-Shop für ausgewählte Partner." %}</p>
+  </div>
+
+  <div class="access-body">
+    {% if has_access %}
+      <div class="status-box status-approved">
+        <i class="fas fa-check-circle"></i>
+        {% trans "Du hast bereits Zugang zum Backroom." %}
+        <a href="{% url 'backroom_list' %}" style="margin-left:auto;color:inherit;text-decoration:underline;">{% trans "Zum Shop" %}</a>
+      </div>
+    {% elif existing_request.status == 'pending' %}
+      <div class="status-box status-pending">
+        <i class="fas fa-hourglass-half"></i>
+        {% trans "Deine Anfrage wird geprüft. Wir melden uns, sobald eine Entscheidung getroffen wurde." %}
+      </div>
+    {% elif existing_request.status == 'rejected' %}
+      <div class="status-box status-rejected">
+        <i class="fas fa-times-circle"></i>
+        {% trans "Deine letzte Anfrage wurde leider abgelehnt." %}
+        {% if existing_request.admin_note %} {{ existing_request.admin_note }}{% endif %}
+      </div>
+      <form method="post" class="access-form">
+        {% csrf_token %}
+        <label for="message">{% trans "Möchtest du erneut anfragen? Erzähl uns kurz, warum du Zugang benötigst:" %}</label>
+        <textarea name="message" id="message" placeholder="{% trans 'z.B. Firma, Wiederverkäufer-Status, gewünschte Produkte...' %}"></textarea>
+        <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> {% trans "Erneut beantragen" %}</button>
+      </form>
+    {% else %}
+      <p style="color:#666;margin-bottom:1.5rem;">
+        {% trans "Der Backroom Shop richtet sich an Partner mit passendem Zugang. Beschreibe kurz dein Anliegen, wir prüfen deine Anfrage manuell." %}
+      </p>
+      <form method="post" class="access-form">
+        {% csrf_token %}
+        <label for="message">{% trans "Nachricht" %}</label>
+        <textarea name="message" id="message" placeholder="{% trans 'z.B. Firma, Wiederverkäufer-Status, gewünschte Produkte...' %}"></textarea>
+        <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> {% trans "Zugang beantragen" %}</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

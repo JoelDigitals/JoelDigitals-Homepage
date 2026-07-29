@@ -1,9 +1,13 @@
 from .models import AffiliateCode, AffiliatePartner, Wallet
+from backroom.access import has_backroom_access
 
 
 def affiliate_ref_status(request):
     ref = request.GET.get("ref", "") or request.session.get("affiliate_ref", "")
-    ctx = {"affiliate_ref_code": "", "affiliate_ref_valid": None, "affiliate_ref_own": False, "wallet_balance": 0.00}
+    ctx = {
+        "affiliate_ref_code": "", "affiliate_ref_valid": None, "affiliate_ref_own": False,
+        "wallet_balance": 0.00, "backroom_access": has_backroom_access(request.user),
+    }
 
     if request.user.is_authenticated:
         wallet = Wallet.objects.filter(user=request.user).first()

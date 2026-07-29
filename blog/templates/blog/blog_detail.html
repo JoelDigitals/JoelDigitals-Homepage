@@ -567,12 +567,31 @@
   <article class="article-body">
     <!-- Featured Image mit Priorisierung -->
     {% if post.get_main_image_url %}
-      <div class="featured-image">
-        <img src="{{ post.get_main_image_url }}" alt="{{ post.title }}" loading="lazy">
+      <div style="display: grid;">
+        <div class="featured-image" style="grid-row: 1 / -1; grid-column: 1 / -1;">
+          <img src="{{ post.get_main_image_url }}" alt="{{ post.title }}" loading="lazy">
+        </div>
+        {% if post.main_image_ai_generated %}
+          <span style="grid-row: 1 / -1; grid-column: 1 / -1; justify-self: end; align-self: start; margin: 12px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 4px; z-index: 2; pointer-events: none;">
+            <span style="background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 3px; padding: 1px 5px; font-size: 0.65rem; font-weight: 700;">AI</span> Generiert
+          </span>
+        {% endif %}
       </div>
     {% elif post.teaser_image %}
-      <div class="featured-image">
-        <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}">
+      <div style="display: grid;">
+        <div class="featured-image" style="grid-row: 1 / -1; grid-column: 1 / -1;">
+          <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}" loading="lazy">
+        </div>
+        {% if post.main_image_ai_generated %}
+          <span style="grid-row: 1 / -1; grid-column: 1 / -1; justify-self: end; align-self: start; margin: 12px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 4px; z-index: 2; pointer-events: none;">
+            <span style="background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 3px; padding: 1px 5px; font-size: 0.65rem; font-weight: 700;">AI</span> Generiert
+          </span>
+        {% endif %}
+      </div>
+    {% elif post.main_image_ai_generated %}
+      <div style="padding: 12px 16px; background: rgba(99,102,241,0.1); border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 6px;">
+        <span style="background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 3px; padding: 1px 5px; font-size: 0.65rem; font-weight: 700; color: #fff;">AI</span>
+        <span style="font-size: 0.8rem; color: #666;">Generiert</span>
       </div>
     {% endif %}
 
@@ -680,12 +699,26 @@
             <article class="related-card">
               
               {% if next_post.get_main_image_url %}
-                <div class="featured-image">
-                  <img src="{{ next_post.get_main_image_url }}" alt="{{ next_post.title }}" loading="lazy">
+                <div style="display: grid;">
+                  <div class="featured-image" style="grid-row: 1 / -1; grid-column: 1 / -1;">
+                    <img src="{{ next_post.get_main_image_url }}" alt="{{ next_post.title }}" loading="lazy">
+                  </div>
+                  {% if next_post.main_image_ai_generated %}
+                    <span style="grid-row: 1 / -1; grid-column: 1 / -1; justify-self: end; align-self: start; margin: 8px; background: rgba(0,0,0,0.7); color: #fff; padding: 3px 8px; border-radius: 5px; font-size: 0.65rem; font-weight: 600; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 3px; z-index: 2; pointer-events: none;">
+                      <span style="background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 3px; padding: 1px 4px; font-size: 0.55rem; font-weight: 700;">AI</span> Generiert
+                    </span>
+                  {% endif %}
                 </div>
               {% elif next_post.teaser_image %}
-                <div class="featured-image">
-                  <img src="{{ next_post.teaser_image.url }}" alt="{{ next_post.title }}">
+                <div style="display: grid;">
+                  <div class="featured-image" style="grid-row: 1 / -1; grid-column: 1 / -1;">
+                    <img src="{{ next_post.teaser_image.url }}" alt="{{ next_post.title }}">
+                  </div>
+                  {% if next_post.main_image_ai_generated %}
+                    <span style="grid-row: 1 / -1; grid-column: 1 / -1; justify-self: end; align-self: start; margin: 8px; background: rgba(0,0,0,0.7); color: #fff; padding: 3px 8px; border-radius: 5px; font-size: 0.65rem; font-weight: 600; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 3px; z-index: 2; pointer-events: none;">
+                      <span style="background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 3px; padding: 1px 4px; font-size: 0.55rem; font-weight: 700;">AI</span> Generiert
+                    </span>
+                  {% endif %}
                 </div>
               {% endif %}
               <div class="related-content">

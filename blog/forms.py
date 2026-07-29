@@ -10,6 +10,7 @@ class BlogPostForm(forms.ModelForm):
         fields = [
             'title_de', 'title_en', 
             'main_image_url', 'main_image_thumb_url', 'main_image_medium_url', 'main_image_delete_url',
+            'main_image_ai_generated',
             'teaser_image',
             'content_de', 'content_en',
             'is_published', 'published_at', 'categories'

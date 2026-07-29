@@ -1,0 +1,342 @@
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Backroom Shop – Joel Digitals{% endblock %}
+{% block meta_description %}Exklusive Produkte für den Einzelhandel – JDS Management für Vereine und mehr.{% endblock %}
+
+{% block content %}
+<style>
+  .backroom-header {
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    padding: 3rem 2rem;
+    border-radius: 16px;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .backroom-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .backroom-header p {
+    color: rgba(255,255,255,0.8);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .backroom-header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(4px);
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .search-form {
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 200px;
+    max-width: 400px;
+  }
+
+  .search-form input {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .search-form input:focus {
+    border-color: var(--primary);
+  }
+
+  .search-form button {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+  }
+
+  .search-form button:hover {
+    background: var(--primary-hover);
+  }
+
+  .sort-select {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.95rem;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .product-count {
+    color: #888;
+    font-size: 0.9rem;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-card:hover {
+    transform: translateY(-4px);
+    border-color: #f59e0b;
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.15);
+  }
+
+  .product-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+  }
+
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover .product-image img {
+    transform: scale(1.05);
+  }
+
+  .product-info {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .product-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .product-description {
+    color: #999;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+  }
+
+  .product-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+  }
+
+  .product-price {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #f59e0b;
+  }
+
+  .ek-badge {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+    margin-right: 0.4rem;
+  }
+
+  .product-uvp {
+    display: block;
+    font-size: 0.8rem;
+    color: #999;
+    text-decoration: line-through;
+    font-weight: 400;
+  }
+
+  .product-discount-tag {
+    background: #fff0f0;
+    color: #c82333;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-left: 0.4rem;
+  }
+
+  .btn-detail {
+    background: var(--primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn-detail:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+  }
+
+  .btn-cart {
+    background: #f59e0b;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn-cart:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .backroom-header h1 { font-size: 1.8rem; }
+    .product-grid { grid-template-columns: 1fr; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .search-form { max-width: 100%; }
+    .sort-select { width: 100%; }
+  }
+</style>
+
+<div class="backroom-header">
+  <div class="badge"><i class="fas fa-store-alt"></i> Backroom Shop</div>
+  <h1><i class="fas fa-box-open"></i> Backroom Shop</h1>
+  <p>Exklusive Produkte für den Einzelhandel – JDS Management für Vereine und mehr</p>
+</div>
+
+<div class="toolbar">
+  <form method="get" class="search-form">
+    <input type="text" name="q" placeholder="{% trans 'Search products...' %}" value="{{ query }}">
+    <button type="submit"><i class="fas fa-search"></i></button>
+  </form>
+
+  <select class="sort-select" onchange="window.location.href = this.value;">
+    <option value="?{% if query %}q={{ query }}&{% endif %}sort=order" {% if current_sort == 'order' %}selected{% endif %}>
+      {% trans "Sort by" %}...
+    </option>
+    <option value="?{% if query %}q={{ query }}&{% endif %}sort=name" {% if current_sort == 'name' %}selected{% endif %}>
+      {% trans "Name A-Z" %}
+    </option>
+    <option value="?{% if query %}q={{ query }}&{% endif %}sort=price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>
+      {% trans "Price ascending" %}
+    </option>
+    <option value="?{% if query %}q={{ query }}&{% endif %}sort=price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>
+      {% trans "Price descending" %}
+    </option>
+    <option value="?{% if query %}q={{ query }}&{% endif %}sort=newest" {% if current_sort == 'newest' %}selected{% endif %}>
+      {% trans "Newest first" %}
+    </option>
+  </select>
+
+  <span class="product-count">{{ product_count }} {% trans "Products" %}</span>
+</div>
+
+<div class="product-grid">
+  {% for product in products %}
+    <article class="product-card">
+      {% if product.image %}
+        <div class="product-image">
+          <img src="{{ product.image }}" alt="{{ product.display_name }}" loading="lazy">
+        </div>
+      {% endif %}
+      <div class="product-info">
+        <h2 class="product-name">{{ product.display_name }}</h2>
+        <div class="product-description">{{ product.display_description|linebreaks|truncatewords:30 }}</div>
+        <div class="product-footer">
+          <span class="product-price">
+            <span class="ek-badge">EK</span>
+            {% if product.discount_is_active %}
+              <span style="text-decoration:line-through;color:#999;font-size:0.9rem;">{{ product.price }}€</span>
+              {{ product.discounted_price|floatformat:2 }}€
+              <span class="product-discount-tag"><i class="fas fa-tag"></i> -{{ product.discount_percent }}%</span>
+            {% else %}
+              {{ product.price }}€
+            {% endif %}
+            {% if product.uvp %}
+              <span class="product-uvp">{% trans "UVP" %}: {{ product.uvp }}€</span>
+            {% endif %}
+          </span>
+          <div style="display:flex;gap:0.5rem;">
+            <a href="{% url 'backroom_detail' product.slug %}" class="btn-detail">
+              {% trans "Details" %} <i class="fas fa-arrow-right"></i>
+            </a>
+            {% if user.is_authenticated %}
+              <form method="post" action="{% url 'add_backroom_to_cart' product.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-cart">
+                  <i class="fas fa-cart-plus"></i>
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </article>
+  {% empty %}
+    <div style="text-align: center; color: #999; padding: 3rem; grid-column: 1 / -1;">
+      <i class="fas fa-box-open" style="font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.3;"></i>
+      {% if query %}
+        <p>{% trans "No products found for" %} "{{ query }}".</p>
+        <a href="{% url 'backroom_list' %}" class="btn-detail" style="display:inline-flex;margin-top:1rem;">
+          <i class="fas fa-times"></i> {% trans "Clear search" %}
+        </a>
+      {% else %}
+        <p>{% trans "No products available yet." %}</p>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

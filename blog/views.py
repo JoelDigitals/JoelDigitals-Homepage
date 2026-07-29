@@ -134,7 +134,8 @@ def admin_blog(request):
     # Nur die nötigsten Felder laden
     posts = BlogPost.objects.all().only(
         'id', 'title_de', 'title_en', 'created_at', 
-        'is_published', 'teaser_image', 'views'
+        'is_published', 'teaser_image', 'views',
+        'main_image_ai_generated'
     ).prefetch_related('categories').order_by('-created_at')
     
     lang = request.LANGUAGE_CODE

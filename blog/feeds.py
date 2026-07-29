@@ -39,7 +39,10 @@ class LatestPostsFeed(Feed):
             plain = plain[:397] + "..."
         img = item.get_main_image_url()
         if img:
-            plain = f"[Bild: {img}]\n\n{plain}"
+            label = "[Bild: KI-generiert]" if item.main_image_ai_generated else f"[Bild: {img}]"
+            plain = f"{label}\n\n{plain}"
+        elif item.main_image_ai_generated:
+            plain = f"[KI-generiertes Bild]\n\n{plain}"
         return plain
 
     def item_pubdate(self, item):
@@ -67,4 +70,8 @@ class AtomLatestPostsFeed(LatestPostsFeed):
 
     def item_description(self, item):
         lang = get_language() or "de"
-        return item.content_en if (lang == "en" and item.content_en) else item.content_de
+        content = item.content_en if (lang == "en" and item.content_en) else item.content_de
+        if item.main_image_ai_generated:
+            badge = '<p style="margin-bottom: 10px;"><span style="background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">AI</span> <span style="font-size: 0.8rem; color: #666;">Generiert</span></p>'
+            content = badge + content
+        return content

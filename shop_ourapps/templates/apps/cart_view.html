@@ -195,6 +195,22 @@
     font-size: 1.1rem;
   }
 
+  .ek-badge {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .uvp-line {
+    font-size: 0.8rem;
+    color: #999;
+    margin-top: 0.2rem;
+  }
+
   .discount-tag {
     background: #fff0f0;
     color: #c82333;
@@ -473,6 +489,14 @@
                     <i class="fas fa-gift"></i>
                   </div>
                 {% endif %}
+              {% elif item.backroom_product %}
+                {% if item.backroom_product.image %}
+                  <img src="{{ item.backroom_product.image }}" alt="{{ item.backroom_product.name }}">
+                {% else %}
+                  <div class="item-image-placeholder">
+                    <i class="fas fa-store-alt"></i>
+                  </div>
+                {% endif %}
               {% elif item.app.display_image %}
                 <img src="{{ item.app.display_image }}" alt="{{ item.app.name }}">
               {% else %}
@@ -490,6 +514,29 @@
                     <span class="qty-badge">{{ item.quantity }}x</span>
                     <span class="price-regular">€{{ item.price }}</span>
                   </div>
+                </div>
+              {% elif item.backroom_product %}
+                <h2 class="item-name">{% if "de" in lang %}{{ item.backroom_product.name }}{% else %}{{ item.backroom_product.name_english|default:item.backroom_product.name }}{% endif %}</h2>
+                <div class="item-pricing">
+                  <div class="price-line" style="flex-wrap:wrap;">
+                    <span class="qty-badge">{{ item.quantity }}x</span>
+                    <span class="ek-badge">EK</span>
+                    {% if item.backroom_product.discount_is_active %}
+                      <span class="price-original">€{{ item.backroom_product.price }}</span>
+                      <span class="price-discounted">€{{ item.price }}</span>
+                      <span class="discount-tag">
+                        <i class="fas fa-tag"></i>
+                        {{ item.backroom_product.discount_percent }}%
+                      </span>
+                    {% else %}
+                      <span class="price-regular">€{{ item.price }}</span>
+                    {% endif %}
+                  </div>
+                  {% if item.backroom_product.uvp %}
+                    <div class="uvp-line">
+                      {% trans "UVP" %}: <span style="text-decoration:line-through;">€{{ item.backroom_product.uvp }}</span>
+                    </div>
+                  {% endif %}
                 </div>
               {% elif item.package %}
                 <h2 class="item-name">{{ item.package.name }}</h2>

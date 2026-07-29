@@ -284,6 +284,26 @@
       </div>
       {% endif %}
 
+      {% if backroom_request_count %}
+      <div class="panel" style="border-color:rgba(245,158,11,.3);">
+        <h3><i class="fas fa-store-alt" style="color:#f59e0b;"></i> {% trans "Backroom: Zugangsanfragen" %} ({{ backroom_request_count }})</h3>
+        {% for br in pending_backroom_requests %}
+        <form method="post" style="margin-bottom:.5rem;padding:.5rem;background:var(--bg);border-radius:8px;border:1px solid var(--border);font-size:.8rem;">
+          {% csrf_token %}
+          <input type="hidden" name="backroom_access_action" value="1">
+          <input type="hidden" name="req_id" value="{{ br.id }}">
+          <div style="font-weight:600;">{{ br.user.username }}</div>
+          <div style="color:#888;margin:.2rem 0;">{{ br.user.email }}</div>
+          {% if br.message %}<div style="color:#888;font-size:.75rem;margin-bottom:.3rem;">{{ br.message|truncatechars:80 }}</div>{% endif %}
+          <div style="display:flex;gap:.3rem;">
+            <button name="action" value="approve" style="flex:1;padding:.3rem;background:#4CAF50;color:white;border:none;border-radius:4px;font-size:.7rem;cursor:pointer;">✓ {% trans "Approve" %}</button>
+            <button name="action" value="reject" style="flex:1;padding:.3rem;background:#ef4444;color:white;border:none;border-radius:4px;font-size:.7rem;cursor:pointer;">✗ {% trans "Reject" %}</button>
+          </div>
+        </form>
+        {% endfor %}
+      </div>
+      {% endif %}
+
       {% if jds_request_count or jds_feature_request_count %}
       <div class="panel" style="border-color:rgba(0,68,204,.3);">
         <h3><i class="fas fa-sliders-h" style="color:var(--primary);"></i> {% trans "JDS Management: Anfragen" %} ({{ jds_request_count|add:jds_feature_request_count }})</h3>

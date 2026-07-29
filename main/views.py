@@ -311,6 +311,20 @@ def _handle_admin_dashboard_actions(request, redirect_name):
             _send_withdrawal_email(wr, 'rejected')
         return redirect(redirect_name)
 
+    if request.method == "POST" and "backroom_access_action" in request.POST:
+        from backroom.models import BackroomAccessRequest
+        req_id = request.POST.get("req_id")
+        action = request.POST.get("action")
+        note = request.POST.get("note", "")
+        req = get_object_or_404(BackroomAccessRequest, id=req_id)
+        if action == "approve":
+            req.approve()
+            messages.success(request, f"Backroom-Zugang für {req.user.username} genehmigt.")
+        elif action == "reject":
+            req.reject(note=note)
+            messages.success(request, f"Backroom-Anfrage von {req.user.username} abgelehnt.")
+        return redirect(redirect_name)
+
     return None
 
 
@@ -487,6 +501,11 @@ def _build_admin_dashboard_context(request):
     pending_withdrawals = WithdrawalRequest.objects.filter(status='pending').order_by('-created_at')[:5]
     withdrawal_count = WithdrawalRequest.objects.filter(status='pending').count()
 
+    # === BACKROOM: ZUGANGSANFRAGEN ===
+    from backroom.models import BackroomAccessRequest
+    pending_backroom_requests = BackroomAccessRequest.objects.filter(status='pending').select_related('user').order_by('-created_at')[:5]
+    backroom_request_count = BackroomAccessRequest.objects.filter(status='pending').count()
+
     # === JDS MANAGEMENT: KONFIGURATIONS- & FUNKTIONS-ANFRAGEN ===
     from jds_configurator.models import JdsConfigRequest, JdsFeatureRequest
     pending_jds_requests = JdsConfigRequest.objects.filter(status='pending').order_by('-created_at')[:5]
@@ -582,6 +601,8 @@ def _build_admin_dashboard_context(request):
         'total_users': total_users,
         'pending_withdrawals': pending_withdrawals,
         'withdrawal_count': withdrawal_count,
+        'pending_backroom_requests': pending_backroom_requests,
+        'backroom_request_count': backroom_request_count,
         'pending_jds_requests': pending_jds_requests,
         'jds_request_count': jds_request_count,
         'pending_jds_feature_requests': pending_jds_feature_requests,
@@ -1574,6 +1595,7 @@ def sitemap_txt(request):
     from shop_ourapps.models import App as ShopApp
     from wiki.models import Wiki as WikiArticle
     from status.models import App as StatusApp
+    from backroom.models import BackroomProduct
 
     base_url = "https://www.joel-digitals.de"
     lines = []
@@ -1585,7 +1607,7 @@ def sitemap_txt(request):
             '', '/about/', '/services/', '/contact/contact/',
             '/blog/', '/our-apps/', '/shop/',
             '/downloads/', '/status/',
-            '/wiki/', '/imprint/', '/privacy/', '/terms/',
+            '/wiki/', '/backroom/', '/imprint/', '/privacy/', '/terms/',
         ]
         for page in static_pages:
             lines.append(f"{base_url}{prefix}{page}")
@@ -1601,6 +1623,9 @@ def sitemap_txt(request):
 
         for wiki in WikiArticle.objects.filter(is_published=True):
             lines.append(f"{base_url}{prefix}/wiki/{wiki.slug}/")
+
+        for bp in BackroomProduct.objects.filter(is_published=True):
+            lines.append(f"{base_url}{prefix}/backroom/{bp.slug}/")
 
     for sa in StatusApp.objects.filter(is_active=True):
         lines.append(f"{base_url}/status/app/{sa.pk}/")

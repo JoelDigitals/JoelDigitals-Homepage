@@ -1,0 +1,205 @@
+{% extends "base_home.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ product.display_name }} – Backroom Shop – Joel Digitals{% endblock %}
+{% block meta_description %}{{ product.display_description|striptags|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<style>
+  .detail-container {
+    max-width: 900px;
+    margin: 2rem auto;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: #f59e0b;
+    gap: 0.75rem;
+  }
+
+  .product-detail-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .product-detail-image {
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+  }
+
+  .product-detail-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .product-detail-info {
+    padding: 2rem;
+  }
+
+  .product-detail-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 1rem 0;
+  }
+
+  .product-detail-price {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #f59e0b;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .ek-badge {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .product-detail-uvp {
+    font-size: 1rem;
+    color: #999;
+    text-decoration: line-through;
+    font-weight: 400;
+  }
+
+  .product-detail-original {
+    font-size: 1.1rem;
+    color: #999;
+    text-decoration: line-through;
+    font-weight: 400;
+  }
+
+  .product-detail-discount-tag {
+    background: #fff0f0;
+    color: #c82333;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .product-detail-description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #ccc;
+    margin-bottom: 2rem;
+  }
+
+  .btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #f59e0b;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-action:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+  }
+
+  .btn-action.secondary {
+    background: #666;
+  }
+
+  .btn-action.secondary:hover {
+    background: #555;
+  }
+
+  @media (max-width: 768px) {
+    .product-detail-name { font-size: 1.5rem; }
+    .product-detail-price { font-size: 1.3rem; }
+    .product-detail-info { padding: 1.5rem; }
+  }
+</style>
+
+<div class="detail-container">
+  <a href="{% url 'backroom_list' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> {% trans "Back to Backroom Shop" %}
+  </a>
+
+  <div class="product-detail-card">
+    {% if product.image %}
+      <div class="product-detail-image">
+        <img src="{{ product.image }}" alt="{{ product.display_name }}">
+      </div>
+    {% endif %}
+
+      <div class="product-detail-info">
+        <h1 class="product-detail-name">{{ product.display_name }}</h1>
+        <div class="product-detail-price">
+          <span class="ek-badge">EK</span>
+          {% if product.discount_is_active %}
+            <span class="product-detail-original">{{ product.price }}€</span>
+            <span>{{ product.discounted_price|floatformat:2 }}€</span>
+            <span class="product-detail-discount-tag"><i class="fas fa-tag"></i> -{{ product.discount_percent }}%</span>
+          {% else %}
+            <span>{{ product.price }}€</span>
+          {% endif %}
+          {% if product.uvp %}
+            <span class="product-detail-uvp">{% trans "UVP" %}: {{ product.uvp }}€</span>
+          {% endif %}
+        </div>
+        {% if product.requires_activation %}
+          <p style="color:#f59e0b;font-size:0.9rem;margin-top:-1rem;margin-bottom:1.5rem;">
+            <i class="fas fa-key"></i> {% trans "Nach dem Kauf ist eine Aktivierung erforderlich. Details erhältst du nach Zahlungseingang." %}
+          </p>
+        {% endif %}
+        <div class="product-detail-description">{{ product.display_description|linebreaks }}</div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          {% if user.is_authenticated %}
+            <form method="post" action="{% url 'add_backroom_to_cart' product.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn-action">
+                <i class="fas fa-cart-plus"></i> {% trans "In den Warenkorb" %}
+              </button>
+            </form>
+          {% else %}
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn-action">
+              <i class="fas fa-sign-in-alt"></i> {% trans "Zum Kauf anmelden" %}
+            </a>
+          {% endif %}
+          <a href="/contact/" class="btn-action secondary">
+            <i class="fas fa-envelope"></i> {% trans "Anfragen" %}
+          </a>
+        </div>
+      </div>
+  </div>
+</div>
+{% endblock %}

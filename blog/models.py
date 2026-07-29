@@ -29,6 +29,7 @@ class BlogPost(models.Model):
     main_image_thumb_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="ImgBB Thumbnail URL")
     main_image_medium_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="ImgBB Medium URL")
     main_image_delete_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="ImgBB Lösch-URL")
+    main_image_ai_generated = models.BooleanField(default=False, verbose_name="KI-generiertes Bild")
 
     push_notified_at = models.DateTimeField(
         null=True, blank=True,

@@ -22,6 +22,7 @@ urlpatterns = [
     # Weitere URLs für das Shop-System (Warenkorb und Checkout)
     path('cart/', views.cart_view, name='cart_view'),
     path('cart/add/<int:app_id>/', views.add_to_cart, name='add_to_cart'),
+    path('cart/add-backroom/<int:product_id>/', views.add_backroom_to_cart, name='add_backroom_to_cart'),
     path('cart/update/', views.update_cart, name='update_cart'),
     path('checkout/', views.checkout, name='checkout'),
     path("create-stripe-payment/<int:order_id>/", views.create_stripe_payment, name="create_stripe_payment"),

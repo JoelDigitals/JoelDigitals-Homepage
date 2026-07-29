@@ -4570,3 +4570,110 @@ msgstr "Störungsbenachrichtigungen"
 msgid "Choose which apps you want outage/status alerts for."
 msgstr ""
 "Wähle, für welche Apps du Störungs-/Statusmeldungen erhalten möchtest."
+
+# ---------------- Backroom (auto-added) ----------------
+msgid "Anfragen"
+msgstr "Anfragen"
+
+msgid "Erneut beantragen"
+msgstr "Erneut beantragen"
+
+msgid "In den Warenkorb"
+msgstr "In den Warenkorb"
+
+msgid "Nachricht"
+msgstr "Nachricht"
+
+msgid "UVP"
+msgstr "UVP"
+
+msgid "Zugang beantragen"
+msgstr "Zugang beantragen"
+
+msgid "Zum Kauf anmelden"
+msgstr "Zum Kauf anmelden"
+
+msgid "Zum Shop"
+msgstr "Zum Shop"
+
+msgid "Du hast bereits Zugang zum Backroom."
+msgstr "Du hast bereits Zugang zum Backroom."
+
+msgid "Deine Anfrage wird geprüft. Wir melden uns, sobald eine Entscheidung getroffen wurde."
+msgstr "Deine Anfrage wird geprüft. Wir melden uns, sobald eine Entscheidung getroffen wurde."
+
+msgid "Deine letzte Anfrage wurde leider abgelehnt."
+msgstr "Deine letzte Anfrage wurde leider abgelehnt."
+
+msgid "Der Backroom Shop richtet sich an Partner mit passendem Zugang. Beschreibe kurz dein Anliegen, wir prüfen deine Anfrage manuell."
+msgstr "Der Backroom Shop richtet sich an Partner mit passendem Zugang. Beschreibe kurz dein Anliegen, wir prüfen deine Anfrage manuell."
+
+msgid "Der Backroom ist unser Einkaufspreis-Shop für ausgewählte Partner."
+msgstr "Der Backroom ist unser Einkaufspreis-Shop für ausgewählte Partner."
+
+msgid "Möchtest du erneut anfragen? Erzähl uns kurz, warum du Zugang benötigst:"
+msgstr "Möchtest du erneut anfragen? Erzähl uns kurz, warum du Zugang benötigst:"
+
+msgid "Nach dem Kauf ist eine Aktivierung erforderlich. Details erhältst du nach Zahlungseingang."
+msgstr "Nach dem Kauf ist eine Aktivierung erforderlich. Details erhältst du nach Zahlungseingang."
+
+msgid "z.B. Firma, Wiederverkäufer-Status, gewünschte Produkte..."
+msgstr "z.B. Firma, Wiederverkäufer-Status, gewünschte Produkte..."
+
+msgid "Du hast bereits eine Anfrage laufen."
+msgstr "Du hast bereits eine Anfrage laufen."
+
+msgid "Deine Anfrage wurde eingereicht. Wir melden uns, sobald sie geprüft wurde."
+msgstr "Deine Anfrage wurde eingereicht. Wir melden uns, sobald sie geprüft wurde."
+
+msgid "Clear search"
+msgstr "Suche zurücksetzen"
+
+msgid "Sort by"
+msgstr "Sortieren nach"
+
+msgid "Name A-Z"
+msgstr "Name A-Z"
+
+msgid "Newest first"
+msgstr "Neueste zuerst"
+
+msgid "Price ascending"
+msgstr "Preis aufsteigend"
+
+msgid "Price descending"
+msgstr "Preis absteigend"
+
+msgid "Products"
+msgstr "Produkte"
+
+msgid "No products available yet."
+msgstr "Noch keine Produkte verfügbar."
+
+msgid "No products found for"
+msgstr "Keine Produkte gefunden für"
+
+msgid "Search products..."
+msgstr "Produkte suchen..."
+
+msgid "Back to Backroom Shop"
+msgstr "Zurück zum Backroom Shop"
+
+msgid "Company"
+msgstr "Unternehmen"
+
+msgid "Legal"
+msgstr "Rechtliches"
+
+msgid "Partner"
+msgstr "Partner"
+
+msgid "Affiliate Program"
+msgstr "Partnerprogramm"
+
+msgid "Request Backroom Access"
+msgstr "Backroom Zugang beantragen"
+
+msgid "Backroom Shop"
+msgstr "Backroom Shop"
+

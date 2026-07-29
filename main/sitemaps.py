@@ -4,6 +4,7 @@ from blog.models import BlogPost
 from landingpages.models import LandingPage
 from shop_ourapps.models import App as ShopApp
 from wiki.models import Wiki as WikiArticle
+from backroom.models import BackroomProduct
 
 
 class StaticViewSitemap(Sitemap):
@@ -70,3 +71,17 @@ class WikiSitemap(Sitemap):
 
     def location(self, obj):
         return reverse('wiki:detail', args=[obj.slug])
+
+
+class BackroomSitemap(Sitemap):
+    changefreq = "weekly"
+    priority = 0.6
+
+    def items(self):
+        return BackroomProduct.objects.filter(is_published=True)
+
+    def lastmod(self, obj):
+        return obj.updated_at
+
+    def location(self, obj):
+        return reverse('backroom_detail', args=[obj.slug])

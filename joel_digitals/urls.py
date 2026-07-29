@@ -8,7 +8,7 @@ from django.urls import path, include
 from django.conf.urls.i18n import i18n_patterns
 from django.views.static import serve as static_serve
 from django.contrib.sitemaps.views import sitemap
-from main.sitemaps import StaticViewSitemap, BlogSitemap, LandingPageSitemap, ShopAppSitemap, WikiSitemap
+from main.sitemaps import StaticViewSitemap, BlogSitemap, LandingPageSitemap, ShopAppSitemap, WikiSitemap, BackroomSitemap
 from main import views as main_views  # ← WICHTIG: Import hinzufügen
 from JoelDigitalsApp import cron as jd_cron
 from django.views.generic import TemplateView
@@ -20,6 +20,7 @@ sitemaps = {
     'landingpages': LandingPageSitemap,
     'shop': ShopAppSitemap,
     'wiki': WikiSitemap,
+    'backroom': BackroomSitemap,
 }
 
 # --- Basis-URL-Muster (nicht sprachabhängig) ---
@@ -102,6 +103,7 @@ urlpatterns += i18n_patterns(
     # würde /website-konfigurator/ sonst faelschlich als Landingpage-Slug matchen
     # (gleiches Muster wie shop/jds-management/ vs. shop_ourapps' Catch-all oben).
     path('website-konfigurator/', include('website_configurator.urls')),
+    path('backroom/', include('backroom.urls')),
     path('', include('landingpages.urls')),
 )
 

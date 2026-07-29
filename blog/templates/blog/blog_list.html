@@ -202,6 +202,8 @@
     letter-spacing: 0.5px;
   }
 
+
+
   .blog-date {
     color: #999;
     font-size: 0.85rem;
@@ -409,12 +411,26 @@
         <article class="blog-card">
 
           {% if post.get_main_image_url %}
-            <div class="blog-image-wrapper">
-              <img src="{{ post.get_main_image_url }}" alt="{{ post.title }}" loading="lazy">
+            <div style="display: grid;">
+              <div class="blog-image-wrapper" style="grid-row: 1 / -1; grid-column: 1 / -1;">
+                <img src="{{ post.get_main_image_url }}" alt="{{ post.title }}" loading="lazy">
+              </div>
+              {% if post.main_image_ai_generated %}
+                <span style="grid-row: 1 / -1; grid-column: 1 / -1; justify-self: end; align-self: start; margin: 12px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 4px; z-index: 2; pointer-events: none;">
+                  <span style="background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 3px; padding: 1px 5px; font-size: 0.65rem; font-weight: 700;">AI</span> Generiert
+                </span>
+              {% endif %}
             </div>
           {% elif post.teaser_image %}
-            <div class="blog-image-wrapper">
-              <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}" loading="lazy">
+            <div style="display: grid;">
+              <div class="blog-image-wrapper" style="grid-row: 1 / -1; grid-column: 1 / -1;">
+                <img src="{{ post.teaser_image.url }}" alt="{{ post.title }}" loading="lazy">
+              </div>
+              {% if post.main_image_ai_generated %}
+                <span style="grid-row: 1 / -1; grid-column: 1 / -1; justify-self: end; align-self: start; margin: 12px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 4px; z-index: 2; pointer-events: none;">
+                  <span style="background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 3px; padding: 1px 5px; font-size: 0.65rem; font-weight: 700;">AI</span> Generiert
+                </span>
+              {% endif %}
             </div>
           {% endif %}
 

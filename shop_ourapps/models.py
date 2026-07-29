@@ -488,6 +488,7 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
     app = models.ForeignKey(App, on_delete=models.CASCADE, null=True, blank=True)
     package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)
+    backroom_product = models.ForeignKey('backroom.BackroomProduct', on_delete=models.CASCADE, null=True, blank=True)
     jds_configuration = models.ForeignKey(
         'jds_configurator.JdsConfiguration', on_delete=models.CASCADE, null=True, blank=True,
         help_text="Individuelle JDS-Management-Konfiguration (Module + User) statt eines Katalog-Preises"
@@ -504,6 +505,8 @@ class CartItem(models.Model):
             return self.jds_configuration.display_name
         if self.package:
             return self.package.name
+        if self.backroom_product:
+            return self.backroom_product.name
         return self.app.name if self.app else f"Item #{self.id}"
 
 
@@ -634,6 +637,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     app = models.ForeignKey(App, on_delete=models.CASCADE, null=True, blank=True)
     package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True, blank=True)
+    backroom_product = models.ForeignKey('backroom.BackroomProduct', on_delete=models.SET_NULL, null=True, blank=True)
     jds_configuration = models.ForeignKey(
         'jds_configurator.JdsConfiguration', on_delete=models.SET_NULL, null=True, blank=True,
         help_text="Individuelle JDS-Management-Konfiguration (Module + User) statt eines Katalog-Preises"
@@ -650,6 +654,8 @@ class OrderItem(models.Model):
             return self.jds_configuration.display_name
         if self.package:
             return self.package.name
+        if self.backroom_product:
+            return self.backroom_product.name
         return self.name_override or (self.app.name if self.app else f"Item #{self.id}")
 
     def __str__(self):

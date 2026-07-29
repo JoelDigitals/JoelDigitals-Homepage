@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.mail import send_mail, EmailMultiAlternatives
 from .models import App, Purchase, Affiliate, Cart, CartItem, Order, OrderItem, DiscountCode, AffiliateCode, AffiliatePartner, Wallet, Voucher, VoucherOrder, AppGroup, AffiliateMarketingMaterial, AffiliateTransaction, CustomLandingPage, WithdrawalRequest, WatchlistEntry, Package, PackageApp
+from backroom.models import BackroomProduct
 from shop_ourapps.models import AffiliatePartner
 from .forms import PurchaseForm, VoucherPurchaseForm
 from .services.automation_service import OrderAutomationService
@@ -262,6 +263,28 @@ def add_package_to_cart(request, package_id):
     if not created:
         messages.info(request, _('Package is already in your cart.'))
     return redirect('cart_view')
+
+
+@login_required
+@require_POST
+def add_backroom_to_cart(request, product_id):
+    from backroom.access import has_backroom_access
+    if not has_backroom_access(request.user):
+        return redirect('backroom_access_request')
+
+    product = get_object_or_404(BackroomProduct, id=product_id, is_published=True)
+    cart = get_user_cart(request.user)
+    cart_item, created = CartItem.objects.get_or_create(
+        user=request.user,
+        cart=cart,
+        backroom_product=product,
+        defaults={'price': product.discounted_price, 'quantity': 1}
+    )
+    if not created:
+        cart_item.quantity += 1
+        cart_item.save()
+    messages.success(request, _('Product added to cart.'))
+    return redirect('backroom_list')
 
 
 def shop(request):
@@ -794,6 +817,8 @@ def cart_item_unit_price(item):
         return item.jds_configuration.total_amount
     if item.package:
         return item.package.discounted_price
+    if item.backroom_product:
+        return item.backroom_product.discounted_price
     return item.app.discounted_price
 
 
@@ -823,7 +848,8 @@ def cart_view(request):
         'total_brutto': total_brutto.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP),
         'total_netto': total_netto.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP),
         'total_vat': total_vat.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP),
-        'wallet_balance': wallet.balance if wallet else 0.00
+        'wallet_balance': wallet.balance if wallet else 0.00,
+        'lang': get_language(),
     })
 
 
@@ -1257,6 +1283,16 @@ def checkout(request):
                     discount_price=item.package.discounted_price,
                     price=item.quantity * item.package.discounted_price
                 )
+            elif item.backroom_product:
+                OrderItem.objects.create(
+                    order=order,
+                    backroom_product=item.backroom_product,
+                    quantity=item.quantity,
+                    single_price=item.backroom_product.price,
+                    discount_percent=item.backroom_product.discount_percent,
+                    discount_price=item.backroom_product.discounted_price,
+                    price=item.quantity * item.backroom_product.discounted_price
+                )
             else:
                 OrderItem.objects.create(
                     order=order,
@@ -1387,6 +1423,7 @@ def checkout(request):
         'customer_info': customer_info,
         'initial_affiliate_code': initial_affiliate_code,
         'initial_discount_code': initial_discount_code,
+        'lang': get_language(),
     }
     return render(request, 'apps/checkout.html', context)
 
@@ -2089,6 +2126,7 @@ def invoice_view(request, order_id):
         'order': order,
         'now': timezone.now(),
         'items': items,
+        'lang': get_language(),
         **totals
     }
     return render(request, 'apps/invoice.html', context)

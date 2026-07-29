@@ -264,35 +264,58 @@
     
     footer {
       background: #181818;
-      padding: 1.5rem 2rem;
-      text-align: center;
+      padding: 2.5rem 2rem 1.5rem;
       font-size: 0.9rem;
       border-top: 1px solid var(--border);
       color: #ccc;
       display: flex;
       flex-direction: column;
-      gap: 0.8rem;
+      gap: 2rem;
       align-items: center;
     }
-    
-    footer .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-      justify-content: center;
+
+    footer .footer-columns {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 2rem;
+      max-width: 1100px;
+      width: 100%;
     }
-    
-    footer .footer-links a {
+
+    footer .footer-col h4 {
+      color: #fff;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin: 0 0 0.9rem 0;
+      font-weight: 700;
+    }
+
+    footer .footer-col a {
+      display: block;
       color: #ccc;
       text-decoration: none;
+      padding: 0.25rem 0;
       transition: color .3s;
     }
-    
-    footer .footer-links a:hover {
+
+    footer .footer-col a:hover {
       color: var(--primary);
       text-decoration: underline;
     }
-    
+
+    footer .footer-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      align-items: center;
+      width: 100%;
+      max-width: 1100px;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+
     footer .socials {
       display: flex;
       gap: 1rem;
@@ -498,14 +521,26 @@
         flex-direction: column;
         align-items: center;
       }
-      
+
       main {
         padding: 1rem;
       }
-      
+
       #cookie-banner {
         padding: 1rem;
         font-size: 0.8rem;
+      }
+
+      footer .footer-columns {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 900px) and (min-width: 601px) {
+      footer .footer-columns {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
 
@@ -636,6 +671,9 @@
     <a href="/blog/">{% trans "Blog" %}</a>
     <a href="/our-apps/">{% trans "Our Apps" %}</a>
     <a href="/shop/">{% trans "Shop" %}</a>
+    {% if backroom_access %}
+      <a href="/backroom/" style="color: #f59e0b;"><i class="fas fa-store-alt"></i> {% trans "Backroom" %}</a>
+    {% endif %}
 
     {% if user.is_authenticated %}
       <!-- Warenkorb Icon -->
@@ -864,37 +902,66 @@ document.addEventListener("click", function(event) {
 </main>
 
 <footer>
-  <div>&copy; 2025-2026 Joel Digitals. All rights reserved.</div>
-  
-  <div class="footer-links">
-    <a href="/imprint/">{% trans "Imprint" %}</a> |
-    <a href="/privacy/">{% trans "Privacy Policy" %}</a> |
-    <a href="/terms/">{% trans "Terms of Service" %}</a> |
-    <a href="/withdrawal/">{% trans "Withdrawal" %}</a> |
-    <a href="/affiliate/info/">{% trans "Affiliate Program" %}</a> |
-    <a href="/blog/rss/" title="RSS Feed"><i class="fas fa-rss"></i> RSS</a> |
-    <a href="/">{% trans "Home" %}</a>
+  <div class="footer-columns">
+    <div class="footer-col">
+      <h4>{% trans "Company" %}</h4>
+      <a href="/about/">{% trans "About Us" %}</a>
+      <a href="/contact/">{% trans "Contact" %}</a>
+      <a href="/services/">{% trans "Services" %}</a>
+      <a href="/status/">{% trans "Status" %}</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>{% trans "Shop" %}</h4>
+      <a href="/our-apps/">{% trans "Our Apps" %}</a>
+      <a href="/shop/">{% trans "Shop" %}</a>
+      <a href="/blog/">{% trans "Blog" %}</a>
+      <a href="/wiki/">{% trans "Wiki" %}</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>{% trans "Legal" %}</h4>
+      <a href="/imprint/">{% trans "Imprint" %}</a>
+      <a href="/privacy/">{% trans "Privacy Policy" %}</a>
+      <a href="/terms/">{% trans "Terms of Service" %}</a>
+      <a href="/withdrawal/">{% trans "Withdrawal" %}</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>{% trans "Partner" %}</h4>
+      <a href="/affiliate/info/">{% trans "Affiliate Program" %}</a>
+      {% if backroom_access %}
+        <a href="/backroom/">{% trans "Backroom Shop" %}</a>
+      {% else %}
+        <a href="/backroom/zugang/">{% trans "Request Backroom Access" %}</a>
+      {% endif %}
+      <a href="/blog/rss/"><i class="fas fa-rss"></i> RSS</a>
+    </div>
   </div>
 
-  <div class="socials">
-    <a href="https://facebook.com/joeldigitalsofficial" target="_blank" aria-label="Facebook">
-      <i class="fab fa-facebook-f"></i>
-    </a>
-    <a href="https://instagram.com/joel_digitals_official" target="_blank" aria-label="Instagram">
-      <i class="fab fa-instagram"></i>
-    </a>
-    <a href="https://www.youtube.com/@JoelDigitals" target="_blank" aria-label="YouTube">
-      <i class="fab fa-youtube"></i>
-    </a>
-    <a href="https://www.tiktok.com/@joel_digitals_official" target="_blank" aria-label="TikTok">
-      <i class="fab fa-tiktok"></i>
-    </a>
-    <a href="https://discord.gg/RWvfkFakus" target="_blank" aria-label="Discord">
-      <i class="fab fa-discord"></i>
-    </a>
-    <a href="https://wa.me/4915253480270" target="_blank" aria-label="WhatsApp">
-      <i class="fab fa-whatsapp"></i>
-    </a>
+  <div class="footer-bottom">
+    <div>&copy; 2025-2026 Joel Digitals. All rights reserved.</div>
+
+    <div class="socials">
+      <a href="https://facebook.com/joeldigitalsofficial" target="_blank" aria-label="Facebook">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+      <a href="https://instagram.com/joel_digitals_official" target="_blank" aria-label="Instagram">
+        <i class="fab fa-instagram"></i>
+      </a>
+      <a href="https://www.youtube.com/@JoelDigitals" target="_blank" aria-label="YouTube">
+        <i class="fab fa-youtube"></i>
+      </a>
+      <a href="https://www.tiktok.com/@joel_digitals_official" target="_blank" aria-label="TikTok">
+        <i class="fab fa-tiktok"></i>
+      </a>
+      <a href="https://discord.gg/RWvfkFakus" target="_blank" aria-label="Discord">
+        <i class="fab fa-discord"></i>
+      </a>
+      <a href="https://wa.me/4915253480270" target="_blank" aria-label="WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+      </a>
+    </div>
   </div>
 </footer>
 
