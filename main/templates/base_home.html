@@ -195,7 +195,7 @@
 
     .profile-menu-email {
       font-size: 0.85rem;
-      color: #999;
+      color: var(--text);
     }
 
     .profile-menu-items {
@@ -267,7 +267,7 @@
       padding: 2.5rem 2rem 1.5rem;
       font-size: 0.9rem;
       border-top: 1px solid var(--border);
-      color: #ccc;
+      color: var(--text);
       display: flex;
       flex-direction: column;
       gap: 2rem;
@@ -276,10 +276,14 @@
 
     footer .footer-columns {
       display: grid;
-      grid-template-columns: repeat(4, minmax(140px, 1fr));
-      gap: 2rem;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
       max-width: 1100px;
       width: 100%;
+    }
+
+    footer .footer-col {
+      min-width: 0;
     }
 
     footer .footer-col h4 {
@@ -293,10 +297,11 @@
 
     footer .footer-col a {
       display: block;
-      color: #ccc;
+      color: var(--text);
       text-decoration: none;
-      padding: 0.25rem 0;
+      padding: 0.3rem 0;
       transition: color .3s;
+      font-size: 0.88rem;
     }
 
     footer .footer-col a:hover {
@@ -321,10 +326,11 @@
       gap: 1rem;
       justify-content: center;
       font-size: 1.3rem;
+      flex-wrap: wrap;
     }
     
     footer .socials a {
-      color: #ccc;
+      color: var(--text);
       transition: color .3s, transform .3s;
     }
     
@@ -531,10 +537,39 @@
         font-size: 0.8rem;
       }
 
-      footer .footer-columns {
-        grid-template-columns: 1fr;
+      footer {
+        padding: 2rem 1.25rem 1.25rem;
         gap: 1.5rem;
-        text-align: center;
+      }
+
+      footer .footer-columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem 1rem;
+        text-align: left;
+      }
+
+      footer .footer-col h4 {
+        margin-bottom: 0.6rem;
+      }
+
+      footer .footer-col a {
+        padding: 0.2rem 0;
+        font-size: 0.85rem;
+      }
+
+      footer .footer-bottom {
+        padding-top: 1.25rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      footer {
+        padding: 1.5rem 1rem 1rem;
+      }
+
+      footer .footer-columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem 0.75rem;
       }
     }
 

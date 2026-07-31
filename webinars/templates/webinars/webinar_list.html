@@ -92,7 +92,7 @@
     align-items: center;
     gap: 0.35rem;
     font-size: 0.85rem;
-    color: #999;
+    color: var(--text);
   }
 
   .webinar-meta-item i {
@@ -100,7 +100,7 @@
   }
 
   .webinar-description {
-    color: #aaa;
+    color: var(--text);
     font-size: 0.9rem;
     line-height: 1.6;
     margin-bottom: 1rem;
@@ -174,7 +174,7 @@
   .empty-state {
     text-align: center;
     padding: 3rem;
-    color: #666;
+    color: var(--text);
   }
 
   .empty-state i {
@@ -218,7 +218,7 @@
   <!-- Vergangene Webinare -->
   {% if past_webinars %}
     <h2 class="section-title" style="margin-top: 3rem;">
-      <i class="fas fa-history" style="color:#999;"></i>
+      <i class="fas fa-history" style="color: var(--text);"></i>
       {% trans "Past Webinars" %}
     </h2>
     <div class="webinar-grid">

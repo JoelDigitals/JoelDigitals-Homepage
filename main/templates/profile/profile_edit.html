@@ -89,7 +89,7 @@
   }
 
   .form-input::placeholder {
-    color: #666;
+    color: var(--text);
   }
 
   .form-row {
@@ -174,7 +174,7 @@
 
   .helper-text {
     font-size: 0.85rem;
-    color: #999;
+    color: var(--text);
     margin-top: 0.3rem;
     font-style: italic;
   }
@@ -299,7 +299,7 @@
             <input type="checkbox" name="marketing_opt_in" id="marketing_opt_in" value="1" {% if profile.marketing_opt_in %}checked{% endif %} style="width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer;">
             <div>
               <span style="font-weight: 600; color: var(--text);">{% trans "Marketing-E-Mails erhalten" %}</span>
-              <p style="margin: 4px 0 0; font-size: 0.85rem; color: #999; font-style: italic;">
+              <p style="margin: 4px 0 0; font-size: 0.85rem; color: var(--text); font-style: italic;">
                 {% trans "Erhalte Neuigkeiten, exklusive Angebote und nützliche Tipps per E-Mail. Jederzeit abbestellbar." %}
               </p>
             </div>

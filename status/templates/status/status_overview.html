@@ -83,7 +83,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    color: #666;
+    color: var(--text);
     text-decoration: none;
     margin-bottom: 2rem;
     font-size: 0.95rem;
@@ -202,7 +202,7 @@
   }
 
   .issue-desc {
-    color: #666;
+    color: var(--text);
     line-height: 1.6;
     margin: 0;
   }
@@ -575,7 +575,7 @@ function readStatus() {
 
       <!-- Report a Problem -->
       <div style="text-align:center;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);">
-        <p style="color:#666;margin-bottom:1rem;font-size:0.95rem;">
+        <p style="color: var(--text);margin-bottom:1rem;font-size:0.95rem;">
           <i class="fas fa-headset" style="color:var(--primary);margin-right:0.4rem;"></i>
           {% trans "Experiencing an issue not listed here? Let us know!" %}
         </p>

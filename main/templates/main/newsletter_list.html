@@ -17,7 +17,7 @@
   .panel h3 { margin:0 0 1rem; font-size:1rem; display:flex; align-items:center; gap:.5rem; }
 
   .nl-table { width:100%; border-collapse:collapse; }
-  .nl-table th { text-align:left; padding:.75rem .5rem; font-size:.75rem; text-transform:uppercase; letter-spacing:.5px; color:#888; border-bottom:2px solid var(--border); }
+  .nl-table th { text-align:left; padding:.75rem .5rem; font-size:.75rem; text-transform:uppercase; letter-spacing:.5px; color: var(--text); border-bottom:2px solid var(--border); }
   .nl-table td { padding:.75rem .5rem; font-size:.85rem; color:var(--text); border-bottom:1px solid var(--border); vertical-align:middle; }
   .nl-table tr:hover td { background:rgba(0,68,204,.03); }
 
@@ -37,7 +37,7 @@
   .btn-sm { padding:.3rem .55rem; font-size:.75rem; }
   .btn:disabled { opacity:.5; cursor:not-allowed; transform:none !important; }
 
-  .empty-state { text-align:center; padding:3rem 1rem; color:#888; }
+  .empty-state { text-align:center; padding:3rem 1rem; color: var(--text); }
   .empty-state i { font-size:3rem; margin-bottom:1rem; opacity:.3; }
 
   .quick-actions { display:flex; gap:.5rem; flex-wrap:wrap; }
@@ -85,7 +85,7 @@
         {% for nl in newsletters %}
         <tr>
           <td style="font-weight:600;">{{ nl.title }}</td>
-          <td style="color:#888;">{{ nl.subject|truncatechars:40 }}</td>
+          <td style="color: var(--text);">{{ nl.subject|truncatechars:40 }}</td>
           <td>
             {% if nl.status == 'draft' %}
               <span class="status-badge status-draft"><i class="fas fa-pen"></i> {% trans "Entwurf" %}</span>
@@ -93,9 +93,9 @@
               <span class="status-badge status-sent"><i class="fas fa-check"></i> {% trans "Gesendet" %}</span>
             {% endif %}
           </td>
-          <td>{% if nl.status == 'sent' %}{{ nl.recipient_count }}{% else %}<span style="color:#888;">–</span>{% endif %}</td>
-          <td style="color:#888;">{{ nl.created_at|date:"d.m.Y H:i" }}</td>
-          <td style="color:#888;">{% if nl.sent_at %}{{ nl.sent_at|date:"d.m.Y H:i" }}{% else %}<span style="color:#888;">–</span>{% endif %}</td>
+          <td>{% if nl.status == 'sent' %}{{ nl.recipient_count }}{% else %}<span style="color: var(--text);">–</span>{% endif %}</td>
+          <td style="color: var(--text);">{{ nl.created_at|date:"d.m.Y H:i" }}</td>
+          <td style="color: var(--text);">{% if nl.sent_at %}{{ nl.sent_at|date:"d.m.Y H:i" }}{% else %}<span style="color: var(--text);">–</span>{% endif %}</td>
           <td style="text-align:right;">
             <div style="display:flex;gap:.3rem;justify-content:flex-end;">
               <a href="{% url 'newsletter_preview' nl.id %}" class="btn btn-sm btn-outline" title="{% trans 'Vorschau' %}">

@@ -15,7 +15,7 @@
   .nl-body { background:var(--surface); border-radius:0 0 16px 16px; padding:2rem; box-shadow:0 4px 12px rgba(0,0,0,.3); }
 
   .info-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:1.5rem; padding:1rem; background:var(--bg); border-radius:8px; }
-  .info-item label { display:block; font-size:.7rem; text-transform:uppercase; letter-spacing:.5px; color:#888; margin-bottom:.25rem; }
+  .info-item label { display:block; font-size:.7rem; text-transform:uppercase; letter-spacing:.5px; color: var(--text); margin-bottom:.25rem; }
   .info-item span { font-size:.9rem; color:var(--text); font-weight:600; }
 
   .email-frame { background:#0a0a0f; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:1.5rem; }
@@ -71,7 +71,7 @@
       </div>
     </div>
 
-    <h3 style="margin:0 0 .75rem;font-size:.9rem;color:#888;">{% trans "E-Mail-Vorschau (wie sie beim Empfänger ankommt)" %}</h3>
+    <h3 style="margin:0 0 .75rem;font-size:.9rem;color: var(--text);">{% trans "E-Mail-Vorschau (wie sie beim Empfänger ankommt)" %}</h3>
 
     <div class="email-frame">
       <div class="email-frame-header">

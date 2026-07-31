@@ -3972,8 +3972,11 @@ msgstr "Kostenlose Webinare"
 
 #: templates/main/home.html
 msgid "Register"
-msgstr "Anmelden"
+msgstr "Registrieren"
 
+#: templates/main/home.html
+msgid "Register now"
+msgstr "Jetzt anmelden"
 #: templates/main/home.html
 msgid "View all webinars"
 msgstr "Alle Webinare anzeigen"

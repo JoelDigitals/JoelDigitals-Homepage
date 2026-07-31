@@ -100,7 +100,7 @@
   }
 
   .product-count {
-    color: #888;
+    color: var(--text);
     font-size: 0.9rem;
   }
 
@@ -159,7 +159,7 @@
   }
 
   .product-description {
-    color: #999;
+    color: var(--text);
     font-size: 0.95rem;
     line-height: 1.5;
     margin-bottom: 1rem;
@@ -194,7 +194,7 @@
   .product-uvp {
     display: block;
     font-size: 0.8rem;
-    color: #999;
+    color: var(--text);
     text-decoration: line-through;
     font-weight: 400;
   }
@@ -299,7 +299,7 @@
           <span class="product-price">
             <span class="ek-badge">EK</span>
             {% if product.discount_is_active %}
-              <span style="text-decoration:line-through;color:#999;font-size:0.9rem;">{{ product.price }}€</span>
+              <span style="text-decoration:line-through;color: var(--text);font-size:0.9rem;">{{ product.price }}€</span>
               {{ product.discounted_price|floatformat:2 }}€
               <span class="product-discount-tag"><i class="fas fa-tag"></i> -{{ product.discount_percent }}%</span>
             {% else %}
@@ -326,7 +326,7 @@
       </div>
     </article>
   {% empty %}
-    <div style="text-align: center; color: #999; padding: 3rem; grid-column: 1 / -1;">
+    <div style="text-align: center; color: var(--text); padding: 3rem; grid-column: 1 / -1;">
       <i class="fas fa-box-open" style="font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.3;"></i>
       {% if query %}
         <p>{% trans "No products found for" %} "{{ query }}".</p>

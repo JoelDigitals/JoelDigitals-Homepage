@@ -22,9 +22,9 @@
 .wcfg-option input[type=radio]{position:absolute;top:1rem;right:1rem}
 .wcfg-option-title{font-weight:700;font-size:1rem;padding-right:1.5rem}
 .wcfg-option-title i{color:var(--primary);margin-right:.5rem}
-.wcfg-option-desc{font-size:.8rem;color:#aaa}
+.wcfg-option-desc{font-size:.8rem;color: var(--text)}
 .wcfg-fld{margin-top:1.25rem}
-.wcfg-fld label{display:block;font-size:.8rem;font-weight:600;color:#aaa;margin-bottom:.4rem}
+.wcfg-fld label{display:block;font-size:.8rem;font-weight:600;color: var(--text);margin-bottom:.4rem}
 .wcfg-fld input,.wcfg-fld textarea{width:100%;padding:.6rem .8rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text);font-size:.9rem;transition:border-color .15s ease}
 .wcfg-fld input:focus,.wcfg-fld textarea:focus{border-color:var(--primary);outline:none}
 .wcfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
@@ -36,26 +36,26 @@
 .wcfg-cat-group{margin-bottom:.5rem;transition:opacity .15s ease}
 .wcfg-cat-header{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin:1.25rem 0 .6rem}
 .wcfg-cat-group:first-child .wcfg-cat-header{margin-top:0}
-.wcfg-cat{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#888}
-.wcfg-cat-selectall{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:#aaa;cursor:pointer;font-weight:600;white-space:nowrap}
+.wcfg-cat{font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color: var(--text)}
+.wcfg-cat-selectall{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color: var(--text);cursor:pointer;font-weight:600;white-space:nowrap}
 .wcfg-module{display:flex;align-items:center;justify-content:space-between;padding:.7rem .9rem;border:1px solid var(--border);border-radius:8px;margin-bottom:.5rem;cursor:pointer;transition:border-color .15s ease, background .15s ease}
 .wcfg-module:hover{border-color:var(--primary)}
 .wcfg-module.checked{border-color:var(--primary);background:rgba(0,68,204,.08)}
 .wcfg-module-name{display:flex;flex-direction:column;gap:.15rem;font-size:.9rem}
-.wcfg-module-name small{color:#888;font-size:.75rem}
+.wcfg-module-name small{color: var(--text);font-size:.75rem}
 .wcfg-module-price{font-weight:700;color:var(--primary);font-size:.9rem;white-space:nowrap;margin-left:1rem}
 .wcfg-total-box{position:sticky;bottom:0;background:var(--surface);border:1px solid var(--primary);border-radius:10px;padding:1.1rem 1.25rem;margin-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem}
-.wcfg-total-label{font-size:.85rem;color:#aaa}
+.wcfg-total-label{font-size:.85rem;color: var(--text)}
 .wcfg-total-val{font-size:1.6rem;font-weight:800;color:var(--primary)}
 .wcfg-btn{padding:.7rem 1.4rem;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer;border:none;transition:opacity .15s ease, background .15s ease}
 .wcfg-btn:disabled{opacity:.6;cursor:default}
 .wcfg-btn-primary{background:var(--primary);color:#fff}
 .wcfg-btn-primary:hover:not(:disabled){background:var(--primary-hover)}
-.wcfg-btn-secondary{background:transparent;color:#ccc;border:1px solid var(--border)}
+.wcfg-btn-secondary{background:transparent;color: var(--text);border:1px solid var(--border)}
 .wcfg-actions{display:flex;justify-content:space-between;margin-top:1.5rem;gap:.6rem;flex-wrap:wrap}
 .wcfg-summary-line{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
 .wcfg-summary-line:last-child{border-bottom:none}
-.wcfg-consent{display:flex;align-items:flex-start;gap:.6rem;font-size:.85rem;color:#ccc;line-height:1.4}
+.wcfg-consent{display:flex;align-items:flex-start;gap:.6rem;font-size:.85rem;color: var(--text);line-height:1.4}
 .wcfg-consent input{margin-top:.2rem}
 .wcfg-consent a{color:var(--primary);text-decoration:none}
 </style>
@@ -82,7 +82,7 @@
     <div class="wcfg-step active visible" data-step="1">
       <div class="wcfg-card">
         <h2>1. Deine Kontaktdaten</h2>
-        <p style="color:#aaa;font-size:.85rem;margin-top:-.5rem">Damit wir dir deinen Preisvorschlag zuordnen und dich bei Rückfragen erreichen können.</p>
+        <p style="color: var(--text);font-size:.85rem;margin-top:-.5rem">Damit wir dir deinen Preisvorschlag zuordnen und dich bei Rückfragen erreichen können.</p>
         <div class="wcfg-grid">
           <div class="wcfg-fld"><label>Name *</label><input type="text" name="name"></div>
           <div class="wcfg-fld"><label>E-Mail *</label><input type="email" name="email"></div>

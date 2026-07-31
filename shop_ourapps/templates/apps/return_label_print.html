@@ -73,7 +73,7 @@
     margin-bottom: 20px;
   }
   .brand      { font-size: 22pt; font-weight: 700; color: #1a1a2e; line-height: 1; }
-  .brand-sub  { font-size: 9pt; color: #666; margin-top: 3px; }
+  .brand-sub  { font-size: 9pt; color: var(--text); margin-top: 3px; }
   .label-badge {
     background: #1a1a2e;
     color: white;
@@ -113,7 +113,7 @@
     font-size: 7.5pt;
     text-transform: uppercase;
     letter-spacing: 1.2px;
-    color: #888;
+    color: var(--text);
     margin-bottom: 6px;
     font-weight: 600;
   }
@@ -126,7 +126,7 @@
   /* ── Info table ── */
   .info-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
   .info-table td { padding: 6px 8px; font-size: 10.5pt; border-bottom: 1px solid #f0f0f0; }
-  .info-table .lbl { color: #666; width: 38%; }
+  .info-table .lbl { color: var(--text); width: 38%; }
   .info-table .val { font-weight: 600; }
   .info-table tr:last-child td { border-bottom: none; }
 
@@ -160,7 +160,7 @@
     border-radius: 4px;
     padding: 16px;
     text-align: center;
-    color: #aaa;
+    color: var(--text);
     font-size: 9pt;
     margin: 14px 0;
     background: #fafafa;
@@ -180,7 +180,7 @@
     border-top: 2px dashed #ccc;
     margin: 22px 0;
     text-align: center;
-    color: #bbb;
+    color: var(--text);
     font-size: 8pt;
     padding-top: 4px;
   }
@@ -205,7 +205,7 @@
     padding-top: 12px;
     border-top: 1px solid #eee;
     font-size: 8.5pt;
-    color: #888;
+    color: var(--text);
     line-height: 1.6;
   }
 </style>
@@ -274,13 +274,13 @@
     {% if rr.admin_note %}
     <tr>
       <td class="lbl">Hinweis</td>
-      <td class="val" style="color:#555;">{{ rr.admin_note }}</td>
+      <td class="val" style="color: var(--text);">{{ rr.admin_note }}</td>
     </tr>
     {% endif %}
   </table>
 
   {% if rr.description %}
-  <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:10px 14px;margin:10px 0;font-size:10pt;color:#555;">
+  <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:10px 14px;margin:10px 0;font-size:10pt;color: var(--text);">
     <strong>Beschreibung:</strong> {{ rr.description }}
   </div>
   {% endif %}
@@ -304,7 +304,7 @@
         Retouren-Abteilung<br>
         Niederwiesstraße 20<br>
         66822 Lebach<br>
-        <small style="font-size:9pt;color:#888;">support@joel-digitals.de</small>
+        <small style="font-size:9pt;color: var(--text);">support@joel-digitals.de</small>
       </div>
     </div>
   </div>
@@ -345,13 +345,13 @@
 
   {% if rr.refund_amount %}
   <div class="refund-box">
-    <div style="font-size:9pt;color:#555;margin-bottom:4px;">Genehmigte Erstattung:</div>
+    <div style="font-size:9pt;color: var(--text);margin-bottom:4px;">Genehmigte Erstattung:</div>
     <div class="amount">€ {{ rr.refund_amount }}</div>
     {% if rr.refund_method %}
-    <div style="font-size:9.5pt;color:#555;margin-top:4px;">Methode: {{ rr.refund_method }}</div>
+    <div style="font-size:9.5pt;color: var(--text);margin-top:4px;">Methode: {{ rr.refund_method }}</div>
     {% endif %}
     {% if rr.refunded_at %}
-    <div style="font-size:9pt;color:#888;">Erstattet am: {{ rr.refunded_at|date:"d.m.Y" }}</div>
+    <div style="font-size:9pt;color: var(--text);">Erstattet am: {{ rr.refunded_at|date:"d.m.Y" }}</div>
     {% endif %}
   </div>
   {% endif %}

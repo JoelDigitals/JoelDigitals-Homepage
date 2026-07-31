@@ -4,7 +4,7 @@
 
 <div style="margin-bottom:24px;">
   <h2 style="color:#e0e0e0;margin:0 0 12px 0;">Deine Bestellung ist unterwegs!</h2>
-  <p style="color:#aaa;margin:0 0 16px 0;">Hallo {{ order.first_name }},<br> wir haben deine Bestellung #{{ order.id }} auf den Weg gebracht.</p>
+  <p style="color: var(--text);margin:0 0 16px 0;">Hallo {{ order.first_name }},<br> wir haben deine Bestellung #{{ order.id }} auf den Weg gebracht.</p>
 </div>
 
 {% if shipment %}
@@ -12,16 +12,16 @@
   <h3 style="color:#00bfff;margin:0 0 10px 0;"><i class="fas fa-shipping-fast" style="margin-right:6px;"></i> Sendungsverfolgung | Tracking</h3>
   <table style="width:100%;border-collapse:collapse;font-size:14px;">
     <tr>
-      <td style="padding:6px 0;color:#999;width:120px;">Carrier:</td>
+      <td style="padding:6px 0;color: var(--text);width:120px;">Carrier:</td>
       <td style="padding:6px 0;color:#e0e0e0;font-weight:600;">{{ shipment.carrier }}</td>
     </tr>
     <tr>
-      <td style="padding:6px 0;color:#999;">Sendungsnr.:</td>
+      <td style="padding:6px 0;color: var(--text);">Sendungsnr.:</td>
       <td style="padding:6px 0;color:#e0e0e0;font-weight:600;">{{ shipment.tracking_number }}</td>
     </tr>
     {% if shipment.resolved_tracking_url %}
     <tr>
-      <td style="padding:6px 0;color:#999;"></td>
+      <td style="padding:6px 0;color: var(--text);"></td>
       <td style="padding:6px 0;">
         <a href="{{ shipment.resolved_tracking_url }}" target="_blank"
            style="display:inline-block;padding:8px 16px;background:linear-gradient(135deg,#00bfff,#0099cc);color:#fff;border-radius:6px;text-decoration:none;font-weight:600;font-size:13px;">
@@ -54,7 +54,7 @@
   <table style="width:100%;border-collapse:collapse;font-size:13px;">
     {% for item in order.items.all %}
     <tr>
-      <td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:#ccc;">{{ item.get_name }} × {{ item.quantity }}</td>
+      <td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);color: var(--text);">{{ item.get_name }} × {{ item.quantity }}</td>
       <td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:#e0e0e0;text-align:right;">€{{ item.price|floatformat:2 }}</td>
     </tr>
     {% endfor %}
@@ -68,7 +68,7 @@
 
 <div style="margin-bottom:24px;">
   <h2 style="color:#e0e0e0;margin:0 0 12px 0;">Your order is on the way!</h2>
-  <p style="color:#aaa;margin:0 0 16px 0;">Hello {{ order.first_name }},<br> your order #{{ order.id }} has been shipped.</p>
+  <p style="color: var(--text);margin:0 0 16px 0;">Hello {{ order.first_name }},<br> your order #{{ order.id }} has been shipped.</p>
 </div>
 
 {% if shipment %}
@@ -76,16 +76,16 @@
   <h3 style="color:#00bfff;margin:0 0 10px 0;">📦 Tracking Information</h3>
   <table style="width:100%;border-collapse:collapse;font-size:14px;">
     <tr>
-      <td style="padding:6px 0;color:#999;width:120px;">Carrier:</td>
+      <td style="padding:6px 0;color: var(--text);width:120px;">Carrier:</td>
       <td style="padding:6px 0;color:#e0e0e0;font-weight:600;">{{ shipment.carrier }}</td>
     </tr>
     <tr>
-      <td style="padding:6px 0;color:#999;">Tracking #:</td>
+      <td style="padding:6px 0;color: var(--text);">Tracking #:</td>
       <td style="padding:6px 0;color:#e0e0e0;font-weight:600;">{{ shipment.tracking_number }}</td>
     </tr>
     {% if shipment.resolved_tracking_url %}
     <tr>
-      <td style="padding:6px 0;color:#999;"></td>
+      <td style="padding:6px 0;color: var(--text);"></td>
       <td style="padding:6px 0;">
         <a href="{{ shipment.resolved_tracking_url }}" target="_blank"
            style="display:inline-block;padding:8px 16px;background:linear-gradient(135deg,#00bfff,#0099cc);color:#fff;border-radius:6px;text-decoration:none;font-weight:600;font-size:13px;">

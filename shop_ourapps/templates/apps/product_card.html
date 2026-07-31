@@ -38,7 +38,7 @@
     <p class="description">{{ product.description|truncatechars:80 }}</p>
 
     {% if product.item_type != "app" %}
-      <div style="font-size:0.85rem;color:#666;margin:0.5rem 0;text-align:center;">
+      <div style="font-size:0.85rem;color: var(--text);margin:0.5rem 0;text-align:center;">
         <i class="fas fa-cubes" style="color:#22c55e;"></i>
         {% blocktrans with count=product.apps_count %}{{ count }} apps included{% endblocktrans %}
       </div>
@@ -203,7 +203,7 @@
 
 .image-placeholder {
   font-size: 4rem;
-  color: #bbb;
+  color: var(--text);
 }
 
 .card-content {
@@ -229,7 +229,7 @@
 
 .description {
   margin: 0 0 0.5rem 0;
-  color: #666;
+  color: var(--text);
   font-size: 0.95rem;
   line-height: 1.5;
   text-align: center;
@@ -243,7 +243,7 @@
 
 .version {
   margin: 0 0 1rem 0;
-  color: #999;
+  color: var(--text);
   font-size: 0.85rem;
   text-align: center;
   flex-shrink: 0;
@@ -286,7 +286,7 @@
 
 .price-old {
   text-decoration: line-through;
-  color: #999;
+  color: var(--text);
   font-size: 1rem;
 }
 
@@ -297,7 +297,7 @@
 }
 
 .price-label {
-  color: #666;
+  color: var(--text);
   font-size: 0.95rem;
 }
 

@@ -277,7 +277,7 @@
   .items-table th {
     text-align: left;
     padding: 0.75rem;
-    color: #666;
+    color: var(--text);
     font-weight: 600;
     font-size: 0.85rem;
     text-transform: uppercase;
@@ -321,7 +321,7 @@
 
   .product-image-placeholder {
     font-size: 2rem;
-    color: #bbb;
+    color: var(--text);
   }
 
   .product-info h4 {
@@ -331,7 +331,7 @@
   }
 
   .product-sku {
-    color: #999;
+    color: var(--text);
     font-size: 0.85rem;
     font-family: monospace;
   }
@@ -347,7 +347,7 @@
 
   .price-original {
     text-decoration: line-through;
-    color: #999;
+    color: var(--text);
     font-size: 0.9rem;
   }
 
@@ -377,7 +377,7 @@
   .price-total {
     display: block;
     margin-top: 0.5rem;
-    color: #666;
+    color: var(--text);
     font-size: 0.9rem;
   }
 
@@ -437,7 +437,7 @@
     margin-top: 1rem;
     padding-top: 1rem;
     border-top: 1px solid var(--border);
-    color: #666;
+    color: var(--text);
     font-size: 0.9rem;
   }
 
@@ -460,7 +460,7 @@
 
   .billing-address {
     line-height: 1.8;
-    color: #666;
+    color: var(--text);
   }
 
   .billing-address strong {
@@ -491,7 +491,7 @@
     padding: 1rem;
     background: var(--surface);
     border-radius: 8px;
-    color: #666;
+    color: var(--text);
     line-height: 1.6;
     white-space: pre-wrap;
   }
@@ -500,7 +500,7 @@
   .empty-items {
     text-align: center;
     padding: 3rem 1.5rem;
-    color: #999;
+    color: var(--text);
   }
 
   .empty-icon {
@@ -578,7 +578,7 @@
     .items-table td::before {
       content: attr(data-label);
       font-weight: 600;
-      color: #666;
+      color: var(--text);
       font-size: 0.85rem;
     }
 
@@ -660,7 +660,7 @@
         <i class="fas fa-envelope-open-text" style="color:#f59e0b; font-size:1.3rem; margin-top:0.15rem;"></i>
         <div>
           <strong>{% trans "Your order is being delivered" %}</strong>
-          <p style="margin:0.25rem 0 0; font-size:0.9rem; color:#888;">
+          <p style="margin:0.25rem 0 0; font-size:0.9rem; color: var(--text);">
             {% trans "We've sent your registration code by email. Please check your inbox - and don't forget your spam folder." %}
           </p>
         </div>
@@ -811,13 +811,13 @@
             {% endif %}
 
             {% if order.phone %}
-              <span style="color: #666;">
+              <span style="color: var(--text);">
                 <i class="fas fa-phone"></i> {{ order.phone }}
               </span><br>
             {% endif %}
 
             {% if order.vat_number %}
-              <span style="font-size: 0.9rem; color: #999;">
+              <span style="font-size: 0.9rem; color: var(--text);">
                 VAT: {{ order.vat_number }}
               </span>
             {% endif %}

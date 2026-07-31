@@ -17,7 +17,7 @@
 select,textarea{width:100%;padding:.55rem .7rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text);margin-bottom:.75rem}
 </style>
 <div class="jdscfg-admin-wrap">
-  <p><a href="{% url 'jds_configurator:admin_request_list' %}" style="color:#999;text-decoration:none">&larr; Zurück zur Liste</a></p>
+  <p><a href="{% url 'jds_configurator:admin_request_list' %}" style="color: var(--text);text-decoration:none">&larr; Zurück zur Liste</a></p>
   <h1>{{ config_request.reference }} <span class="badge b-{{ config_request.status }}">{{ config_request.get_status_display }}</span></h1>
 
   <div class="card">

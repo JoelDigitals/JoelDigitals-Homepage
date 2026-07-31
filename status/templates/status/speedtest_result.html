@@ -83,7 +83,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    color: #666;
+    color: var(--text);
     text-decoration: none;
     margin-bottom: 2rem;
     font-size: 0.95rem;
@@ -118,7 +118,7 @@
   }
 
   .test-date {
-    color: #888;
+    color: var(--text);
     font-size: 0.9rem;
     margin-left: auto;
     white-space: nowrap;
@@ -183,7 +183,7 @@
 
   .score-label {
     font-size: 1rem;
-    color: #888;
+    color: var(--text);
   }
 
   .score-status {
@@ -200,7 +200,7 @@
   }
 
   .score-description {
-    color: #666;
+    color: var(--text);
     margin-top: 1.5rem;
     font-size: 1.1rem;
     line-height: 1.6;
@@ -317,7 +317,7 @@
   }
 
   .metric-label {
-    color: #888;
+    color: var(--text);
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -658,7 +658,7 @@
           <i class="fas fa-times-circle"></i>
         </div>
         <h2 style="color: #ef4444; margin-bottom: 1rem;">{% trans "Analysis Error" %}</h2>
-        <p style="color: #666; margin-bottom: 2rem;">{{ result.error }}</p>
+        <p style="color: var(--text); margin-bottom: 2rem;">{{ result.error }}</p>
         <a href="{% url 'speedtest_form' %}" class="action-btn btn-primary">
           <i class="fas fa-redo"></i> {% trans "Try Again" %}
         </a>
@@ -716,7 +716,7 @@
           </div>
           
           <div class="category-score" style="color: {% if result.performance.score >= 70 %}#10b981{% elif result.performance.score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">
-            {{ result.performance.score }}<span style="font-size: 1rem; color: #888;">/100</span>
+            {{ result.performance.score }}<span style="font-size: 1rem; color: var(--text);">/100</span>
           </div>
           
           <div class="progress-container">
@@ -755,7 +755,7 @@
           </div>
           
           <div class="category-score" style="color: {% if result.seo.score >= 70 %}#10b981{% elif result.seo.score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">
-            {{ result.seo.score }}<span style="font-size: 1rem; color: #888;">/100</span>
+            {{ result.seo.score }}<span style="font-size: 1rem; color: var(--text);">/100</span>
           </div>
           
           <div class="progress-container">
@@ -798,7 +798,7 @@
           </div>
           
           <div class="category-score" style="color: {% if result.security.score >= 70 %}#10b981{% elif result.security.score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">
-            {{ result.security.score }}<span style="font-size: 1rem; color: #888;">/100</span>
+            {{ result.security.score }}<span style="font-size: 1rem; color: var(--text);">/100</span>
           </div>
           
           <div class="progress-container">
@@ -833,7 +833,7 @@
           </div>
           
           <div class="category-score" style="color: {% if result.mobile.score >= 70 %}#10b981{% elif result.mobile.score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">
-            {{ result.mobile.score }}<span style="font-size: 1rem; color: #888;">/100</span>
+            {{ result.mobile.score }}<span style="font-size: 1rem; color: var(--text);">/100</span>
           </div>
           
           <div class="progress-container">
@@ -872,7 +872,7 @@
           </div>
           
           <div class="category-score" style="color: {% if result.server.score >= 70 %}#10b981{% elif result.server.score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">
-            {{ result.server.score }}<span style="font-size: 1rem; color: #888;">/100</span>
+            {{ result.server.score }}<span style="font-size: 1rem; color: var(--text);">/100</span>
           </div>
           
           <div class="progress-container">
@@ -907,7 +907,7 @@
           </div>
           
           <div class="category-score" style="color: {% if result.accessibility.score >= 70 %}#10b981{% elif result.accessibility.score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">
-            {{ result.accessibility.score }}<span style="font-size: 1rem; color: #888;">/100</span>
+            {{ result.accessibility.score }}<span style="font-size: 1rem; color: var(--text);">/100</span>
           </div>
           
           <div class="progress-container">

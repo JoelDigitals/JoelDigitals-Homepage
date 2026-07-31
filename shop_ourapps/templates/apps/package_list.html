@@ -20,7 +20,7 @@
   }
 
   .packages-header p {
-    color: #888;
+    color: var(--text);
     font-size: 1.05rem;
     max-width: 600px;
     margin: 0 auto;
@@ -42,7 +42,7 @@
   {% for package in packages %}
     {% include "apps/package_card.html" %}
   {% empty %}
-  <div style="grid-column:1/-1;text-align:center;padding:3rem;color:#888;">
+  <div style="grid-column:1/-1;text-align:center;padding:3rem;color: var(--text);">
     <i class="fas fa-box-open" style="font-size:3rem;display:block;margin-bottom:1rem;"></i>
     <p>{% trans "No packages available yet." %}</p>
   </div>

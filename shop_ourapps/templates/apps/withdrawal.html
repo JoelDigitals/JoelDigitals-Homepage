@@ -13,7 +13,7 @@
   .wf-row textarea { min-height:80px; resize:vertical; }
   .wf-btn { width:100%; padding:.85rem; background:#1a1a2e; color:white; border:none; border-radius:10px; font-weight:700; font-size:1.05rem; cursor:pointer; }
   .wf-btn:hover { opacity:.9; }
-  .wf-info { font-size:.8rem; color:#888; margin-top:1rem; line-height:1.5; }
+  .wf-info { font-size:.8rem; color: var(--text); margin-top:1rem; line-height:1.5; }
 </style>
 <div class="wf-wrap">
   <div class="wf-card">
@@ -27,8 +27,8 @@
       <div class="wf-row"><label>{{ T.first_name }} *</label><input type="text" name="first_name" required></div>
       <div class="wf-row"><label>{{ T.last_name }} *</label><input type="text" name="last_name" required></div>
       <div class="wf-row"><label>{{ T.email }} *</label><input type="email" name="email" required></div>
-      <div class="wf-row"><label>{{ T.company }} <span style="font-weight:400;color:#888;">({{ T.optional }})</span></label><input type="text" name="company_name"></div>
-      <div class="wf-row"><label>{{ T.iban }} <span style="font-weight:400;color:#888;">({{ T.iban_hint }})</span></label><input type="text" name="iban" placeholder="DE..."></div>
+      <div class="wf-row"><label>{{ T.company }} <span style="font-weight:400;color: var(--text);">({{ T.optional }})</span></label><input type="text" name="company_name"></div>
+      <div class="wf-row"><label>{{ T.iban }} <span style="font-weight:400;color: var(--text);">({{ T.iban_hint }})</span></label><input type="text" name="iban" placeholder="DE..."></div>
       <div class="wf-row"><label>{{ T.reason }}</label><textarea name="reason"></textarea></div>
       <button type="submit" class="wf-btn">{{ T.submit }}</button>
     </form>

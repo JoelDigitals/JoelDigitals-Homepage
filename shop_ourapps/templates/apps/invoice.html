@@ -148,7 +148,7 @@
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #666;
+    color: var(--text);
     margin-bottom: 0.5rem;
     font-weight: 600;
   }
@@ -180,7 +180,7 @@
 
   .meta-label {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -267,7 +267,7 @@
 
   .vat-notice {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text);
     margin-bottom: 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px dashed #ccc;
@@ -382,7 +382,7 @@
 
   .bank-label {
     font-size: 0.8rem;
-    color: #666;
+    color: var(--text);
     text-transform: uppercase;
   }
 
@@ -394,7 +394,7 @@
   }
 
   .company-footer {
-    color: #666;
+    color: var(--text);
     font-size: 0.9rem;
     line-height: 1.6;
   }
@@ -586,7 +586,7 @@
             </tr>
             {% empty %}
             <tr>
-              <td colspan="7" style="text-align:center; padding: 2rem; color: #999;">
+              <td colspan="7" style="text-align:center; padding: 2rem; color: var(--text);">
                 <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
                 {% trans "No items available." %}
               </td>

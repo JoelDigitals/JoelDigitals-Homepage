@@ -101,7 +101,7 @@
   }
 
   .confirmation-message {
-    color: #666;
+    color: var(--text);
     line-height: 1.6;
     margin-bottom: 1.5rem;
   }
@@ -128,7 +128,7 @@
   }
 
   .info-label {
-    color: #666;
+    color: var(--text);
     font-size: 0.95rem;
   }
 
@@ -183,7 +183,7 @@
 
   .bank-content p {
     margin: 0;
-    color: #666;
+    color: var(--text);
     line-height: 1.6;
   }
 
@@ -453,7 +453,7 @@
               <span class="item-price">€{{ item.price|floatformat:2 }}</span>
             </div>
           {% empty %}
-            <p style="text-align: center; color: #999; padding: 2rem;">
+            <p style="text-align: center; color: var(--text); padding: 2rem;">
               {% trans "No items found" %}
             </p>
           {% endfor %}

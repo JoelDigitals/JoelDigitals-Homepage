@@ -8,10 +8,10 @@
 .wcfg-admin-nav a{color:var(--primary);text-decoration:none;font-weight:600;font-size:.85rem}
 table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
 th,td{padding:.7rem .9rem;text-align:left;border-bottom:1px solid var(--border);font-size:.875rem}
-th{background:#181818;text-transform:uppercase;font-size:.7rem;letter-spacing:.04em;color:#999}
+th{background:#181818;text-transform:uppercase;font-size:.7rem;letter-spacing:.04em;color: var(--text)}
 tr:last-child td{border-bottom:none}
 .badge{display:inline-block;padding:.2rem .6rem;border-radius:99px;font-size:.72rem;font-weight:600}
-.b-draft{background:#2a2a2a;color:#999}
+.b-draft{background:#2a2a2a;color: var(--text)}
 .b-pending{background:#4a3b00;color:#facc15}
 .b-in_review{background:#1e3a5f;color:#60a5fa}
 .b-contacted{background:#1e3a5f;color:#60a5fa}
@@ -40,7 +40,7 @@ a.rowlink{color:var(--primary);text-decoration:none;font-weight:600}
         <td><a class="rowlink" href="{% if request.base_template == 'base_app.html' %}{% url 'jd_website_config_detail_app' pk=r.pk %}{% else %}{% url 'website_configurator:admin_request_detail' r.pk %}{% endif %}">Öffnen</a></td>
       </tr>
       {% empty %}
-      <tr><td colspan="9" style="text-align:center;color:#888">Keine aktiven Anfragen vorhanden.</td></tr>
+      <tr><td colspan="9" style="text-align:center;color: var(--text)">Keine aktiven Anfragen vorhanden.</td></tr>
       {% endfor %}
     </tbody>
   </table>

@@ -29,7 +29,7 @@
     <h2>{{ package.name }}</h2>
     <p class="description">{{ package.description|truncatechars:80 }}</p>
 
-    <div style="font-size:0.85rem;color:#666;margin:0.5rem 0;text-align:center;">
+    <div style="font-size:0.85rem;color: var(--text);margin:0.5rem 0;text-align:center;">
       <i class="fas fa-cubes" style="color:#22c55e;"></i>
       {% blocktrans with count=package.apps.count %}{{ count }} apps included{% endblocktrans %}
     </div>

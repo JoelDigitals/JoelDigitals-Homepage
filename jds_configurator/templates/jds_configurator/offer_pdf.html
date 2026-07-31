@@ -8,13 +8,13 @@
 @page{size:A4;margin:20mm}
 body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;line-height:1.4;color:#333;margin:0;position:relative}
 .window-area{position:absolute;top:27mm;left:20mm;width:85mm;height:45mm;border:1px dashed #ccc;pointer-events:none}
-.sender-field{display:flex;align-items:center;position:absolute;top:10mm;left:20mm;font-size:9pt;color:#666;gap:5mm}
+.sender-field{display:flex;align-items:center;position:absolute;top:10mm;left:20mm;font-size:9pt;color: var(--text);gap:5mm}
 .recipient-address{position:absolute;top:27mm;left:20mm;width:85mm;font-size:11pt;line-height:1.3}
 .content{position:absolute;top:100mm;left:20mm;right:20mm}
 .letter-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15mm}
 .letter-header h1{font-size:18pt;margin:0 0 3mm;color:#0044cc}
 .letter-header p{margin:1mm 0}
-.sender-info{text-align:right;font-size:9pt;color:#666;margin-bottom:5mm}
+.sender-info{text-align:right;font-size:9pt;color: var(--text);margin-bottom:5mm}
 table{width:100%;border-collapse:collapse;margin:8mm 0}
 th,td{padding:2.5mm 2mm;border-bottom:1px solid #ddd;text-align:left}
 th{background:#e8f0ff;color:#0044cc;font-weight:bold}
@@ -23,8 +23,8 @@ th{background:#e8f0ff;color:#0044cc;font-weight:bold}
 .totals .grand{font-weight:bold;font-size:12pt;border-top:1px solid #333;padding-top:2mm}
 .signature{margin-top:20mm;font-size:10pt}
 .signature-line{width:60mm;border-top:1px solid #333;margin-top:5mm}
-.note{margin-top:6mm;font-size:9pt;color:#666}
-.footer{position:absolute;bottom:20mm;left:20mm;right:20mm;font-size:8.5pt;color:#666;border-top:2px solid #0044cc;padding-top:3mm}
+.note{margin-top:6mm;font-size:9pt;color: var(--text)}
+.footer{position:absolute;bottom:20mm;left:20mm;right:20mm;font-size:8.5pt;color: var(--text);border-top:2px solid #0044cc;padding-top:3mm}
 </style>
 </head>
 <body>

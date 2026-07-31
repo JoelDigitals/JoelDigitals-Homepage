@@ -197,7 +197,7 @@
   }
 
   .section-text {
-    color: #666;
+    color: var(--text);
     line-height: 1.7;
     font-size: 1rem;
     margin-bottom: 1.5rem;
@@ -272,7 +272,7 @@
   }
 
   .product-description {
-    color: #666;
+    color: var(--text);
     font-size: 0.9375rem;
     line-height: 1.5;
     margin-bottom: 1rem;
@@ -285,7 +285,7 @@
 
   .price-old {
     text-decoration: line-through;
-    color: #888;
+    color: var(--text);
     margin-right: 0.5rem;
     font-size: 0.9375rem;
   }
@@ -353,7 +353,7 @@
   }
 
   .info-card p {
-    color: #666;
+    color: var(--text);
     max-width: 600px;
     margin: 0 auto 1.25rem;
     line-height: 1.6;
@@ -399,7 +399,7 @@
   }
 
   .rating-count {
-    color: #888;
+    color: var(--text);
     margin-bottom: 1.25rem;
     font-size: 0.9375rem;
   }
@@ -464,7 +464,7 @@
   }
 
   .blog-card p {
-    color: #666;
+    color: var(--text);
     font-size: 0.9375rem;
     line-height: 1.5;
     flex: 1;
@@ -803,7 +803,7 @@
             <p class="product-description">{{ product.short_description|default:product.description|truncatewords:18 }}</p>
 
             {% if product.item_type == "package" %}
-              <div style="font-size:0.85rem;color:#666;margin:0.5rem 0;text-align:center;">
+              <div style="font-size:0.85rem;color: var(--text);margin:0.5rem 0;text-align:center;">
                 <i class="fas fa-cubes" style="color:#22c55e;"></i>
                 {% blocktrans with count=product.apps.count %}{{ count }} apps included{% endblocktrans %}
               </div>
@@ -903,7 +903,7 @@
     <!-- Website-Konfigurator CTA -->
     <section class="info-card" style="border-color:rgba(0,68,204,.3);">
       <h2><i class="fas fa-sliders-h" style="color: var(--primary);"></i> {% trans "Website-Konfigurator" %}</h2>
-      <p style="color:#888;max-width:520px;margin:0.75rem auto 1.5rem;">
+      <p style="color: var(--text);max-width:520px;margin:0.75rem auto 1.5rem;">
         {% trans "Finde in wenigen Klicks heraus, was deine neue Website kostet - Website-Typ, Umsetzung und Funktionen frei kombinierbar." %}
       </p>
       <a href="{% url 'website_configurator:wizard' %}" class="btn-primary" style="background: linear-gradient(135deg, var(--primary), #0066ff); color: white; width: 100%; max-width: 340px;">
@@ -922,7 +922,7 @@
           </div>
           <div style="flex:1;min-width:0;">
             <div style="font-weight:600;font-size:0.95rem;">{{ w.title }}</div>
-            <div style="font-size:0.8rem;color:#888;margin-top:2px;">
+            <div style="font-size:0.8rem;color: var(--text);margin-top:2px;">
               <i class="far fa-calendar-alt" style="color:#06b6d4;"></i> {{ w.date_time|date:"d.m. H:i" }}
               {% if not w.is_full %}
                 · {% blocktrans with count=w.spots_remaining %}{{ count }} spots{% endblocktrans %}
@@ -932,7 +932,7 @@
             </div>
           </div>
           <div style="font-size:0.85rem;color:#06b6d4;font-weight:600;white-space:nowrap;">
-            {% trans "Register" %} <i class="fas fa-arrow-right" style="font-size:0.75rem;"></i>
+            {% trans "Register now" %} <i class="fas fa-arrow-right" style="font-size:0.75rem;"></i>
           </div>
         </a>
         {% endfor %}
@@ -952,9 +952,9 @@
         <details style="margin-bottom:0.5rem;border-radius:10px;border:1px solid var(--border);overflow:hidden;background:var(--bg);">
           <summary style="padding:0.9rem 1.1rem;cursor:pointer;font-weight:600;font-size:0.95rem;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center;">
             {{ faq.question }}
-            <i class="fas fa-chevron-down" style="font-size:0.75rem;color:#888;transition:transform 0.2s;"></i>
+            <i class="fas fa-chevron-down" style="font-size:0.75rem;color: var(--text);transition:transform 0.2s;"></i>
           </summary>
-          <div style="padding:0 1.1rem 1rem;font-size:0.9rem;color:#888;line-height:1.6;border-top:1px solid var(--border);padding-top:0.75rem;margin-top:0;">
+          <div style="padding:0 1.1rem 1rem;font-size:0.9rem;color: var(--text);line-height:1.6;border-top:1px solid var(--border);padding-top:0.75rem;margin-top:0;">
             <p style="margin:0 0 0.75rem;">{{ faq.short_answer|linebreaksbr }}</p>
             <a href="{% url 'detail' faq.slug %}" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.4rem 1rem;background:var(--primary);color:white;border-radius:8px;font-size:0.85rem;font-weight:600;text-decoration:none;">
               {% trans "Read more" %} <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i>
@@ -962,7 +962,7 @@
           </div>
         </details>
         {% empty %}
-          <p style="color:#888;text-align:center;padding:1.5rem;">{% trans "No FAQs available at the moment." %}</p>
+          <p style="color: var(--text);text-align:center;padding:1.5rem;">{% trans "No FAQs available at the moment." %}</p>
         {% endfor %}
       </div>
 
@@ -984,7 +984,7 @@
           </span>
           <div style="flex:1;min-width:0;">
             <div style="font-weight:600;font-size:14px;color:var(--text);">{{ item.app.name }}</div>
-            <div style="font-size:12px;color:#888;">
+            <div style="font-size:12px;color: var(--text);">
               {% if item.status == 'online' %}{% trans "Operational" %}
               {% elif item.status == 'offline' %}{% trans "Offline" %}
               {% else %}{% trans "Issues Reported" %}{% endif %}
@@ -1098,22 +1098,22 @@
         <div style="background:var(--bg);border-radius:12px;padding:1.5rem;text-align:center;border:1px solid var(--border);">
           <i class="fas fa-globe" style="font-size:2rem;color:var(--primary);margin-bottom:0.75rem;"></i>
           <h3 style="margin:0 0 0.5rem;font-size:1rem;">{{ T.web_dev }}</h3>
-          <p style="color:#888;font-size:0.85rem;margin:0;">{{ T.web_dev_desc }}</p>
+          <p style="color: var(--text);font-size:0.85rem;margin:0;">{{ T.web_dev_desc }}</p>
         </div>
         <div style="background:var(--bg);border-radius:12px;padding:1.5rem;text-align:center;border:1px solid var(--border);">
           <i class="fas fa-robot" style="font-size:2rem;color:#6366f1;margin-bottom:0.75rem;"></i>
           <h3 style="margin:0 0 0.5rem;font-size:1rem;">{{ T.automation }}</h3>
-          <p style="color:#888;font-size:0.85rem;margin:0;">{{ T.automation_desc }}</p>
+          <p style="color: var(--text);font-size:0.85rem;margin:0;">{{ T.automation_desc }}</p>
         </div>
         <div style="background:var(--bg);border-radius:12px;padding:1.5rem;text-align:center;border:1px solid var(--border);">
           <i class="fas fa-bullhorn" style="font-size:2rem;color:#f59e0b;margin-bottom:0.75rem;"></i>
           <h3 style="margin:0 0 0.5rem;font-size:1rem;">{{ T.marketing }}</h3>
-          <p style="color:#888;font-size:0.85rem;margin:0;">{{ T.marketing_desc }}</p>
+          <p style="color: var(--text);font-size:0.85rem;margin:0;">{{ T.marketing_desc }}</p>
         </div>
         <div style="background:var(--bg);border-radius:12px;padding:1.5rem;text-align:center;border:1px solid var(--border);">
           <i class="fas fa-cloud" style="font-size:2rem;color:#10b981;margin-bottom:0.75rem;"></i>
           <h3 style="margin:0 0 0.5rem;font-size:1rem;">{{ T.cloud }}</h3>
-          <p style="color:#888;font-size:0.85rem;margin:0;">{{ T.cloud_desc }}</p>
+          <p style="color: var(--text);font-size:0.85rem;margin:0;">{{ T.cloud_desc }}</p>
         </div>
         <div style="text-align:center;margin-top:1.5rem;">
           <a href="/services/" class="btn-primary" style="background:linear-gradient(135deg,var(--primary),#0066ff);color:white;animation:pulse-btn 2s infinite;width:100%;max-width:300px;">
@@ -1130,22 +1130,22 @@
         <div style="background:var(--bg);border-radius:12px;padding:1.25rem;border:1px solid var(--border);text-align:left;">
           <span style="font-size:1.5rem;">⚡</span>
           <h3 style="margin:0.25rem 0;font-size:0.95rem;">{{ T.fast }}</h3>
-          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.fast_desc }}</p>
+          <p style="color: var(--text);font-size:0.8rem;margin:0;">{{ T.fast_desc }}</p>
         </div>
         <div style="background:var(--bg);border-radius:12px;padding:1.25rem;border:1px solid var(--border);text-align:left;">
           <span style="font-size:1.5rem;">🇩🇪</span>
           <h3 style="margin:0.25rem 0;font-size:0.95rem;">{{ T.german }}</h3>
-          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.german_desc }}</p>
+          <p style="color: var(--text);font-size:0.8rem;margin:0;">{{ T.german_desc }}</p>
         </div>
         <div style="background:var(--bg);border-radius:12px;padding:1.25rem;border:1px solid var(--border);text-align:left;">
           <span style="font-size:1.5rem;">💰</span>
           <h3 style="margin:0.25rem 0;font-size:0.95rem;">{{ T.fair }}</h3>
-          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.fair_desc }}</p>
+          <p style="color: var(--text);font-size:0.8rem;margin:0;">{{ T.fair_desc }}</p>
         </div>
         <div style="background:var(--bg);border-radius:12px;padding:1.25rem;border:1px solid var(--border);text-align:left;">
           <span style="font-size:1.5rem;">🎯</span>
           <h3 style="margin:0.25rem 0;font-size:0.95rem;">{{ T.tailored }}</h3>
-          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.tailored_desc }}</p>
+          <p style="color: var(--text);font-size:0.8rem;margin:0;">{{ T.tailored_desc }}</p>
         </div>
       </div>
     </section>
@@ -1157,17 +1157,17 @@
         <a href="/wiki/" style="flex:1;min-width:200px;padding:1.5rem;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);text-align:center;">
           <i class="fas fa-book-open" style="font-size:2rem;color:var(--primary);display:block;margin-bottom:0.5rem;"></i>
           <strong>{{ T.wiki }}</strong>
-          <p style="color:#888;font-size:0.8rem;margin:0.25rem 0 0;">{{ T.wiki_desc }}</p>
+          <p style="color: var(--text);font-size:0.8rem;margin:0.25rem 0 0;">{{ T.wiki_desc }}</p>
         </a>
         <a href="/downloads/" style="flex:1;min-width:200px;padding:1.5rem;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);text-align:center;">
           <i class="fas fa-download" style="font-size:2rem;color:#6366f1;display:block;margin-bottom:0.5rem;"></i>
           <strong>{{ T.downloads }}</strong>
-          <p style="color:#888;font-size:0.8rem;margin:0.25rem 0 0;">{{ T.downloads_desc }}</p>
+          <p style="color: var(--text);font-size:0.8rem;margin:0.25rem 0 0;">{{ T.downloads_desc }}</p>
         </a>
         <a href="/blog/" style="flex:1;min-width:200px;padding:1.5rem;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);text-align:center;">
           <i class="fas fa-newspaper" style="font-size:2rem;color:#f59e0b;display:block;margin-bottom:0.5rem;"></i>
           <strong>{{ T.blog_res }}</strong>
-          <p style="color:#888;font-size:0.8rem;margin:0.25rem 0 0;">{{ T.blog_res_desc }}</p>
+          <p style="color: var(--text);font-size:0.8rem;margin:0.25rem 0 0;">{{ T.blog_res_desc }}</p>
         </a>
       </div>
     </section>
@@ -1179,22 +1179,22 @@
         <div style="text-align:center;padding:1.5rem;">
           <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#0066ff);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;color:white;font-size:1.3rem;"><i class="fas fa-comments"></i></div>
           <strong style="display:block;margin-bottom:0.25rem;">{{ T.consultation }}</strong>
-          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.consultation_desc }}</p>
+          <p style="color: var(--text);font-size:0.8rem;margin:0;">{{ T.consultation_desc }}</p>
         </div>
         <div style="text-align:center;padding:1.5rem;">
           <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;color:white;font-size:1.3rem;"><i class="fas fa-pencil-ruler"></i></div>
           <strong style="display:block;margin-bottom:0.25rem;">{{ T.planning }}</strong>
-          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.planning_desc }}</p>
+          <p style="color: var(--text);font-size:0.8rem;margin:0;">{{ T.planning_desc }}</p>
         </div>
         <div style="text-align:center;padding:1.5rem;">
           <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;color:white;font-size:1.3rem;"><i class="fas fa-code"></i></div>
           <strong style="display:block;margin-bottom:0.25rem;">{{ T.development }}</strong>
-          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.development_desc }}</p>
+          <p style="color: var(--text);font-size:0.8rem;margin:0;">{{ T.development_desc }}</p>
         </div>
         <div style="text-align:center;padding:1.5rem;">
           <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;color:white;font-size:1.3rem;"><i class="fas fa-rocket"></i></div>
           <strong style="display:block;margin-bottom:0.25rem;">{{ T.launch }}</strong>
-          <p style="color:#888;font-size:0.8rem;margin:0;">{{ T.launch_desc }}</p>
+          <p style="color: var(--text);font-size:0.8rem;margin:0;">{{ T.launch_desc }}</p>
         </div>
       </div>
     </section>

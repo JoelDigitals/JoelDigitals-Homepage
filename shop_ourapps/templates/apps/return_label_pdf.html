@@ -7,21 +7,21 @@
   body { font-family: Helvetica, Arial, sans-serif; font-size: 11pt; color: #111; }
   .header { border-bottom: 3px solid #1a1a2e; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; }
   .brand { font-size: 22pt; font-weight: bold; color: #1a1a2e; }
-  .brand-sub { font-size: 9pt; color: #666; }
+  .brand-sub { font-size: 9pt; color: var(--text); }
   .badge { background: #1a1a2e; color: white; padding: 6px 14px; border-radius: 4px; font-size: 10pt; font-weight: bold; }
   h2 { font-size: 14pt; color: #1a1a2e; border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-top: 20px; }
   table { width: 100%; border-collapse: collapse; margin: 10px 0; }
   td { padding: 6px 8px; font-size: 10pt; }
-  .label-cell { color: #666; width: 38%; }
+  .label-cell { color: var(--text); width: 38%; }
   .value-cell { font-weight: bold; }
   tr:nth-child(even) { background: #f8f8f8; }
   .address-box { border: 2px solid #1a1a2e; padding: 14px 18px; border-radius: 6px; margin: 14px 0; }
-  .address-label { font-size: 8pt; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .address-label { font-size: 8pt; color: var(--text); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
   .address-content { font-size: 13pt; font-weight: bold; line-height: 1.6; }
-  .barcode-placeholder { background: #f0f0f0; border: 1px dashed #ccc; text-align: center; padding: 16px; color: #999; font-size: 9pt; margin: 14px 0; border-radius: 4px; }
+  .barcode-placeholder { background: #f0f0f0; border: 1px dashed #ccc; text-align: center; padding: 16px; color: var(--text); font-size: 9pt; margin: 14px 0; border-radius: 4px; }
   .reason-box { background: #fff3cd; border: 1px solid #ffc107; padding: 10px 14px; border-radius: 4px; font-size: 10pt; }
-  .footer { position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid #ddd; padding: 8px 2cm; font-size: 8pt; color: #999; text-align: center; }
-  .cut-line { border-top: 2px dashed #ccc; margin: 24px 0; text-align: center; color: #aaa; font-size: 8pt; padding-top: 4px; }
+  .footer { position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid #ddd; padding: 8px 2cm; font-size: 8pt; color: var(--text); text-align: center; }
+  .cut-line { border-top: 2px dashed #ccc; margin: 24px 0; text-align: center; color: var(--text); font-size: 8pt; padding-top: 4px; }
 </style>
 </head>
 <body>
@@ -106,7 +106,7 @@
 
 <div class="cut-line">✂ ── ── Bitte diesen Schein der Rücksendung beilegen ── ── ✂</div>
 
-<p style="font-size:9pt;color:#666;line-height:1.6;">
+<p style="font-size:9pt;color: var(--text);line-height:1.6;">
   Bitte legen Sie diesen Retourenschein Ihrer Rücksendung bei. Verwenden Sie eine sichere Verpackung.
   Bei Fragen wenden Sie sich an: <strong>{{ company.email }}</strong>
 </p>

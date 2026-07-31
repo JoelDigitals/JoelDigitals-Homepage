@@ -128,7 +128,7 @@
 
   .app-image-placeholder {
     font-size: 4rem;
-    color: #bbb;
+    color: var(--text);
   }
 
   .app-header {
@@ -148,7 +148,7 @@
     align-items: center;
     gap: 0.3rem;
     font-size: 0.85rem;
-    color: #999;
+    color: var(--text);
     background: rgba(0, 68, 204, 0.1);
     padding: 0.3rem 0.8rem;
     border-radius: 20px;
@@ -212,7 +212,7 @@
   .empty-state {
     text-align: center;
     padding: 4rem 2rem;
-    color: #999;
+    color: var(--text);
   }
 
   .empty-icon {
@@ -225,7 +225,7 @@
     justify-content: center;
     font-size: 3rem;
     margin: 0 auto 1.5rem;
-    color: #ccc;
+    color: var(--text);
   }
 
   .empty-title {
@@ -446,7 +446,7 @@
           <div class="app-description">
             {{ package.description|truncatewords:25|linebreaks }}
           </div>
-          <div style="font-size:0.85rem;color:#888;margin-bottom:1rem;text-align:center;">
+          <div style="font-size:0.85rem;color: var(--text);margin-bottom:1rem;text-align:center;">
             <i class="fas fa-cubes" style="color:#22c55e;"></i>
             {% blocktrans with count=package.apps.count %}{{ count }} apps included{% endblocktrans %}
           </div>
@@ -468,7 +468,7 @@
           {% endif %}
           <div style="text-align:center;margin-bottom:1rem;">
             {% if package.discount_is_active %}
-            <span style="text-decoration:line-through;color:#999;margin-right:0.5rem;">€{{ package.price }}</span>
+            <span style="text-decoration:line-through;color: var(--text);margin-right:0.5rem;">€{{ package.price }}</span>
             {% endif %}
             <strong style="font-size:1.3rem;color:#22c55e;">€{{ package.discounted_price|floatformat:2 }}</strong>
           </div>

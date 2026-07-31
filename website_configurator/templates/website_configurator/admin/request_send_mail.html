@@ -8,14 +8,14 @@
 .row{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
 .row:last-child{border-bottom:none}
 .wcfg-fld{margin-bottom:1rem}
-.wcfg-fld label{display:block;font-size:.8rem;font-weight:600;color:#aaa;margin-bottom:.4rem}
+.wcfg-fld label{display:block;font-size:.8rem;font-weight:600;color: var(--text);margin-bottom:.4rem}
 .wcfg-fld input,.wcfg-fld textarea,.wcfg-fld select{width:100%;padding:.6rem .8rem;border:1px solid var(--border);border-radius:8px;background:#111;color:var(--text);font-size:.9rem;font-family:inherit}
 .btn{padding:.6rem 1.2rem;border-radius:8px;font-weight:700;font-size:.875rem;cursor:pointer;border:none;margin-right:.6rem}
 .btn-primary{background:var(--primary);color:#fff}
-.btn-secondary{background:transparent;color:#ccc;border:1px solid var(--border);text-decoration:none;display:inline-flex;align-items:center}
+.btn-secondary{background:transparent;color: var(--text);border:1px solid var(--border);text-decoration:none;display:inline-flex;align-items:center}
 </style>
 <div class="wcfg-admin-wrap">
-  <p><a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_website_config_detail_app' pk=config_request.pk %}{% else %}{% url 'website_configurator:admin_request_detail' config_request.pk %}{% endif %}" style="color:#999;text-decoration:none">&larr; Zurück zur Anfrage</a></p>
+  <p><a href="{% if request.base_template == 'base_app.html' %}{% url 'jd_website_config_detail_app' pk=config_request.pk %}{% else %}{% url 'website_configurator:admin_request_detail' config_request.pk %}{% endif %}" style="color: var(--text);text-decoration:none">&larr; Zurück zur Anfrage</a></p>
   <h1 style="font-size:1.4rem;margin-bottom:1rem">Mail an {{ config_request.name }}</h1>
 
   <div class="card">
